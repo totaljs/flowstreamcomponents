@@ -1,0 +1,34 @@
+<script total>
+
+	exports.name = 'Print';
+	exports.icon = 'fa fa-print';
+	exports.version = '1';
+	exports.author = 'Peter Širka';
+	exports.config = {};
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+
+	exports.make = function(instance) {
+		instance.message = function($) {
+			instance.status($.data);
+			$.destroy();
+		};
+	};
+
+</script>
+
+<style>
+	.f-print footer > div { margin: 10px; }
+	.f-print pre { font-size: 10px; margin: 0; padding: 5px; background-color: #F0F0F0; border-radius: var(--radius); }
+	.ui-dark .f-print pre { background-color: #404040; tab-size:  }
+</style>
+
+<body>
+	<div class="meta">
+		<div><i class="fa fa-print mr5"></i>Print</div>
+	</div>
+	<footer>
+		<div data-bind="!?.status.{0}__html pre:Thelpers.jsonformat(JSON.stringify(value, null, '\t'))__show" class="hidden selectable">
+			<pre class="json"></pre>
+		</div>
+	</footer>
+</body>
