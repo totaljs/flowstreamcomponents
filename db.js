@@ -12,7 +12,7 @@ PATH.fs.readdir('components', function(err, response) {
 	response.wait(function(filename, next) {
 
 		var data = {};
-		data.name = filename.substring(0, filename.length - 5);
+		data.id = filename.substring(0, filename.length - 5);
 
 		PATH.fs.readFile('components/' + filename, function(err, response) {
 			response = response.toString('utf8');
@@ -21,7 +21,9 @@ PATH.fs.readdir('components', function(err, response) {
 			var author = response.match(/exports\.author.*?;/);
 			var color = response.match(/exports\.color.*?;/);
 			var icon = response.match(/exports\.icon.*?;/);
+			var name = response.match(/exports\.name.*?;/);
 
+			data.name = name ? evaluate(name[0]).name : '';
 			data.author = author ? evaluate(author[0]).author : '';
 			data.icon = icon ? evaluate(icon[0]).icon : '';
 			data.color = color ? evaluate(color[0]).color : '';

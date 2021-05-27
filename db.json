@@ -1,1 +1,1 @@
-[{"name":"code","author":"Peter Širka","icon":"fa fa-code","color":"","version":"1"},{"name":"counter","author":"Peter Širka","icon":"fa fa-calculator","color":"","version":"1"},{"name":"print","author":"Peter Širka","icon":"fa fa-print","color":"","version":"1"}]
+[{"id":"code","name":"Code","author":"Peter Širka","icon":"fa fa-code","color":"","version":"1"},{"id":"counter","name":"Counter","author":"Peter Širka","icon":"fa fa-calculator","color":"","version":"1"},{"id":"print","name":"Print","author":"Peter Širka","icon":"fa fa-print","color":"","version":"1"}]
