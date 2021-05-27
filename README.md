@@ -1,4 +1,4 @@
-# Total.js FlowStream component
+# Total.js FlowStream components
 
 This repository contains open-source __Total.js FlowStream components__.
 
