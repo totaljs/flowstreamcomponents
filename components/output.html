@@ -32,13 +32,13 @@
 			}
 		};
 
-		instance.flowstream();
+		setTimeout(() => instance.flowstream(), 2000);
 	};
 
 </script>
 
 <style>
-	.f-output .name { font-size: 14px; margin: 10px; background-color: #F5F5F5; text-align: center; border: 1px dashed #E0E0E0; padding: 10px; border-radius: var(--radius); }
+	.f-output .name { font-size: 14px; margin: 10px; background-color: #F0F0F0; text-align: center; border: 1px dashed #E0E0E0; padding: 10px; border-radius: var(--radius); }
 	.ui-dark .f-output .name { background-color: #282828; border-color: #404040; }
 </style>
 
@@ -55,7 +55,7 @@ The component sends data to another Flow.
 
 <body>
 	<header>
-		<i class="fa fa-long-arrow-alt-right mr5"></i>FlowStream Output
+		<div><i class="fa fa-long-arrow-alt-right mr5"></i>FlowStream Output</div>
 	</header>
 	<footer>
 		<div class="name" data-bind="?.config.{0}.name__text__empty"></div>

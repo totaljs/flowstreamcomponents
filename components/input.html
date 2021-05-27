@@ -81,7 +81,7 @@
 </script>
 
 <style>
-	.f-input .name { font-size: 14px; margin: 10px; background-color: #F5F5F5; border: 1px dashed #E0E0E0; padding: 10px; border-radius: var(--radius); }
+	.f-input .name { font-size: 14px; margin: 10px; background-color: #F0F0F0; border: 1px dashed #E0E0E0; padding: 10px; border-radius: var(--radius); }
 	.f-input hr { margin: 5px 0; }
 	.ui-dark .f-input .name { background-color: #282828; border-color: #404040; }
 </style>
@@ -102,10 +102,10 @@ The component receives data from another Flow.
 		<i class="fa fa-long-arrow-alt-left mr5"></i>FlowStream Input
 	</header>
 	<footer>
-		<div class="name" data-bind="?.status.{0}__template">
+		<div class="name" data-bind="?.status.{0}__template__show:value && value.is">
 			<script type="text/html">
 				{{ if value && value.is }}
-					<div><i class="{{ value.icon }} mr5"{{ if value.color }} style="color:{{ value.color }}"{{ fi }}></i>{{ value.flow }} {{ if value.reference }}({{ value.reference }}){{ fi }}</div>
+					<div><i class="{{ value.icon }} mr5" style="color:{{ value.color }}"></i>{{ value.flow }} {{ if value.reference }}({{ value.reference }}){{ fi }}</div>
 					<hr />
 					<div class="b">{{ value.name }}</div>
 				{{ fi }}
