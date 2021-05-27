@@ -22,7 +22,9 @@ PATH.fs.readdir('components', function(err, response) {
 			var color = response.match(/exports\.color.*?;/);
 			var icon = response.match(/exports\.icon.*?;/);
 			var name = response.match(/exports\.name.*?;/);
+			var group = response.match(/exports\.group.*?;/);
 
+			data.group = group ? evaluate(group[0]).group : '';
 			data.name = name ? evaluate(name[0]).name : '';
 			data.author = author ? evaluate(author[0]).author : '';
 			data.icon = icon ? evaluate(icon[0]).icon : '';

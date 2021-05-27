@@ -1,15 +1,19 @@
 <script total>
 
 	exports.name = 'Print';
-	exports.icon = 'fa fa-print';
+	exports.group = 'Common';
 	exports.version = '1';
+	exports.icon = 'fa fa-print';
 	exports.author = 'Peter Širka';
 	exports.config = {};
 	exports.inputs = [{ id: 'input', name: 'Input' }];
 
 	exports.make = function(instance) {
 		instance.message = function($) {
-			instance.status($.data);
+			var data = $.data;
+			if (data instanceof Buffer)
+				data = data.toString('hex').substring(0, 200);
+			instance.status(data);
 			$.destroy();
 		};
 	};
@@ -21,6 +25,10 @@
 	.f-print pre { font-size: 10px; margin: 0; padding: 5px; background-color: #F0F0F0; border-radius: var(--radius); }
 	.ui-dark .f-print pre { background-color: #404040; tab-size:  }
 </style>
+
+<readme>
+The component prints incoming data into the JSON format.
+</readme>
 
 <body>
 	<div class="meta">

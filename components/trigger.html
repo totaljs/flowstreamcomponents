@@ -1,0 +1,96 @@
+<script total>
+
+	exports.name = 'Trigger';
+	exports.group = 'Triggers';
+	exports.version = '1';
+	exports.icon = 'fa fa-bullhorn';
+	exports.author = 'Peter Širka';
+	exports.config = { random: true, type: 'string', data: '', restart: false };
+	exports.outputs = [{ id: 'output', name: 'Output' }];
+
+	exports.make = function(instance, config) {
+
+		instance.trigger = function() {
+
+			var val;
+
+			switch (config.type) {
+				case 'number':
+					val = config.random ? U.random() : config.data.parseFloat();
+					break;
+				case 'buffer':
+					try {
+						val = config.random ? Buffer.from(U.random_string()) : Buffer.from(config.data, 'base64');
+					} catch (e) {
+						instance.throw(e);
+					}
+					break;
+				case 'date':
+					val = config.random ? NOW.add('-' + U.random(500, 10)) : config.data.parseDate();
+					break;
+				case 'object':
+					try {
+						val = config.random ? {} : new Function('return ' + config.data);
+					} catch (e) {
+						instance.throw(e);
+					}
+					break;
+				case 'boolean':
+					val = config.random ? U.random() % 2 === 0 : config.data === 'true' || config.data === 'on' || config.data === '1';
+					break;
+				default:
+					val = config.random ? U.random_string(20) : config.data;
+					break;
+			}
+
+			instance.send('output', val);
+		};
+
+		config.restart && setTimeout(() => instance.trigger(), 5000);
+
+	};
+
+</script>
+
+<script>
+	FUNC.ftrigger_exec = function(el) {
+		SETTER('websocket/send', { TYPE: 'trigger', id: el.attrd2('id') });
+	};
+</script>
+
+<style>
+	.f-trigger .padding { padding: 0 10px 10px; }
+	.f-trigger button { width: 100%; height: 24px; border: 1px solid #E0E0E0; border-radius: var(--radius); color: #000; background-color: #F0F0F0; margin: 0; }
+	.f-trigger button:hover { background-color: #F8F8F8; }
+	.f-trigger button:active { background-color: #E0E0E0; }
+	.ui-dark .f-trigger button { border-color: #404040; color: #FFF; background-color: #222; }
+	.ui-dark .f-trigger button:hover { background-color: #303030; }
+	.ui-dark .f-trigger button:active { background-color: #404040; }
+</style>
+
+<settings>
+	<div class="padding">
+		<div data---="input__?.type__dirsource:string|String,number|Number,boolean|Boolean,date|Date,object|Object,buffer|Buffer as Base64;required:1">Type</div>
+		<div class="mt10 m">
+			<div data---="checkbox__?.restart">Trigger 5s after initialization.</div>
+			<div data---="checkbox__?.random">Random data</div>
+		</div>
+		<div data-bind="?.random__hide" class="hidden">
+			<hr />
+			<div data---="input__?.data__required:1">Data</div>
+		</div>
+	</div>
+</settings>
+
+<readme>
+The component triggers data into the Flow.
+</readme>
+
+<body>
+	<div class="meta">
+		<div><i class="fa fa-bullhorn mr5"></i>Trigger component</div>
+	</div>
+	<div class="padding">
+		<button class="exec" data-exec="FUNC.ftrigger_exec">Run</button>
+	</div>
+</body>

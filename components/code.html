@@ -1,8 +1,9 @@
 <script total>
 
 	exports.name = 'Code';
-	exports.icon = 'fa fa-code';
+	exports.group = 'Common';
 	exports.version = '1';
+	exports.icon = 'fa fa-code';
 	exports.author = 'Peter Širka';
 	exports.config = { outputs: 1, code: '// $;\n// cache;\n// value;\n// send(value);\n// error(err);' };
 	exports.inputs = [{ id: 'input', name: 'Input' }];
@@ -49,6 +50,10 @@
 	};
 
 </script>
+
+<readme>
+This component executes a custom JavaScript code as it is.
+</readme>
 
 <settings>
 	<div class="padding">
