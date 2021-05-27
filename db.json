@@ -1,1 +1,65 @@
-[{"id":"code","group":"Common","name":"Code","author":"Peter Širka","icon":"fa fa-code","color":"","version":"1"},{"id":"counter","group":"Common","name":"Counter","author":"Peter Širka","icon":"fa fa-calculator","color":"","version":"1"},{"id":"print","group":"Common","name":"Print","author":"Peter Širka","icon":"fa fa-print","color":"","version":"1"},{"id":"trigger","group":"Triggers","name":"Trigger","author":"Peter Širka","icon":"fa fa-bullhorn","color":"","version":"1"}]
+[
+	{
+		"id": "code",
+		"group": "Common",
+		"name": "Code",
+		"author": "Peter Širka",
+		"icon": "fa fa-code",
+		"color": "",
+		"version": "1"
+	},
+	{
+		"id": "counter",
+		"group": "Common",
+		"name": "Counter",
+		"author": "Peter Širka",
+		"icon": "fa fa-calculator",
+		"color": "",
+		"version": "1"
+	},
+	{
+		"id": "input",
+		"group": "FlowStream",
+		"name": "Input",
+		"author": "Peter Širka",
+		"icon": "fa fa-long-arrow-alt-left",
+		"color": "",
+		"version": "1"
+	},
+	{
+		"id": "output",
+		"group": "FlowStream",
+		"name": "Output",
+		"author": "Peter Širka",
+		"icon": "fa fa-long-arrow-alt-right",
+		"color": "",
+		"version": "1"
+	},
+	{
+		"id": "print",
+		"group": "Common",
+		"name": "Print",
+		"author": "Peter Širka",
+		"icon": "fa fa-print",
+		"color": "",
+		"version": "1"
+	},
+	{
+		"id": "timer",
+		"group": "Triggers",
+		"name": "Timer",
+		"author": "Peter Širka",
+		"icon": "far fa-clock-o",
+		"color": "",
+		"version": "1"
+	},
+	{
+		"id": "trigger",
+		"group": "Triggers",
+		"name": "Trigger",
+		"author": "Peter Širka",
+		"icon": "fa fa-bullhorn",
+		"color": "",
+		"version": "1"
+	}
+]

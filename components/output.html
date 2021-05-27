@@ -1,0 +1,63 @@
+<script total>
+
+	exports.name = 'Output';
+	exports.group = 'FlowStream';
+	exports.version = '1';
+	exports.icon = 'fa fa-long-arrow-alt-right';
+	exports.author = 'Peter Širka';
+	exports.config = { name: 'Output' };
+	exports.inputs = [{ id: 'data', name: 'Data' }];
+	exports.type = 'output';
+
+	exports.make = function(instance, config) {
+
+		var instances = [];
+
+		instance.message = function($) {
+			for (var fi of instances)
+				fi.process($.data, instance);
+			$.destroy();
+		};
+
+		instance.flowstream = function(id) {
+			instances = [];
+			for (var key in MAIN.flowstream.instances) {
+				var flow = MAIN.flowstream.instances[key];
+				for (var id in flow.meta.flow) { 
+					var fi = flow.meta.flow[id];
+					var ci = flow.meta.components[fi.component];
+					if (ci.type === 'input')
+						fi.process && instances.push(fi);
+				}
+			}
+		};
+
+		instance.flowstream();
+	};
+
+</script>
+
+<style>
+	.f-output .name { font-size: 14px; margin: 10px; background-color: #F5F5F5; text-align: center; border: 1px dashed #E0E0E0; padding: 10px; border-radius: var(--radius); }
+	.ui-dark .f-output .name { background-color: #282828; border-color: #404040; }
+</style>
+
+
+<settings>
+	<div class="padding">
+		<div data---="input__?.name__required:1">Output name</div>
+	</div>
+</settings>
+
+<readme>
+The component sends data to another Flow.
+</readme>
+
+<body>
+	<header>
+		<i class="fa fa-long-arrow-alt-right mr5"></i>FlowStream Output
+	</header>
+	<footer>
+		<div class="name" data-bind="?.config.{0}.name__text__empty"></div>
+	</footer>
+</body>

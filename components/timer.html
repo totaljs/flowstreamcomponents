@@ -1,0 +1,118 @@
+<script total>
+
+	exports.name = 'Timer';
+	exports.group = 'Triggers';
+	exports.version = '1';
+	exports.icon = 'far fa-clock-o';
+	exports.author = 'Peter Širka';
+	exports.config = { random: true, type: 'string', data: '', interval: 0 };
+	exports.outputs = [{ id: 'output', name: 'Output' }];
+
+	exports.make = function(instance, config) {
+
+		var interval;
+
+		instance.trigger = function() {
+
+			var val;
+
+			switch (config.type) {
+				case 'number':
+					val = config.random ? U.random() : config.data.parseFloat();
+					break;
+				case 'buffer':
+					try {
+						val = config.random ? Buffer.from(U.random_string()) : Buffer.from(config.data, 'base64');
+					} catch (e) {
+						instance.throw(e);
+					}
+					break;
+				case 'date':
+					val = config.random ? NOW.add('-' + U.random(500, 10)) : config.data.parseDate();
+					break;
+				case 'object':
+					try {
+						val = config.random ? {} : new Function('return ' + config.data);
+					} catch (e) {
+						instance.throw(e);
+					}
+					break;
+				case 'boolean':
+					val = config.random ? U.random() % 2 === 0 : config.data === 'true' || config.data === 'on' || config.data === '1';
+					break;
+				default:
+					val = config.random ? U.random_string(20) : config.data;
+					break;
+			}
+
+			instance.send('output', val);
+		};
+
+		instance.configure = function() {
+			interval && clearInterval(interval);
+			interval = null;
+			if (config.interval)
+				interval = setInterval(() => instance.trigger(), config.interval);
+		};
+
+		instance.close = function() {
+			interval && clearInterval(interval);
+			interval = null;
+		};
+
+		instance.configure();
+	};
+
+</script>
+
+<script>
+	FUNC.ftimer_exec = function(el) {
+		SETTER('websocket/send', { TYPE: 'trigger', id: el.attrd2('id') });
+	};
+</script>
+
+<style>
+	.f-timer .padding { padding: 0 10px 10px; }
+	.f-timer button { width: 100%; height: 24px; border: 1px solid #E0E0E0; border-radius: var(--radius); color: #000; background-color: #F0F0F0; margin: 0; }
+	.f-timer button:hover { background-color: #F8F8F8; }
+	.f-timer button:active { background-color: #E0E0E0; }
+	.ui-dark .f-timer button { border-color: #404040; color: #FFF; background-color: #222; }
+	.ui-dark .f-timer button:hover { background-color: #303030; }
+	.ui-dark .f-timer button:active { background-color: #404040; }
+</style>
+
+<settings>
+	<div class="padding">
+		<div class="row">
+			<div class="col-md-3 m">
+				<div data---="input__?.interval__type:number;required:1">Interval</div>
+				<div class="help">In milliseconds</div>
+			</div>
+			<div class="col-md-9 m">
+				<div data---="input__?.type__dirsource:string|String,number|Number,boolean|Boolean,date|Date,object|Object,buffer|Buffer as Base64;required:1">Type</div>
+			</div>
+		</div>
+		<hr />
+		<div class="m">
+			<div data---="checkbox__?.random">Random data</div>
+		</div>
+		<div data-bind="?.random__hide" class="hidden">
+			<hr />
+			<div data---="input__?.data__required:1">Data</div>
+		</div>
+	</div>
+</settings>
+
+<readme>
+The component triggers data into the Flow in the specified interval.
+</readme>
+
+<body>
+	<header>
+		<i class="far fa-clock-o"></i>Timer
+	</header>
+	<div class="padding">
+		<button class="exec" data-exec="FUNC.ftimer_exec">Run</button>
+		<div class="help">Interval: <span data-bind="?.config.{0}.interval__text__empty"></span> ms</div>
+	</div>
+</body>

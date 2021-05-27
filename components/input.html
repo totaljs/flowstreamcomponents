@@ -1,0 +1,115 @@
+<script total>
+
+	exports.name = 'Input';
+	exports.group = 'FlowStream';
+	exports.version = '1';
+	exports.icon = 'fa fa-long-arrow-alt-left';
+	exports.author = 'Peter Širka';
+	exports.config = { id: '' };
+	exports.outputs = [{ id: 'data', name: 'Data' }];
+	exports.type = 'input';
+
+	exports.make = function(instance, config) {
+
+		var componentid;
+		var flowid;
+
+		instance.process = function(data, component) {
+			if (component.id === componentid && component.main.name === flowid)
+				instance.send('data', data);
+		};
+
+		instance.configure = function() {
+			var arr = config.id.split('_');
+			var is = false;
+			if (arr[0] && arr[1]) {
+				flowid = arr[0];
+				componentid = arr[1];
+				var db = MAIN.flowstream.db[arr[0]];
+				var flow = MAIN.flowstream.instances[arr[0]];
+				if (flow) {
+					var com = flow.meta.flow[arr[1]];
+					if (com) {
+						instance.status({ flow: db.name, name: com.config.name, icon: db.icon, color: db.color, reference: db.reference, is: true });
+						is = true;
+					}
+				}
+			}
+
+			if (!is) {
+				instance.status({ is: false });
+				flowid = '';
+				componentid = '';
+			}
+		};
+
+		instance.flowstream = function(id, type) {
+			if (flowid === id)
+				instance.configure();
+		};
+
+		instance.call = function(data, answer) {
+			var arr = [];
+			for (var key in MAIN.flowstream.instances) {
+				var flow = MAIN.flowstream.instances[key];
+				for (var id in flow.meta.flow) {
+					var db = MAIN.flowstream.db[key];
+					var fi = flow.meta.flow[id];
+					var com = flow.meta.components[fi.component];
+					if (com.type === 'output')
+						arr.push({ id: key + '_' + fi.id, flow: db.name, name: fi.config.name, reference: db.reference, icon: db.icon, color: db.color });
+				}
+			}
+			answer(arr);
+		};
+
+		instance.configure();
+	};
+
+</script>
+
+<script>
+	ON('configure_input', function(data) {
+		data.call(function(response) {
+
+			for (var item of response)
+				item.name = '<b>{0}</b>: {1}'.format(item.flow, item.name);
+
+			SET('%outputs', response);
+		});
+	});
+</script>
+
+<style>
+	.f-input .name { font-size: 14px; margin: 10px; background-color: #F5F5F5; border: 1px dashed #E0E0E0; padding: 10px; border-radius: var(--radius); }
+	.f-input hr { margin: 5px 0; }
+	.ui-dark .f-input .name { background-color: #282828; border-color: #404040; }
+</style>
+
+
+<settings>
+	<div class="padding">
+		<div data---="input__?.id__dirsource:%outputs;dirraw:1">Output</div>
+	</div>
+</settings>
+
+<readme>
+The component receives data from another Flow.
+</readme>
+
+<body>
+	<header>
+		<i class="fa fa-long-arrow-alt-left mr5"></i>FlowStream Input
+	</header>
+	<footer>
+		<div class="name" data-bind="?.status.{0}__template">
+			<script type="text/html">
+				{{ if value && value.is }}
+					<div><i class="{{ value.icon }} mr5"{{ if value.color }} style="color:{{ value.color }}"{{ fi }}></i>{{ value.flow }} {{ if value.reference }}({{ value.reference }}){{ fi }}</div>
+					<hr />
+					<div class="b">{{ value.name }}</div>
+				{{ fi }}
+			</script>
+		</div>
+	</footer>
+</body>

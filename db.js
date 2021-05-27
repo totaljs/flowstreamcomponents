@@ -36,7 +36,8 @@ PATH.fs.readdir('components', function(err, response) {
 		});
 
 	}, function() {
-		PATH.fs.writeFile('db.json', JSON.stringify(arr), NOOP);
+		arr.quicksort('name');
+		PATH.fs.writeFile('db.json', JSON.stringify(arr, null, '\t'), NOOP);
 	});
 
 });

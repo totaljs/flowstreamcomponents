@@ -31,9 +31,9 @@ The component prints incoming data into the JSON format.
 </readme>
 
 <body>
-	<div class="meta">
-		<div><i class="fa fa-print mr5"></i>Print</div>
-	</div>
+	<header>
+		<i class="fa fa-print"></i>Print
+	</header>
 	<footer>
 		<div data-bind="!?.status.{0}__html pre:Thelpers.jsonformat(JSON.stringify(value, null, '\t'))__show" class="hidden selectable">
 			<pre class="json"></pre>
