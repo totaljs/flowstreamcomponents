@@ -22,7 +22,7 @@
 		"group": "FlowStream",
 		"name": "Input",
 		"author": "Peter Širka",
-		"icon": "fa fa-long-arrow-alt-left",
+		"icon": "fas fa-sign-out-alt",
 		"color": "",
 		"version": "1"
 	},
@@ -31,7 +31,7 @@
 		"group": "FlowStream",
 		"name": "Output",
 		"author": "Peter Širka",
-		"icon": "fa fa-long-arrow-alt-right",
+		"icon": "fa fa-crosshairs",
 		"color": "",
 		"version": "1"
 	},
