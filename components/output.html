@@ -94,7 +94,8 @@
 			answer(arr);
 		};
 
-		setTimeout(() => instance.configure(), 500);
+		instance.configure();
+		setTimeout(() => instance.configure(), 1500);
 		setTimeout(() => instance.flowstream(), 2000);
 	};
 
