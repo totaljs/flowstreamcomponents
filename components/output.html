@@ -5,12 +5,14 @@
 	exports.version = '1';
 	exports.icon = 'fa fa-crosshairs';
 	exports.author = 'Peter Širka';
-	exports.config = { name: 'Output' };
+	exports.config = { id: '', name: 'Output' };
 	exports.inputs = [{ id: 'data', name: 'Data' }];
 	exports.type = 'output';
 
 	exports.make = function(instance, config) {
 
+		var componentid;
+		var flowid;
 		var instances = [];
 
 		instance.message = function($) {
@@ -32,6 +34,67 @@
 			}
 		};
 
+		instance.configure = function() {
+
+			var arr = (config.id || '').split('_');
+			var is = false;
+			if (arr[0] && arr[1]) {
+				flowid = arr[0];
+				componentid = arr[1];
+				var db = MAIN.flowstream.db[arr[0]];
+				var flow = MAIN.flowstream.instances[arr[0]];
+				if (flow) {
+					var com = flow.meta.flow[arr[1]];
+					if (com) {
+
+						instance.status({ flow: db.name, name: com.config.name, icon: db.icon, color: db.color, reference: db.reference, is: true });
+						is = true;
+
+						var id = instance.main.name + '_' + instance.id;
+
+						if (com.config.id === id)
+							return;
+
+						if (com.config.id) {
+							// removes old
+							var tmp = com.config.id.split('_');
+							if (tmp[0] && tmp[1]) {
+								var fs = MAIN.flowstream.instances[tmp[0]];
+								fs.reconfigure(tmp[1], { id: '' });
+							}
+						}
+
+						com.config.id = id;
+						flow.reconfigure(arr[1], com.config);
+					}
+				}
+			}
+
+			if (!is) {
+				instance.status({ is: false });
+				flowid = '';
+				componentid = '';
+			}
+
+		};
+
+		// Reads all inputs
+		instance.call = function(data, answer) {
+			var arr = [];
+			for (var key in MAIN.flowstream.instances) {
+				var flow = MAIN.flowstream.instances[key];
+				for (var id in flow.meta.flow) {
+					var db = MAIN.flowstream.db[key];
+					var fi = flow.meta.flow[id];
+					var com = flow.meta.components[fi.component];
+					if (com.type === 'input')
+						arr.push({ id: key + '_' + fi.id, flow: db.name, name: fi.config.name, note: fi.note, reference: db.reference, icon: db.icon, color: db.color });
+				}
+			}
+			answer(arr);
+		};
+
+		setTimeout(() => instance.configure(), 500);
 		setTimeout(() => instance.flowstream(), 2000);
 	};
 
@@ -39,15 +102,29 @@
 
 <style>
 	.ui-flow .f-output { background-color: #E4EDFF; }
-	.f-output .name { font-size: 14px; margin: 10px; background-color: #FFF; text-align: center; border: 1px dashed #E0E0E0; padding: 10px; border-radius: var(--radius); }
+	.f-output .name { font-size: 12px; margin: 10px; }
+	.f-output .target { font-size: 14px; margin: 0 10px 10px; background-color: #FFF; padding: 10px; border-radius: var(--radius); }
+	.f-output hr { margin: 5px 0; }
 	.ui-dark .ui-flow .f-output { background-color: #33415F; }
-	.ui-dark .f-output .name { background-color: #202020; border-color: #404040; }
+	.ui-dark .f-output .target { background-color: #202020; }
 </style>
 
+<script>
+	ON('configure_output', function(data) {
+		data.call(function(response) {
+
+			for (var item of response)
+				item.name = '<b>{0}</b>: {1}'.format(item.flow, item.name);
+
+			SET('%inputs', response);
+		});
+	});
+</script>
 
 <settings>
 	<div class="padding">
-		<div data---="input__?.name__required:1">Output name</div>
+		<div data---="input__?.name__required:1" class="m"><b>Output name</b></div>
+		<div data---="input__?.id__dirsource:%inputs;dirraw:1;placeholder:Choose a specific input;dirempty:No input">Input</div>
 	</div>
 </settings>
 
@@ -60,6 +137,15 @@ The component sends data to another Flow.
 		<i class="fa fa-crosshairs"></i>FlowStream Output
 	</header>
 	<footer>
-		<div class="name" data-bind="?.config.{0}.name__text__empty"></div>
+		<div class="name">Name: <b data-bind="?.config.{0}.name__text__empty"></b></div>
+		<div class="target hidden" data-bind="?.status.{0}__template__show:value && value.is">
+			<script type="text/html">
+				{{ if value && value.is }}
+					<div><i class="{{ value.icon }} mr5" style="color:{{ value.color }}"></i>{{ value.flow }} {{ if value.reference }}({{ value.reference }}){{ fi }}</div>
+					<hr />
+					<div class="b">{{ value.note | empty }}</div>
+				{{ fi }}
+			</script>
+		</div>
 	</footer>
 </body>
