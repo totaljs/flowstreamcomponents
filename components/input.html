@@ -5,7 +5,7 @@
 	exports.version = '1';
 	exports.icon = 'fa fa-long-arrow-alt-left';
 	exports.author = 'Peter Širka';
-	exports.config = { id: '' };
+	exports.config = { id: '', name: '' };
 	exports.outputs = [{ id: 'data', name: 'Data' }];
 	exports.type = 'input';
 
@@ -20,7 +20,9 @@
 		};
 
 		instance.configure = function() {
-			var arr = config.id.split('_');
+
+			var arr = (config.id || '').split('_');
+
 			var is = false;
 			if (arr[0] && arr[1]) {
 				flowid = arr[0];
@@ -64,6 +66,7 @@
 		};
 
 		instance.configure();
+		setTimeout(() => instance.configure(), 1500);
 	};
 
 </script>
@@ -81,15 +84,18 @@
 </script>
 
 <style>
-	.f-input .name { font-size: 14px; margin: 10px; background-color: #F0F0F0; border: 1px dashed #E0E0E0; padding: 10px; border-radius: var(--radius); }
+	.ui-flow .f-input { background-color: #FFDBDB; }
+	.f-input .name { font-size: 12px; margin: 10px; }
+	.f-input .target { font-size: 14px; margin: 10px; background-color: #FFF; padding: 10px; border-radius: var(--radius); }
 	.f-input hr { margin: 5px 0; }
-	.ui-dark .f-input .name { background-color: #282828; border-color: #404040; }
+	.ui-dark .ui-flow .f-input { background-color: #5D2E2E; }
+	.ui-dark .f-input .target { background-color: #202020; }
 </style>
-
 
 <settings>
 	<div class="padding">
-		<div data---="input__?.id__dirsource:%outputs;dirraw:1">Output</div>
+		<div data---="input__?.name__required:1" class="m"><b>Input name</b></div>
+		<div data---="input__?.id__dirsource:%outputs;dirraw:1;placeholder:Choose a specific output;dirempty:No output">Output</div>
 	</div>
 </settings>
 
@@ -102,7 +108,8 @@ The component receives data from another Flow.
 		<i class="fa fa-long-arrow-alt-left mr5"></i>FlowStream Input
 	</header>
 	<footer>
-		<div class="name" data-bind="?.status.{0}__template__show:value && value.is">
+		<div class="name">Name: <b data-bind="?.config.{0}.name__text__empty"></b></div>
+		<div class="target" data-bind="?.status.{0}__template__show:value && value.is">
 			<script type="text/html">
 				{{ if value && value.is }}
 					<div><i class="{{ value.icon }} mr5" style="color:{{ value.color }}"></i>{{ value.flow }} {{ if value.reference }}({{ value.reference }}){{ fi }}</div>
