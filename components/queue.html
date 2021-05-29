@@ -1,0 +1,114 @@
+<script total>
+
+	exports.name = 'Queue';
+	exports.group = 'Common';
+	exports.version = '1';
+	exports.icon = 'fas fa-list';
+	exports.author = 'Peter Širka';
+	exports.config = {};
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }];
+
+	exports.make = function(instance) {
+
+		var filename = PATH.flowstream(instance.id + '.json');
+		var queue = [];
+		var current = null;
+		var timeout;
+
+		instance.queue_snapshot_force = function() {
+			timeout = null;
+			PATH.fs.writeFile(filename, JSON.stringify(queue), NOOP);
+		};
+
+		instance.queue_snapshot = function() {
+			timeout && clearTimeout(timeout);
+			timeout = setTimeout(instance.queue_snapshot_force, 500);
+			PATH.fs.writeFile(PATH.flowstream(instance.id + '.json'), JSON.stringify(queue), NOOP);
+		};
+
+		instance.trigger = function() {
+			current = null;
+			instance.queue_next();
+		};
+
+		instance.queue_next = function() {
+
+			if (current)
+				return;
+
+			current = queue[0];
+
+			if (current) {
+				var msg = instance.newmessage(current.type === 'buffer' ? Buffer.from(current.data, 'Base64') : current.data && typeof(current.data) === 'object' ? CLONE(current.data) : current.data);
+				msg.once('something', instance.queue_end);
+				instance.send('output', msg);
+			}
+
+			instance.status({ pending: queue.length });
+		};
+
+		instance.queue_end = function() {
+			queue.shift();
+			current = null;
+			instance.queue_next();
+			instance.queue_snapshot();
+		};
+
+		instance.destroy = function() {
+			PATH.fs.unlink(filename, NOOP);
+		};
+
+		instance.message = function($) {
+
+			var isbuffer = $.data instanceof Buffer;
+			var data = isbuffer ? $.data.toString('base64') : $.data;
+
+			queue.push({ ts: Date.now(), fromid: $.fromid, data: data, type: isbuffer ? 'buffer' : 'object' });
+			instance.queue_snapshot();
+			instance.status({ pending: queue.length });
+			$.end();
+
+			if (!current)
+				setImmediate(instance.queue_next);
+		};
+
+		PATH.fs.readFile(filename, function(err, response) {
+			if (response) {
+				queue = response.toString('utf8').parseJSON(true);
+				instance.queue_next();
+			}
+		});
+	};
+
+</script>
+
+<style>
+	.f-queue .status { font-size: 12px; margin: 0; padding: 10px; }
+	.f-queue button { float: right; height: 20px; font-size: 11px; border: 1px solid #E0E0E0; border-radius: var(--radius); color: #000; background-color: transparent; margin: 0; padding: 0 5px; }
+	.f-queue button:hover { background-color: #F8F8F8; }
+	.f-queue button:active { background-color: #E0E0E0; }
+	.ui-dark .f-queue button { border-color: #404040; color: #FFF; }
+	.ui-dark .f-queue button:hover { background-color: #303030; }
+	.ui-dark .f-queue button:active { background-color: #404040; }
+</style>
+
+<script>
+	FUNC.fqueue_trigger = function(el) {
+		SETTER('websocket/send', { TYPE: 'trigger', id: el.attrd2('id') });
+	};
+</script>
+
+<readme>
+A simple persistent queue for the incomming messages.
+</readme>
+
+<body>
+	<header>
+		<button class="exec" data-exec="FUNC.fqueue_trigger">Run</button>
+		<i class="fas fa-list"></i>Queue
+	</header>
+	<footer>
+		<div class="status">Delayed messages: <b data-bind="?.status.{0}.pending__text:value?value.format(0):'0'"></b></div>
+	</footer>
+</body>

@@ -18,6 +18,15 @@
 		"version": "1"
 	},
 	{
+		"id": "delay",
+		"group": "Common",
+		"name": "Delay",
+		"author": "Peter Širka",
+		"icon": "far fa-clock-o",
+		"color": "",
+		"version": "1"
+	},
+	{
 		"id": "input",
 		"group": "FlowStream",
 		"name": "Input",
@@ -41,6 +50,15 @@
 		"name": "Print",
 		"author": "Peter Širka",
 		"icon": "fa fa-print",
+		"color": "",
+		"version": "1"
+	},
+	{
+		"id": "queue",
+		"group": "Common",
+		"name": "Queue",
+		"author": "Peter Širka",
+		"icon": "fas fa-list",
 		"color": "",
 		"version": "1"
 	},

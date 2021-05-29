@@ -1,0 +1,101 @@
+<script total>
+
+	exports.name = 'Delay';
+	exports.group = 'Common';
+	exports.version = '1';
+	exports.icon = 'far fa-clock-o';
+	exports.author = 'Peter Širka';
+	exports.config = { delay: 1000 };
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }];
+
+	exports.make = function(instance, config) {
+
+		var items = [];
+		var timeout;
+
+		instance.checkstatus = function() {
+			instance.status({ pending: items.length });
+		};
+
+		instance.trigger = function() {
+			timeout = null;
+			var msg = items.pop();
+			if (msg) {
+				instance.checkstatus();
+				instance.send('output', msg);
+				timeout = clearTimeout(timeout);
+				timeout = setTimeout(instance.trigger, config.delay);
+			}
+		};
+
+		instance.message = function($) {
+			items.push($);
+			if (timeout)
+				instance.checkstatus();
+			else
+				timeout = setTimeout(instance.trigger, config.delay);
+		};
+
+		instance.destroy = function() {
+			timeout && clearTimeout(timeout);
+			timeout = null;
+		};
+
+		instance.configure = function() {
+			timeout && clearTimeout(timeout);
+			timeout = setTimeout(instance.trigger);
+		};
+
+	};
+
+</script>
+
+<script>
+	FUNC.fdelay_exec = function(el) {
+		if (!BLOCKED('fdelay', 500))
+			SETTER('websocket/send', { TYPE: 'trigger', id: el.attrd2('id') });
+	};
+</script>
+
+<style>
+	.f-delay .status { font-size: 12px; margin: 0; padding: 10px; }
+	.f-delay .status span { color: #A0A0A0; }
+	.f-delay .padding { padding: 0 10px 10px; }
+	.f-delay button { width: 100%; height: 24px; border: 1px solid #E0E0E0; border-radius: var(--radius); color: #000; background-color: #F0F0F0; margin: 0; }
+	.f-delay button:hover { background-color: #F8F8F8; }
+	.f-delay button:active { background-color: #E0E0E0; }
+	.ui-dark .f-delay .status span { color: #777; }
+	.ui-dark .f-delay button { border-color: #404040; color: #FFF; background-color: #222; }
+	.ui-dark .f-delay button:hover { background-color: #303030; }
+	.ui-dark .f-delay button:active { background-color: #404040; }
+</style>
+
+<settings>
+	<div class="padding">
+		<div class="row">
+			<div class="col-md-4">
+				<div data---="input__?.delay__type:number;required:1">Delay</div>
+			</div>
+		</div>
+	</div>
+</settings>
+
+<readme>
+The component delays processing of a message.
+</readme>
+
+<body>
+	<header>
+		<i class="far fa-clock-o"></i>Delay
+	</header>
+	<div class="padding">
+		<button class="exec" data-exec="FUNC.fdelay_exec">Skip</button>
+	</div>
+	<footer>
+		<div class="status">
+			<div>Timeout: <span data-bind="?.config.{0}.delay__text:(value?value:'0')+'ms'"></span></div>
+			<div>Delayed messages: <b data-bind="?.status.{0}.pending__text:value?value.format(0):'0'"></b></div>
+		</div>
+	</footer>
+</body>
