@@ -114,7 +114,7 @@ The component receives data from another Flow.
 				{{ if value && value.is }}
 					<div><i class="{{ value.icon }} mr5" style="color:{{ value.color }}"></i>{{ value.flow }} {{ if value.reference }}({{ value.reference }}){{ fi }}</div>
 					<hr />
-					<div class="b">{{ value.name }}</div>
+					<div class="b">{{ value.name | empty }}</div>
 				{{ fi }}
 			</script>
 		</div>
