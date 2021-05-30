@@ -1,0 +1,73 @@
+<script total>
+
+	exports.name = 'SMS';
+	exports.group = 'Total.js API';
+	exports.version = '1';
+	exports.icon = 'fas fa-tablet';
+	exports.author = 'Peter Širka';
+	exports.config = { token: '', to: '', from: '', body: '', isdata: false };
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+
+	exports.make = function(instance, config) {
+
+		instance.message = function($) {
+			var msg = {};
+			msg.to = $.variables(config.to);
+			msg.from = $.variables(config.from);
+			msg.body = config.isdata ? $.data : $.variables(config.body, $.data);
+			$.destroy();
+			TotalAPI($.variables(config.token), 'sms', msg, function(err) {
+				instance.status({ response: err ? err.toString() : '' });
+			});
+		};
+
+	};
+
+</script>
+
+<style>
+	.f-sms .error { font-size: 12px; padding: 10px; color: red; }
+</style>
+
+<readme>
+The component sends a SMS message.
+</readme>
+
+<settings>
+	<div class="padding bg-smoke">
+		<div data---="input__?.token__required:1;camouflage:*">Total API token</div>
+		<div class="help">Supports dynamic variables in the form <code>{key}</code></div>
+	</div>
+	<div class="padding">
+		<div class="row">
+			<div class="col-md-4 m">
+				<div data---="input__?.from">From</div>
+				<div class="help"><b>International format</b>. Supports dynamic variables in the form <code>{key}</code></div>
+			</div>
+			<div class="col-md-4 m">
+				<div data---="input__?.to">To</div>
+				<div class="help"><b>International format</b>. Supports dynamic variables in the form <code>{key}</code></div>
+			</div>
+		</div>
+	</div>
+	<hr class="nmt nmb" />
+	<div class="padding">
+		<div data---="checkbox__?.isdata" class="b mt5">Send incoming message data only</div>
+	</div>
+	<div data-bind="?.isdata__hide" class="hidden">
+		<hr class="nmt nmb" />
+		<div class="padding">
+			<div data---="input__?.body__maxlength:500;required:1">Message</div>
+			<div class="help m">Supports dynamic variables in the form <code>{key}</code>. The component reads data from the message data and then from all defined variables.</div>
+		</div>
+	</div>
+</settings>
+
+<body>
+	<header>
+		<i class="fas fa-tablet"></i>SMS
+	</header>
+	<footer>
+		<div data-bind="!?.status.{0}.response__text__show" class="error hidden"></div>
+	</footer>
+</body>

@@ -5,7 +5,7 @@
 	exports.version = '1';
 	exports.icon = 'fa fa-code';
 	exports.author = 'Peter Širka';
-	exports.config = { outputs: 1, code: '// $;\n// cache;\n// value;\n// send(value);\n// error(err);' };
+	exports.config = { outputs: 1, code: '// $;\n// cache;// vars;\n// repo;\n// value;\n// send(value);\n// error(err);' };
 	exports.inputs = [{ id: 'input', name: 'Input' }];
 	exports.outputs = [{ id: 'output', name: 'Output' }];
 
@@ -30,7 +30,7 @@
 			try {
 				if (config.code) {
 					instance.status(1);
-					fn = new Function('value', 'instance', 'cache', '$', 'message', 'require', 'send', 'error', config.code);
+					fn = new Function('value', 'instance', 'cache', '$', 'message', 'require', 'send', 'error', 'repo', 'vars', config.code);
 				} else {
 					instance.status(0);
 					fn = null;

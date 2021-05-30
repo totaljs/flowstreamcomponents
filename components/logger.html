@@ -1,0 +1,73 @@
+<script total>
+
+	exports.name = 'Logger';
+	exports.group = 'Total.js API';
+	exports.version = '1';
+	exports.icon = 'fas fa-binoculars';
+	exports.author = 'Peter Širka';
+	exports.config = { token: '', type: 'info', message: '', reference: '', url: '' };
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+
+	exports.make = function(instance, config) {
+
+		instance.message = function($) {
+			var msg = {};
+			var doc = MAIN.flowstream.db[instance.main.id];
+			msg.schema = doc.name;
+			msg.ip = $.ip;
+			msg.data = JSON.stringify($.data);
+			msg.url = config.url || doc.url || CONF.url;
+			msg.app = config.name || CONF.name;
+			msg.type = config.type;
+			msg.message = $.variables(config.message);
+			$.destroy();
+			TotalAPI($.variables(config.token), 'logger', msg, function(err) {
+				instance.status({ response: err ? err.toString() : '' });
+			});
+		};
+
+	};
+
+</script>
+
+<style>
+	.f-logger .error { font-size: 12px; padding: 10px; color: red; }
+</style>
+
+<readme>
+The component logs incoming messages into the Total.js Cloud Logger.
+</readme>
+
+<settings>
+	<div class="padding bg-smoke">
+		<div data---="input__?.token__required:1;camouflage:*">Total API token</div>
+		<div class="help">Supports dynamic arguments in the form <code>{key}</code></div>
+	</div>
+	<div class="padding">
+		<div class="row">
+			<div class="col-md-3 m">
+				<div data---="input__?.type__dirsource:info|Info,error|Error,warning|Warning,success|Success;required:1">Type</div>
+			</div>
+			<div class="col-md-3 m">
+				<div data---="input__?.app">App name</div>
+			</div>
+			<div class="col-md-3 m">
+				<div data---="input__?.reference">Reference</div>
+			</div>
+			<div class="col-md-3 m">
+				<div data---="input__?.url">URL address</div>
+			</div>
+		</div>
+		<div data---="input__?.message__required:1;maxlength:200">Message</div>
+		<div class="help">Supports dynamic arguments in the form <code>{key}</code></div>
+	</div>
+</settings>
+
+<body>
+	<header>
+		<i class="fas fa-binoculars"></i>Logger
+	</header>
+	<footer>
+		<div data-bind="!?.status.{0}.response__text__show" class="error hidden"></div>
+	</footer>
+</body>

@@ -1,0 +1,215 @@
+<script total>
+
+	exports.name = 'Request';
+	exports.group = 'Common';
+	exports.version = '1';
+	exports.icon = 'fas fa-cloud-download';
+	exports.author = 'Peter Širka';
+	exports.config = { url: '', method: 'GET', dnscache: true, insecure: false, nocookies: true, xhr: false, parse: true, timeout: 10000, limit: 1024 * 500, responsebody: true, headers: {}, cookies: {}, serialize: null };
+	exports.inputs = [{ id: 'payload', name: 'Payload' }];
+	exports.outputs = [{ id: 'response', name: 'Response' }, { id: 'error', name: 'Error' }];
+
+	exports.make = function(instance, config) {
+
+		instance.trigger = function() {
+			instance.message(instance.newmessage({}));
+		};
+
+		instance.message = function($) {
+
+			if (!config.url) {
+				$.end();
+				return;
+			}
+
+			var opt = {};
+
+			for (var key in config.headers)
+				opt.headers[$.variables(key)] = $.variables(config.headers[key]);
+
+			for (var key in config.cookies)
+				opt.cookies[$.variables(key)] = $.variables(config.cookies[key]);
+
+			opt.method = config.method;
+			opt.url = $.variables(config.url);
+			opt.cook = true;
+
+			if (config.serialize) {
+				switch (config.serialize) {
+
+					case 'json':
+						opt.type = 'json';
+						if (opt.method !== 'GET')
+							opt.body = JSON.stringify($.data);
+						break;
+
+					case 'urlencoded':
+						opt.type = 'urlencoded';
+						if (opt.method === 'GET')
+							opt.query = U.toURLEncode($.data);
+						else
+							opt.body = U.toURLEncode($.data);
+						break;
+
+					case 'buffer':
+						opt.type = 'raw';
+						opt.body = $.data;
+						break;
+
+				}
+			}
+
+			if (config.dnscache)
+				opt.dnscache = true;
+
+			if (config.insecure)
+				opt.insecure = true;
+
+			if (config.nocookies)
+				opt.nocookies = true;
+
+			if (config.xhr)
+				opt.xhr = true;
+
+			if (config.timeout)
+				opt.timeout = config.timeout;
+
+			if (config.limit)
+				opt.limit = config.limit;
+
+			opt.callback = function(err, response) {
+
+				if (err) {
+					$.data = err + '';
+					$.send('error');
+					return;
+				}
+
+				body = response.body;
+
+				if (config.parse) {
+					var type = response.headers['content-type'] || '';
+					if (type) {
+						var index = type.lastIndexOf(';');
+						if (index !== -1)
+							type = type.substring(0, index).trim();
+					}
+					switch (type.toLowerCase()) {
+						case 'text/xml':
+						case 'application/xml':
+							body = body ? body.parseXML(true) : {};
+							break;
+						case 'application/x-www-form-urlencoded':
+							body = body ? DEF.parsers.urlencoded(body) : {};
+							break;
+						case 'application/json':
+						case 'text/json':
+							body = body ? body.parseJSON(true) : null;
+							break;
+						default:
+							body = body && body.isJSON() ? body.parseJSON(true) : body;
+							break;
+					}
+				}
+
+				if (config.responsebody)
+					$.data = body;
+				else
+					$.data = { headers: response.headers, cookies: response.cookies, status: response.status, host: response.host, body: body };
+
+				$.send('response');
+			};
+
+			REQUEST(opt);
+		};
+
+	};
+
+</script>
+
+<style>
+	.f-request .status { font-size: 12px; margin: 0; padding: 10px; }
+	.f-request .status span { padding: 2px 3px; border-radius: var(--radius); color: #FFF; }
+	.f-request button { float: right; height: 20px; font-size: 11px; border: 1px solid #E0E0E0; border-radius: var(--radius); color: #000; background-color: transparent; margin: 0; padding: 0 5px; }
+	.f-request button:hover { background-color: #F8F8F8; }
+	.f-request button:active { background-color: #E0E0E0; }
+	.ui-dark .f-request button { border-color: #404040; color: #FFF; }
+	.ui-dark .f-request button:hover { background-color: #303030; }
+	.ui-dark .f-request button:active { background-color: #404040; }
+</style>
+
+<script>
+	FUNC.fqueue_trigger = function(el) {
+		SETTER('websocket/send', { TYPE: 'trigger', id: el.attrd2('id') });
+	};
+</script>
+
+<readme>
+The component creates a HTTP request. Incoming data will be serialized as the payload.
+
+__Response__:
+
+```json
+{
+	status: Number,
+	headers: { key: value },
+	cookies: { key: value },
+	host: String,
+	body: String/Object/Buffer
+}
+```
+</readme>
+
+<body>
+	<header>
+		<button class="exec" data-exec="FUNC.fqueue_trigger">Run</button>
+		<i class="fas fa-cloud-download"></i>Request
+	</header>
+	<footer>
+		<div class="status" data-bind="?.config.{0}__template">
+			<script type="text/html">
+				<div class="monospace"><span style="background:{{ value.method | color }}">{{ value.method }}</span> {{ value.url }}</div>
+			</script>
+		</div>
+	</footer>
+</body>
+
+<settings>
+	<div class="padding bg-smoke npb">
+		<div class="row">
+			<div class="col-md-3 m">
+				<div data---="input__?.method__dirsource:GET|GET,POST|POST,PUT|PUT,DELETE|DELETE,PATCH|PATCH,API|API;required:1">Method</div>
+			</div>
+			<div class="col-md-9 m">
+				<div data---="input__?.url__required:1"><b>URL address</b></div>
+				<div class="help">URL address supports dynamic variables in the form <code>{key}</code></div>
+			</div>
+		</div>
+	</div>
+	<div class="padding">
+		<div class="row">
+			<div class="col-md-3 m">
+				<div data---="input__?.timeout__type:number">Timeout</div>
+				<div class="help"><i class="far fa-clock-o"></i><span data-bind="?.timeout__text:((value||0)/1000).floor(2)+' sec.'"></span><br />Timeout <b>in milliseconds</b></div>
+			</div>
+			<div class="col-md-3 m">
+				<div data---="input__?.limit__type:number">Max. size</div>
+				<div class="help"><i class="fas fa-calculator"></i><span data-bind="?.limit__text:(value||0).filesize()"></span><br />Response max. size <b>in bytes</b></div>
+			</div>
+		</div>
+	</div>
+	<hr class="nmt nmb" />
+	<div class="padding">
+		<div data---="input__?.serialize__dirsource:json|JSON,urlencoded|URL encode,buffer|Buffer;dirraw:1;placeholder:Choose a specific output;dirempty:None" class="m">Serialization</div>
+		<div data---="keyvalue__?.headers__placeholderkey:Header name;placeholdervalue:Header value and press enter">Headers</div>
+		<div class="help m">Headers support dynamic variables in the form <code>{key}</code></div>
+		<div data---="keyvalue__?.cookies__placeholderkey:Cookie name;placeholdervalue:Cookie value and press enter">Cookies</div>
+		<div class="help m">Cookies support dynamic variables in the form <code>{key}</code></div>
+		<hr />
+		<div data---="checkbox__?.parse">Parse Response to Object</div>
+		<div data---="checkbox__?.dnscache">Enable DNS cache</div>
+		<div data---="checkbox__?.insecure">Allow insecure connection</div>
+		<div data---="checkbox__?.xhr">Add XHR header</div>
+		<div data---="checkbox__?.responsebody">Forward response body only</div>
+	</div>
+</settings>

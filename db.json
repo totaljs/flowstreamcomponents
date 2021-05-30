@@ -31,7 +31,16 @@
 		"group": "FlowStream",
 		"name": "Input",
 		"author": "Peter Širka",
-		"icon": "fas fa-sign-out-alt",
+		"icon": "fa fa-long-arrow-alt-left",
+		"color": "",
+		"version": "1"
+	},
+	{
+		"id": "logger",
+		"group": "Total.js API",
+		"name": "Logger",
+		"author": "Peter Širka",
+		"icon": "fas fa-binoculars",
 		"color": "",
 		"version": "1"
 	},
@@ -59,6 +68,24 @@
 		"name": "Queue",
 		"author": "Peter Širka",
 		"icon": "fas fa-list",
+		"color": "",
+		"version": "1"
+	},
+	{
+		"id": "request",
+		"group": "Common",
+		"name": "Request",
+		"author": "Peter Širka",
+		"icon": "fas fa-cloud-download",
+		"color": "",
+		"version": "1"
+	},
+	{
+		"id": "sms",
+		"group": "Total.js API",
+		"name": "SMS",
+		"author": "Peter Širka",
+		"icon": "fas fa-tablet",
 		"color": "",
 		"version": "1"
 	},
