@@ -45,6 +45,15 @@
 		"version": "1"
 	},
 	{
+		"id": "modified",
+		"group": "Common",
+		"name": "Modified",
+		"author": "Peter Širka",
+		"icon": "fas fa-drafting-compass",
+		"color": "",
+		"version": "1"
+	},
+	{
 		"id": "output",
 		"group": "FlowStream",
 		"name": "Output",

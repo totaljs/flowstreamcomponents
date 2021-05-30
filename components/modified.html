@@ -1,0 +1,114 @@
+<script total>
+
+	exports.name = 'Modified';
+	exports.group = 'Common';
+	exports.version = '1';
+	exports.icon = 'fas fa-drafting-compass';
+	exports.author = 'Peter Širka';
+	exports.config = {};
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'modified', name: 'Modified' }, { id: 'notmodified', name: 'Not modified' }];
+
+	exports.make = function(instance) {
+
+		var ok = 0;
+		var no = 0;
+		var prev;
+
+		instance.checkstatus = function() {
+			instance.status({ modified: ok, notmodified: no });
+		};
+
+		instance.service = function() {
+			instance.checkstatus();
+		};
+
+		instance.message = function($) {
+
+			var data = $.data;
+
+			if (prev) {
+
+				if ($.data == null) {
+					$.end();
+					no++;
+					return;
+				}
+
+				var tmp;
+
+				if (data instanceof Buffer) {
+					if (!Buffer.compare(prev, data)) {
+						no++;
+						$.send('notmodified');
+						return;
+					}
+					prev = Buffer.from(data);
+				} else if (typeof(data) === 'Object') {
+					tmp = JSON.stringify(data);
+					if (tmp === prev) {
+						no++;
+						$.send('notmodified');
+						return;
+					}
+					prev = tmp;
+				} else if (data == prev) {
+					no++;
+					$.send('notmodified');
+					return;
+				} else
+					prev = data;
+			} else
+				prev = data;
+
+			ok++;
+			$.send('modified');
+		};
+
+		instance.trigger = function(data) {
+			ok = 0;
+			no = 0;
+			prev = null;
+			instance.checkstatus();
+		};
+
+	};
+
+</script>
+
+<style>
+	.f-modified .status { font-size: 12px; padding: 10px; }
+	.f-modified .status i { margin-right: 5px; }
+	.f-modified button { float: right; height: 20px; font-size: 11px; border: 1px solid #E0E0E0; border-radius: var(--radius); color: #000; background-color: transparent; margin: 0; padding: 0 5px; }
+	.f-modified button:hover { background-color: #F8F8F8; }
+	.f-modified button:active { background-color: #E0E0E0; }
+	.ui-dark .f-modified button { border-color: #404040; color: #FFF; }
+	.ui-dark .f-modified button:hover { background-color: #303030; }
+	.ui-dark .f-modified button:active { background-color: #404040; }
+</style>
+
+<script>
+	FUNC.fmodified_reset = function(el) {
+		SETTER('websocket/send', { TYPE: 'trigger', id: el.attrd2('id') });
+	};
+</script>
+
+<readme>
+The component compares incoming data with previous data.
+</readme>
+
+<body>
+	<header>
+		<button class="exec" data-exec="FUNC.fmodified_reset">Reset</button>
+		<i class="fas fa-drafting-compass"></i>Modified
+	</header>
+	<footer>
+		<div data-bind="?.status.{0}__template" class="status">
+			<script type="text/html">
+				<div><i class="fa fa-check-circle green"></i>Modified: {{ value.modified | empty }}</div>
+				<div><i class="fa fa-times-circle red"></i>Not modified: {{ value.notmodified | empty }}</div>
+				<div class="help">Refresh interval: <b>1 minute</b></div>
+			</script>
+		</div>
+	</footer>
+</body>
