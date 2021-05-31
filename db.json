@@ -28,10 +28,10 @@
 	},
 	{
 		"id": "input",
-		"group": "FlowStream",
+		"group": "Common",
 		"name": "Input",
 		"author": "Peter Širka",
-		"icon": "fa fa-long-arrow-alt-left",
+		"icon": "fa fa-filter",
 		"color": "",
 		"version": "1"
 	},
@@ -55,7 +55,7 @@
 	},
 	{
 		"id": "output",
-		"group": "FlowStream",
+		"group": "Common",
 		"name": "Output",
 		"author": "Peter Širka",
 		"icon": "fa fa-crosshairs",
