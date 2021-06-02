@@ -11,7 +11,7 @@
 
 	exports.make = function(instance) {
 
-		var filename = PATH.flowstream(instance.id + '.json');
+		var filename = PATH.databases('queue_' + instance.id + '.json');
 		var queue = [];
 		var current = null;
 		var timeout;
@@ -24,7 +24,7 @@
 		instance.queue_snapshot = function() {
 			timeout && clearTimeout(timeout);
 			timeout = setTimeout(instance.queue_snapshot_force, 500);
-			PATH.fs.writeFile(PATH.flowstream(instance.id + '.json'), JSON.stringify(queue), NOOP);
+			PATH.fs.writeFile(filename, JSON.stringify(queue), NOOP);
 		};
 
 		instance.trigger = function() {
