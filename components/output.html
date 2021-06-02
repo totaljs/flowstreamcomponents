@@ -5,8 +5,8 @@
 	exports.version = '1';
 	exports.icon = 'fa fa-crosshairs';
 	exports.author = 'Peter Širka';
-	exports.config = { name: 'Output' };
-	exports.inputs = [{ id: 'data', name: 'Data', readme: '' }];
+	exports.config = { name: 'Output', readme: '' };
+	exports.inputs = [{ id: 'data', name: 'Data' }];
 	exports.type = 'output';
 
 	exports.make = function(instance, config) {
@@ -14,30 +14,10 @@
 		var instances = null;
 
 		instance.message = function($) {
-			if (instances && instances.length) {
-				for (var com of instances)
-					com.send('data', $);
-			}
+			instance.output($.data);
+			$.destroy();
 		};
 
-		instance.flowstream = function() {
-			instances = [];
-			for (var key in MAIN.flowstream.instances) {
-				var fs = MAIN.flowstream.instances[key];
-				for (var fid in fs.meta.flow) {
-					var fi = fs.meta.flow[fid];
-					var com = fs.meta.components[fi.component];
-					if (com.type === 'input2')
-						instances.push(fi);
-				}
-			}
-		};
-
-		instance.configure = function() {
-			MAIN.flowstream.refresh_io();
-		};
-
-		setTimeout(() => instance.flowstream(), 500);
 	};
 
 </script>
