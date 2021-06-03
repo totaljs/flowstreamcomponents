@@ -1,9 +1,9 @@
 <script total>
 
 	exports.name = 'Input';
-	exports.group = 'Common';
+	exports.group = 'FlowStream';
 	exports.version = '1';
-	exports.icon = 'fa fa-filter';
+	exports.icon = 'fa fa-broadcast-tower';
 	exports.author = 'Peter Širka';
 	exports.config = { name: '', readme: '' };
 	exports.outputs = [{ id: 'data', name: 'Data' }];
@@ -11,7 +11,7 @@
 
 	exports.make = function(instance, config) {
 
-		instance.input = function(data) {
+		instance.input = function(fromflowstreamid, fromid, data) {
 			instance.send('data', data);
 		};
 
@@ -33,6 +33,6 @@ The component receives data from another FlowStream.
 
 <body>
 	<header>
-		<i class="fa fa-filter"></i>Input: <b data-bind="?.config.{0}.name__text__empty"></b>
+		<i class="fa fa-broadcast-tower"></i>Input: <b data-bind="?.config.{0}.name__text__empty"></b>
 	</header>
 </body>

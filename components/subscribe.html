@@ -1,0 +1,90 @@
+<script total>
+
+	exports.name = 'Subscribe';
+	exports.group = 'FlowStream';
+	exports.version = '1';
+	exports.icon = 'fa fa-broadcast-tower';
+	exports.author = 'Peter Širka';
+	exports.config = { name: '' };
+	exports.outputs = [{ id: 'data', name: 'Data' }];
+	exports.type = 'input2';
+
+	exports.make = function(instance, config) {
+
+		var flowstreamid;
+		var instanceid;
+
+		instance.input = function(fromflowstreamid, fromid, data) {
+			if (flowstreamid === fromflowstreamid && instanceid === fromid)
+				instance.send('data', data);
+		};
+
+		instance.flowstream = function(id, type) {
+			if (!id || (config.id && config.id.split('_')[0] === id))
+				refresh();
+		};
+
+		var refresh = function() {
+			if (config.id) {
+				var arr = config.id.split('_');
+				flowstreamid = arr[0];
+				instanceid = arr[1];
+				instance.io(flowstreamid, instanceid, function(err, com) {
+					if (com)
+						instance.status({ name: com.name + '/' + com.item.name });
+					else
+						instance.status({ name: '' });
+				});
+			} else
+				instance.status({ name: '' });
+		};
+
+		instance.configure = function() {
+			refresh();
+		};
+
+		instance.call = function(data, answer) {
+			instance.io(function(err, response) {
+				var arr = [];
+				for (var flow of response) {
+					for (var com of flow.items) {
+						if (com.type === 'output') {
+							com.id = flow.id + '_' + com.id;
+							com.name = '<b>' + flow.name.encode() + ':</b> ' + com.name.encode();
+							arr.push(com);
+						}
+					}
+				}
+				arr.quicksort('name');
+				answer(arr);
+			});
+		};
+
+		setTimeout(refresh, 3000);
+	};
+
+</script>
+
+<script>
+	ON('configure_subscribe', function(data) {
+		data.call(function(response) {
+			SET('%outputs', response);
+		});
+	});
+</script>
+
+<settings>
+	<div class="padding">
+		<div data---="input__?.id__dirsource:%outputs;dirraw:1;placeholder:Choose a specific input;dirempty:No output" class="m"><b>Output</b></div>
+	</div>
+</settings>
+
+<readme>
+The component subscribes to the specific `Output` component.
+</readme>
+
+<body>
+	<header>
+		<i class="fa fa-broadcast-tower"></i>Subscribe: <b class="monospace" data-bind="?.status.{0}.name__text__empty"></b>
+	</header>
+</body>

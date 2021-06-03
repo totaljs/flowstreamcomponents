@@ -28,10 +28,10 @@
 	},
 	{
 		"id": "input",
-		"group": "Common",
+		"group": "FlowStream",
 		"name": "Input",
 		"author": "Peter Širka",
-		"icon": "fa fa-filter",
+		"icon": "fa fa-broadcast-tower",
 		"color": "",
 		"version": "1"
 	},
@@ -55,7 +55,7 @@
 	},
 	{
 		"id": "output",
-		"group": "Common",
+		"group": "FlowStream",
 		"name": "Output",
 		"author": "Peter Širka",
 		"icon": "fa fa-crosshairs",
@@ -68,6 +68,15 @@
 		"name": "Print",
 		"author": "Peter Širka",
 		"icon": "fa fa-print",
+		"color": "",
+		"version": "1"
+	},
+	{
+		"id": "publish",
+		"group": "FlowStream",
+		"name": "Publish",
+		"author": "Peter Širka",
+		"icon": "fa fa-crosshairs",
 		"color": "",
 		"version": "1"
 	},
@@ -95,6 +104,15 @@
 		"name": "SMS",
 		"author": "Peter Širka",
 		"icon": "fas fa-tablet",
+		"color": "",
+		"version": "1"
+	},
+	{
+		"id": "subscribe",
+		"group": "FlowStream",
+		"name": "Subscribe",
+		"author": "Peter Širka",
+		"icon": "fa fa-broadcast-tower",
 		"color": "",
 		"version": "1"
 	},

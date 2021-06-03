@@ -1,7 +1,7 @@
 <script total>
 
 	exports.name = 'Output';
-	exports.group = 'Common';
+	exports.group = 'FlowStream';
 	exports.version = '1';
 	exports.icon = 'fa fa-crosshairs';
 	exports.author = 'Peter Širka';
@@ -10,14 +10,10 @@
 	exports.type = 'output';
 
 	exports.make = function(instance, config) {
-
-		var instances = null;
-
 		instance.message = function($) {
 			instance.output($.data);
 			$.destroy();
 		};
-
 	};
 
 </script>
@@ -31,7 +27,7 @@
 </settings>
 
 <readme>
-The component sends data to another Flow.
+The component sends data to another FlowStream.
 </readme>
 
 <body>
