@@ -31,7 +31,16 @@
 		"group": "Common",
 		"name": "End",
 		"author": "Peter Širka",
-		"icon": "far fa-skull-crossbones",
+		"icon": "fas fa-skull-crossbones",
+		"color": "",
+		"version": "1"
+	},
+	{
+		"id": "exec",
+		"group": "Triggers",
+		"name": "Exec",
+		"author": "Peter Širka",
+		"icon": "fas fa-running",
 		"color": "",
 		"version": "1"
 	},

@@ -1,0 +1,48 @@
+<script total>
+
+	exports.name = 'Exec';
+	exports.group = 'Triggers';
+	exports.version = '1';
+	exports.icon = 'fas fa-running';
+	exports.author = 'Peter Širka';
+	exports.config = {};
+	exports.outputs = [{ id: 'output', name: 'Output' }];
+
+	exports.make = function(instance) {
+		instance.message = function($) {
+			$.send('output');
+		};
+	};
+
+</script>
+
+<readme>
+The component is extraordinary because it must be executed directly from the source code via the `flowstream.exec()` method. The component triggers received data into the Flow.
+
+```js
+var opt = {};
+opt.id = 'ID_OF_EXEC_INSTANCE';
+opt.data = { custom: 'data' };
+opt.callback = function(err, msg) {
+	// msg.uid;
+	// msg.ref;
+	// msg.repo {Object}
+	// msg.data {Object}
+	// msg.cloned {Number} how many times was the message cloned?
+	// msg.duration {Number} in milliseconds
+};
+
+// optional:
+// opt.vars = {};    --> custom variables
+// opt.repo = {};    --> custom repository data and this data will be returned in the callback
+// opt.uid;          --> for storing some unique ID
+// opt.ref;          --> for storing some reference ID
+flowinstance.exec(opt);
+```
+</readme>
+
+<body>
+	<header>
+		<i class="fas fa-running"></i>Exec
+	</header>
+</body>
