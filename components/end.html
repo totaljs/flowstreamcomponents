@@ -1,0 +1,27 @@
+<script total>
+
+	exports.name = 'End';
+	exports.group = 'Common';
+	exports.version = '1';
+	exports.icon = 'far fa-skull-crossbones';
+	exports.author = 'Peter Širka';
+	exports.config = {};
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+
+	exports.make = function(instance) {
+		instance.message = function($) {
+			$.destroy();
+		};
+	};
+
+</script>
+
+<readme>
+The component destroys the incoming message.
+</readme>
+
+<body>
+	<header>
+		<i class="far fa-skull-crossbones"></i>End
+	</header>
+</body>

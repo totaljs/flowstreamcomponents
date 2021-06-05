@@ -27,6 +27,15 @@
 		"version": "1"
 	},
 	{
+		"id": "end",
+		"group": "Common",
+		"name": "End",
+		"author": "Peter Širka",
+		"icon": "far fa-skull-crossbones",
+		"color": "",
+		"version": "1"
+	},
+	{
 		"id": "input",
 		"group": "FlowStream",
 		"name": "Input",
