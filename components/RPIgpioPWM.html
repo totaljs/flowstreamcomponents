@@ -1,0 +1,68 @@
+<script total>
+	exports.name = 'RPIgpioPWM';
+	exports.author = 'Thecoolpeople';
+	exports.group = 'Raspberry';
+	exports.icon = 'raspberry-pi';
+	exports.config = {};
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [];
+
+	exports.npm = ['rpi-gpio'];
+
+	exports.make = function(instance, config) {
+		// instance.save();
+
+		instance.message = function($) {
+			//$.throw('RPIgpio:' + config.gpiokey + "#" + config.read_write + "#" + $.data);
+			if(config.gpiokey){
+				let duration = parseFloat($.data)?parseFloat($.data):0.0
+				clearInterval(instance.pwmHandler); //clear PWM
+
+				instance.pwmHandlerCount = -1;
+				require("rpi-gpio").setup(config.gpiokey, require("rpi-gpio").DIR_OUT, require("rpi-gpio").EDGE_NONE)
+				if(duration != 0.0)
+				instance.pwmHandler = setInterval(function(){
+					instance.pwmHandlerCount++;
+					if(instance.pwmHandlerCount < duration*10){
+						require("rpi-gpio").write(config.gpiokey, true, function(err) {
+							//if (err) $.throw(err);
+							instance.send('output', {pin:config.gpiokey, value:true});
+						});
+					}else if(instance.pwmHandlerCount < 10){
+						require("rpi-gpio").write(config.gpiokey, false, function(err) {
+							//if (err) $.throw(err);
+							instance.send('output', {pin:config.gpiokey, value:false});
+						});
+					}else instance.pwmHandlerCount = -1;
+				}, 10)
+			}
+			$.destroy();
+		};
+	};
+
+</script>
+
+<readme>
+	GPIO PWM
+</readme>
+
+<settings>
+	<div class="padding">
+		Settings
+		<div data---="input__?.gpiokey__dirsource:3|GPIO2-SDA_I2C,5|GPIO3-SCL_I2C,7|GPIO4,29|GPIO5,31|GPIO6,26|GPIO7-CE0_N,24|GPIO8-CE1_N,21|GPIO9-MISO,19|GPIO10-MOSI,23|GPIO11-SCLK,32|GPIO12,33|GPIO13,8|GPIO14-UART0_TXD,10|GPIO15-UART0_RXT,36|GPIO16,11|GPIO17,12|GPIO18-PCM_CLK,35|GPIO19,38|GPIO20,40|GPIO21,15|GPIO22,16|GPIO23,18|GPIO24,22|GPIO25,37|GPIO26,13|GPIO27;required:1">GPIO</div>
+	</div>
+</settings>
+
+<style>
+	.f-NAME {}
+</style>
+
+<script>
+	// client-side script
+</script>
+
+<body>
+	<header>
+		<i class="raspberry-pi"></i>Raspberry GPIO PWM
+	</header>
+</body>
