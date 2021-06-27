@@ -2,7 +2,7 @@
 
 	exports.name = 'Trigger';
 	exports.group = 'Triggers';
-	exports.version = '1';
+	exports.version = '2';
 	exports.icon = 'fa fa-bullhorn';
 	exports.author = 'Peter Širka';
 	exports.config = { random: true, type: 'string', data: '', restart: false };
@@ -30,7 +30,7 @@
 					break;
 				case 'object':
 					try {
-						val = config.random ? {} : new Function('return ' + config.data);
+						val = config.random ? {} : (new Function('return ' + config.data))();
 					} catch (e) {
 						instance.throw(e);
 					}
