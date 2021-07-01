@@ -1,0 +1,54 @@
+<script total>
+	exports.name = 'RPIi2cWrite';
+	exports.author = 'Thecoolpeople';
+	exports.group = 'Raspberry';
+	exports.icon = 'fab fa-raspberry-pi';
+	exports.version = '1';
+	exports.config = {};
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }];
+
+	exports.npm = ['i2c-bus'];
+
+	exports.make = function(instance, config) {
+		instance.message = function($) {
+			let address, register, bytes;
+			try{
+				address = parseInt($.data.address?$.data.address:config.address);
+				register = parseInt($.data.register?$.data.register:config.register);
+				bytes = Buffer.from($.data.bytes?$.data.bytes:(config.bytes.split (',').map (function (c) { return parseInt(c);})));
+			}catch(err){instance.send('output', {error:err.toString()});}
+
+			//send msg
+			const i2c1 = require('i2c-bus').openSync(1);
+
+			let length = i2c1.writeI2cBlockSync(address, register, bytes.length, bytes);
+			instance.send('output', {data:bytes});
+			$.destroy();
+		};
+	};
+
+</script>
+
+<readme>
+I2C Write
+- parameters, can be transmitted to the component, or directly set as setting
+ - address: The I2C address of the device
+ - register: The (starting) register
+ - bytes: The bytes which will be written
+</readme>
+
+<settings>
+	<div class="padding">
+		Settings
+		<div data---="input__?.address__required:0">Address</div>
+		<div data---="input__?.register__required:0">Register</div>
+		<div data---="input__?.bytes__required:0">Data</div>
+	</div>
+</settings>
+
+<body>
+	<header>
+		<i class="fab fa-raspberry-pi"></i>Raspberry I2C Write
+	</header>
+</body>

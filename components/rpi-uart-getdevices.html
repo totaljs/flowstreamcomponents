@@ -1,0 +1,49 @@
+<script total>
+	exports.name = 'RPIuartDevices';
+	exports.author = 'Thecoolpeople';
+	exports.group = 'Raspberry';
+	exports.icon = 'fab fa-raspberry-pi';
+	exports.version = '1';
+	exports.config = { };
+	exports.outputs = [{ id: 'output', name: 'Output' }];
+
+	exports.npm = ['serialport'];
+
+	exports.make = function(instance, config) {
+		instance.trigger = async function(){
+			await new require('serialport').list().then(function(ports) {
+				instance.send('output', ports);
+			});
+		}
+	};
+</script>
+
+<readme>
+UART
+- get all devices which are possible to send
+</readme>
+
+<script>
+	FUNC.ftrigger_exec = function(el) {
+		SETTER('websocket/send', { TYPE: 'trigger', id: el.attrd2('id') });
+	};
+</script>
+
+<style>
+	.f-rpiuartdevices .padding { padding: 0 10px 10px; }
+	.f-rpiuartdevices button { width: 100%; height: 24px; border: 1px solid #E0E0E0; border-radius: var(--radius); color: #000; background-color: #F0F0F0; margin: 0; }
+	.f-rpiuartdevices button:hover { background-color: #F8F8F8; }
+	.f-rpiuartdevices button:active { background-color: #E0E0E0; }
+	.ui-dark .f-rpiuartdevices button { border-color: #404040; color: #FFF; background-color: #222; }
+	.ui-dark .f-rpiuartdevices button:hover { background-color: #303030; }
+	.ui-dark .f-rpiuartdevices button:active { background-color: #404040; }
+</style>
+
+<body>
+	<header>
+		<i class="fab fa-raspberry-pi"></i>Raspberry UART Devices
+	</header>
+	<div class="padding">
+		<button class="exec" data-exec="FUNC.ftrigger_exec">Run</button>
+	</div>
+</body>
