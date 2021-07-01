@@ -11,9 +11,12 @@
 	exports.npm = ['serialport'];
 
 	exports.make = function(instance, config) {
+
+		var SerialPort = require('serialport')
 		var sp;
+
 		instance.openConnectionUart = function(){
-			let SerialPort = require('serialport')
+
 			sp = new SerialPort(config.port, {
 				baudRate: parseInt(config.baudrate),
 				dataBits: parseInt(config.databits),
@@ -26,28 +29,33 @@
 			sp.on('open', function() {
 				instance.send('output', 'Port is now open');
 			});
-			//read func
-			sp.on('data', function (data){	// Switches the port into 'flowing mode'
+
+			sp.on('data', function (data) {	// Switches the port into 'flowing mode'
 				instance.send('output', data);
 			});
 
 			sp.open(function (err) {
-				if (err) instance.send('output', {error:'Error opening port: '+ err.message});
+				if (err)
+					instance.send('output', { error: 'Error opening port: ' + err.message });
 			});
 		}
 
 		instance.message = function($) {
+
 			let bytes = $.data;
+
 			//check if sp is open
 			if(!sp)
 				instance.openConnectionUart();
+
 			//send msg
 			sp.write(bytes);
+
 			$.destroy();
 		};
 
 		instance.close = function(){
-			sp && sp.close(function (err) {
+			sp && sp.close(function() {
 				instance.send('output', 'Port is now closed');
 			});
 		}
@@ -55,14 +63,14 @@
 </script>
 
 <readme>
-UART
+# UART
+
 - send a string directly to a port
 - when device from a port sends data to the host, it will be send to the output of the component
 </readme>
 
 <settings>
 	<div class="padding">
-		Settings
 		<div data---="input__?.port__required:1">PORT</div>
 		<div data---="input__?.baudrate__dirsource:110|110,300|300,600|600,1200|1200,2400|2400,4800|4800,9600|9600,14400|14400,19200|19200,38400|38400,57600|57600,115200||115200,128000|128000;required:1">Baudrate</div>
 		<div data---="input__?.databits__dirsource:5|5,6|6,7|7,8|8;required:1">Databits</div>

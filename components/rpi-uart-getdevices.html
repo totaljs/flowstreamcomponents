@@ -4,27 +4,30 @@
 	exports.group = 'Raspberry';
 	exports.icon = 'fab fa-raspberry-pi';
 	exports.version = '1';
-	exports.config = { };
+	exports.config = {};
 	exports.outputs = [{ id: 'output', name: 'Output' }];
 
 	exports.npm = ['serialport'];
 
 	exports.make = function(instance, config) {
+		var SerialPort = require('serialport');
 		instance.trigger = async function(){
-			await new require('serialport').list().then(function(ports) {
+			await new SerialPort.list().then(function(ports) {
 				instance.send('output', ports);
 			});
 		}
 	};
+
 </script>
 
 <readme>
-UART
-- get all devices which are possible to send
+# UART
+
+Get all devices which are possible to send
 </readme>
 
 <script>
-	FUNC.ftrigger_exec = function(el) {
+	FUNC.frpiuartdevices_exec = function(el) {
 		SETTER('websocket/send', { TYPE: 'trigger', id: el.attrd2('id') });
 	};
 </script>
@@ -44,6 +47,6 @@ UART
 		<i class="fab fa-raspberry-pi"></i>Raspberry UART Devices
 	</header>
 	<div class="padding">
-		<button class="exec" data-exec="FUNC.ftrigger_exec">Run</button>
+		<button class="exec" data-exec="FUNC.frpiuartdevices_exec">Run</button>
 	</div>
 </body>

@@ -11,19 +11,27 @@
 	exports.npm = ['i2c-bus'];
 
 	exports.make = function(instance, config) {
+
+		var I2C = require('i2c-bus');
+		var stringtonumber = c => parseInt(c);
+
 		instance.message = function($) {
+
 			let address, register, bytes;
-			try{
-				address = parseInt($.data.address?$.data.address:config.address);
-				register = parseInt($.data.register?$.data.register:config.register);
-				bytes = Buffer.from($.data.bytes?$.data.bytes:(config.bytes.split (',').map (function (c) { return parseInt(c);})));
-			}catch(err){instance.send('output', {error:err.toString()});}
 
-			//send msg
-			const i2c1 = require('i2c-bus').openSync(1);
+			try {
+				address = parseInt($.data.address ? $.data.address : config.address);
+				register = parseInt($.data.register ? $.data.register : config.register);
+				bytes = Buffer.from($.data.bytes ? $.data.bytes : (config.bytes.split (',').map(stringtonumber)));
+			} catch (err) {
+				instance.send('output', { error: err + '' });
+			}
 
+			// Send msg
+			const i2c1 = I2C.openSync(1); // close?
 			let length = i2c1.writeI2cBlockSync(address, register, bytes.length, bytes);
-			instance.send('output', {data:bytes});
+			instance.send('output', { data:bytes });
+
 			$.destroy();
 		};
 	};
@@ -31,19 +39,20 @@
 </script>
 
 <readme>
-I2C Write
-- parameters, can be transmitted to the component, or directly set as setting
- - address: The I2C address of the device
- - register: The (starting) register
- - bytes: The bytes which will be written
+# I2C Write
+
+Parameters, can be transmitted to the component, or directly set as setting.
+
+- `address`: The I2C address of the device
+- `register`: The (starting) register
+- `bytes`: The bytes which will be written
 </readme>
 
 <settings>
 	<div class="padding">
-		Settings
-		<div data---="input__?.address__required:0">Address</div>
-		<div data---="input__?.register__required:0">Register</div>
-		<div data---="input__?.bytes__required:0">Data</div>
+		<div data---="input__?.address">Address</div>
+		<div data---="input__?.register">Register</div>
+		<div data---="input__?.bytes">Data</div>
 	</div>
 </settings>
 

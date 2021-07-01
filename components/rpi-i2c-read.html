@@ -11,47 +11,54 @@
 	exports.npm = ['i2c-bus'];
 
 	exports.make = function(instance, config) {
-		instance.message = function($) {
-			const i2c1 = require('i2c-bus').openSync(1);
 
-			if(config.presensor){
-				switch(config.sensor){
-					case 'DS1307':{
+		var I2C = require('i2c-bus');
+		var BCD2D = function(Wert) {
+			return Wert % 16 + 10 * parseInt(Wert / 16);
+		};
+
+		instance.message = function($) {
+
+			var i2c1 = I2C.openSync(1);
+
+			if (config.presensor) {
+				switch (config.sensor) {
+					case 'DS1307':
 						let rbuf = Buffer.alloc(7);
-						i2c1.readI2cBlockSync(0x68, 0x00, rbuf.length, rbuf);    //address, register, length, buffer
-						let BCD2D = function(Wert){return Wert % 16 + 10 * parseInt(Wert / 16);};
-						instance.send('output', {year:BCD2D(rbuf[6]), month:BCD2D(rbuf[5]), date:BCD2D(rbuf[4]), day:BCD2D(rbuf[3]), hour:BCD2D(rbuf[2]), minute:BCD2D(rbuf[1]), second:BCD2D(rbuf[0])});
-					}break;
+						i2c1.readI2cBlockSync(0x68, 0x00, rbuf.length, rbuf); // address, register, length, buffer
+						instance.send('output', { year: BCD2D(rbuf[6]), month: BCD2D(rbuf[5]), date: BCD2D(rbuf[4]), day: BCD2D(rbuf[3]), hour: BCD2D(rbuf[2]), minute: BCD2D(rbuf[1]), second: BCD2D(rbuf[0]) });
+						break;
 				}
 			}else{
-				let address = parseInt($.data.address?$.data.address:config.address);
-				let register = parseInt($.data.register?$.data.register:config.register);
-				let readLength = parseInt($.data.readLength?$.data.readLength:config.readLength);
+
+				let address = parseInt($.data.address ? $.data.address : config.address);
+				let register = parseInt($.data.register ? $.data.register : config.register);
+				let readLength = parseInt($.data.readLength ? $.data.readLength : config.readLength);
 
 				//send msg
 				let rbuf = Buffer.alloc(readLength);
 				let length = i2c1.readI2cBlockSync(address, register, readLength, rbuf);
-				instance.send('output', {data:rbuf.toString()});
+				$.send('output', rbuf.toString());
 			}
+
 			i2c1.closeSync();
-			$.destroy();
 		};
 	};
 
 </script>
 
 <readme>
-I2C Read
-- parameters, can be transmitted to the component, or directly set as setting
- - address: The I2C address of the device
- - register: The (starting) register
- - readLength: The length of how many bits will be read
-- there are predefined sensors as well
+# I2C Read
+
+Parameters, can be transmitted to the component, or directly set as setting.
+
+- `address`: The I2C address of the device
+- `register`: The (starting) register
+- `readLength`: The length of how many bits will be read
 </readme>
 
 <settings>
 	<div class="padding">
-		Settings
 		<div class="mt10 m">
 			<div data---="checkbox__?.presensor">Predefined Sensor</div>
 		</div>

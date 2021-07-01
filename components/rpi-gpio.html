@@ -11,42 +11,68 @@
 	exports.npm = ['rpi-gpio'];
 
 	exports.make = function(instance, config) {
+
+		var RPI = require('rpi-gpio');
+
 		instance.message = function($) {
+
 			let bit = $.data;
-			//$.throw('RPIgpio:' + config.gpiokey + '#' + config.read_write + '#' + bit);
-			if(config.read_write && config.gpiokey){
-				if(config.read_write == 'write'){
-					require('rpi-gpio').setup(config.gpiokey, require('rpi-gpio').DIR_OUT, require('rpi-gpio').EDGE_NONE, function(err) {
-						if (err) $.throw(err);
-						require('rpi-gpio').write(config.gpiokey, !!bit, function(err) {
-							if (err) $.throw(err);
-							instance.send('output', {pin:config.gpiokey, value:!!bit});
+
+			if (config.read_write && config.gpiokey) {
+
+				switch (config.read_write) {
+
+					case 'write':
+						RPI.setup(config.gpiokey, RPI.DIR_OUT, RPI.EDGE_NONE, function(err) {
+
+							if (err)
+								instance.throw(err);
+
+							RPI.write(config.gpiokey, !!bit, function(err) {
+
+								if (err)
+									instance.throw(err);
+
+								instance.send('output', { pin: config.gpiokey, value: !!bit });
+							});
 						});
-					});
-				}else if(config.read_write == 'read'){
-					require('rpi-gpio').setup(config.gpiokey, require('rpi-gpio').DIR_IN, require('rpi-gpio').EDGE_NONE, function(err) {
-						if (err) $.throw(err);
-						require('rpi-gpio').read(config.gpiokey, function(err, val) {
-							if (err) $.throw(err);
-							instance.send('output', {pin:config.gpiokey, value:val});
+						break;
+
+					case 'read':
+						RPI.setup(config.gpiokey, RPI.DIR_IN, RPI.EDGE_NONE, function(err) {
+
+							if (err)
+								instance.throw(err);
+
+							RPI.read(config.gpiokey, function(err, val) {
+
+								if (err)
+									instance.throw(err);
+
+								instance.send('output', { pin: config.gpiokey, value: val });
+							});
 						});
-					});
+						break;
 				}
 			}
+
 			$.destroy();
 		};
 	};
 </script>
 
 <readme>
-GPIO
-write mode
+# GPIO
+
+__Write mode__:
+
 - Select the GPIO you want
 - Set the read/write option to write
 - Send true to the component to set the GPIO to HIGH
 - Send false to the component to set the GPIO to LOW
 
-read mode
+__Read mode__:
+
 - Select the GPIO you want
 - Set the read/write option to write
 - Send true to the node so read the state of the gpio
@@ -54,7 +80,6 @@ read mode
 
 <settings>
 	<div class="padding">
-		Settings
 		<div data---="input__?.gpiokey__dirsource:3|GPIO2-SDA_I2C,5|GPIO3-SCL_I2C,7|GPIO4,29|GPIO5,31|GPIO6,26|GPIO7-CE0_N,24|GPIO8-CE1_N,21|GPIO9-MISO,19|GPIO10-MOSI,23|GPIO11-SCLK,32|GPIO12,33|GPIO13,8|GPIO14-UART0_TXD,10|GPIO15-UART0_RXT,36|GPIO16,11|GPIO17,12|GPIO18-PCM_CLK,35|GPIO19,38|GPIO20,40|GPIO21,15|GPIO22,16|GPIO23,18|GPIO24,22|GPIO25,37|GPIO26,13|GPIO27;required:1">GPIO</div>
 		<div data---="input__?.read_write__dirsource:read|read,write|write;required:1">read/write</div>
 	</div>
