@@ -45,7 +45,7 @@
 				$.destroy();
 		};
 
-		instance.destroy = function() {
+		instance.close = function() {
 			instance.pwmHandler && clearInterval(instance.pwmHandler);
 		};
 	};
