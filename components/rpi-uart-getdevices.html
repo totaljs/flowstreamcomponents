@@ -11,7 +11,7 @@
 
 	exports.make = function(instance, config) {
 		var SerialPort = require('serialport');
-		instance.trigger = async function(){
+		instance.trigger = async function() {
 			await new SerialPort.list().then(function(ports) {
 				instance.send('output', ports);
 			});
