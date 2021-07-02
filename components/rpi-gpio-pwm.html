@@ -7,6 +7,7 @@
 	exports.version = '1';
 	exports.config = {};
 	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }, { id: 'error', name: 'Error' }];
 
 	exports.npm = ['rpi-gpio'];
 
@@ -14,26 +15,35 @@
 
 		var RPI = require('rpi-gpio');
 
-		var handler = function() {
+		var handler = function(duration) {
 			instance.pwmHandlerCount++;
-			if (instance.pwmHandlerCount < duration * 10)
-				RPI.write(config.gpiokey, true, err => instance.send('output', { pin: config.gpiokey, value: true }));
-			else if (instance.pwmHandlerCount < 10)
-				RPI.write(config.gpiokey, false, err => instance.send('output', { pin: config.gpiokey, value: false }));
-			else
+			if (instance.pwmHandlerCount < duration * 10) {
+				RPI.write(config.gpiokey, true, function(err) {
+					if (err)
+						instance.send('error', err + '');
+					else
+						instance.send('output', { pin: config.gpiokey, value: true });
+				});
+			} else if (instance.pwmHandlerCount < 10) {
+				RPI.write(config.gpiokey, false, function(err) {
+					if (err)
+						instance.send('error', err + '');
+					else
+						instance.send('output', { pin: config.gpiokey, value: false });
+				});
+			} else
 				instance.pwmHandlerCount = -1;
 		};
 
 		instance.message = function($) {
 
-			//$.throw('RPIgpio:' + config.gpiokey + '#' + config.read_write + '#' + $.data);
 			if (config.gpiokey) {
-				let duration = parseFloat($.data) ? parseFloat($.data) : 0.0;
-				clearInterval(instance.pwmHandler); //clear PWM
+				let duration = $.data ? parseFloat($.data) : 0.0;
+				instance.pwmHandler && clearInterval(instance.pwmHandler); // clear PWM
 				instance.pwmHandlerCount = -1;
 				RPI.setup(config.gpiokey, RPI.DIR_OUT, RPI.EDGE_NONE)
 				if (duration != 0.0)
-					instance.pwmHandler = setInterval(handler, 10);
+					instance.pwmHandler = setInterval(handler, 10, duration);
 			}
 
 			$.destroy();
