@@ -6,7 +6,7 @@
 	exports.version = '1';
 	exports.config = { port:'/dev/ttyUSB0' };
 	exports.inputs = [{ id: 'input', name: 'Input' }];
-	exports.outputs = [{ id: 'output', name: 'Output' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }, { id: 'error', name: 'Error' }];
 
 	exports.npm = ['serialport'];
 
@@ -27,7 +27,8 @@
 			});
 
 			sp.on('open', function() {
-				instance.send('output', 'Port is now open');
+				instance.status({ open: true });
+				// instance.send('output', 'Port is now open');
 			});
 
 			sp.on('data', function (data) {	// Switches the port into 'flowing mode'
@@ -36,7 +37,7 @@
 
 			sp.open(function (err) {
 				if (err)
-					instance.send('output', { error: 'Error opening port: ' + err.message });
+					instance.send('error', 'Error opening port: ' + err.message);
 			});
 		}
 
@@ -45,22 +46,25 @@
 			let bytes = $.data;
 
 			//check if sp is open
-			if(!sp)
+			if (!sp)
 				instance.openConnectionUart();
 
 			//send msg
 			sp.write(bytes);
-
 			$.destroy();
 		};
 
 		instance.close = function(){
 			sp && sp.close(function() {
-				instance.send('output', 'Port is now closed');
+				instance.status({ open: false });
 			});
 		}
 	};
 </script>
+
+<style>
+	.f-rpiuart .status { font-size: 12px; margin: 0; padding: 0 10px 5px; font-weight: bold; }
+</style>
 
 <readme>
 # UART
@@ -83,4 +87,13 @@
 	<header>
 		<i class="fab fa-raspberry-pi"></i>Raspberry UART
 	</header>
+	<footer>
+		<div data-bind="!?.status.{0}__template__show" class="status hidden">
+			{{ if value.open }}
+				<i class="fa fa-circle mr5 green"></i>Open
+			{{ else }}
+				<i class="fa fa-circle mr5 red"></i>Closed
+			{{ fi }}
+		</div>
+	</footer>
 </body>
