@@ -26,10 +26,13 @@
 					case 'DS1307':
 						let rbuf = Buffer.alloc(7);
 						i2c1.readI2cBlockSync(0x68, 0x00, rbuf.length, rbuf); // address, register, length, buffer
-						instance.send('output', { year: BCD2D(rbuf[6]), month: BCD2D(rbuf[5]), date: BCD2D(rbuf[4]), day: BCD2D(rbuf[3]), hour: BCD2D(rbuf[2]), minute: BCD2D(rbuf[1]), second: BCD2D(rbuf[0]) });
+						$.send('output', { year: BCD2D(rbuf[6]), month: BCD2D(rbuf[5]), date: BCD2D(rbuf[4]), day: BCD2D(rbuf[3]), hour: BCD2D(rbuf[2]), minute: BCD2D(rbuf[1]), second: BCD2D(rbuf[0]) });
+						break;
+					default:
+						$.destroy();
 						break;
 				}
-			}else{
+			} else {
 
 				let address = parseInt($.data.address ? $.data.address : config.address);
 				let register = parseInt($.data.register ? $.data.register : config.register);
