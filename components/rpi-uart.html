@@ -28,7 +28,10 @@
 
 			sp.on('open', function() {
 				instance.status({ open: true });
-				// instance.send('output', 'Port is now open');
+			});
+
+			sp.on('close', function() {
+				instance.status({ open: false });
 			});
 
 			sp.on('data', function (data) {	// Switches the port into 'flowing mode'
@@ -55,9 +58,7 @@
 		};
 
 		instance.close = function(){
-			sp && sp.close(function() {
-				instance.status({ open: false });
-			});
+			sp && sp.close(NOOP);
 		}
 	};
 </script>
