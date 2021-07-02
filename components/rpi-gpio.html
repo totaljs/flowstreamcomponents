@@ -47,13 +47,10 @@
 							}
 
 							RPI.read(config.gpiokey, function(err, val) {
-
-								if (err) {
+								if (err)
 									$.send('error', err + '');
-									return;
-								}
-
-								$.send('output', { pin: config.gpiokey, value: val });
+								else
+									$.send('output', { pin: config.gpiokey, value: val });
 							});
 						});
 						return;
