@@ -10,9 +10,9 @@
 	exports.npm = ['serialport'];
 
 	exports.make = function(instance, config) {
-		var SerialPort = require('serialport');
+		var SerialPort = new require('serialport');
 		instance.trigger = async function() {
-			await new SerialPort.list().then(function(ports) {
+			await SerialPort.list().then(function(ports) {
 				instance.send('output', ports);
 			});
 		}
