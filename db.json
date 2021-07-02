@@ -117,6 +117,60 @@
 		"version": "1"
 	},
 	{
+		"id": "rpi-gpio",
+		"group": "Raspberry",
+		"name": "RPIgpio",
+		"author": "Thecoolpeople",
+		"icon": "fab fa-raspberry-pi",
+		"color": "",
+		"version": "1"
+	},
+	{
+		"id": "rpi-gpio-pwm",
+		"group": "Raspberry",
+		"name": "RPIgpioPWM",
+		"author": "Thecoolpeople",
+		"icon": "fab fa-raspberry-pi",
+		"color": "",
+		"version": "1"
+	},
+	{
+		"id": "rpi-i2c-read",
+		"group": "Raspberry",
+		"name": "RPIi2cRead",
+		"author": "Thecoolpeople",
+		"icon": "fab fa-raspberry-pi",
+		"color": "",
+		"version": "1"
+	},
+	{
+		"id": "rpi-i2c-write",
+		"group": "Raspberry",
+		"name": "RPIi2cWrite",
+		"author": "Thecoolpeople",
+		"icon": "fab fa-raspberry-pi",
+		"color": "",
+		"version": "1"
+	},
+	{
+		"id": "rpi-uart",
+		"group": "Raspberry",
+		"name": "RPIuart",
+		"author": "Thecoolpeople",
+		"icon": "fab fa-raspberry-pi",
+		"color": "",
+		"version": "1"
+	},
+	{
+		"id": "rpi-uart-getdevices",
+		"group": "Raspberry",
+		"name": "RPIuartDevices",
+		"author": "Thecoolpeople",
+		"icon": "fab fa-raspberry-pi",
+		"color": "",
+		"version": "1"
+	},
+	{
 		"id": "sms",
 		"group": "Total.js API",
 		"name": "SMS",
