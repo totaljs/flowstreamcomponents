@@ -35,7 +35,7 @@
 
 			if (config.gpiokey) {
 				let duration = $.data ? parseFloat($.data) : 0.0;
-				instance.pwmHandler && clearInterval(instance.pwmHandler); // clear PWM
+				instance.pwmHandler && clearInterval(instance.pwmHandler);
 				instance.pwmHandlerCount = -1;
 				RPI.setup(config.gpiokey, RPI.DIR_OUT, RPI.EDGE_NONE)
 				$.send('output', { pin: config.gpiokey, value: duration });
@@ -43,6 +43,10 @@
 					instance.pwmHandler = setInterval(handler, 10, duration);
 			} else
 				$.destroy();
+		};
+
+		instance.destroy = function() {
+			instance.pwmHandler && clearInterval(instance.pwmHandler);
 		};
 	};
 
