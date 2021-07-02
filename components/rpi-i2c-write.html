@@ -29,9 +29,10 @@
 			}
 
 			// Send msg
-			const i2c1 = I2C.openSync(1);
+			let i2c1 = I2C.openSync(1);
 			let length = i2c1.writeI2cBlockSync(address, register, bytes.length, bytes);
 			$.send('output', { data: bytes });
+			i2c1.closeSync();
 		};
 	};
 
