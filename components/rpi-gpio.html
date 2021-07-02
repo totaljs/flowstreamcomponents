@@ -6,7 +6,7 @@
 	exports.version = '1';
 	exports.config = {};
 	exports.inputs = [{ id: 'input', name: 'Input' }];
-	exports.outputs = [{ id: 'output', name: 'Output' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }, { id: 'error', name: 'Error' }];
 
 	exports.npm = ['rpi-gpio'];
 
@@ -21,42 +21,47 @@
 			if (config.read_write && config.gpiokey) {
 
 				switch (config.read_write) {
-
 					case 'write':
 						RPI.setup(config.gpiokey, RPI.DIR_OUT, RPI.EDGE_NONE, function(err) {
 
-							if (err)
-								instance.throw(err);
+							if (err) {
+								$.send('error', err + '');
+								return;
+							}
 
 							RPI.write(config.gpiokey, !!bit, function(err) {
-
 								if (err)
-									instance.throw(err);
-
-								instance.send('output', { pin: config.gpiokey, value: !!bit });
+									$.send('error', err + '');
+								else
+									$.send('output', { pin: config.gpiokey, value: !!bit });
 							});
 						});
-						break;
+						return;
 
 					case 'read':
 						RPI.setup(config.gpiokey, RPI.DIR_IN, RPI.EDGE_NONE, function(err) {
 
-							if (err)
-								instance.throw(err);
+							if (err) {
+								$.send('error', err + '');
+								return;
+							}
 
 							RPI.read(config.gpiokey, function(err, val) {
 
-								if (err)
-									instance.throw(err);
+								if (err) {
+									$.send('error', err + '');
+									return;
+								}
 
-								instance.send('output', { pin: config.gpiokey, value: val });
+								$.send('output', { pin: config.gpiokey, value: val });
 							});
 						});
-						break;
+						return;
 				}
 			}
 
 			$.destroy();
+
 		};
 	};
 </script>
