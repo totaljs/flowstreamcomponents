@@ -6,7 +6,7 @@
 	exports.version = '1';
 	exports.config = {};
 	exports.inputs = [{ id: 'input', name: 'Input' }];
-	exports.outputs = [{ id: 'output', name: 'Output' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }, { id: 'error', name: 'Error' }];
 
 	exports.npm = ['i2c-bus'];
 
@@ -24,15 +24,14 @@
 				register = parseInt($.data.register ? $.data.register : config.register);
 				bytes = Buffer.from($.data.bytes ? $.data.bytes : (config.bytes.split (',').map(stringtonumber)));
 			} catch (err) {
-				instance.send('output', { error: err + '' });
+				$.send('output', err + '');
+				return;
 			}
 
 			// Send msg
-			const i2c1 = I2C.openSync(1); // close?
+			const i2c1 = I2C.openSync(1);
 			let length = i2c1.writeI2cBlockSync(address, register, bytes.length, bytes);
-			instance.send('output', { data:bytes });
-
-			$.destroy();
+			$.send('output', { data: bytes });
 		};
 	};
 
