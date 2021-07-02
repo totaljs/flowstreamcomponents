@@ -21,15 +21,11 @@
 				RPI.write(config.gpiokey, true, function(err) {
 					if (err)
 						instance.send('error', err + '');
-					else
-						instance.send('output', { pin: config.gpiokey, value: true });
 				});
 			} else if (instance.pwmHandlerCount < 10) {
 				RPI.write(config.gpiokey, false, function(err) {
 					if (err)
 						instance.send('error', err + '');
-					else
-						instance.send('output', { pin: config.gpiokey, value: false });
 				});
 			} else
 				instance.pwmHandlerCount = -1;
@@ -42,11 +38,11 @@
 				instance.pwmHandler && clearInterval(instance.pwmHandler); // clear PWM
 				instance.pwmHandlerCount = -1;
 				RPI.setup(config.gpiokey, RPI.DIR_OUT, RPI.EDGE_NONE)
+				$.send('output', { pin: config.gpiokey, value: duration });
 				if (duration != 0.0)
 					instance.pwmHandler = setInterval(handler, 10, duration);
-			}
-
-			$.destroy();
+			} else
+				$.destroy();
 		};
 	};
 
