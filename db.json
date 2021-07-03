@@ -9,6 +9,15 @@
 		"version": "1"
 	},
 	{
+		"id": "connections",
+		"group": "Linux Monitoring",
+		"name": "Connections",
+		"author": "Peter Širka",
+		"icon": "far fa-chart-network",
+		"color": "",
+		"version": ""
+	},
+	{
 		"id": "counter",
 		"group": "Common",
 		"name": "Counter",
@@ -16,6 +25,15 @@
 		"icon": "fa fa-calculator",
 		"color": "",
 		"version": "1"
+	},
+	{
+		"id": "cpu",
+		"group": "Linux Monitoring",
+		"name": "CPU",
+		"author": "Peter Širka",
+		"icon": "far fa-microchip",
+		"color": "",
+		"version": ""
 	},
 	{
 		"id": "delay",
@@ -45,6 +63,15 @@
 		"version": "1"
 	},
 	{
+		"id": "hdd",
+		"group": "Linux Monitoring",
+		"name": "HDD",
+		"author": "Peter Širka",
+		"icon": "far fa-hdd",
+		"color": "",
+		"version": ""
+	},
+	{
 		"id": "input",
 		"group": "FlowStream",
 		"name": "Input",
@@ -61,6 +88,15 @@
 		"icon": "fas fa-binoculars",
 		"color": "",
 		"version": "1"
+	},
+	{
+		"id": "memory",
+		"group": "Linux Monitoring",
+		"name": "Memory",
+		"author": "Peter Širka",
+		"icon": "far fa-memory",
+		"color": "",
+		"version": ""
 	},
 	{
 		"id": "modified",
@@ -88,6 +124,15 @@
 		"icon": "fa fa-print",
 		"color": "",
 		"version": "1"
+	},
+	{
+		"id": "process",
+		"group": "Linux Monitoring",
+		"name": "Process",
+		"author": "Peter Širka",
+		"icon": "fas fa-heart-rate",
+		"color": "",
+		"version": ""
 	},
 	{
 		"id": "publish",
@@ -187,6 +232,15 @@
 		"icon": "fa fa-broadcast-tower",
 		"color": "",
 		"version": "1"
+	},
+	{
+		"id": "tail",
+		"group": "Linux Monitoring",
+		"name": "Tail",
+		"author": "Peter Širka",
+		"icon": "far fa-file-alt",
+		"color": "",
+		"version": ""
 	},
 	{
 		"id": "timer",

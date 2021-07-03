@@ -1,0 +1,104 @@
+<script total>
+
+	exports.name = 'HDD';
+	exports.icon = 'far fa-hdd';
+	exports.group = 'Linux Monitoring';
+	exports.config = { interval: 60, path: '/' };
+	exports.outputs = [{ id: 'output', name: 'Output' }, { id: 'error', name: 'Error' }];
+	exports.author = 'Peter Širka';
+
+	exports.make = function(instance, config) {
+
+		var stats = { free: 0, total: 0, used: 0 };
+		var interval;
+
+		var measure = function() {
+
+			if (!config.path)
+				return;
+
+			F.Child.exec('df -hTB1 {0}'.format(config.path), function(err, response) {
+
+				if (err) {
+					instance.send('error', err + '');
+					return;
+				}
+
+				response.parseTerminal(function(info) {
+					stats.total = info[2].parseInt();
+					stats.free = info[4].parseInt();
+					stats.used = info[3].parseInt();
+				}, 1);
+
+				instance.status(stats);
+				stats.total = (stats.total / 1024 / 1024).floor(2);
+				stats.free = (stats.free / 1024 / 1024).floor(2);
+				stats.used = (stats.used / 1024 / 1024).floor(2);
+				instance.send('output', stats);
+			});
+		}
+
+		instance.configure = function() {
+			interval && clearInterval(interval);
+			interval = setInterval(measure, config.interval * 1000);
+			setImmediate(measure);
+		};
+
+		instance.close = function() {
+			interval && clearInterval(interval);
+			interval = null;
+		};
+
+		instance.configure();
+	};
+
+</script>
+
+<readme>
+This component monitors HDD consumption (in MB) in the Linux systems. It uses `df` command.
+
+__Data Example__:
+
+```js
+{
+	free: 0,
+	total: 0,
+	used: 0
+}
+```
+</readme>
+
+<style>
+	.f-hdd footer { padding: 10px; font-size: 11px; }
+	.f-hdd footer > div > div { height: 16px; }
+	.f-hdd footer b { float: right; }
+</style>
+
+<settings>
+	<div class="padding">
+		<div class="row">
+			<div class="col-md-4">
+				<div data---="input__?.interval__type:number;required:1">Interval</div>
+				<div class="help">In seconds</div>
+			</div>
+			<div class="col-md-4">
+				<div data---="input__?.path__required:1">Path</div>
+			</div>
+		</div>
+	</div>
+</settings>
+
+<body>
+	<header>
+		<i class="far fa-hdd"></i>HDD
+	</header>
+	<footer>
+		<div data-bind="!?.status.{0}__template__show">
+			<script type="text/html">
+				<div><b>{{ value.free | filesize }}</b>Free</div>
+				<div><b>{{ value.used | filesize }}</b>Used</div>
+				<div><b>{{ value.total | filesize }}</b>Total</div>
+			</script>
+		</div>
+	</footer>
+</body>

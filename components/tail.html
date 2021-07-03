@@ -1,0 +1,88 @@
+<script total>
+
+	exports.name = 'Tail';
+	exports.icon = 'far fa-file-alt';
+	exports.group = 'Linux Monitoring';
+	exports.config = { path: '/var/log/syslog' };
+	exports.author = 'Peter Širka';
+	exports.outputs = [{ id: 'output', name: 'Output' }, { id: 'error', name: 'Error' }];
+
+	exports.make = function(instance, config) {
+
+		var stats = { value: '' };
+		var proc;
+
+		var watch = function() {
+
+			proc && proc.kill(9);
+
+			proc = require('child_process').spawn('tail', ['-n 1', '-f', config.path]);
+
+			proc.on('close', function() {
+				proc = null;
+			});
+
+			proc.on('error', function(err) {
+				instance.send('error', err + '');
+			});
+
+			proc.stdout.on('data', function(response) {
+				stats.value = response.toString('utf8').trim();
+				stats.date = new Date();
+				instance.status(stats);
+				instance.send('output', stats);
+			});
+		};
+
+		instance.close = function() {
+			if (proc) {
+				proc.kill(9);
+				proc = null;
+			}
+		};
+
+		instance.configure = function() {
+			watch();
+		};
+
+		instance.configure();
+	};
+
+</script>
+
+<readme>
+This component monitors last line in some text file with the help of `tail` command in the Linux systems.
+
+__Data Example__:
+
+```js
+{
+	value: 'Some meessage'
+	date: Date
+}
+```
+</readme>
+
+<style>
+	.f-tail footer { padding: 10px 5px; font-size: 11px; }
+</style>
+
+<settings>
+	<div class="padding">
+		<div data---="input__?.path__required:1">Path</div>
+	</div>
+</settings>
+
+<body>
+	<header>
+		<i class="far fa-file-alt"></i>Tail - <code data-bind="?.config.{0}.path__text__empty"></code>
+	</header>
+	<footer>
+		<div data-bind="!?.status.{0}__template__show:value.value">
+			<script type="text/html">
+				<div class="b">{{ value.date | format('HH:mm:ss') }}</div>
+				<div>{{ value.value }}</div>
+			</script>
+		</div>
+	</footer>
+</body>

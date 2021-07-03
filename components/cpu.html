@@ -1,0 +1,88 @@
+<script total>
+
+	exports.name = 'CPU';
+	exports.icon = 'far fa-microchip';
+	exports.group = 'Linux Monitoring';
+	exports.outputs = [{ id: 'output', name: 'Output' }, { id: 'error', name: 'Error' }];
+	exports.author = 'Peter Širka';
+
+	exports.make = function(instance, config) {
+
+		var stats = { cpu: 0, cores: [] };
+		var delay;
+
+		var send = function() {
+			delay = null;
+
+			for (var i = 0; i < stats.cores.length; i++) {
+				if (stats.cores[i] == null)
+					stats.cores[i] = 0;
+			}
+
+			instance.send('output', CLONE(stats));
+		};
+
+		var proc = require('child_process').spawn('mpstat', ['-P', 'ALL', '10']);
+
+		proc.on('close', function() {
+			proc = null;
+		});
+
+		proc.on('error', function(err) {
+			instance.send('error', err + '');
+		});
+
+		proc.stdout.on('data', function(response) {
+			response.toString('utf8').parseTerminal(function(arr) {
+
+				if (arr[2] === 'all') {
+					stats.cpu = +arr[3];
+					instance.status(stats.cpu);
+				} else
+					stats.cores[+arr[2]] = +arr[3];
+
+				delay && clearTimeout(delay);
+				delay = setTimeout(send, 100);
+			}, 1);
+		});
+
+		instance.close = function() {
+			clearTimeout(delay);
+			if (proc) {
+				proc.kill(9);
+				proc = null;
+			}
+		};
+
+	};
+
+</script>
+
+<readme>
+This component monitors CPU `% percentage` consumption in the Linux systems. It uses `mpstat` command with 10 seconds interval.
+
+__Data Example__:
+
+```js
+{
+	cpu: 30, // percentage
+	cores: [4, 60, 0], // percentage
+	count: 3 // count of cores
+}
+```
+</readme>
+
+<style>
+	.f-cpu footer { padding: 10px 5px; font-size: 11px; }
+	.f-cpu footer .progress { border: 1px solid #E0E0E0; padding: 1px; margin-bottom: 3px; }
+	.f-cpu footer .progress > div { height: 4px; }
+</style>
+
+<body>
+	<header>
+		<i class="far fa-microchip"></i>CPU
+	</header>
+	<footer>
+		<div data---="progress__!?.status.{0}"></div>
+	</footer>
+</body>

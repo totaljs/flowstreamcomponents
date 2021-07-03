@@ -1,0 +1,123 @@
+<script total>
+
+	exports.name = 'Process';
+	exports.icon = 'fas fa-heart-rate';
+	exports.group = 'Linux Monitoring';
+	exports.config = { interval: 10, grep: '' };
+	exports.outputs = [{ id: 'output', name: 'Output' }, { id: 'error', name: 'Error' }];
+	exports.author = 'Peter Širka';
+
+	exports.make = function(instance, config) {
+
+		var stats = { cpu: 0, memory: 0 };
+		var interval;
+
+		var measure = function() {
+
+			if (!config.grep)
+				return;
+
+			F.Child.exec('ps aux | grep "{0}" | grep -v "grep" | awk {\'print $2\'}'.format(config.grep), function(err, response) {
+
+				if (err) {
+					instance.send('error', err + '');
+					return;
+				}
+
+				var pid = response.trim().split('\n');
+				var count = pid.length;
+				pid = pid.join(',');
+				if (!pid) {
+					instance.send('error', 'No process');
+					return;
+				}
+
+				F.Child.exec('ps -p {0} -o %cpu,rss,etime'.format(pid), function(err, response) {
+					var line = response.split('\n')[1];
+					line = line.trim().replace(/\s{2,}/g, ' ').split(' ');
+					stats.count = count;
+					stats.grep = config.grep;
+					stats.cpu = line[0].parseFloat();
+					stats.memory = line[1].parseInt() * 1024; // kB to bytes
+					stats.uptime = line[2];
+
+					// Open Files
+					F.Child.exec('ls /proc/{0}/fd/ | wc -l'.format(pid), function(err, response) {
+						stats.files = response.trim().parseInt2();
+						instance.status(stats);
+						stats.memory = (stats.memory / 1024 / 1024).floor(2);
+						instance.send('output', stats);
+					});
+				});
+			});
+		}
+
+		instance.configure = function() {
+			interval && clearInterval(interval);
+			interval = setInterval(measure, config.interval * 1000);
+			setImmediate(measure);
+		};
+
+		instance.close = function() {
+			interval && clearInterval(interval);
+			interval = null;
+		};
+
+		instance.configure();
+	};
+
+</script>
+
+<readme>
+This component monitors CPU (in %) and Memory consumption (in MB) in the Linux systems for the specific process. It uses `ps` command.
+
+__Data Example__:
+
+```js
+{
+	grep: 'nginx',
+	cpu: 0.5,
+	memory: 45,
+	files: 343,
+	uptime: '1 day'
+}
+```
+</readme>
+
+<style>
+	.f-process footer { padding: 10px; font-size: 11px; }
+	.f-process footer > div > div { height: 16px; }
+	.f-process footer b { float: right; }
+</style>
+
+<settings>
+	<div class="padding">
+		<div class="row">
+			<div class="col-md-4">
+				<div data---="input__?.interval__type:number;required:1">Interval</div>
+				<div class="help">In seconds</div>
+			</div>
+			<div class="col-md-4">
+				<div data---="input__?.grep__required:1">App name</div>
+			</div>
+		</div>
+	</div>
+</settings>
+
+<body>
+	<header>
+		<i class="fas fa-heart-rate"></i>Process
+	</header>
+	<footer>
+		<div data-bind="!?.status.{0}__template__show">
+			<script type="text/html">
+				<div><b>{{ value.grep }}</b>Name</div>
+				<div><b>{{ value.count }}</b>Processes</div>
+				<div><b>{{ value.cpu }}%</b>CPU</div>
+				<div><b>{{ value.files }}</b>Open files</div>
+				<div><b>{{ value.memory | filesize }}</b>Memory</div>
+				<div><b>{{ value.uptime }}</b>Uptime</div>
+			</script>
+		</div>
+	</footer>
+</body>
