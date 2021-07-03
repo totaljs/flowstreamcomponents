@@ -15,7 +15,7 @@
 		"author": "Peter Širka",
 		"icon": "far fa-chart-network",
 		"color": "",
-		"version": ""
+		"version": "1"
 	},
 	{
 		"id": "counter",
@@ -33,7 +33,7 @@
 		"author": "Peter Širka",
 		"icon": "far fa-microchip",
 		"color": "",
-		"version": ""
+		"version": "1"
 	},
 	{
 		"id": "delay",
@@ -69,7 +69,7 @@
 		"author": "Peter Širka",
 		"icon": "far fa-hdd",
 		"color": "",
-		"version": ""
+		"version": "1"
 	},
 	{
 		"id": "input",
@@ -96,7 +96,7 @@
 		"author": "Peter Širka",
 		"icon": "far fa-memory",
 		"color": "",
-		"version": ""
+		"version": "1"
 	},
 	{
 		"id": "modified",
@@ -132,7 +132,7 @@
 		"author": "Peter Širka",
 		"icon": "fas fa-heart-rate",
 		"color": "",
-		"version": ""
+		"version": "1"
 	},
 	{
 		"id": "publish",
@@ -240,7 +240,7 @@
 		"author": "Peter Širka",
 		"icon": "far fa-file-alt",
 		"color": "",
-		"version": ""
+		"version": "1"
 	},
 	{
 		"id": "timer",
