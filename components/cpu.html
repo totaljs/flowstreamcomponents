@@ -37,10 +37,12 @@
 			response.toString('utf8').parseTerminal(function(arr) {
 
 				if (arr[2] === 'all') {
-					stats.cpu = +arr[3];
+					stats.cpu = (arr[3] || '').parseFloat2();
 					instance.status(stats.cpu);
-				} else
-					stats.cores[+arr[2]] = +arr[3];
+				} else {
+					var index = (arr[2] || '').parseInt2();
+					stats.cores[index] = (arr[3] || '').parseFloat2();
+				}
 
 				delay && clearTimeout(delay);
 				delay = setTimeout(send, 100);
