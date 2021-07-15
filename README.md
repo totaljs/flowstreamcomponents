@@ -4,7 +4,9 @@
 - [Join Total.js Telegram](https://t.me/totaljs)
 - [Support](https://www.totaljs.com/support/)
 
-This repository contains open-source __Total.js FlowStream components__.
+This repository contains open-source __Total.js FlowStream components__. Please keep:
+
+- [Our coding standards and guidelines](https://docs.totaljs.com/welcome/67b47001ty51c/)
 
 ## Contact
 
