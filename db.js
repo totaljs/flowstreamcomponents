@@ -26,6 +26,7 @@ PATH.fs.readdir('components', function(err, response) {
 
 			data.group = group ? evaluate(group[0]).group : '';
 			data.name = name ? evaluate(name[0]).name : '';
+			data.url = 'https://cdn.totaljs.com/flowstream/components/' + filename;
 			data.author = author ? evaluate(author[0]).author : '';
 			data.icon = icon ? evaluate(icon[0]).icon : '';
 			data.color = color ? evaluate(color[0]).color : '';
