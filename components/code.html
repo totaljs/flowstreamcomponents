@@ -2,10 +2,10 @@
 
 	exports.name = 'Code';
 	exports.group = 'Common';
-	exports.version = '1';
+	exports.version = '2';
 	exports.icon = 'fa fa-code';
 	exports.author = 'Peter Širka';
-	exports.config = { outputs: 1, code: '// $;\n// cache;// vars;\n// repo;\n// value;\n// send(value);\n// error(err);' };
+	exports.config = { outputs: 1, code: '// instance {FlowStreamInstance};\n// $ {FlowStreamMessage};\n// vars {Object};\n// repo {Object};\n// data {String/Number/Boolean/Date/Buffer/Object};\n// $.send([output], data);\n// $.destroy();\n// $.throw(err);\n\n// IMPORTANT: If you do not perform re-send, you need to destroy this message via $.destroy() method\n// IMPORTANT: methods $.send(), $.destroy() and $.throw() can be executed only once\n\n// $.send(\'output\', data);\n$.destroy();' };
 	exports.inputs = [{ id: 'input', name: 'Input' }];
 	exports.outputs = [{ id: 'output', name: 'Output' }];
 
@@ -16,21 +16,20 @@
 		instance.message = function($) {
 			if (fn) {
 				try {
-					var send = data => instance.send('output', data);
-					var error = err => $.throw(err);
-					fn($.data, instance, instance.cache, $, $, require, send, error);
+					var send = data => $.send('output', data);
+					fn($.data, instance, $, $, F.require, send, $.repo, $.vars, $.data);
 				} catch (e) {
+					$.destroy();
 					$.throw(e);
 				}
 			}
-			$.destroy();
 		};
 
 		instance.configure = function() {
 			try {
 				if (config.code) {
 					instance.status(1);
-					fn = new Function('value', 'instance', 'cache', '$', 'message', 'require', 'send', 'error', 'repo', 'vars', config.code);
+					fn = new Function('value', 'instance', '$', 'message', 'require', 'send', 'repo', 'vars', 'data', config.code);
 				} else {
 					instance.status(0);
 					fn = null;
