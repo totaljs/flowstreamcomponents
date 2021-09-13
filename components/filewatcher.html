@@ -1,0 +1,108 @@
+<script total>
+
+	exports.name = 'File Watcher';
+	exports.group = 'Files';
+	exports.version = '1';
+	exports.icon = 'fa fa-recycle';
+	exports.author = 'Peter Širka';
+	exports.config = { path: '', parser: 'json', interval: 1000 };
+	exports.outputs = [{ id: 'output', name: 'Output' }];
+
+	exports.make = function(instance, config) {
+
+		var old;
+		var timeout;
+
+		var monitor = function() {
+
+			if (!config.path)
+				return;
+
+			var path = config.path[0] === '~' ? PATH.root(config.path.substring(1)) : config.path;
+
+			F.Fs.readFile(path, function(err, response) {
+				if (response) {
+					F.Fs.unlink(path, NOOP);
+					instance.status({ used: new Date() });
+					timeout = setTimeout(monitor, config.interval);
+					switch (config.parser) {
+						case 'json':
+							response = response.toString('utf8').parseJSON(true);
+							break;
+						case 'text':
+							response = response.toString('utf8');
+							break;
+						case 'number':
+							response = parseFloat(response.toString('utf8').replace(/\,/g, '.'));
+							if (isNaN(response))
+								response = null;
+							break;
+						case 'date':
+							response = response.toString('utf8').parseDate();
+							if (response && isNaN(response.getTime()))
+								response = null;
+							break;
+					}
+
+					if (response !== null)
+						instance.send('output', response);
+
+				} else
+					timeout = setTimeout(monitor, config.interval);
+			});
+		};
+
+		instance.configure = function() {
+			if (config.path) {
+				timeout && clearTimeout(timeout);
+				timeout = setTimeout(monitor, config.interval);
+			}
+		};
+
+		instance.close = function() {
+			timeout && clearTimeout(timeout);
+			timeout = null;
+		};
+
+		instance.configure();
+
+	};
+
+</script>
+
+<settings>
+	<div class="padding">
+		<div class="row">
+			<div class="col-md-9 m">
+				<div data---="input__?.path___required:1;placeholder:/www/flowstream/data.json"><b>Path</b></div>
+				<div class="help">Absolute path to the file. The path starts with the <code>~</code> char will watch filename in the project's root directory.</div>
+			</div>
+			<div class="col-md-3 m">
+				<div data---="input__?.interval___required:1;type:number;min:100;align:1;ricon:!ms__1000">Interval</div>
+			</div>
+		</div>
+		<div data---="input__?.parser__dirsource:json|JSON,text|Text,buffer|Buffer,number|Number,date|Date;required:1__'json'" class="m">Parser</div>
+
+	</div>
+</settings>
+
+<readme>
+The component watches the existence of the file, then reads the content and sends it next. The file will be removed automatically after reading.
+</readme>
+
+<style>
+	.f-filewatcher footer { padding: 10px; font-size: 12px; }
+	.f-filewatcher hr { margin: 5px 0; }
+</style>
+
+<body>
+	<header>
+		<i class="fa fa-recycle"></i>File Watcher
+	</header>
+	<footer>
+		<div><i class="far fa-clock-o mr5"></i><span data-bind="?.config.{0}.interval__text__empty"></span> ms</div>
+		<div><i class="fa fa-recycle mr5"></i><span data-bind="?.status.{0}.used__text__format:yyyy-MM-dd HH:mm:ss__empty"></span></div>
+		<hr />
+		<div data-bind="?.config.{0}.path__text__empty"></div>
+	</footer>
+</body>

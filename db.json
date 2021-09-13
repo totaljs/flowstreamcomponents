@@ -70,6 +70,16 @@
 		"version": "1"
 	},
 	{
+		"id": "filewatcher",
+		"group": "Files",
+		"name": "File Watcher",
+		"url": "https://cdn.totaljs.com/flowstream/components/filewatcher.html",
+		"author": "Peter Širka",
+		"icon": "fa fa-recycle",
+		"color": "",
+		"version": "1"
+	},
+	{
 		"id": "hdd",
 		"group": "Linux Monitoring",
 		"name": "HDD",
