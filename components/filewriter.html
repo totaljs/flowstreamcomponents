@@ -1,0 +1,112 @@
+<script total>
+
+	exports.name = 'File Writer';
+	exports.group = 'Files';
+	exports.version = '1';
+	exports.icon = 'fa fa-pencil';
+	exports.author = 'Peter Širka';
+	exports.config = { path: '', serializer: 'json', rewrite: true, divider: '\\n' };
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+
+	exports.make = function(instance, config) {
+
+		var path;
+		var divider;
+		var timeout;
+
+		var replacewhitechar = function(text) {
+			switch (text[1]) {
+				case 'n':
+					return '\n';
+				case 'r':
+					return '\r';
+				case 't':
+					return '\t';
+			}
+			return text;
+		};
+
+		instance.message = function($) {
+
+			if (!config.path)
+				return;
+
+			var data = $.data;
+
+			switch (config.serializer) {
+				case 'json':
+					data = JSON.stringify($.data);
+					break;
+				case 'text':
+					data = data + '';
+					break;
+			}
+
+			if (!(data instanceof Buffer)) {
+				if (typeof(data) !== 'string')
+					data = data + '';
+				data = Buffer.from(data, 'utf8');
+			}
+
+			NOW = new Date();
+			instance.status({ used: NOW, size: data.length });
+
+			if (config.rewrite) {
+				F.Fs.writeFile(path, data, NOOP);
+			} else {
+				if (divider)
+					data = Buffer.concat([data, divider]);
+				F.Fs.appendFile(path, data, NOOP);
+			}
+
+			$.destroy();
+		};
+
+		instance.configure = function() {
+			path = config.path[0] === '~' ? PATH.root(config.path.substring(1)) : config.path;
+			divider = config.divider ? Buffer.from(config.divider.replace(/\\[a-z]/g, replacewhitechar), 'utf8') : null;
+		};
+
+		instance.configure();
+
+	};
+
+</script>
+
+<settings>
+	<div class="padding">
+		<div data---="input__?.path__required:1;placeholder:/www/flowstream/data.json" class="m"><b>Path</b></div>
+		<div class="help">Absolute path to the file. The path starts with the <code>~</code> char will use a filename in the project's root directory.</div>
+		<div data---="input__?.serializer__dirsource:json|JSON,text|Text,buffer|Buffer;required:1__'json'" class="m">Serializer</div>
+		<div data---="input__?.rewrite__type:checkbox__true">Rewrite content</div>
+		<div data-bind="?.rewrite__hide" class="hidden">
+			<hr />
+			<div class="row">
+				<div class="col-md-4 m">
+					<div data---="input__?.divider">Divider</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</settings>
+
+<readme>
+The component writes incoming data into the file.
+</readme>
+
+<style>
+	.CLASS footer { padding: 10px; font-size: 12px; }
+	.CLASS hr { margin: 5px 0; }
+</style>
+
+<body>
+	<header>
+		<i class="fa fa-pencil"></i>File Writer
+	</header>
+	<footer>
+		<div><i class="far fa-calendar mr5"></i><span data-bind="STATUS.used__text__format:yyyy-MM-dd HH:mm:ss__empty"></span></div>
+		<div><i class="fa fa-calculator mr5"></i><span data-bind="STATUS.size__text__helper:filesize__empty"></span></div>
+		<hr />
+		<div data-bind="CONFIG.path__text__empty"></div>
+	</footer>
+</body>

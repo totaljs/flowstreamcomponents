@@ -21,9 +21,9 @@
 </script>
 
 <style>
-	.f-print footer > div { margin: 10px; }
-	.f-print pre { font-size: 10px; margin: 0; padding: 5px; background-color: #F0F0F0; border-radius: var(--radius); }
-	.ui-dark .f-print pre { background-color: #404040; tab-size: 2; }
+	.CLASS footer > div { margin: 10px; }
+	.CLASS pre { font-size: 10px; margin: 0; padding: 5px; background-color: #F0F0F0; border-radius: var(--radius); }
+	.ui-dark .CLASS pre { background-color: #404040; tab-size: 2; }
 </style>
 
 <readme>
@@ -35,7 +35,7 @@ The component prints incoming data into the JSON format.
 		<i class="fa fa-print"></i>Print
 	</header>
 	<footer>
-		<div data-bind="!?.status.{0}__html pre:Thelpers.jsonformat(JSON.stringify(value, null, '\t'))__show" class="hidden selectable">
+		<div data-bind="!STATUS__html pre:Thelpers.jsonformat(JSON.stringify(value, null, '\t'))__show" class="hidden selectable">
 			<pre class="json"></pre>
 		</div>
 	</footer>

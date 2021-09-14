@@ -72,13 +72,13 @@
 </script>
 
 <style>
-	.f-timer .padding { padding: 0 10px 10px; }
-	.f-timer button { width: 100%; height: 24px; border: 1px solid #E0E0E0; border-radius: var(--radius); color: #000; background-color: #F0F0F0; margin: 0; }
-	.f-timer button:hover { background-color: #F8F8F8; }
-	.f-timer button:active { background-color: #E0E0E0; }
-	.ui-dark .f-timer button { border-color: #404040; color: #FFF; background-color: #222; }
-	.ui-dark .f-timer button:hover { background-color: #303030; }
-	.ui-dark .f-timer button:active { background-color: #404040; }
+	.CLASS .padding { padding: 0 10px 10px; }
+	.CLASS button { width: 100%; height: 24px; border: 1px solid #E0E0E0; border-radius: var(--radius); color: #000; background-color: #F0F0F0; margin: 0; }
+	.CLASS button:hover { background-color: #F8F8F8; }
+	.CLASS button:active { background-color: #E0E0E0; }
+	.ui-dark .CLASS button { border-color: #404040; color: #FFF; background-color: #222; }
+	.ui-dark .CLASS button:hover { background-color: #303030; }
+	.ui-dark .CLASS button:active { background-color: #404040; }
 </style>
 
 <settings>
@@ -113,6 +113,6 @@ The component triggers data into the Flow in the specified interval.
 	</header>
 	<div class="padding">
 		<button class="exec" data-exec="FUNC.ftimer_exec">Run</button>
-		<div class="help">Interval: <span data-bind="?.config.{0}.interval__text__empty"></span> ms</div>
+		<div class="help">Interval: <span data-bind="CONFIG.interval__text__empty"></span> ms</div>
 	</div>
 </body>

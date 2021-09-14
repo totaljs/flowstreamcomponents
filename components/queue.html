@@ -84,13 +84,13 @@
 </script>
 
 <style>
-	.f-queue .status { font-size: 12px; margin: 0; padding: 10px; }
-	.f-queue button { float: right; height: 20px; font-size: 11px; border: 1px solid #E0E0E0; border-radius: var(--radius); color: #000; background-color: transparent; margin: 0; padding: 0 5px; }
-	.f-queue button:hover { background-color: #F8F8F8; }
-	.f-queue button:active { background-color: #E0E0E0; }
-	.ui-dark .f-queue button { border-color: #404040; color: #FFF; }
-	.ui-dark .f-queue button:hover { background-color: #303030; }
-	.ui-dark .f-queue button:active { background-color: #404040; }
+	.CLASS .status { font-size: 12px; margin: 0; padding: 10px; }
+	.CLASS button { float: right; height: 20px; font-size: 11px; border: 1px solid #E0E0E0; border-radius: var(--radius); color: #000; background-color: transparent; margin: 0; padding: 0 5px; }
+	.CLASS button:hover { background-color: #F8F8F8; }
+	.CLASS button:active { background-color: #E0E0E0; }
+	.ui-dark .CLASS button { border-color: #404040; color: #FFF; }
+	.ui-dark .CLASS button:hover { background-color: #303030; }
+	.ui-dark .CLASS button:active { background-color: #404040; }
 </style>
 
 <script>
@@ -109,6 +109,6 @@ A simple persistent queue for the incomming messages.
 		<i class="fas fa-list"></i>Queue
 	</header>
 	<footer>
-		<div class="status">Delayed messages: <b data-bind="?.status.{0}.pending__text:value?value.format(0):'0'"></b></div>
+		<div class="status">Delayed messages: <b data-bind="STATUS.pending__text:value?value.format(0):'0'"></b></div>
 	</footer>
 </body>

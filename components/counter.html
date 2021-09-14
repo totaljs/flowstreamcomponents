@@ -28,13 +28,13 @@
 </script>
 
 <style>
-	.f-counter .status { font-size: 35px; margin: 0; padding: 0 10px 5px; font-weight: bold; }
-	.f-counter button { float: right; height: 20px; font-size: 11px; border: 1px solid #E0E0E0; border-radius: var(--radius); color: #000; background-color: transparent; margin: 0; padding: 0 5px; }
-	.f-counter button:hover { background-color: #F8F8F8; }
-	.f-counter button:active { background-color: #E0E0E0; }
-	.ui-dark .f-counter button { border-color: #404040; color: #FFF; }
-	.ui-dark .f-counter button:hover { background-color: #303030; }
-	.ui-dark .f-counter button:active { background-color: #404040; }
+	.CLASS .status { font-size: 35px; margin: 0; padding: 0 10px 5px; font-weight: bold; }
+	.CLASS button { float: right; height: 20px; font-size: 11px; border: 1px solid #E0E0E0; border-radius: var(--radius); color: #000; background-color: transparent; margin: 0; padding: 0 5px; }
+	.CLASS button:hover { background-color: #F8F8F8; }
+	.CLASS button:active { background-color: #E0E0E0; }
+	.ui-dark .CLASS button { border-color: #404040; color: #FFF; }
+	.ui-dark .CLASS button:hover { background-color: #303030; }
+	.ui-dark .CLASS button:active { background-color: #404040; }
 </style>
 
 <script>
@@ -53,6 +53,6 @@ The component counts incoming messages.
 		<i class="fa fa-calculator"></i>Counter
 	</header>
 	<footer>
-		<div data-bind="!?.status.{0}__text:value.format(0)__show:value>=0" class="status hidden"></div>
+		<div data-bind="!STATUS__text:value.format(0)__show:value>=0" class="status hidden"></div>
 	</footer>
 </body>

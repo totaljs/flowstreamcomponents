@@ -23,7 +23,8 @@
 			F.Fs.readFile(path, function(err, response) {
 				if (response) {
 					F.Fs.unlink(path, NOOP);
-					instance.status({ used: new Date() });
+					NOW = new Date();
+					instance.status({ used: NOW, size: response.length });
 					timeout = setTimeout(monitor, config.interval);
 					switch (config.parser) {
 						case 'json':
@@ -82,7 +83,6 @@
 			</div>
 		</div>
 		<div data---="input__?.parser__dirsource:json|JSON,text|Text,buffer|Buffer,number|Number,date|Date;required:1__'json'" class="m">Parser</div>
-
 	</div>
 </settings>
 
@@ -91,8 +91,8 @@ The component watches the existence of the file, then reads the content and send
 </readme>
 
 <style>
-	.f-filewatcher footer { padding: 10px; font-size: 12px; }
-	.f-filewatcher hr { margin: 5px 0; }
+	.CLASS footer { padding: 10px; font-size: 12px; }
+	.CLASS hr { margin: 5px 0; }
 </style>
 
 <body>
@@ -100,9 +100,9 @@ The component watches the existence of the file, then reads the content and send
 		<i class="fa fa-recycle"></i>File Watcher
 	</header>
 	<footer>
-		<div><i class="far fa-clock-o mr5"></i><span data-bind="?.config.{0}.interval__text__empty"></span> ms</div>
-		<div><i class="fa fa-recycle mr5"></i><span data-bind="?.status.{0}.used__text__format:yyyy-MM-dd HH:mm:ss__empty"></span></div>
+		<div><i class="far fa-calendar mr5"></i><span data-bind="STATUS.used__text__format:yyyy-MM-dd HH:mm:ss__empty"></span></div>
+		<div><i class="fa fa-calculator mr5"></i><span data-bind="STATUS.size__text__helper:filesize__empty"></span></div>
 		<hr />
-		<div data-bind="?.config.{0}.path__text__empty"></div>
+		<div data-bind="CONFIG.path__text__empty"></div>
 	</footer>
 </body>

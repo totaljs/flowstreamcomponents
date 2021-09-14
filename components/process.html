@@ -86,9 +86,9 @@ __Data Example__:
 </readme>
 
 <style>
-	.f-process footer { padding: 10px; font-size: 11px; }
-	.f-process footer > div > div { height: 16px; }
-	.f-process footer b { float: right; }
+	.CLASS footer { padding: 10px; font-size: 11px; }
+	.CLASS footer > div > div { height: 16px; }
+	.CLASS footer b { float: right; }
 </style>
 
 <settings>
@@ -110,7 +110,7 @@ __Data Example__:
 		<i class="fas fa-heart-rate"></i>Process
 	</header>
 	<footer>
-		<div data-bind="!?.status.{0}__template__show">
+		<div data-bind="!STATUS__template__show">
 			<script type="text/html">
 				<div><b>{{ value.grep }}</b>Name</div>
 				<div><b>{{ value.count }}</b>Processes</div>

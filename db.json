@@ -80,6 +80,16 @@
 		"version": "1"
 	},
 	{
+		"id": "filewriter",
+		"group": "Files",
+		"name": "File Writer",
+		"url": "https://cdn.totaljs.com/flowstream/components/filewriter.html",
+		"author": "Peter Širka",
+		"icon": "fa fa-pencil",
+		"color": "",
+		"version": "1"
+	},
+	{
 		"id": "hdd",
 		"group": "Linux Monitoring",
 		"name": "HDD",

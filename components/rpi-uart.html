@@ -64,7 +64,7 @@
 </script>
 
 <style>
-	.f-rpiuart .status { font-size: 12px; margin: 0; padding: 0 10px 5px; font-weight: bold; }
+	.CLASS .status { font-size: 12px; margin: 0; padding: 0 10px 5px; font-weight: bold; }
 </style>
 
 <readme>
@@ -89,7 +89,7 @@
 		<i class="fab fa-raspberry-pi"></i>Raspberry UART
 	</header>
 	<footer>
-		<div data-bind="!?.status.{0}__template__show" class="status hidden">
+		<div data-bind="!STATUS__template__show" class="status hidden">
 			{{ if value.open }}
 				<i class="fa fa-circle mr5 green"></i>Open
 			{{ else }}

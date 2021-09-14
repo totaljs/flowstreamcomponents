@@ -65,7 +65,7 @@ __Data Example__:
 </readme>
 
 <style>
-	.f-tail footer { padding: 10px 5px; font-size: 11px; }
+	.CLASS footer { padding: 10px 5px; font-size: 11px; }
 </style>
 
 <settings>
@@ -76,10 +76,10 @@ __Data Example__:
 
 <body>
 	<header>
-		<i class="far fa-file-alt"></i>Tail - <code data-bind="?.config.{0}.path__text__empty"></code>
+		<i class="far fa-file-alt"></i>Tail - <code data-bind="CONFIG.path__text__empty"></code>
 	</header>
 	<footer>
-		<div data-bind="!?.status.{0}__template__show:value.value">
+		<div data-bind="!STATUS__template__show:value.value">
 			<script type="text/html">
 				<div class="b">{{ value.date | format('HH:mm:ss') }}</div>
 				<div>{{ value.value }}</div>

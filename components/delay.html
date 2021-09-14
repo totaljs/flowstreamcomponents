@@ -70,16 +70,16 @@
 </script>
 
 <style>
-	.f-delay .status { font-size: 12px; margin: 0; padding: 10px; }
-	.f-delay .status span { color: #A0A0A0; }
-	.f-delay .padding { padding: 0 10px 10px; }
-	.f-delay button { width: 100%; height: 24px; border: 1px solid #E0E0E0; border-radius: var(--radius); color: #000; background-color: #F0F0F0; margin: 0; }
-	.f-delay button:hover { background-color: #F8F8F8; }
-	.f-delay button:active { background-color: #E0E0E0; }
-	.ui-dark .f-delay .status span { color: #777; }
-	.ui-dark .f-delay button { border-color: #404040; color: #FFF; background-color: #222; }
-	.ui-dark .f-delay button:hover { background-color: #303030; }
-	.ui-dark .f-delay button:active { background-color: #404040; }
+	.CLASS .status { font-size: 12px; margin: 0; padding: 10px; }
+	.CLASS .status span { color: #A0A0A0; }
+	.CLASS .padding { padding: 0 10px 10px; }
+	.CLASS button { width: 100%; height: 24px; border: 1px solid #E0E0E0; border-radius: var(--radius); color: #000; background-color: #F0F0F0; margin: 0; }
+	.CLASS button:hover { background-color: #F8F8F8; }
+	.CLASS button:active { background-color: #E0E0E0; }
+	.ui-dark .CLASS .status span { color: #777; }
+	.ui-dark .CLASS button { border-color: #404040; color: #FFF; background-color: #222; }
+	.ui-dark .CLASS button:hover { background-color: #303030; }
+	.ui-dark .CLASS button:active { background-color: #404040; }
 </style>
 
 <settings>
@@ -105,8 +105,8 @@ The component delays processing of a message.
 	</div>
 	<footer>
 		<div class="status">
-			<div>Timeout: <span data-bind="?.config.{0}.delay__text:(value?value:'0')+'ms'"></span></div>
-			<div>Delayed messages: <b data-bind="?.status.{0}.pending__text:value?value.format(0):'0'"></b></div>
+			<div>Timeout: <span data-bind="CONFIG.delay__text:(value?value:'0')+'ms'"></span></div>
+			<div>Delayed messages: <b data-bind="STATUS.pending__text:value?value.format(0):'0'"></b></div>
 		</div>
 	</footer>
 </body>
