@@ -60,9 +60,9 @@ __Data Example__:
 </readme>
 
 <style>
-	.f-memory footer { padding: 10px; font-size: 11px; }
-	.f-memory footer > div > div { height: 16px; }
-	.f-memory footer b { float: right; }
+	.CLASS footer { padding: 10px; font-size: 11px; }
+	.CLASS footer > div > div { height: 16px; }
+	.CLASS footer b { float: right; }
 </style>
 
 <settings>
@@ -81,7 +81,7 @@ __Data Example__:
 		<i class="far fa-memory"></i>Memory
 	</header>
 	<footer>
-		<div data-bind="!?.status.{0}__template__show">
+		<div data-bind="!STATUS__template__show">
 			<script type="text/html">
 				<div><b>{{ value.free | filesize }}</b>Free</div>
 				<div><b>{{ value.used | filesize }}</b>Used</div>
