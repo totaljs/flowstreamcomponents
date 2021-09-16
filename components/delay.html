@@ -2,7 +2,7 @@
 
 	exports.name = 'Delay';
 	exports.group = 'Common';
-	exports.version = '2';
+	exports.version = '3';
 	exports.icon = 'far fa-clock-o';
 	exports.author = 'Peter Širka';
 	exports.config = { delay: 1000 };
@@ -29,7 +29,7 @@
 			var msg = items.pop();
 			if (msg) {
 				instance.checkstatus();
-				instance.send('output', msg);
+				msg.send('output');
 				timeout = clearTimeout(timeout);
 				timeout = setTimeout(instance.trigger, config.delay);
 			}
