@@ -200,6 +200,16 @@
 		"version": "1"
 	},
 	{
+		"id": "read",
+		"group": "Common",
+		"name": "Read",
+		"url": "https://cdn.totaljs.com/flowstream/components/read.html",
+		"author": "Peter Širka",
+		"icon": "fa fa-filter",
+		"color": "",
+		"version": "1"
+	},
+	{
 		"id": "request",
 		"group": "Common",
 		"name": "Request",
