@@ -2,7 +2,7 @@
 
 	exports.name = 'Queue';
 	exports.group = 'Common';
-	exports.version = '1';
+	exports.version = '2';
 	exports.icon = 'fas fa-list';
 	exports.author = 'Peter Širka';
 	exports.config = {};
@@ -12,8 +12,9 @@
 	exports.make = function(instance) {
 
 		var filename = PATH.databases('queue_' + instance.id + '.json');
-		var queue = [];
+		var isready = false;
 		var current = null;
+		var queue = [];
 		var timeout;
 
 		instance.queue_snapshot_force = function() {
@@ -65,19 +66,24 @@
 			var data = isbuffer ? $.data.toString('base64') : $.data;
 
 			queue.push({ ts: Date.now(), fromid: $.fromid, data: data, type: isbuffer ? 'buffer' : 'object' });
-			instance.queue_snapshot();
+			isready && instance.queue_snapshot();
 			instance.status({ pending: queue.length });
 			$.end();
 
-			if (!current)
+			if (isready && !current)
 				setImmediate(instance.queue_next);
 		};
 
 		PATH.fs.readFile(filename, function(err, response) {
 			if (response) {
-				queue = response.toString('utf8').parseJSON(true);
+				var arr = response.toString('utf8').parseJSON(true);
+				if (queue.length)
+					arr.push.apply(arr, queue);
+				else
+					queue = arr;
 				instance.queue_next();
 			}
+			isready = true;
 		});
 	};
 
