@@ -130,19 +130,7 @@
 <style>
 	.CLASS .status { font-size: 12px; margin: 0; padding: 10px; }
 	.CLASS .status span { padding: 2px 3px; border-radius: var(--radius); color: #FFF; }
-	.CLASS button { float: right; height: 20px; font-size: 11px; border: 1px solid #E0E0E0; border-radius: var(--radius); color: #000; background-color: transparent; margin: 0; padding: 0 5px; }
-	.CLASS button:hover { background-color: #F8F8F8; }
-	.CLASS button:active { background-color: #E0E0E0; }
-	.ui-dark .CLASS button { border-color: #404040; color: #FFF; }
-	.ui-dark .CLASS button:hover { background-color: #303030; }
-	.ui-dark .CLASS button:active { background-color: #404040; }
 </style>
-
-<script>
-	FUNC.fqueue_trigger = function(el) {
-		SETTER('websocket/send', { TYPE: 'trigger', id: el.attrd2('id') });
-	};
-</script>
 
 <readme>
 The component creates a HTTP request. Incoming data will be serialized as the payload.
@@ -162,11 +150,10 @@ __Response__:
 
 <body>
 	<header>
-		<button class="exec" data-exec="FUNC.fqueue_trigger">Run</button>
 		<i class="ICON"></i>NAME
 	</header>
-	<footer>
-		<div class="status" data-bind="?.config.{0}__template">
+	<footer class="hidden" data-bind="CONFIG.url__show">
+		<div class="status" data-bind="CONFIG__template">
 			<script type="text/html">
 				<div class="monospace"><span style="background:{{ value.method | color }}">{{ value.method }}</span> {{ value.url }}</div>
 			</script>

@@ -2,19 +2,46 @@
 
 	exports.name = 'Print';
 	exports.group = 'Common';
-	exports.version = '1.1';
+	exports.version = '3';
 	exports.icon = 'fa fa-print';
 	exports.author = 'Peter Širka';
-	exports.config = {};
+	exports.config = { repo: false, data: true };
 	exports.inputs = [{ id: 'input', name: 'Input' }];
 
-	exports.make = function(instance) {
-
+	exports.make = function(instance, config) {
 		instance.message = function($) {
+
 			var data = $.data;
-			if (data instanceof Buffer)
-				data = data.toString('hex').substring(0, 200);
-			instance.status(data);
+
+			if (config.data !== false) {
+				if (data instanceof Buffer)
+					data = data.toString('hex').substring(0, 200);
+			}
+
+			var count = 0;
+
+			for (var key in config) {
+				if (config[key])
+					count++;
+			}
+
+			var output = count > 1 ? {} : null;
+
+			if (config.repo) {
+				if (output)
+					output.repo = $.repo;
+				else
+					output = $.repository;
+			}
+
+			if (config.data) {
+				if (output)
+					output.data = $.data;
+				else
+					output = $.data;
+			}
+
+			output && instance.status(output);
 			$.destroy();
 		};
 
@@ -42,6 +69,13 @@
 <readme>
 The component prints incoming data into the JSON format.
 </readme>
+
+<settings>
+	<div class="padding">
+		<div data---="input__?.repo__type:checkbox">Shows repository</div>
+		<div data---="input__?.data__type:checkbox">Shows data</div>
+	</div>
+</settings>
 
 <body>
 	<header>

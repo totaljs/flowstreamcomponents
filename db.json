@@ -47,7 +47,7 @@
 		"author": "Peter Širka",
 		"icon": "far fa-clock-o",
 		"color": "",
-		"version": "2"
+		"version": "3"
 	},
 	{
 		"id": "end",
@@ -96,6 +96,16 @@
 		"url": "https://cdn.totaljs.com/flowstream/components/hdd.html",
 		"author": "Peter Širka",
 		"icon": "far fa-hdd",
+		"color": "",
+		"version": "1"
+	},
+	{
+		"id": "httproute",
+		"group": "Triggers",
+		"name": "HTTP Route",
+		"url": "https://cdn.totaljs.com/flowstream/components/httproute.html",
+		"author": "",
+		"icon": "fa fa-route",
 		"color": "",
 		"version": "1"
 	},
@@ -157,7 +167,7 @@
 		"author": "Peter Širka",
 		"icon": "fa fa-print",
 		"color": "",
-		"version": "1"
+		"version": "2"
 	},
 	{
 		"id": "process",
@@ -186,6 +196,16 @@
 		"url": "https://cdn.totaljs.com/flowstream/components/queue.html",
 		"author": "Peter Širka",
 		"icon": "fas fa-list",
+		"color": "",
+		"version": "2"
+	},
+	{
+		"id": "read",
+		"group": "Common",
+		"name": "Read",
+		"url": "https://cdn.totaljs.com/flowstream/components/read.html",
+		"author": "Peter Širka",
+		"icon": "fa fa-filter",
 		"color": "",
 		"version": "1"
 	},

@@ -1,0 +1,72 @@
+<script total>
+
+	exports.name = 'Read';
+	exports.group = 'Common';
+	exports.version = '1';
+	exports.icon = 'fa fa-filter';
+	exports.author = 'Peter Širka';
+	exports.config = { path: '' };
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }];
+
+	exports.make = function(instance, config) {
+
+		var fn;
+
+		instance.message = function($) {
+			if (fn) {
+				var value = $.data && typeof($.data) === 'object' ? fn($.data) : undefined;
+				if (value !== undefined)
+					$.send('output', value);
+				else
+					$.destroy();
+			} else
+				$.destroy();
+		};
+
+		instance.configure = function() {
+			if (config.path) {
+				try {
+					fn = new Function('data', 'return data?.' + config.path.replace(/\s|\./, '?.'));
+				} catch (e) {
+					fn = null;
+					instance.throw(e);
+				}
+			}
+		};
+
+		instance.close = function() {
+			fn = null;
+		};
+
+		instance.configure();
+
+	};
+
+</script>
+
+<readme>
+This component reads a specific value according to the entered path.
+</readme>
+
+<style>
+	.CLASS footer > div { height: 40px; line-height: 40px; margin: 0 10px; font-size: 12px; }
+	.CLASS footer > span { color: #888; }
+</style>
+
+<settings>
+	<div class="padding">
+		<div data---="input__?.path__placeholder:temperature.max;required:1" class="m">Path</div>
+	</div>
+</settings>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+	<footer>
+		<div>
+			Path: <span data-bind="CONFIG.path__empty__text" class="b"></span>
+		</div>
+	</footer>
+</body>
