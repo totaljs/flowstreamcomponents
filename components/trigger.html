@@ -51,12 +51,6 @@
 
 </script>
 
-<script>
-	FUNC.ftrigger_exec = function(el) {
-		SETTER('websocket/send', { TYPE: 'trigger', id: el.attrd2('id') });
-	};
-</script>
-
 <style>
 	.CLASS .padding { padding: 0 10px 10px; }
 	.CLASS button { width: 100%; height: 24px; border: 1px solid #E0E0E0; border-radius: var(--radius); color: #000; background-color: #F0F0F0; margin: 0; }
@@ -90,6 +84,6 @@ The component triggers data into the Flow.
 		<i class="ICON"></i>NAME
 	</header>
 	<div class="padding">
-		<button class="exec" data-exec="FUNC.ftrigger_exec">Run</button>
+		<button class="exec" data-exec="FUNC.trigger">Run</button>
 	</div>
 </body>
