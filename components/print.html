@@ -2,13 +2,14 @@
 
 	exports.name = 'Print';
 	exports.group = 'Common';
-	exports.version = '1';
+	exports.version = '1.1';
 	exports.icon = 'fa fa-print';
 	exports.author = 'Peter Širka';
 	exports.config = {};
 	exports.inputs = [{ id: 'input', name: 'Input' }];
 
 	exports.make = function(instance) {
+
 		instance.message = function($) {
 			var data = $.data;
 			if (data instanceof Buffer)
@@ -16,6 +17,11 @@
 			instance.status(data);
 			$.destroy();
 		};
+
+		instance.trigger = function() {
+			instance.status('');
+		}
+
 	};
 
 </script>
@@ -24,6 +30,13 @@
 	.CLASS footer > div { margin: 10px; }
 	.CLASS pre { font-size: 10px; margin: 0; padding: 5px; background-color: #F0F0F0; border-radius: var(--radius); }
 	.ui-dark .CLASS pre { background-color: #404040; tab-size: 2; }
+
+	.CLASS button { float: right; height: 20px; font-size: 11px; border: 1px solid #E0E0E0; border-radius: var(--radius); color: #000; background-color: transparent; margin: 0; padding: 0 5px; }
+	.CLASS button:hover { background-color: #F8F8F8; }
+	.CLASS button:active { background-color: #E0E0E0; }
+	.ui-dark .CLASS button { border-color: #404040; color: #FFF; }
+	.ui-dark .CLASS button:hover { background-color: #303030; }
+	.ui-dark .CLASS button:active { background-color: #404040; }
 </style>
 
 <readme>
@@ -32,6 +45,7 @@ The component prints incoming data into the JSON format.
 
 <body>
 	<header>
+		<button class="exec" data-exec="FUNC.trigger">Clear</button>
 		<i class="ICON"></i>NAME
 	</header>
 	<footer>
