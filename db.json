@@ -90,6 +90,16 @@
 		"version": "1"
 	},
 	{
+		"id": "flashback",
+		"group": "Common",
+		"name": "Flashback",
+		"url": "https://cdn.totaljs.com/flowstream/components/flashback.html",
+		"author": "Peter Širka",
+		"icon": "fa fa-history",
+		"color": "",
+		"version": "1"
+	},
+	{
 		"id": "hdd",
 		"group": "Linux Monitoring",
 		"name": "HDD",
