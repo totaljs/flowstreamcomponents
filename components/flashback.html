@@ -4,7 +4,7 @@
 	exports.group = 'Common';
 	exports.version = '2';
 	exports.icon = 'fa fa-history';
-	exports.author = 'Peter Širka';
+	exports.author = 'Peter Širka & Jakub Urban';
 	exports.inputs = [{ id: 'input', name: 'Input' }];
 	exports.outputs = [{ id: 'output', name: 'Output' }];
 
@@ -82,11 +82,10 @@ The component remembers the data for repeating the action.
 <body>
 	<header>
 		<i class="ICON"></i>NAME
-		<button class="exec mini" data-exec="FUNC.fflashback_clear" data-bind="STATUS.empty__disabled" disabled >Clear</button>
+		<button class="exec mini" data-exec="FUNC.fflashback_clear" data-bind="STATUS.empty__disabled" disabled>Clear</button>
 	</header>
 	<div class="padding">
 		<button class="exec" data-exec="FUNC.trigger" data-bind="STATUS.empty__disabled" disabled>Repeat</button>
-		<!-- <button class="exec" data-exec="FUNC.fflashback_clear" data-bind="STATUS.empty__disabled" disabled style="margin-top:10px">Clear</button> -->
 	</div>
 	<footer>
 		<div data-bind="!STATUS__html pre:Thelpers.jsonformat(JSON.stringify(value.data, null, '\t'))__hide:value.empty" class="hidden selectable">
