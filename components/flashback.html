@@ -2,33 +2,51 @@
 
 	exports.name = 'Flashback';
 	exports.group = 'Common';
-	exports.version = '1';
+	exports.version = '2';
 	exports.icon = 'fa fa-history';
-	exports.author = 'Peter Širka';
+	exports.author = 'Peter Širka & Jakub Urban';
 	exports.inputs = [{ id: 'input', name: 'Input' }];
 	exports.outputs = [{ id: 'output', name: 'Output' }];
 
 	exports.make = function(instance, config) {
 
-		var data = null;
 		var empty = true;
+		var status = { empty: true };
+		var timeout = null;
 
 		instance.message = function($) {
+			status.empty = false;
+			status.data = CLONE($.data);
+			status.repo = CLONE($.repo);
 
-			if (empty) {
-				instance.status({ empty: false });
-				empty = false;
+			$.send('output');
+
+			if (timeout) {
+				clearTimeout(timeout);
+				timeout = null;
 			}
 
-			data = CLONE($.data);
-			$.send('output');
+			timeout = setTimeout(() => {
+				timeout = null;
+				instance.status(status);
+			}, 500);
+
 		};
 
-		instance.trigger = function() {
-			instance.newmessage(data).send('output');
+		instance.trigger = function(msg) {
+			if (msg.type === 'clear') {
+				status.data = null;
+				status.repo = null;
+				status.empty = true;
+				instance.status(status);
+			} else {
+				var message = instance.newmessage(status.data);
+				message.repo = status.repo;
+				message.send('output');
+			}
 		};
 
-		instance.status({ empty: true });
+		instance.status(status);
 
 	};
 
@@ -40,22 +58,38 @@ The component remembers the data for repeating the action.
 
 <style>
 	.CLASS .padding { padding: 0 10px 10px; }
+	.CLASS pre { font-size: 10px; margin: 0; padding: 5px; background-color: #F0F0F0; border-radius: var(--radius); }
+	.CLASS footer > div { margin: 10px; }
 	.CLASS button { width: 100%; height: 24px; border: 1px solid #E0E0E0; border-radius: var(--radius); color: #000; background-color: #F0F0F0; margin: 0; }
 	.CLASS button:hover { background-color: #F8F8F8; }
 	.CLASS button:active { background-color: #E0E0E0; }
 	.CLASS button:disabled { background-color: #F0F0F0; color: #A0A0A0; cursor: not-allowed; }
+	.CLASS .mini { width: initial; float: right; height: 20px; font-size: 11px; border: 1px solid #E0E0E0; border-radius: var(--radius); color: #000; background-color: transparent; margin: 0; padding: 0 5px; }
 
 	.ui-dark .CLASS button { border-color: #404040; color: #FFF; background-color: #222; }
 	.ui-dark .CLASS button:hover { background-color: #303030; }
 	.ui-dark .CLASS button:active { background-color: #404040; }
 	.ui-dark .CLASS button:disabled { background-color: #333; color: #666; cursor: not-allowed; }
+	.ui-dark .CLASS pre { background-color: #404040; tab-size: 2; }
 </style>
+
+<script>
+	FUNC.fflashback_clear = function(el) {
+		SETTER('websocket/send', { TYPE: 'trigger', id: el.attrd2('id'), type: 'clear' });
+	};
+</script>
 
 <body>
 	<header>
 		<i class="ICON"></i>NAME
+		<button class="exec mini" data-exec="FUNC.fflashback_clear" data-bind="STATUS.empty__disabled" disabled>Clear</button>
 	</header>
 	<div class="padding">
 		<button class="exec" data-exec="FUNC.trigger" data-bind="STATUS.empty__disabled" disabled>Repeat</button>
 	</div>
+	<footer>
+		<div data-bind="!STATUS__html pre:Thelpers.jsonformat(JSON.stringify(value.data, null, '\t'))__hide:value.empty" class="hidden selectable">
+			<pre class="json"></pre>
+		</div>
+	</footer>
 </body>
