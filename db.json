@@ -94,10 +94,10 @@
 		"group": "Common",
 		"name": "Flashback",
 		"url": "https://cdn.totaljs.com/flowstream/components/flashback.html",
-		"author": "Peter Širka",
+		"author": "Peter Širka & Jakub Urban",
 		"icon": "fa fa-history",
 		"color": "",
-		"version": "1"
+		"version": "2"
 	},
 	{
 		"id": "hdd",
@@ -156,6 +156,16 @@
 		"url": "https://cdn.totaljs.com/flowstream/components/modified.html",
 		"author": "Peter Širka",
 		"icon": "fas fa-drafting-compass",
+		"color": "",
+		"version": "1"
+	},
+	{
+		"id": "opensync",
+		"group": "External",
+		"name": "OpenSync",
+		"url": "https://cdn.totaljs.com/flowstream/components/opensync.html",
+		"author": "Peter Širka",
+		"icon": "fa fa-sync",
 		"color": "",
 		"version": "1"
 	},

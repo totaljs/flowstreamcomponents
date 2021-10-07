@@ -1,0 +1,92 @@
+<script total>
+
+	exports.name = 'OpenSync';
+	exports.author = 'Peter Širka';
+	exports.group = 'External';
+	exports.icon = 'fa fa-sync';
+	exports.version = '1';
+	exports.config = {};
+	exports.outputs = [{ id: 'output', name: 'Output' }];
+
+	exports.make = function(instance, config) {
+
+		var ws = null;
+
+		var connect = function() {
+			ws && ws.close();
+			ws = null;
+			WEBSOCKETCLIENT(function(client) {
+				ws = client;
+				client.on('error', err => instance.throw(err));
+				client.on('message', function(msg) {
+					if (msg.type === 'init')
+						instance.status({ connected: 1 });
+					else
+						instance.newmessage(msg).send('output');
+				});
+				client.connect(config.url.replace(/^http/, 'ws'));
+			});
+		};
+
+		instance.configure = function() {
+			if (config.url) {
+				connect();
+			} else if (ws) {
+				ws.close();
+				ws = null;
+				instance.status({ connected: 0 });
+			}
+		};
+
+		instance.close = function() {
+			ws && ws.close();
+			ws = null;
+		};
+
+		instance.configure();
+
+	};
+
+</script>
+
+<style>
+	.CLASS footer { padding: 8px; font-size: 12px; }
+</style>
+
+<readme>
+This component receives a data from the [OpenSync](https://docs.totaljs.com/opensync/) app. Data example:
+
+```js
+{
+	id: String,              // Internal ID
+	channel: String,         // Channel
+	ip: String,              // Host IP address
+	method: String,          // HTTP method (upper-case)
+	headers: Object,         // Key:value
+	query: Object,           // Key:value
+	body: Object,            // JSON or key:value,
+	ua: String,              // Parsed user-agent
+	files: [Object Array]    // Uploaded files { filename: String, extension: String, type: String, size: Number, url: String, width: Number, height: Number }
+}
+```
+</readme>
+
+<settings>
+	<div class="padding">
+		<div data---="input__?.url__required:1;camouflage:1">URL address + token</div>
+		<div class="help">Enter URL address + token to the OpenSync server. This component will connect to the OpenSync via WebSocket.</div>
+	</div>
+</settings>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+	<footer>
+		<div data-bind="STATUS__template">
+			<script type="text/html">
+				<i class="fa fa-circle {{ if value.connected }}green{{ else }}red{{ fi }} mr5"></i>{{ if value.connected }}Connected{{ else }}Disconnected{{ fi }}
+			</script>
+		</div>
+	</footer>
+</body>
