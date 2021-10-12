@@ -4,27 +4,20 @@
 	exports.author = 'Peter Širka';
 	exports.group = 'External';
 	exports.icon = 'fa fa-sync';
-	exports.version = '1';
+	exports.version = '2';
 	exports.config = {};
 	exports.outputs = [{ id: 'output', name: 'Output' }];
 
 	exports.make = function(instance, config) {
 
-		var ws = null;
+		var client = null;
 
 		var connect = function() {
-			ws && ws.close();
-			ws = null;
-			WEBSOCKETCLIENT(function(client) {
-				ws = client;
-				client.on('error', err => instance.throw(err));
-				client.on('message', function(msg) {
-					if (msg.type === 'init')
-						instance.status({ connected: 1 });
-					else
-						instance.newmessage(msg).send('output');
-				});
-				client.connect(config.url.replace(/^http/, 'ws'));
+			client = OPENCLIENT(config.url, instance.id);
+			client.error(err => instance.throw(err));
+			client.online(is => instance.status({ connected: is ? 1 : 0 }));
+			client.message(function(msg) {
+				instance.newmessage(msg).send('output');
 			});
 		};
 
@@ -32,8 +25,8 @@
 			if (config.url) {
 				connect();
 			} else if (ws) {
-				ws.close();
-				ws = null;
+				client.close();
+				client = null;
 				instance.status({ connected: 0 });
 			}
 		};
@@ -59,12 +52,13 @@ This component receives a data from the [OpenSync](https://docs.totaljs.com/open
 ```js
 {
 	id: String,              // Internal ID
+	type: String,            // Parsed content-type (can be empty with the "GET" method)
 	channel: String,         // Channel
 	ip: String,              // Host IP address
 	method: String,          // HTTP method (upper-case)
 	headers: Object,         // Key:value
 	query: Object,           // Key:value
-	body: Object,            // JSON or key:value,
+	body: Object,            // JSON/key:value/String
 	ua: String,              // Parsed user-agent
 	files: [Object Array]    // Uploaded files { filename: String, extension: String, type: String, size: Number, url: String, width: Number, height: Number }
 }
