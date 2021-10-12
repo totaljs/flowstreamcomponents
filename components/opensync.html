@@ -11,11 +11,18 @@
 	exports.make = function(instance, config) {
 
 		var client = null;
+		var status = { connected: 0, meta: EMPTYOBJECT };
 
 		var connect = function() {
 			client = OPENCLIENT(config.url, instance.id);
 			client.error(err => instance.throw(err));
-			client.online(is => instance.status({ connected: is ? 1 : 0 }));
+
+			client.online(function(meta) {
+				status.connected = meta ? 1 : 0;
+				status.meta = meta;
+				instance.status(status);
+			});
+
 			client.message(function(msg) {
 				instance.newmessage(msg).send('output');
 			});
@@ -24,16 +31,20 @@
 		instance.configure = function() {
 			if (config.url) {
 				connect();
-			} else if (ws) {
-				client.close();
-				client = null;
+			} else {
+				if (client) {
+					client.close();
+					client = null;
+				}
 				instance.status({ connected: 0 });
 			}
 		};
 
 		instance.close = function() {
-			ws && ws.close();
-			ws = null;
+			if (client) {
+				client.close();
+				client = null;
+			}
 		};
 
 		instance.configure();
@@ -44,6 +55,7 @@
 
 <style>
 	.CLASS footer { padding: 8px; font-size: 12px; }
+	.CLASS footer i { width: 12px; text-align: center; margin-right: 5px; }
 </style>
 
 <readme>
@@ -77,9 +89,10 @@ This component receives a data from the [OpenSync](https://docs.totaljs.com/open
 		<i class="ICON"></i>NAME
 	</header>
 	<footer>
-		<div data-bind="STATUS__template">
+		<div data-bind="!STATUS__template">
 			<script type="text/html">
-				<i class="fa fa-circle {{ if value.connected }}green{{ else }}red{{ fi }} mr5"></i>{{ if value.connected }}Connected{{ else }}Disconnected{{ fi }}
+				<div class="b"><i class="fa fa-globe"></i>{{ if value.meta }}{{value.meta.name }}{{ else }}---{{ fi }}</div>
+				<div><i class="fa fa-circle {{ if value.connected }}green{{ else }}red{{ fi }}"></i>{{ if value.connected }}Connected{{ else }}Disconnected{{ fi }}</div>
 			</script>
 		</div>
 	</footer>
