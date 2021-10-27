@@ -167,7 +167,7 @@
 		"author": "Peter Širka",
 		"icon": "fa fa-sync",
 		"color": "",
-		"version": "1"
+		"version": "2"
 	},
 	{
 		"id": "output",
@@ -237,7 +237,7 @@
 		"author": "Peter Širka",
 		"icon": "fas fa-cloud-download",
 		"color": "",
-		"version": "1"
+		"version": "2"
 	},
 	{
 		"id": "rpi-gpio",
