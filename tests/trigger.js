@@ -1,25 +1,43 @@
 const tester = require('../tester');
 
-tester(builder => {
-	builder.test('trigger', component => {
+tester(async function(builder) {
+	await builder.test(function(test, next) {
+		// If message won't come out in 0.5 second, test will fail
+		const timeout = setTimeout(function() {
+			test.fail('Timeout');
+		}, 500);
+
+		test.output = function(msg) {
+			clearTimeout(timeout);
+			msg.ok('Timeout');
+			next();
+		};
+
+		test.trigger();
+	});
+
+	builder.test(function(test) {
 
 		// Random string
-		component.set({ random: true, data: 'NOT_RANDOM' });
-		component.output = msg => {
+		test.configure({ random: true, data: 'NOT_RANDOM' });
+		test.output = function(msg) {
 			msg.fail(msg.data === 'NOT_RANDOM', 'Random string');
 		};
-		component.trigger();
+
+		test.trigger();
 
 		// NOT Random string
-		setTimeout(() => {
-			component.set({ random: false, data: 'NOT_RANDOM' });
-			component.output = msg => {
+		setTimeout(function() {
+			test.configure({ random: false, data: 'NOT_RANDOM' });
+
+			test.output = function(msg) {
 				msg.ok(msg.data === 'NOT_RANDOM', 'NOT Random string');
 
 				// End
 				builder.done();
 			};
-			component.trigger();
+
+			test.trigger();
 		}, 1000);
 
 	});
