@@ -1,27 +1,27 @@
 const tester = require('../tester');
 
-tester(builder => {
-	builder.test('counter', component => {
+tester(function(builder) {
+	builder.test(function(test) {
 
 		let messages = 0;
 
 		// Send random message to input
-		component.inputs.input('Hello World!');
+		test.input('Hello World!');
 		messages++;
 
 		// Send another message after 1 second
-		setTimeout(() => {
-			component.inputs.input(true);
+		setTimeout(function() {
+			test.input('Hello Again!');
 			messages++;
 		}, 1 * 1000);
 
-		setTimeout(() => {
+		setTimeout(function() {
 			// Check if message count is as expected
-			component.ok(messages === component.currentStatus, 'Counting');
+			test.ok(test.currentStatus === messages, 'Counting');
 
 			// Clear counter
-			component.trigger();
-			component.ok(component.currentStatus === 0, 'Clearing');
+			test.trigger();
+			test.ok(test.currentStatus === 0, 'Clearing');
 
 			// End tester
 			builder.done();

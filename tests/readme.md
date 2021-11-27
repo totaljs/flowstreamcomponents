@@ -4,18 +4,19 @@ Simple tool for testing Flowstream components.
 
 ## Usage
 
-First, you need to initialize testing Flowstream instance by calling imported `tester` function. In callback you will get `builder` that is used to initialize components. First argument of builder is filename of component inside `components` directory (can be changed with `tester.path`). After successfull component initialization, `component` instance is returned in callback of second argument where you can start testing your component.
+First, you need to initialize testing Flowstream instance by calling imported `tester` function. In callback you will get `builder` that is used to initialize components. To initialize component use `builder.test` with filename as first argument of component inside `components` directory (path can be changed with `tester.path`). After successfull component initialization, `test` instance is returned in callback of second argument where you can start testing your component.
 
 If your test is longer than 5 seconds, consider extending `tester.autoCloseDuration` value or disabling auto-close feature and manually existing using tester with `builder.done()` method.
-You can also test multiple components in one file with `builder.test`. Example is `tests/example-multiple.js` file.
+
+You can also test multiple components in one file with `builder.test`. Example is in `tests/example-multiple.js` file.
 
 ```js
 const tester = require("./tester");
 
-tester((builder) => {
-  builder.test("counter", (component) => {
+tester(function (builder) {
+  builder.test("counter", function (test) {
     // Test was successful
-    component.ok();
+    test.ok();
 
     // Show tester results
     builder.done();
@@ -25,88 +26,101 @@ tester((builder) => {
 
 ## Test
 
+**Testing**:
+
+First argument of callback in `builder.test` method is `test` that is used to create tests for your component.
+
 **Configuration**:
 
-To dynamically change configuration of component use `set` method. After using `set` method, tester will reset configuration to default value from component's file (`exports.config`) and replace ONLY provided properties from first argument. You can also tell tester to NOT trigger `configure` method of component with second argument (`component.set({ ready: true }, true)`).
+To dynamically change configuration of component use `configure` method. After using `set` method, tester will reset configuration to default value from component's file (`exports.config`) and replace ONLY provided properties from first argument. You can also tell tester to NOT trigger `configure` method of component with second `true` argument (`test.configure({ ready: true }, true)`).
 
 ```js
-builder.test("test", (component) => {
+builder.test("test", function (test) {
   // { mode: 'debug', ready: false }
-  component.set({ ready: true });
+  test.configure({ ready: true });
   // { mode: 'debug', ready: true }
+});
+```
+
+**Input**:
+
+All inputs of component are wrapped in `test.input` method. With this you can simulate sending data to your component and catch output message of components in callback or `test.message` and `test.output` delegated (Component must have outputs).
+
+First optional argument is index of input (default input index is `input`). Second is data you want to send to your component and last is optional callback of received output.
+
+Also keep in mind that tester can't tell which output message is from requested input so you can receive output messages from other inputs also. In that case, consider using global message catching via `test.message` or `test.output` with your own handling logic.
+
+```js
+builder.test("increment", function(test) {
+  const data = [1, 2];
+
+  test.input(data, msg => {
+    // Test is flagged as Successful when message data is equal to 3
+    msg.ok(msg.data === 3);
+
+    // Same result
+    msg.fail(msg.data !== 3);
+  };
 });
 ```
 
 **Output**:
 
-All outcoming messages from component can be catched with `component.output` delegate. In callback you get [Flowstream message](https://docs.totaljs.com/total4/40844001ni51c/) but it's extended with test handlers (more in **Handlers**)
+All outcoming messages from component can be catched with `test.message` or `test.output` delegate. In callback you get [Flowstream message](https://docs.totaljs.com/total4/40844001ni51c/) but it's extended with test handlers (more in **Handlers**)
 
 ```js
-builder.test("test", (component) => {
-  component.output = (msg) => {
-    // Check if message is from "output1" index and content of message is "total.js"
+builder.test("test", function (test) {
+  test.output = function (msg) {
+    // Check if message is from "output1" index and data of message is "total.js"
     if (msg.index === "output1" && msg.data === "total.js") msg.ok();
     else msg.fail();
 
-    // Shorthand
+    // Shorthand - If condition inside "msg.ok()" is not true, "msg.fail" is called automatically
     msg.ok(msg.index === "output1" && msg.data === "total.js");
   };
 });
 ```
 
-**Inputs**:
-
-All inputs of component are wrapped in `component.inputs` object. With this you can simulate sending data to your component and catch output message of components (Component must have outputs).
-
-```js
-builder.test("increment", (component) => {
-  const data = { num1: 1, num2: 2 };
-
-  component.inputs.input(data, msg => {
-    msg.ok(msg.data === 3);
-  };
-
-  // Test is evaluated as successful when ANY message is sent to output
-  component.inputs.input(data);
-});
-```
-
 **Trigger**:
 
-You can manually trigger component's `trigger` method simply with `component.trigger(data)` method.
+You can manually trigger component's `trigger` method simply with `test.trigger(data)` method.
 
 **Status**:
 
-To change component's status use `component.status(status)`. Current status of component is stored in `component.currentStatus` (Don't mutate this property directly, use `status` method instead). When status is changed (from test but also from component method) delegate `component.onStatus` with new status is triggered.
+To change component's status use `test.status(status)`. Current status of component is stored in `test.currentStatus` (Don't mutate this property directly, use `status` method instead).
+When status is changed (from test but also from component method) delegate `test.onstatus` or `onStatus` with new status is triggered.
 
 ## Handlers
 
-Handlers are used to tell tester if your testing script was successful or invalid.
+Handlers are used to tell tester if your testing script was successful or invalid. It doesn't exit your testing flow it just print in console your test was successful. If one test fails, other tests will not stop.
 
 ```js
-builder.test("test", (component) => {
-  component.ok(); // Mark test as successful
-  component.ok(false); // Mark test as failed
+builder.test("test", function (test) {
+  test.ok(); // Mark test as successful
+  test.ok(false); // Mark test as failed
 
-  component.fail(); // Mark test as failed
-  component.fail(false); // Mark test as successful
+  test.fail(); // Mark test as failed
+  test.fail(false); // Mark test as successful
 });
 ```
 
 Handlers can be also used in any received message.
 
 ```js
-builder.test("test", (component) => {
-  component.inputs.input("Marco", (msg) => {
+builder.test("marco-polo", function (test) {
+  test.input("Marco", function (msg) {
     msg.ok(msg.data === "Polo");
   });
 
-  component.output = (msg) => {
-    msg.ok("Polo");
+  // Or
+  test.output = function (msg) {
+    msg.ok(msg.data === "Polo");
   };
+
+  test.input("Marco");
 });
 ```
 
 ## Examples
 
-All example files are stored in `tests` directory and has prefix `example`.
+All example files are stored in `tests` directory with prefix `example`.
