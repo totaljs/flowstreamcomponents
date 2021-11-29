@@ -1,8 +1,5 @@
-const tester = require('../tester');
-
-tester(function(builder) {
+require('../tester')(function(builder, done) {
 	builder.test(function(test) {
-
 		let messages = 0;
 
 		// Send random message to input
@@ -24,7 +21,7 @@ tester(function(builder) {
 			test.ok(test.currentStatus === 0, 'Clearing');
 
 			// End tester
-			builder.done();
+			done();
 		}, 2 * 1000);
 
 	});

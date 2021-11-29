@@ -6,20 +6,18 @@ Simple tool for testing Flowstream components.
 
 First, you need to initialize testing Flowstream instance by calling imported `tester` function. In callback you will get `builder` that is used to initialize components. To initialize component use `builder.test` with filename as first argument of component inside `components` directory (path can be changed with `tester.path`). After successfull component initialization, `test` instance is returned in callback of second argument where you can start testing your component.
 
-If your test is longer than 5 seconds, consider extending `tester.autoCloseDuration` value or disabling auto-close feature and manually existing using tester with `builder.done()` method.
+If your test is longer than 5 seconds, consider extending `tester.autoCloseDuration` value or disabling auto-close feature and manually existing using tester with `done()` or `builder.done()` method.
 
 You can also test multiple components in one file with `builder.test`. Example is in `tests/example-multiple.js` file.
 
 ```js
-const tester = require("./tester");
-
-tester(function (builder) {
+require("./tester")(function (builder, done) {
   builder.test("counter", function (test) {
     // Test was successful
     test.ok();
 
-    // Show tester results
-    builder.done();
+    // End tester and show results
+    done();
   });
 });
 ```
@@ -56,10 +54,10 @@ builder.test("increment", function(test) {
 
   test.input(data, msg => {
     // Test is flagged as Successful when message data is equal to 3
-    msg.ok(msg.data === 3);
+    test.ok(msg.data === 3);
 
     // Same result
-    msg.fail(msg.data !== 3);
+    test.fail(msg.data !== 3);
   };
 });
 ```
@@ -72,11 +70,11 @@ All outcoming messages from component can be catched with `test.message` or `tes
 builder.test("test", function (test) {
   test.output = function (msg) {
     // Check if message is from "output1" index and data of message is "total.js"
-    if (msg.index === "output1" && msg.data === "total.js") msg.ok();
-    else msg.fail();
+    if (msg.index === "output1" && msg.data === "total.js") test.ok();
+    else test.fail();
 
     // Shorthand - If condition inside "msg.ok()" is not true, "msg.fail" is called automatically
-    msg.ok(msg.index === "output1" && msg.data === "total.js");
+    test.ok(msg.index === "output1" && msg.data === "total.js");
   };
 });
 ```
@@ -87,8 +85,7 @@ You can manually trigger component's `trigger` method simply with `test.trigger(
 
 **Status**:
 
-To change component's status use `test.status(status)`. Current status of component is stored in `test.currentStatus` (Don't mutate this property directly, use `status` method instead).
-When status is changed (from test but also from component method) delegate `test.onstatus` or `onStatus` with new status is triggered.
+When status is changed (from test but also from component method) delegate `test.status` with new status is triggered. Current status of component is stored in `test.currentStatus` (Don't mutate this property directly).
 
 ## Handlers
 
@@ -109,12 +106,12 @@ Handlers can be also used in any received message.
 ```js
 builder.test("marco-polo", function (test) {
   test.input("Marco", function (msg) {
-    msg.ok(msg.data === "Polo");
+    test.ok(msg.data === "Polo");
   });
 
   // Or
   test.output = function (msg) {
-    msg.ok(msg.data === "Polo");
+    test.ok(msg.data === "Polo");
   };
 
   test.input("Marco");
