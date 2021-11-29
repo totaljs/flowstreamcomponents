@@ -1,6 +1,4 @@
-const tester = require('../tester');
-
-tester(async function(builder) {
+require('../tester')(async function(builder, done) {
 	await builder.test(function(test, next) {
 		// If message won't come out in 0.5 second, test will fail
 		const timeout = setTimeout(function() {
@@ -9,7 +7,7 @@ tester(async function(builder) {
 
 		test.output = function(msg) {
 			clearTimeout(timeout);
-			msg.ok('Timeout');
+			test.ok('Timeout');
 			next();
 		};
 
@@ -21,7 +19,7 @@ tester(async function(builder) {
 		// Random string
 		test.configure({ random: true, data: 'NOT_RANDOM' });
 		test.output = function(msg) {
-			msg.fail(msg.data === 'NOT_RANDOM', 'Random string');
+			test.fail(msg.data === 'NOT_RANDOM', 'Random string');
 		};
 
 		test.trigger();
@@ -31,10 +29,10 @@ tester(async function(builder) {
 			test.configure({ random: false, data: 'NOT_RANDOM' });
 
 			test.output = function(msg) {
-				msg.ok(msg.data === 'NOT_RANDOM', 'NOT Random string');
+				test.ok(msg.data === 'NOT_RANDOM', 'NOT Random string');
 
-				// End
-				builder.done();
+				// End tester
+				done();
 			};
 
 			test.trigger();

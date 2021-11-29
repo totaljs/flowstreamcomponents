@@ -10,7 +10,8 @@ const logSuccess = function(test) {
 	tester.stats.ok++;
 
 	const name = test.__description__;
-	console.log('[OK] -', test.__name__ + (name ? ' - ' + name : ''));
+	const duration = '(' + (new Date() - test.startAt) + ' ms)';
+	console.log('[DONE] -', test.__name__, (name ? '- ' + name : ''), duration);
 
 	delete test.__tester__;
 	delete test.__name__;
@@ -22,7 +23,8 @@ const logFailed = function(test) {
 	tester.stats.failed++;
 
 	const name = test.__description__;
-	console.log('[FAILED] -', test.__name__ + (name ? ' - ' + name : ''));
+	const duration = '(' + (new Date() - test.startAt) + ' ms)';
+	console.log('[FAIL] -', test.__name__, (name ? '- ' + name : ''), duration);
 
 	delete test.__tester__;
 	delete test.__name__;
@@ -41,9 +43,6 @@ tester.output = function(msg) {
 	const test = this.tests[msg.fromid];
 	const inputTest = tester.inputTests[msg.fromid + '_' + msg.__input__];
 
-	msg.ok = test.ok;
-	msg.fail = test.fail;
-
 	// Global message catch
 	test.output && test.output(msg);
 	test.message && test.message(msg);
@@ -60,24 +59,25 @@ tester.output = function(msg) {
 
 tester.finish = tester.done = function(message) {
 	setTimeout(() => {
-		this.stop();
+		const duration = new Date() - tester.startAt;
+		const result = tester.stats.failed > 0 ? 'FAILED' : 'SUCCESSFUL';
 
-		const duration = (new Date() - this.startAt) / 1000;
-
-		console.log('[DONE] in {0}s'.format(duration));
+		console.log('[FINISHED] - {0} in {1} ms'.format(result, duration));
 
 		message && console.log(' ' + message);
 
-		console.log(' - Total:', this.stats.total);
-		console.log(' - Success:', this.stats.ok);
-		console.log(' - Failed:', this.stats.failed);
+		console.log(' - Total:', tester.stats.total);
+		console.log(' - Success:', tester.stats.ok);
+		console.log(' - Failed:', tester.stats.failed);
+
+		tester.stop();
 	}, 5);
 };
 
 tester.end = tester.throw = tester.fail = function(message) {
-	this.stop();
+	console.log('[FAIL]' + (message ? ' - ' + message : ''));
 
-	console.log('[FAILED]' + (message ? ' - ' + message : ''));
+	this.stop();
 };
 
 tester.stop = function() {
@@ -86,6 +86,8 @@ tester.stop = function() {
 	this.flowstream.destroy();
 	this.flowstream = null;
 	this.timeoutTimer = null;
+
+	process.exit(this.stats.failed > 0);
 };
 
 tester.test = function(name, callback) {
@@ -220,6 +222,7 @@ tester.test = function(name, callback) {
 					test.defaultConfig = instance.config;
 					test.config = instance.config;
 					test.instance = instance;
+					test.startAt = new Date();
 
 					// Change config of component
 					test.configure = test.reconfigure = function(properties, withoutConfigure) {
@@ -234,11 +237,6 @@ tester.test = function(name, callback) {
 					// Trigger
 					test.trigger = function(data) {
 						instance.trigger(data);
-					};
-
-					// Status
-					test.status = function(newStatus) {
-						instance.status(newStatus);
 					};
 
 					tester.tests[id] = test;
@@ -258,19 +256,13 @@ module.exports = function(callback) {
 
 	flow.onstatus = function(status) {
 		const test = tester.tests[this.id];
-
-		test.onstatus && test.onstatus(status);
-		test.onStatus && test.onStatus(status);
-
+		test.status && test.status(status);
 		test.currentStatus = status;
 	};
 
 	flow.ondashboard = function(status) {
 		const test = tester.tests[this.id];
-
-		test.ondashboard && test.ondashboard(status);
-		test.onDashboard && test.onDashboard(status);
-
+		test.dashboard && test.dashboard(status);
 		test.currentDashboard = status;
 	};
 
@@ -289,5 +281,5 @@ module.exports = function(callback) {
 		tester.done();
 	}, tester.autoCloseDuration);
 
-	callback(tester);
+	callback(tester, tester.done);
 };
