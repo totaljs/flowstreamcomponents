@@ -1,5 +1,5 @@
-require('../tester')(async function(builder, done) {
-	await builder.test(function(test, next) {
+require('../tester')(async function(test, done) {
+	await test(function(test, next) {
 		// If message won't come out in 0.5 second, test will fail
 		const timeout = setTimeout(function() {
 			test.fail('Timeout');
@@ -14,7 +14,7 @@ require('../tester')(async function(builder, done) {
 		test.trigger();
 	});
 
-	builder.test(function(test) {
+	test(function(test) {
 
 		// Random string
 		test.configure({ random: true, data: 'NOT_RANDOM' });

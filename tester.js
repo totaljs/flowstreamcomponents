@@ -100,7 +100,7 @@ tester.test = function(name, callback) {
 		callback = name;
 	}
 
-	const componentPath = Path.join(__dirname, this.path, testName + '.html');
+	const componentPath = Path.join(__dirname, tester.path, testName + '.html');
 
 	let testPromiseResolver;
 	const testPromise = new Promise(resolve => testPromiseResolver = resolve);
@@ -111,7 +111,7 @@ tester.test = function(name, callback) {
 			return;
 		}
 
-		const flow = this.flowstream;
+		const flow = tester.flowstream;
 
 		// Connection Ids
 		const componentConnectionId = 'com_' + testName + '_' + UID();
@@ -281,5 +281,5 @@ module.exports = function(callback) {
 		tester.done();
 	}, tester.autoCloseDuration);
 
-	callback(tester, tester.done);
+	callback(tester.test, tester.done);
 };
