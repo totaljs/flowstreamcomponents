@@ -4,15 +4,15 @@ Simple tool for testing Flowstream components.
 
 ## Usage
 
-First, you need to initialize testing Flowstream instance by calling imported `tester` function. In callback you will get `builder` that is used to initialize components. To initialize component use `builder.test` with filename as first argument of component inside `components` directory (path can be changed with `tester.path`). After successfull component initialization, `test` instance is returned in callback of second argument where you can start testing your component.
+First, you need to initialize testing Flowstream instance by calling imported `tester` function. In callback you will get `test` function that is used to initialize components. To initialize component use `test` with filename as first argument of component inside `components` directory (path can be changed with `tester.path`). After successfull component initialization, `test` instance is returned in callback of second argument where you can start testing your component.
 
-If your test is longer than 5 seconds, consider extending `tester.autoCloseDuration` value or disabling auto-close feature and manually existing using tester with `done()` or `builder.done()` method.
+If your test is longer than 5 seconds, consider extending `tester.autoCloseDuration` value or disabling auto-close feature and manually existing using tester with `done()` method (second argument in callback of `tester()` function).
 
-You can also test multiple components in one file with `builder.test`. Example is in `tests/example-multiple.js` file.
+You can also test multiple components in one file. Example is in `tests/example-multiple.js` file.
 
 ```js
-require("./tester")(function (builder, done) {
-  builder.test("counter", function (test) {
+require("./tester")(function (test, done) {
+  test("counter", function (test) {
     // Test was successful
     test.ok();
 
@@ -26,14 +26,14 @@ require("./tester")(function (builder, done) {
 
 **Testing**:
 
-First argument of callback in `builder.test` method is `test` that is used to create tests for your component.
+First argument of callback in `test` function is `test` that is used to create tests for your component.
 
 **Configuration**:
 
 To dynamically change configuration of component use `configure` method. After using `set` method, tester will reset configuration to default value from component's file (`exports.config`) and replace ONLY provided properties from first argument. You can also tell tester to NOT trigger `configure` method of component with second `true` argument (`test.configure({ ready: true }, true)`).
 
 ```js
-builder.test("test", function (test) {
+test("test", function (test) {
   // { mode: 'debug', ready: false }
   test.configure({ ready: true });
   // { mode: 'debug', ready: true }
@@ -49,7 +49,7 @@ First optional argument is index of input (default input index is `input`). Seco
 Also keep in mind that tester can't tell which output message is from requested input so you can receive output messages from other inputs also. In that case, consider using global message catching via `test.message` or `test.output` with your own handling logic.
 
 ```js
-builder.test("increment", function(test) {
+test("increment", function(test) {
   const data = [1, 2];
 
   test.input(data, msg => {
@@ -67,7 +67,7 @@ builder.test("increment", function(test) {
 All outcoming messages from component can be catched with `test.message` or `test.output` delegate. In callback you get [Flowstream message](https://docs.totaljs.com/total4/40844001ni51c/) but it's extended with test handlers (more in **Handlers**)
 
 ```js
-builder.test("test", function (test) {
+test("test", function (test) {
   test.output = function (msg) {
     // Check if message is from "output1" index and data of message is "total.js"
     if (msg.index === "output1" && msg.data === "total.js") test.ok();
@@ -92,7 +92,7 @@ When status is changed (from test but also from component method) delegate `test
 Handlers are used to tell tester if your testing script was successful or invalid. It doesn't exit your testing flow it just print in console your test was successful. If one test fails, other tests will not stop.
 
 ```js
-builder.test("test", function (test) {
+test("test", function (test) {
   test.ok(); // Mark test as successful
   test.ok(false); // Mark test as failed
 
@@ -104,7 +104,7 @@ builder.test("test", function (test) {
 Handlers can be also used in any received message.
 
 ```js
-builder.test("marco-polo", function (test) {
+test("marco-polo", function (test) {
   test.input("Marco", function (msg) {
     test.ok(msg.data === "Polo");
   });

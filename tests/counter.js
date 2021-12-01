@@ -1,5 +1,5 @@
-require('../tester')(function(builder, done) {
-	builder.test(function(test) {
+require('../tester')(function(test, done) {
+	test(function(test) {
 		let messages = 0;
 
 		// Send random message to input
