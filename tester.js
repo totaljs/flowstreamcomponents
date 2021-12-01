@@ -11,7 +11,7 @@ const logSuccess = function(test) {
 
 	const name = test.__description__;
 	const duration = '(' + (new Date() - test.startAt) + ' ms)';
-	console.log('[DONE] -', test.__name__, (name ? '- ' + name : ''), duration);
+	console.log('[OK]', test.__name__, (name ? '- ' + name : ''), duration);
 
 	delete test.__tester__;
 	delete test.__name__;
@@ -24,7 +24,7 @@ const logFailed = function(test) {
 
 	const name = test.__description__;
 	const duration = '(' + (new Date() - test.startAt) + ' ms)';
-	console.log('[FAIL] -', test.__name__, (name ? '- ' + name : ''), duration);
+	console.log('[FAILED]', test.__name__, (name ? '- ' + name : ''), duration);
 
 	delete test.__tester__;
 	delete test.__name__;
@@ -60,22 +60,27 @@ tester.output = function(msg) {
 tester.finish = tester.done = function(message) {
 	setTimeout(() => {
 		const duration = new Date() - tester.startAt;
-		const result = tester.stats.failed > 0 ? 'FAILED' : 'SUCCESSFUL';
 
-		console.log('[FINISHED] - {0} in {1} ms'.format(result, duration));
+		var div = '|--------------------------------------|';
 
-		message && console.log(' ' + message);
+		if (message) {
+			console.log(div);
+			console.log(message);
+		}
 
-		console.log(' - Total:', tester.stats.total);
-		console.log(' - Success:', tester.stats.ok);
-		console.log(' - Failed:', tester.stats.failed);
+		console.log(div);
+		console.log('| Total              |', tester.stats.total.padLeft(15, ' '), '|');
+		console.log('| Success            |', tester.stats.ok.padLeft(15, ' '), '|');
+		console.log('| Failed             |', tester.stats.failed.padLeft(15, ' '), '|');
+		console.log('| Duration           |', (duration + ' ms').padLeft(15, ' '), '|');
+		console.log(div);
 
 		tester.stop();
 	}, 5);
 };
 
 tester.end = tester.throw = tester.fail = function(message) {
-	console.log('[FAIL]' + (message ? ' - ' + message : ''));
+	console.log('[NO]' + (message ? ' - ' + message : ''));
 
 	this.stop();
 };
@@ -219,14 +224,14 @@ tester.test = function(name, callback) {
 					};
 
 					test.tester = tester; // Reference to main tester instance
-					test.defaultConfig = instance.config;
+					test.default_config = instance.config;
 					test.config = instance.config;
 					test.instance = instance;
 					test.startAt = new Date();
 
 					// Change config of component
 					test.configure = test.reconfigure = function(properties, withoutConfigure) {
-						instance.config = test.defaultConfig;
+						instance.config = test.default_config;
 
 						for (let key in properties)
 							instance.config[key] = properties[key];
@@ -257,13 +262,13 @@ module.exports = function(callback) {
 	flow.onstatus = function(status) {
 		const test = tester.tests[this.id];
 		test.status && test.status(status);
-		test.currentStatus = status;
+		test.current_status = status;
 	};
 
 	flow.ondashboard = function(status) {
 		const test = tester.tests[this.id];
 		test.dashboard && test.dashboard(status);
-		test.currentDashboard = status;
+		test.current_dashboard = status;
 	};
 
 	flow.onerror = function(err, source, instanceId) {
@@ -271,6 +276,7 @@ module.exports = function(callback) {
 		if (instance) {
 			instance.onError && instance.onError(err);
 			instance.onerror && instance.onerror(err);
+			instance.current_err = err;
 		}
 	};
 

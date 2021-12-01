@@ -1,6 +1,17 @@
-require('../tester')(function(test, done) {
-	test(function(test) {
+// FlowStream Tester
+// Component: counter.html
+
+require('../tester')(async function(describe, done) {
+
+	await describe(function(test, next) {
+
 		let messages = 0;
+		let status = 0;
+
+		// Capture component status
+		test.status = function(data) {
+			status = data;
+		};
 
 		// Send random message to input
 		test.input('Hello World!');
@@ -13,16 +24,21 @@ require('../tester')(function(test, done) {
 		}, 1 * 1000);
 
 		setTimeout(function() {
+
 			// Check if message count is as expected
-			test.ok(test.currentStatus === messages, 'Counting');
+			test.ok(status === messages, 'Counting');
 
 			// Clear counter
 			test.trigger();
-			test.ok(test.currentStatus === 0, 'Clearing');
+			test.ok(status === 0, 'Clearing');
 
-			// End tester
-			done();
+			next();
+
 		}, 2 * 1000);
 
 	});
+
+	// End tester
+	done();
+
 });
