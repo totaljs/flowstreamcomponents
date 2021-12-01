@@ -1,13 +1,13 @@
 const tester = require('../tester');
 
-// tester.autoClose = false; // Use "done" or "builder.done()" to manually end tester
+// tester.autoClose = false; // Use "done" to manually end tester
 // tester.autoCloseDuration = 5 * 1000; // 5 seconds
 
 // tester.directory = './components';
 
-tester(async function(builder, done) {
+tester(async function(test, done) {
 	// Pass filename as first argument otherwise filename of this file will be automatically assigned
-	await builder.test('example-increment', async function(test, next) {
+	await test('example-increment', async function(test, next) {
 
 		// Output messages from component
 		test.output = function(msg) {
@@ -43,13 +43,13 @@ tester(async function(builder, done) {
 		test.input('number', 10, function(msg) {
 			test.ok(msg.data === 0, '"-10 + 10 = 0"');
 
-			// Resolve this test and go to next "builder.test"
+			// Resolve this test and go to next test
 			next();
 		});
 
 	});
 
-	builder.test('counter', function(test) {
+	test('counter', function(test) {
 		setTimeout(() => {
 			// Test was successful
 			test.ok();
