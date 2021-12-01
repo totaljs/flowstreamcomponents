@@ -12,14 +12,14 @@ You can also test multiple components in one file. Example is in `tests/example-
 
 ```js
 require('./tester')(function (describe, done) {
-  describe('counter', function (test) {
+    describe('counter', function (test) {
 
-    // Test was successful
-    test.ok();
+        // Test was successful
+        test.ok();
 
-    // End tester and show results
-    done();
-  });
+        // End tester and show results
+        done();
+    });
 });
 ```
 
@@ -35,9 +35,9 @@ To dynamically change configuration of component use `configure` method. After u
 
 ```js
 describe('test', function (test) {
-  // { mode: 'debug', ready: false }
-  test.configure({ ready: true });
-  // { mode: 'debug', ready: true }
+    // { mode: 'debug', ready: false }
+    test.configure({ ready: true });
+    // { mode: 'debug', ready: true }
 });
 ```
 
@@ -51,15 +51,15 @@ Also keep in mind that tester can't tell which output message is from requested 
 
 ```js
 describe('increment', function(test) {
-  const data = [1, 2];
+    const data = [1, 2];
 
-  test.input(data, msg => {
-    // Test is flagged as Successful when message data is equal to 3
-    test.ok(msg.data === 3);
+    test.input(data, msg => {
+        // Test is flagged as Successful when message data is equal to 3
+        test.ok(msg.data === 3);
 
-    // Same result
-    test.fail(msg.data !== 3);
-  };
+        // Same result
+        test.fail(msg.data !== 3);
+    };
 });
 ```
 
@@ -69,17 +69,17 @@ All outcoming messages from component can be catched with `test.message` or `tes
 
 ```js
 test('test', function (test) {
-  test.output = function (msg) {
+    test.output = function (msg) {
 
-    // Check if message is from 'output1' index and data of message is 'total.js'
-    if (msg.index === 'output1' && msg.data === 'total.js')
-      test.ok();
-    else
-      test.fail();
+        // Check if message is from 'output1' index and data of message is 'total.js'
+        if (msg.index === 'output1' && msg.data === 'total.js')
+            test.ok();
+        else
+            test.fail();
 
-    // Shorthand - If condition inside 'msg.ok()' is not true, 'msg.fail' is called automatically
-    test.ok(msg.index === 'output1' && msg.data === 'total.js');
-  };
+        // Shorthand - If condition inside 'msg.ok()' is not true, 'msg.fail' is called automatically
+        test.ok(msg.index === 'output1' && msg.data === 'total.js');
+    };
 });
 ```
 
@@ -98,11 +98,11 @@ Handlers are used to tell tester if your testing script was successful or invali
 ```js
 describe('test', function (test) {
 
-  test.ok(); // Mark test as successful
-  test.ok(false); // Mark test as failed
+    test.ok(); // Mark test as successful
+    test.ok(false); // Mark test as failed
 
-  test.fail(); // Mark test as failed
-  test.fail(false); // Mark test as successful
+    test.fail(); // Mark test as failed
+    test.fail(false); // Mark test as successful
 
 });
 ```
@@ -112,16 +112,16 @@ Handlers can be also used in any received message.
 ```js
 describe('marco-polo', function (test) {
 
-  test.input('Marco', function (msg) {
-    test.ok(msg.data === 'Polo');
-  });
+    test.input('Marco', function (msg) {
+        test.ok(msg.data === 'Polo');
+    });
 
-  // Or
-  test.output = function (msg) {
-    test.ok(msg.data === 'Polo');
-  };
+    // Or
+    test.output = function (msg) {
+        test.ok(msg.data === 'Polo');
+    };
 
-  test.input('Marco');
+    test.input('Marco');
 });
 ```
 
