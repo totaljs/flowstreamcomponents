@@ -6,12 +6,15 @@ Simple tool for testing FlowStream components.
 
 First, you need to initialize testing FlowStream instance by calling imported `tester` function. In callback you will get `test` function that is used to initialize components. To initialize component use `test` with filename as first argument of component inside `components` directory (path can be changed with `tester.path`). After successfull component initialization, `test` instance is returned in callback of second argument where you can start testing your component.
 
-If your test is longer than 5 seconds, consider extending `tester.autoCloseDuration` value or disabling auto-close feature and manually existing using tester with `done()` method (second argument in callback of `tester()` function).
+If your test is longer than 5 seconds, consider extending `tester.timeout` value or disabling auto-close feature and manually existing using tester with `done()` method (second argument in callback of `tester()` function).
 
 You can also test multiple components in one file. Example is in `tests/example-multiple.js` file.
 
 ```js
 require('./tester')(function (describe, done) {
+
+    // this.timeout = 10000; // 10 seconds timeout
+
     describe('counter', function (test) {
 
         // Test was successful

@@ -10,7 +10,7 @@ const logSuccess = function(test) {
 	tester.stats.ok++;
 
 	const name = test.__description__;
-	const duration = '(' + (new Date() - test.startAt) + ' ms)';
+	const duration = '(' + (new Date() - test.beg) + ' ms)';
 	console.log('[OK]', test.__name__, (name ? '- ' + name : ''), duration);
 
 	delete test.__tester__;
@@ -23,7 +23,7 @@ const logFailed = function(test) {
 	tester.stats.failed++;
 
 	const name = test.__description__;
-	const duration = '(' + (new Date() - test.startAt) + ' ms)';
+	const duration = '(' + (new Date() - test.beg) + ' ms)';
 	console.log('[FAILED]', test.__name__, (name ? '- ' + name : ''), duration);
 
 	delete test.__tester__;
@@ -33,8 +33,7 @@ const logFailed = function(test) {
 // Tester
 const tester = {};
 tester.path = './components';
-tester.autoClose = true;
-tester.autoCloseDuration = 5 * 1000;
+tester.timeout = 5 * 1000;
 tester.inputTests = {};
 tester.tests = {};
 tester.stats = { total: 0, ok: 0, failed: 0 };
@@ -59,7 +58,7 @@ tester.output = function(msg) {
 
 tester.finish = tester.done = function(message) {
 	setTimeout(() => {
-		const duration = new Date() - tester.startAt;
+		const duration = new Date() - tester.beg;
 
 		var div = '|--------------------------------------|';
 
@@ -81,12 +80,11 @@ tester.finish = tester.done = function(message) {
 
 tester.end = tester.throw = tester.fail = function(message) {
 	console.log('[NO]' + (message ? ' - ' + message : ''));
-
 	this.stop();
 };
 
 tester.stop = function() {
-	clearTimeout(this.autoCloseTimeout);
+	clearTimeout(this.timeoutid);
 
 	this.flowstream.destroy();
 	this.flowstream = null;
@@ -227,7 +225,7 @@ tester.test = function(name, callback) {
 					test.default_config = instance.config;
 					test.config = instance.config;
 					test.instance = instance;
-					test.startAt = new Date();
+					test.beg = new Date();
 
 					// Change config of component
 					test.configure = test.reconfigure = function(properties, withoutConfigure) {
@@ -280,12 +278,11 @@ module.exports = function(callback) {
 		}
 	};
 
-	tester.startAt = new Date();
+	tester.beg = new Date();
+	callback.call(tester, tester.test, tester.done);
 
 	// Start "Timeout" timer
-	tester.autoCloseTimeout = setTimeout(() => {
+	tester.timeoutid = setTimeout(() => {
 		tester.done();
-	}, tester.autoCloseDuration);
-
-	callback(tester.test, tester.done);
+	}, tester.timeout);
 };
