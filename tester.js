@@ -2,6 +2,7 @@ require('total4');
 
 const Path = require('path');
 const Fs = require('fs');
+const TestAll = process.mainModule.exports === exports;
 
 // Loggers
 const logSuccess = function(test) {
@@ -84,12 +85,10 @@ tester.end = tester.throw = tester.fail = function(message) {
 };
 
 tester.stop = function() {
-	clearTimeout(this.timeoutid);
-
-	this.flowstream.destroy();
+	this.timeoutid && clearTimeout(this.timeoutid);
+	this.flowstream && this.flowstream.destroy();
 	this.flowstream = null;
-	this.timeoutTimer = null;
-
+	this.timeoutid = null;
 	process.exit(this.stats.failed > 0);
 };
 
@@ -286,3 +285,36 @@ module.exports = function(callback) {
 		tester.done();
 	}, tester.timeout);
 };
+
+if (TestAll) {
+	// Run all test scripts
+	F.Fs.readdir('tests', function(err, files) {
+		tester.beg = Date.now();
+		files.wait(function(file, next) {
+
+			if (U.getExtension(file) === 'js') {
+
+				tester.stats.total++;
+
+				var now = Date.now();
+				var child = F.Child.fork('tests/' + file, { detached: true, silent: true });
+
+				child.on('exit', function(code) {
+
+					if (code)
+						tester.stats.failed++;
+					else
+						tester.stats.ok++;
+
+					var ms = Date.now() - now;
+					console.log('[{0}] '.format(code ? 'FAILED' : 'OK') + file + ' ({0} s)'.format((ms / 1000).toFixed(2)));
+					next();
+
+				});
+
+			} else
+				next();
+
+		}, tester.done);
+	});
+}
