@@ -8,6 +8,13 @@ This repository contains open-source __Total.js FlowStream components__. Please 
 
 - [Our coding standards and guidelines](https://docs.totaljs.com/welcome/67b47001ty51c/)
 
+## Run unit-test for all tests
+
+- open terminal/command-line
+- `$ cd flowstreamcomponents`
+- `$ npm install total4` (only once)
+- `$ node tester.js`
+
 ## Contact
 
 - <info@totaljs.com>
