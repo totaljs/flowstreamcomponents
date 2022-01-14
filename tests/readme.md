@@ -118,6 +118,25 @@ test("marco-polo", function (test) {
 });
 ```
 
+## Errors
+
+To capture error from a single component, use `test.onerror()` function.
+
+```js
+// Component
+exports.make = function(instance, config) {
+		instance.message = function($) {
+      instance.throw('a', 'b', 'c', 'd');
+    });
+}
+
+// Test
+test("test", function (test) {
+  test.onerror = function (a, b, c, d) {
+    console.log(a, b, c, d);
+  };
+});
+```
 ## Examples
 
 All example files are stored in `tests` directory with prefix `example`.
