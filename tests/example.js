@@ -1,13 +1,11 @@
-const tester = require('../tester');
-
 // tester.autoClose = false; // Use "done" to manually end tester
 // tester.autoCloseDuration = 5 * 1000; // 5 seconds
 
 // tester.directory = './components';
 
-tester(async function(test, done) {
+require('../tester')(async function(describe, done) {
 	// Pass filename as first argument otherwise filename of this file will be automatically assigned
-	await test('example-increment', async function(test, next) {
+	await describe('example-increment', async function(test, next) {
 
 		// Output messages from component
 		test.output = function(msg) {
@@ -54,14 +52,17 @@ tester(async function(test, done) {
 
 	});
 
-	test('counter', function(test) {
+	describe('counter', function(test) {
+
 		setTimeout(() => {
 			// Test was successful
 			test.ok();
 
 			// End tester and show results in console
 			done();
+
 		}, 1000);
+
 	});
 
 });

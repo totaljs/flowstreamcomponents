@@ -2,6 +2,7 @@ require('total4');
 
 const Path = require('path');
 const Fs = require('fs');
+const TestAll = process.mainModule.exports === exports;
 
 // Loggers
 const logSuccess = function(test) {
@@ -10,8 +11,8 @@ const logSuccess = function(test) {
 	tester.stats.ok++;
 
 	const name = test.__description__;
-	const duration = '(' + (new Date() - test.startAt) + ' ms)';
-	console.log('[DONE] -', test.__name__, (name ? '- ' + name : ''), duration);
+	const duration = '(' + (new Date() - test.beg) + ' ms)';
+	console.log('[OK]', test.__name__, (name ? '- ' + name : ''), duration);
 
 	delete test.__tester__;
 	delete test.__name__;
@@ -23,8 +24,8 @@ const logFailed = function(test) {
 	tester.stats.failed++;
 
 	const name = test.__description__;
-	const duration = '(' + (new Date() - test.startAt) + ' ms)';
-	console.log('[FAIL] -', test.__name__, (name ? '- ' + name : ''), duration);
+	const duration = '(' + (new Date() - test.beg) + ' ms)';
+	console.log('[FAILED]', test.__name__, (name ? '- ' + name : ''), duration);
 
 	delete test.__tester__;
 	delete test.__name__;
@@ -33,8 +34,7 @@ const logFailed = function(test) {
 // Tester
 const tester = {};
 tester.path = './components';
-tester.autoClose = true;
-tester.autoCloseDuration = 5 * 1000;
+tester.timeout = 5 * 1000;
 tester.inputTests = {};
 tester.tests = {};
 tester.stats = { total: 0, ok: 0, failed: 0 };
@@ -59,34 +59,36 @@ tester.output = function(msg) {
 
 tester.finish = tester.done = function(message) {
 	setTimeout(() => {
-		const duration = new Date() - tester.startAt;
-		const result = tester.stats.failed > 0 ? 'FAILED' : 'SUCCESSFUL';
+		const duration = new Date() - tester.beg;
 
-		console.log('[FINISHED] - {0} in {1} ms'.format(result, duration));
+		var div = '|--------------------------------------|';
 
-		message && console.log(' ' + message);
+		if (message) {
+			console.log(div);
+			console.log(message);
+		}
 
-		console.log(' - Total:', tester.stats.total);
-		console.log(' - Success:', tester.stats.ok);
-		console.log(' - Failed:', tester.stats.failed);
+		console.log(div);
+		console.log('| Total              |', tester.stats.total.padLeft(15, ' '), '|');
+		console.log('| Success            |', tester.stats.ok.padLeft(15, ' '), '|');
+		console.log('| Failed             |', tester.stats.failed.padLeft(15, ' '), '|');
+		console.log('| Duration           |', (duration + ' ms').padLeft(15, ' '), '|');
+		console.log(div);
 
 		tester.stop();
 	}, 5);
 };
 
 tester.end = tester.throw = tester.fail = function(message) {
-	console.log('[FAIL]' + (message ? ' - ' + message : ''));
-
+	console.log('[NO]' + (message ? ' - ' + message : ''));
 	this.stop();
 };
 
 tester.stop = function() {
-	clearTimeout(this.autoCloseTimeout);
-
-	this.flowstream.destroy();
+	this.timeoutid && clearTimeout(this.timeoutid);
+	this.flowstream && this.flowstream.destroy();
 	this.flowstream = null;
-	this.timeoutTimer = null;
-
+	this.timeoutid = null;
 	process.exit(this.stats.failed > 0);
 };
 
@@ -219,14 +221,14 @@ tester.test = function(name, callback) {
 					};
 
 					test.tester = tester; // Reference to main tester instance
-					test.defaultConfig = instance.config;
+					test.default_config = instance.config;
 					test.config = instance.config;
 					test.instance = instance;
-					test.startAt = new Date();
+					test.beg = new Date();
 
 					// Change config of component
 					test.configure = test.reconfigure = function(properties, withoutConfigure) {
-						instance.config = test.defaultConfig;
+						instance.config = test.default_config;
 
 						for (let key in properties)
 							instance.config[key] = properties[key];
@@ -260,13 +262,13 @@ module.exports = function(callback) {
 	flow.onstatus = function(status) {
 		const test = tester.tests[this.id];
 		test.status && test.status(status);
-		test.currentStatus = status;
+		test.current_status = status;
 	};
 
 	flow.ondashboard = function(status) {
 		const test = tester.tests[this.id];
 		test.dashboard && test.dashboard(status);
-		test.currentDashboard = status;
+		test.current_dashboard = status;
 	};
 
 	flow.onerror = function(a, b, c, d) {
@@ -274,12 +276,44 @@ module.exports = function(callback) {
 		this.onerror && this.onerror(a, b, c, d);
 	};
 
-	tester.startAt = new Date();
+	tester.beg = new Date();
+	callback.call(tester, tester.test, tester.done);
 
 	// Start "Timeout" timer
-	tester.autoCloseTimeout = setTimeout(() => {
+	tester.timeoutid = setTimeout(() => {
 		tester.done();
-	}, tester.autoCloseDuration);
-
-	callback(tester.test, tester.done);
+	}, tester.timeout);
 };
+
+if (TestAll) {
+	// Run all test scripts
+	F.Fs.readdir('tests', function(err, files) {
+		tester.beg = Date.now();
+		files.wait(function(file, next) {
+
+			if (U.getExtension(file) === 'js') {
+
+				tester.stats.total++;
+
+				var now = Date.now();
+				var child = F.Child.fork('tests/' + file, { detached: true, silent: true });
+
+				child.on('exit', function(code) {
+
+					if (code)
+						tester.stats.failed++;
+					else
+						tester.stats.ok++;
+
+					var ms = Date.now() - now;
+					console.log('[{0}] '.format(code ? 'FAILED' : 'OK') + file + ' ({0} s)'.format((ms / 1000).toFixed(2)));
+					next();
+
+				});
+
+			} else
+				next();
+
+		}, tester.done);
+	});
+}

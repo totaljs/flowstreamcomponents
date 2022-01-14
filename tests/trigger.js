@@ -1,9 +1,9 @@
-require('../tester')(async function(test, done) {
-	await test(function(test, next) {
+require('../tester')(async function(describe, done) {
+
+	await describe(function(test, next) {
+
 		// If message won't come out in 0.5 second, test will fail
-		const timeout = setTimeout(function() {
-			test.fail('Timeout');
-		}, 500);
+		var timeout = setTimeout(() => test.fail('Timeout'), 500);
 
 		test.output = function(msg) {
 			clearTimeout(timeout);
@@ -14,7 +14,7 @@ require('../tester')(async function(test, done) {
 		test.trigger();
 	});
 
-	test(function(test) {
+	await describe(function(test, next) {
 
 		// Random string
 		test.configure({ random: true, data: 'NOT_RANDOM' });
@@ -30,13 +30,15 @@ require('../tester')(async function(test, done) {
 
 			test.output = function(msg) {
 				test.ok(msg.data === 'NOT_RANDOM', 'NOT Random string');
-
-				// End tester
-				done();
+				next();
 			};
 
 			test.trigger();
 		}, 1000);
 
 	});
+
+	// End test
+	done();
+
 });
