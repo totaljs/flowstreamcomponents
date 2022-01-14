@@ -14,7 +14,7 @@ require('../tester')(async function(describe, done) {
 			// test.fail();
 		};
 
-		// Changing component status
+		// Changing component status  (or onStatus)
 		test.status = function(newStatus) {
 			console.log('[LOG] Component\'s new status is' + newStatus);
 		};
@@ -30,6 +30,11 @@ require('../tester')(async function(describe, done) {
 
 		// Change component's configuration without triggering configure function
 		test.configure({ increment: 5 }, true);
+
+		// Catch error from "instance.throw()" function (or onError)
+		test.onerror = function(a, b, c, d) {
+			console.log(a, b, c, d);
+		}
 
 		// Any output based on input "number" will be flagged as success
 		// Use "await" so test bellow wont interupt or modify configuration of this test

@@ -244,6 +244,9 @@ tester.test = function(name, callback) {
 					tester.tests[id] = test;
 
 					callback(test, testPromiseResolver);
+
+					instance.onerror = test.onerror;
+					instance.onError = test.onError;
 				}
 			});
 		});
@@ -268,13 +271,9 @@ module.exports = function(callback) {
 		test.current_dashboard = status;
 	};
 
-	flow.onerror = function(err, source, instanceId) {
-		const instance = flow.meta.flow[instanceId] || this;
-		if (instance) {
-			instance.onError && instance.onError(err);
-			instance.onerror && instance.onerror(err);
-			instance.current_err = err;
-		}
+	flow.onerror = function(a, b, c, d) {
+		this.onError && this.onError(a, b, c, d);
+		this.onerror && this.onerror(a, b, c, d);
 	};
 
 	tester.beg = new Date();
