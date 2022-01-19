@@ -1,0 +1,114 @@
+<script total>
+
+	exports.name = 'MQTT Subscribe';
+	exports.icon = 'fa fa-sign-in';
+	exports.group = 'MQTT';
+	exports.config = { broker: '' };
+	exports.outputs = [{ id: 'message', name: 'Message' }];
+	exports.author = 'Martin Smola';
+	exports.version = '1';
+
+	exports.make = function(instance, config) {
+
+		var subscribed = false;
+		var broker, topic;
+
+		instance.configure = function() {
+
+			if (subscribed && broker)
+				broker.unsubscribe(instance.id, topic);
+
+			topic = config.topic;
+
+			instance.status({ status: 'Not configured', topic });
+			broker = instance.main.find(config.broker);
+
+			if (broker) {
+				broker.subscribe(instance.id, topic);
+				subscribed = true;
+				instance.status({ status: 'Subscribed', topic });
+			} else {
+				instance.status({ status: 'Broker not found', topic });
+			}
+		};
+
+		instance.onmessage = function(topic, message, match) {
+			instance.send('message', { topic, message, match });
+		};
+
+		instance.close = function() {
+			if (subscribed && broker)
+				broker.unsubscibe(instance.id, topic);
+		};
+
+		setTimeout(instance.configure, 2000);
+
+        instance.call = function(data, answer) {
+            var arr = [];
+
+            var instances = instance.main.instances();
+
+            instances = instances.filter(i => i.module.name === 'MQTT Broker');
+            for (let com of instances)
+                arr.push({ id: com.id, name: `${com.state.name} (${com.state.status})` });
+
+            answer(arr);
+        };
+	};
+</script>
+
+<readme>
+MQTT Subscribe
+</readme>
+
+<style>
+	.CLASS footer { padding: 10px; font-size: 11px; }
+	.CLASS footer > div > div { height: 16px; }
+	.CLASS footer b { float: right; }
+</style>
+
+<script>
+	ON('configure_mqttsubscribe', function(data) {
+		data.call(function(response) {
+			SET('%brokers', response);
+		});
+	});
+</script>
+
+<settings>
+	<div class="padding">
+		<div class="row">
+			<div class="col-md-6">
+				<div data---="input__?.broker__dirsource:%brokers;dirraw:1;placeholder:Select broker;dirempty:No broker;required:1" class="m"><b>Broker</b></div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-6">
+				<div data---="input__?.topic__placeholder:devices/status;required:1" class="m"><b>Topic</b></div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12">
+				<p>
+					<b>The topic supports wildcards like:</b><br>
+					- devices/+/status -> devices/1/status or devices/123456/status etc.<br>
+					- devices/#        -> any topic begining with devices/.......
+				</p>
+			</div>
+		</div>
+	</div>
+</settings>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+	<footer>
+		<div data-bind="!STATUS__template__show">
+			<script type="text/html">
+				<div><b>{{ value.status }}</b>Status</div>
+				<div><b>{{ value.topic }}</b>Topic</div>
+			</script>
+		</div>
+	</footer>
+</body>

@@ -1,0 +1,207 @@
+<script total>
+
+	exports.name = 'MQTT Broker';
+	exports.icon = 'fa fa-exchange-alt';
+	exports.group = 'MQTT';
+	exports.config = { hostname: 'localhost', port: 1883, secure: false };
+	exports.outputs = [{ id: 'output', name: 'Messages' }, { id: 'error', name: 'Errors' }];
+	exports.author = 'Martin Smola';
+	exports.version = '1';
+	exports.npm = ['mqtt'];
+
+	exports.make = function(instance, config) {
+
+		const mqtt = require('mqtt');
+		var client;
+
+		const state = () => {
+			var obj;
+			if (!client) {
+				obj = { connected: false, connecting: false, disconnected: true, disconnnecting: false, status: 'disconnected' };
+			} else {
+				const { connected, disconnecting, reconnecting } = client;
+				obj = { connecting: client.stream ? client.stream.connecting : false, connected, disconnecting, reconnecting };
+				const current = Object.keys(obj).filter(s => obj[s]);
+				obj.status = current.length ? current[0] : 'disconnected';
+			}
+
+			instance.state = { status: obj.status, name: config.hostname + ':' + config.port };
+			instance.status(instance.state);
+			return obj;
+		};
+
+		instance.configure = function() {
+			disconnect(connect);
+		};
+
+		instance.close = function() {
+			disconnect(NOOP);
+		};
+
+		instance.configure();
+
+		function disconnect(callback) {
+			if (!client)
+				return callback && callback();
+
+			if (client.end)
+				client.end(true, cb);
+			else
+				cb();
+
+			function cb() {
+				client.removeAllListeners();
+				client = null;
+				callback && callback();
+			};
+		};
+
+		function connect() {
+
+			state();
+
+			var broker = config.secure ? 'mqtts://' : 'mqtt://' + config.hostname + ':' + config.port;
+
+			client = mqtt.connect(broker, config);
+
+			client.on('connect', function() {
+				state();
+			});
+
+			client.on('reconnect', function() {
+				state();
+			});
+
+			client.on('message', function(topic, message) {
+				message = message.toString();
+				if (message[0] === '{')
+					message = message.parseJSON(true);
+
+				onmessage(topic, message);
+			});
+
+			client.on('close', function(err) {
+				if (err && err.toString().indexOf('Error')) {
+				}
+				state();
+			});
+
+			client.on('error', function(err) {
+				state();
+			});
+		};
+
+		function onmessage(topic, message) {
+			console.log('Broker.onmessage', topic, message);
+			for (let sub in subscribtions) {
+				var match = mqttWildcard(topic, sub);
+				if (match) {
+					for (const comid of sub) {
+						const com = instance.main.find(comid);
+						com && com.onmessage(topic, message, match);
+					}
+				}
+			}
+		}
+
+		instance.publish = function(topic, message, options) {
+			console.log('Broker.publish', topic, message, options);
+			client && client.publish(topic, message, options, function(err){
+				if (err)
+					console.log('error', err);
+			});
+		};
+
+		const subscribtions = {};
+
+		instance.subscribe = function(componentid, topic) {
+			var self = this;
+			subscribtions[topic] = subscribtions[topic] || [];
+			if (subscribtions[topic].indexOf(componentid) > -1)
+				return;
+
+			console.log('Broker.subscribe', topic);
+			client.subscribe(topic);
+			subscribtions[topic].push(componentid);
+		};
+
+		instance.unsubscribe = function(componentid, topic) {
+			var self = this;
+			var sub = subscribtions[topic];
+			if (sub) {
+				subscribtions[topic] = sub.remove(componentid);
+				client.connected && !subscribtions[topic].length && client.unsubscribe(topic);
+			}
+		};
+
+		// https://github.com/hobbyquaker/mqtt-wildcard
+		function mqttWildcard(topic, wildcard) {
+			if (topic === wildcard) {
+				return [];
+			} else if (wildcard === '#') {
+				return [topic];
+			}
+
+			var res = [];
+
+			var t = String(topic).split('/');
+			var w = String(wildcard).split('/');
+
+			var i = 0;
+			for (var lt = t.length; i < lt; i++) {
+				if (w[i] === '+') {
+					res.push(t[i]);
+				} else if (w[i] === '#') {
+					res.push(t.slice(i).join('/'));
+					return res;
+				} else if (w[i] !== t[i]) {
+					return null;
+				}
+			}
+
+			if (w[i] === '#') {
+				i += 1;
+			}
+
+			return (i === w.length) ? res : null;
+		}
+	};
+
+</script>
+
+<readme>
+	MQTT Broker
+</readme>
+
+<style>
+	.CLASS footer { padding: 10px; font-size: 11px; }
+	.CLASS footer > div > div { height: 16px; }
+	.CLASS footer b { float: right; }
+</style>
+
+<settings>
+	<div class="padding">
+		<div class="row">
+			<div class="col-md-4">
+				<div data---="input__?.hostname__placeholder:test.mosquitto.org;required:1">Hostname</div>
+			</div>
+			<div class="col-md-4">
+				<div data---="input__?.port__type:number;required:1">Port</div>
+			</div>
+		</div>
+	</div>
+</settings>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+	<footer>
+		<div data-bind="!STATUS__template__show">
+			<script type="text/html">
+				<div><b>{{ value.name }}</b>Name</div>
+				<div><b>{{ value.status }}</b>Status</div>
+			</script>
+		</div>
+	</footer>
+</body>
