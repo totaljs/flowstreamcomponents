@@ -160,6 +160,36 @@
 		"version": "1"
 	},
 	{
+		"id": "mqtt-broker",
+		"group": "MQTT",
+		"name": "MQTT Broker",
+		"url": "https://cdn.totaljs.com/flowstream/components/mqtt-broker.html",
+		"author": "Martin Smola",
+		"icon": "fa fa-exchange-alt",
+		"color": "",
+		"version": "1"
+	},
+	{
+		"id": "mqtt-publish",
+		"group": "MQTT",
+		"name": "MQTT Publish",
+		"url": "https://cdn.totaljs.com/flowstream/components/mqtt-publish.html",
+		"author": "Martin Smola",
+		"icon": "fa fa-sign-out",
+		"color": "",
+		"version": "1"
+	},
+	{
+		"id": "mqtt-subscribe",
+		"group": "MQTT",
+		"name": "MQTT Subscribe",
+		"url": "https://cdn.totaljs.com/flowstream/components/mqtt-subscribe.html",
+		"author": "Martin Smola",
+		"icon": "fa fa-sign-in",
+		"color": "",
+		"version": "1"
+	},
+	{
 		"id": "opensync",
 		"group": "External",
 		"name": "OpenSync",
