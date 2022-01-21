@@ -149,6 +149,21 @@ tester.test = function(name, callback) {
 					const id = componentConnectionId;
 					const instance = flow.meta.flow[id];
 					const testInstance = flow.meta.flow[testConnectionId];
+
+					instance.httproute = NOOP;
+					instance.save = NOOP;
+					instance.io = NOOP;
+					instance.toinput = NOOP;
+					instance.output = NOOP;
+					instance.newvariables = function(vars) {
+						instance.variables && instance.variables(vars);
+					};
+					instance.reconfigure = function(conf){
+						for (let key in conf)
+							instance.config[key] = conf[key];
+						instance.configure && instance.configure();
+					};
+
 					const test = {};
 
 					test.input = function(inputIndex, data, handler) {
@@ -261,6 +276,8 @@ module.exports = function(callback) {
 
 	flow.onstatus = function(status) {
 		const test = tester.tests[this.id];
+		if (!test)
+			return;
 		test.status && test.status(status);
 		test.current_status = status;
 	};
