@@ -7,7 +7,8 @@
 		"author": "Peter Širka",
 		"icon": "fa fa-code",
 		"color": "",
-		"version": "2"
+		"version": "2",
+		"readme": "This component executes a custom JavaScript code as it is.\nadaôskldj salkdjasdasd\nasdlkjsadlasjd"
 	},
 	{
 		"id": "connections",
@@ -17,7 +18,8 @@
 		"author": "Peter Širka",
 		"icon": "fa fa-network-wired",
 		"color": "",
-		"version": "1"
+		"version": "1",
+		"readme": "This component monitors open connections to the specific port in the Linux systems for the specific process. It uses `netstat` command.\n\n__Data Example__:\n\n```js\n{\n\tport: 80,\n\tconnections: 54\n}\n```"
 	},
 	{
 		"id": "counter",
@@ -27,7 +29,8 @@
 		"author": "Peter Širka",
 		"icon": "fa fa-calculator",
 		"color": "",
-		"version": "1"
+		"version": "1",
+		"readme": "The component counts incoming messages."
 	},
 	{
 		"id": "cpu",
@@ -37,7 +40,8 @@
 		"author": "Peter Širka",
 		"icon": "fa fa-microchip",
 		"color": "",
-		"version": "1"
+		"version": "1",
+		"readme": "This component monitors CPU `% percentage` consumption in the Linux systems. It uses `mpstat` command with 10 seconds interval.\n\n__Data Example__:\n\n```js\n{\n\tcpu: 30, // percentage\n\tcores: [4, 60, 0], // percentage\n\tcount: 3 // count of cores\n}\n```"
 	},
 	{
 		"id": "delay",
@@ -47,7 +51,8 @@
 		"author": "Peter Širka",
 		"icon": "far fa-clock-o",
 		"color": "",
-		"version": "3"
+		"version": "3",
+		"readme": "The component delays processing of a message."
 	},
 	{
 		"id": "end",
@@ -57,7 +62,8 @@
 		"author": "Peter Širka",
 		"icon": "fas fa-skull-crossbones",
 		"color": "",
-		"version": "1"
+		"version": "1",
+		"readme": "The component destroys the incoming message."
 	},
 	{
 		"id": "exec",
@@ -67,7 +73,8 @@
 		"author": "Peter Širka",
 		"icon": "fas fa-running",
 		"color": "",
-		"version": "1"
+		"version": "1",
+		"readme": "The component is extraordinary because it must be executed directly from the source code via the `flowstream.exec()` method. The component triggers received data into the Flow.\n\n```js\nvar opt = {};\nopt.id = 'ID_OF_EXEC_INSTANCE';\nopt.data = { custom: 'data' };\nopt.callback = function(err, msg) {\n\t// msg.uid;\n\t// msg.ref;\n\t// msg.repo {Object}\n\t// msg.data {Object}\n\t// msg.cloned {Number} how many times was the message cloned?\n\t// msg.duration {Number} in milliseconds\n};\n\n// optional:\n// opt.vars = {};    --> custom variables\n// opt.repo = {};    --> custom repository data and this data will be returned in the callback\n// opt.uid;          --> for storing some unique ID\n// opt.ref;          --> for storing some reference ID\nflowinstance.exec(opt);\n```"
 	},
 	{
 		"id": "filewatcher",
@@ -77,7 +84,8 @@
 		"author": "Peter Širka",
 		"icon": "fa fa-recycle",
 		"color": "",
-		"version": "1"
+		"version": "1",
+		"readme": "The component watches the existence of the file, then reads the content and sends it next. The file will be removed automatically after reading."
 	},
 	{
 		"id": "filewriter",
@@ -87,7 +95,8 @@
 		"author": "Peter Širka",
 		"icon": "fa fa-pencil",
 		"color": "",
-		"version": "1"
+		"version": "1",
+		"readme": "The component writes incoming data into the file."
 	},
 	{
 		"id": "flashback",
@@ -97,7 +106,8 @@
 		"author": "Peter Širka & Jakub Urban",
 		"icon": "fa fa-history",
 		"color": "",
-		"version": "2"
+		"version": "2",
+		"readme": "The component remembers the data for repeating the action."
 	},
 	{
 		"id": "hdd",
@@ -107,7 +117,8 @@
 		"author": "Peter Širka",
 		"icon": "far fa-hdd",
 		"color": "",
-		"version": "1"
+		"version": "1",
+		"readme": "This component monitors HDD consumption (in MB) in the Linux systems. It uses `df` command.\n\n__Data Example__:\n\n```js\n{\n\tfree: 0,\n\ttotal: 0,\n\tused: 0\n}\n```"
 	},
 	{
 		"id": "httproute",
@@ -117,7 +128,8 @@
 		"author": "",
 		"icon": "fa fa-route",
 		"color": "",
-		"version": "1"
+		"version": "1",
+		"readme": "This component registers an HTTP Route and sends request data next.\n\n__Output data__:\n\n```js\n{\n\t\"route\": String,\n\t\"params\": Object,\n\t\"query\": Object,\n\t\"body\": Object,\n\t\"files\": Array,\n\t\"headers\": Object,\n\t\"url\": String,\n\t\"ip\": String,\n\t\"cookies\": Object\n}\n```"
 	},
 	{
 		"id": "input",
@@ -127,7 +139,8 @@
 		"author": "Peter Širka",
 		"icon": "fa fa-broadcast-tower",
 		"color": "",
-		"version": "1"
+		"version": "1",
+		"readme": "The component receives data from another FlowStream."
 	},
 	{
 		"id": "logger",
@@ -137,7 +150,8 @@
 		"author": "Peter Širka",
 		"icon": "fas fa-binoculars",
 		"color": "",
-		"version": "1"
+		"version": "1",
+		"readme": "The component logs incoming messages into the Total.js Cloud Logger."
 	},
 	{
 		"id": "memory",
@@ -147,7 +161,8 @@
 		"author": "Peter Širka",
 		"icon": "fa fa-memory",
 		"color": "",
-		"version": "1"
+		"version": "1",
+		"readme": "This component monitors a memory consumption (in MB) in the Linux systems. It uses `free` command.\n\n__Data Example__:\n\n```js\n{\n\tfree: 0,\n\ttotal: 0,\n\tused: 0\n}\n```"
 	},
 	{
 		"id": "modified",
@@ -157,7 +172,8 @@
 		"author": "Peter Širka",
 		"icon": "fas fa-drafting-compass",
 		"color": "",
-		"version": "1"
+		"version": "1",
+		"readme": "The component compares incoming data with previous data."
 	},
 	{
 		"id": "mqtt-broker",
@@ -167,7 +183,8 @@
 		"author": "Martin Smola",
 		"icon": "fa fa-exchange-alt",
 		"color": "",
-		"version": "1"
+		"version": "1",
+		"readme": "MQTT Broker"
 	},
 	{
 		"id": "mqtt-publish",
@@ -177,7 +194,8 @@
 		"author": "Martin Smola",
 		"icon": "fa fa-sign-out",
 		"color": "",
-		"version": "1"
+		"version": "1",
+		"readme": "MQTT Publish\n\nInput:\n```javascript\n{\n\ttopic: 'some/topic',\n\tmessage: { some: 'data' },\n\t// optional\n\toptions: {\n\t\tqos: 0|1|2,\n\t\tretain: true|false\n\t}\n}\n```"
 	},
 	{
 		"id": "mqtt-subscribe",
@@ -187,7 +205,8 @@
 		"author": "Martin Smola",
 		"icon": "fa fa-sign-in",
 		"color": "",
-		"version": "1"
+		"version": "1",
+		"readme": "MQTT Subscribe"
 	},
 	{
 		"id": "opensync",
@@ -197,7 +216,8 @@
 		"author": "Peter Širka",
 		"icon": "fa fa-sync",
 		"color": "",
-		"version": "2"
+		"version": "2",
+		"readme": "This component receives a data from the [OpenSync](https://docs.totaljs.com/opensync/) app. Data example:\n\n```js\n{\n\tid: String,              // Internal ID\n\ttype: String,            // Parsed content-type (can be empty with the \"GET\" method)\n\tchannel: String,         // Channel\n\tip: String,              // Host IP address\n\tmethod: String,          // HTTP method (upper-case)\n\theaders: Object,         // Key:value\n\tquery: Object,           // Key:value\n\tbody: Object,            // JSON/key:value/String\n\tua: String,              // Parsed user-agent\n\tfiles: [Object Array]    // Uploaded files { filename: String, extension: String, type: String, size: Number, url: String, width: Number, height: Number }\n}\n```"
 	},
 	{
 		"id": "output",
@@ -207,7 +227,8 @@
 		"author": "Peter Širka",
 		"icon": "fa fa-crosshairs",
 		"color": "",
-		"version": "1"
+		"version": "1",
+		"readme": "The component sends data to another FlowStream."
 	},
 	{
 		"id": "print",
@@ -217,7 +238,8 @@
 		"author": "Peter Širka",
 		"icon": "fa fa-print",
 		"color": "",
-		"version": "3"
+		"version": "3",
+		"readme": "The component prints incoming data into the JSON format."
 	},
 	{
 		"id": "process",
@@ -227,7 +249,8 @@
 		"author": "Peter Širka",
 		"icon": "fa fa-procedures",
 		"color": "",
-		"version": "1"
+		"version": "1",
+		"readme": "This component monitors CPU (in %) and Memory consumption (in MB) in the Linux systems for the specific process. It uses `ps` command.\n\n__Data Example__:\n\n```js\n{\n\tgrep: 'nginx',\n\tcpu: 0.5,\n\tmemory: 45,\n\tfiles: 343,\n\tuptime: '1 day'\n}\n```"
 	},
 	{
 		"id": "publish",
@@ -237,7 +260,8 @@
 		"author": "Peter Širka",
 		"icon": "fa fa-crosshairs",
 		"color": "",
-		"version": "1"
+		"version": "1",
+		"readme": "The component publish the data to the specific `Input` component."
 	},
 	{
 		"id": "queue",
@@ -247,7 +271,8 @@
 		"author": "Peter Širka",
 		"icon": "fas fa-list",
 		"color": "",
-		"version": "2"
+		"version": "2",
+		"readme": "A simple persistent queue for the incomming messages."
 	},
 	{
 		"id": "read",
@@ -257,7 +282,8 @@
 		"author": "Peter Širka",
 		"icon": "fa fa-filter",
 		"color": "",
-		"version": "1"
+		"version": "1",
+		"readme": "This component reads a specific value according to the entered path."
 	},
 	{
 		"id": "request",
@@ -267,7 +293,8 @@
 		"author": "Peter Širka",
 		"icon": "fas fa-cloud-download",
 		"color": "",
-		"version": "2"
+		"version": "2",
+		"readme": "The component creates a HTTP request. Incoming data will be serialized as the payload.\n\n__Response__:\n\n```json\n{\n\tstatus: Number,\n\theaders: { key: value },\n\tcookies: { key: value },\n\thost: String,\n\tbody: String/Object/Buffer\n}\n```"
 	},
 	{
 		"id": "rpi-gpio",
@@ -277,7 +304,8 @@
 		"author": "Thecoolpeople",
 		"icon": "fab fa-raspberry-pi",
 		"color": "",
-		"version": "1"
+		"version": "1",
+		"readme": "# GPIO\r\n\r\n__Write mode__:\r\n\r\n- Select the GPIO you want\r\n- Set the read/write option to write\r\n- Send true to the component to set the GPIO to HIGH\r\n- Send false to the component to set the GPIO to LOW\r\n\r\n__Read mode__:\r\n\r\n- Select the GPIO you want\r\n- Set the read/write option to write\r\n- Send true to the node so read the state of the gpio"
 	},
 	{
 		"id": "rpi-gpio-pwm",
@@ -287,7 +315,8 @@
 		"author": "Thecoolpeople",
 		"icon": "fab fa-raspberry-pi",
 		"color": "",
-		"version": "1"
+		"version": "1",
+		"readme": "# GPIO PWM\r\n\r\n- send number with the uptime duration to the component.\r\n- 0 (zero) is 0%\r\n- 1 (one) is 100%."
 	},
 	{
 		"id": "rpi-i2c-read",
@@ -297,7 +326,8 @@
 		"author": "Thecoolpeople",
 		"icon": "fab fa-raspberry-pi",
 		"color": "",
-		"version": "1"
+		"version": "1",
+		"readme": "# I2C Read\r\n\r\nParameters, can be transmitted to the component, or directly set as setting.\r\n\r\n- `address`: The I2C address of the device\r\n- `register`: The (starting) register\r\n- `readLength`: The length of how many bits will be read"
 	},
 	{
 		"id": "rpi-i2c-write",
@@ -307,7 +337,8 @@
 		"author": "Thecoolpeople",
 		"icon": "fab fa-raspberry-pi",
 		"color": "",
-		"version": "1"
+		"version": "1",
+		"readme": "# I2C Write\r\n\r\nParameters, can be transmitted to the component, or directly set as setting.\r\n\r\n- `address`: The I2C address of the device\r\n- `register`: The (starting) register\r\n- `bytes`: The bytes which will be written"
 	},
 	{
 		"id": "rpi-uart",
@@ -317,7 +348,8 @@
 		"author": "Thecoolpeople",
 		"icon": "fab fa-raspberry-pi",
 		"color": "",
-		"version": "1"
+		"version": "1",
+		"readme": "# UART\r\n\r\n- send a string directly to a port\r\n- when device from a port sends data to the host, it will be send to the output of the component"
 	},
 	{
 		"id": "rpi-uart-getdevices",
@@ -327,7 +359,8 @@
 		"author": "Thecoolpeople",
 		"icon": "fab fa-raspberry-pi",
 		"color": "",
-		"version": "1"
+		"version": "1",
+		"readme": "# UART\r\n\r\nGet all devices which are possible to send"
 	},
 	{
 		"id": "sms",
@@ -337,7 +370,8 @@
 		"author": "Peter Širka",
 		"icon": "fas fa-tablet",
 		"color": "",
-		"version": "1"
+		"version": "1",
+		"readme": "The component sends a SMS message."
 	},
 	{
 		"id": "subscribe",
@@ -347,7 +381,8 @@
 		"author": "Peter Širka",
 		"icon": "fa fa-broadcast-tower",
 		"color": "",
-		"version": "1"
+		"version": "1",
+		"readme": "The component subscribes to the specific `Output` component."
 	},
 	{
 		"id": "tail",
@@ -356,6 +391,17 @@
 		"url": "https://cdn.totaljs.com/flowstream/components/tail.html",
 		"author": "Peter Širka",
 		"icon": "far fa-file-alt",
+		"color": "",
+		"version": "1",
+		"readme": "This component monitors last line in some text file with the help of `tail` command in the Linux systems.\n\n__Data Example__:\n\n```js\n{\n\tvalue: 'Some meessage'\n\tdate: Date\n}\n```"
+	},
+	{
+		"id": "example-increment",
+		"group": "common",
+		"name": "Test Increment",
+		"url": "https://cdn.totaljs.com/flowstream/components/example-increment.html",
+		"author": "Jakub Urban",
+		"icon": "fa fa-bong",
 		"color": "",
 		"version": "1"
 	},
@@ -367,7 +413,8 @@
 		"author": "Peter Širka",
 		"icon": "far fa-clock-o",
 		"color": "",
-		"version": "2"
+		"version": "2",
+		"readme": "The component triggers data into the Flow in the specified interval."
 	},
 	{
 		"id": "trigger",
@@ -377,6 +424,7 @@
 		"author": "Peter Širka",
 		"icon": "fa fa-bullhorn",
 		"color": "",
-		"version": "2"
+		"version": "2",
+		"readme": "The component triggers data into the Flow."
 	}
 ]
