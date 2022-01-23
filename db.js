@@ -1,5 +1,28 @@
 require('total4');
 
+FUNC.indent = function(count, val) {
+
+	var lines = val.split('\n');
+	var str = '';
+	var total = Math.abs(count);
+	var is = false;
+
+	for (var i = 0; i < total; i++)
+		str += '\t';
+
+	for (var i = 0; i < lines.length; i++) {
+		if (count > 0 && lines[i])
+			lines[i] = str + lines[i];
+		else if (lines[i].substring(0, total) === str) {
+			lines[i] = lines[i].substring(total);
+			is = true;
+		} else if (lines[i] && !is)
+			break;
+	}
+
+	return lines.join('\n');
+};
+
 PATH.fs.readdir('components', function(err, response) {
 
 	var arr = [];
@@ -31,6 +54,11 @@ PATH.fs.readdir('components', function(err, response) {
 			data.icon = icon ? evaluate(icon[0]).icon : '';
 			data.color = color ? evaluate(color[0]).color : '';
 			data.version = version ? evaluate(version[0]).version : '';
+
+			var index = response.indexOf('<readme>');
+
+			if (index !== -1)
+				data.readme = FUNC.indent(-1, response.substring(index + 8, response.indexOf('</readme>', index + 8))).trim();
 
 			arr.push(data);
 			next();
