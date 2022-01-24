@@ -8,7 +8,7 @@
 		"icon": "fa fa-code",
 		"color": "",
 		"version": "2",
-		"readme": "This component executes a custom JavaScript code as it is.\nadaôskldj salkdjasdasd\nasdlkjsadlasjd"
+		"readme": "This component executes a custom JavaScript code as it is."
 	},
 	{
 		"id": "connections",
@@ -394,16 +394,6 @@
 		"color": "",
 		"version": "1",
 		"readme": "This component monitors last line in some text file with the help of `tail` command in the Linux systems.\n\n__Data Example__:\n\n```js\n{\n\tvalue: 'Some meessage'\n\tdate: Date\n}\n```"
-	},
-	{
-		"id": "example-increment",
-		"group": "common",
-		"name": "Test Increment",
-		"url": "https://cdn.totaljs.com/flowstream/components/example-increment.html",
-		"author": "Jakub Urban",
-		"icon": "fa fa-bong",
-		"color": "",
-		"version": "1"
 	},
 	{
 		"id": "timer",

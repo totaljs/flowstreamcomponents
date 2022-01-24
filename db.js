@@ -37,6 +37,11 @@ PATH.fs.readdir('components', function(err, response) {
 		var data = {};
 		data.id = filename.substring(0, filename.length - 5);
 
+		if (data.id === 'example-increment') {
+			next();
+			return;
+		}
+
 		PATH.fs.readFile('components/' + filename, function(err, response) {
 			response = response.toString('utf8');
 
