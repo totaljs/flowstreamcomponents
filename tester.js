@@ -289,8 +289,9 @@ module.exports = function(callback) {
 	};
 
 	flow.onerror = function(a, b, c, d) {
-		this.onError && this.onError(a, b, c, d);
-		this.onerror && this.onerror(a, b, c, d);
+		const test = tester.tests[this.id];
+		test.onError && test.onError(a, b, c, d);
+		test.onerror && test.onerror(a, b, c, d);
 	};
 
 	tester.beg = new Date();
