@@ -1,0 +1,109 @@
+<script total>
+
+	exports.name = 'SQLite3';
+	exports.group = 'Databases';
+	exports.icon = 'fa fa-database';
+	exports.author = 'Total Avengers';
+	exports.version = '1';
+	exports.config = {};
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }, { id: 'error', name: 'Error' }];
+	exports.npm = ['better-sqlite3'];
+
+	exports.make = function(instance, config) {
+
+		const Database = require('better-sqlite3');
+		var db;
+		var fns = ['run', 'get', 'all'];
+
+		instance.message = function($) {
+			if (!db) {
+				$.send('error', { error: 'db not ready' });
+				return instance.throw('SQLite3 not ready');
+			}
+
+			var data = $.data;
+
+			if (!data.prepare || !data.fn) {
+				instance.throw('No `prepare` or `op` provided');
+				return $.send('error', { error: 'invalid input data' });;
+			}
+
+			if (fns.indexOf(data.fn) < 0) {
+				instance.throw('Unsupported function: ' + data.fn);
+				return $.send('error', { error: 'unsupported function' });
+			}
+
+			let stmt = db.prepare(data.prepare);
+			let result = data.data ? stmt[data.fn](data.data) : stmt[data.fn]();
+			$.send('output', result);
+		};
+
+		instance.configure = function() {
+			// "config" is changed
+			db = new Database(PATH.databases(config.filename || `${instance.id}.sqlite`), { verbose: console.log });
+		};
+
+		instance.close = function() {
+			// this instance is closed
+			db && db.close();
+		};
+
+		instance.variables = function(variables) {
+			// FlowStream variables are changed
+		};
+
+		instance.variables2 = function(variables) {
+			// Global variables are changed
+		};
+
+		instance.configure();
+
+	};
+
+</script>
+
+<readme>
+SQLite3 [Documentation](https://github.com/JoshuaWise/better-sqlite3/blob/HEAD/docs/api.md)
+
+```js
+{
+	// query
+	prepare: 'INSERT INTO cats (name, age) VALUES (?, ?)',
+
+	// function name: run, get, all, exec
+	fn: 'run',
+
+	// data, optional
+	data: ['Joey', 2] // string/number or array
+
+}
+```
+
+Functions:
+	- [run](https://github.com/JoshuaWise/better-sqlite3/blob/HEAD/docs/api.md#runbindparameters---object)
+	- [get](https://github.com/JoshuaWise/better-sqlite3/blob/HEAD/docs/api.md#getbindparameters---row)
+	- [all](https://github.com/JoshuaWise/better-sqlite3/blob/HEAD/docs/api.md#allbindparameters---array-of-rows)
+	- [exec](https://github.com/JoshuaWise/better-sqlite3/blob/HEAD/docs/api.md#execstring---this)
+</readme>
+
+<settings>
+	<div class="padding">
+		<div class="row">
+			<div class="col-md-4">
+				<div data---="input__?.filename">Filename (optional)</div>
+			</div>
+		</div>
+	</div>
+</settings>
+
+<style>
+	.CLASS footer { padding: 10px; font-size: 12px; }
+</style>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+	<footer></footer>
+</body>
