@@ -209,6 +209,17 @@
 		"readme": "MQTT Subscribe"
 	},
 	{
+		"id": "mysql",
+		"group": "Databases",
+		"name": "MySQL",
+		"url": "https://cdn.totaljs.com/flowstream/components/mysql.html",
+		"author": "Total Avengers",
+		"icon": "fa fa-database",
+		"color": "",
+		"version": "1",
+		"readme": "MySQL\n\n## Input\nExpected data:\n```javascript\n{\n\tquery: 'SELECT * FROM tblname;'\n}\n```"
+	},
+	{
 		"id": "opensync",
 		"group": "External",
 		"name": "OpenSync",
@@ -229,6 +240,17 @@
 		"color": "",
 		"version": "1",
 		"readme": "The component sends data to another FlowStream."
+	},
+	{
+		"id": "postgresql",
+		"group": "Databases",
+		"name": "PostgreSQL",
+		"url": "https://cdn.totaljs.com/flowstream/components/postgresql.html",
+		"author": "Total Avengers",
+		"icon": "fa fa-database",
+		"color": "",
+		"version": "1",
+		"readme": "PostgreSQL\n\n## Input\nExpected data:\n```javascript\n{\n\tquery: 'SELECT * FROM tblname;'\n}\n```"
 	},
 	{
 		"id": "print",
@@ -372,6 +394,17 @@
 		"color": "",
 		"version": "1",
 		"readme": "The component sends a SMS message."
+	},
+	{
+		"id": "sqlite3",
+		"group": "Databases",
+		"name": "SQLite3",
+		"url": "https://cdn.totaljs.com/flowstream/components/sqlite3.html",
+		"author": "Total Avengers",
+		"icon": "fa fa-database",
+		"color": "",
+		"version": "1",
+		"readme": "SQLite3 [Documentation](https://github.com/JoshuaWise/better-sqlite3/blob/HEAD/docs/api.md)\n\n```js\n{\n\t// query\n\tprepare: 'INSERT INTO cats (name, age) VALUES (?, ?)',\n\n\t// function name: run, get, all, exec\n\tfn: 'run',\n\n\t// data, optional\n\tdata: ['Joey', 2] // string/number or array\n\n}\n```\n\nFunctions:\n\t- [run](https://github.com/JoshuaWise/better-sqlite3/blob/HEAD/docs/api.md#runbindparameters---object)\n\t- [get](https://github.com/JoshuaWise/better-sqlite3/blob/HEAD/docs/api.md#getbindparameters---row)\n\t- [all](https://github.com/JoshuaWise/better-sqlite3/blob/HEAD/docs/api.md#allbindparameters---array-of-rows)\n\t- [exec](https://github.com/JoshuaWise/better-sqlite3/blob/HEAD/docs/api.md#execstring---this)"
 	},
 	{
 		"id": "subscribe",
