@@ -1,0 +1,139 @@
+<script total>
+
+	exports.name = 'MySQL';
+	exports.group = 'Databases';
+	exports.icon = 'fa fa-database';
+	exports.author = 'Total Avengers';
+	exports.version = '1';
+	exports.config = {};
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }];
+	exports.npm = ['mysql2'];
+
+	exports.make = function(instance, config) {
+
+		const mysql = require('mysql2');
+
+		var MYSQL;
+
+		instance.message = function($) {
+			var data = $.data;
+
+			if (!MYSQL || !MYSQL.pool)
+				return $.send('output', { error: 'MySQL connection not configured' });
+
+			MYSQL.pool.query(data.query, function(err, rows, fields) {
+				if (err)
+					return $.send('output', { error: err.message });
+
+				$.send('output', { rows });
+			})
+		};
+
+		instance.close = function(callback) {
+			if (MYSQL) {
+				MYSQL.count--;
+				if (MYSQL.count === 0) {// last component using this connection so destroy it
+					MYSQL.pool.end();
+					delete MYSQL_POOLS[config.connection];
+				}
+				MYSQL = null;
+			}
+		};
+
+		console.log(MYSQL_POOLS);
+
+		instance.configure = function() {
+
+			// same connection, ignore
+			if (!config.connection || (MYSQL && MYSQL.string === config.connection))
+				return;
+
+			instance.close();
+
+			// already existing connection, use it
+			if (MYSQL_POOLS[config.connection]) {
+				MYSQL = MYSQL_POOLS[config.connection];
+				MYSQL.count++;
+				return;
+			}
+
+			var pool = mysql.createPool(config.connection);
+			MYSQL = MYSQL_POOLS[config.connection] = {
+				pool,
+				count: 1,
+				string: config.connection
+			};
+
+			pool.query('SELECT NOW() AS message;', (err, response) => {
+				if (err)
+					instance.throw(err.message);
+			});
+		};
+
+		instance.configure();
+
+	};
+
+	var MYSQL_POOLS = {};
+
+</script>
+
+<readme>
+MySQL
+
+## Input
+Expected data:
+```javascript
+{
+	query: 'SELECT * FROM tblname;'
+}
+```
+</readme>
+
+<settings>
+	<div class="padding">
+		<div class="row m">
+			<div class="col-md-12">
+				<div data---="input__?.connection__;required:1">Connection string</div>
+				<div class="help">e.g.: mysql://user:password@localhost:3306/dbname</div>
+			</div>
+		</div>
+		<!--<div class="row m">
+			<div class="col-md-4">
+				<div data---="input__?.host__placeholder:localhost;required:1">Hostname</div>
+			</div>
+			<div class="col-md-4">
+				<div data---="input__?.port__type:number;required:1__5432">Port</div>
+			</div>
+			<div class="col-md-4">
+				<div data---="input__?.database__placeholder:mydb;required:1">Database</div>
+			</div>
+		</div>
+		<div class="row m">
+			<div class="col-md-4">
+				<div data---="input__?.user">Username</div>
+			</div>
+			<div class="col-md-4">
+				<div data---="input__?.password">Password</div>
+			</div>
+		</div>-->
+	</div>
+</settings>
+
+<style>
+	.CLASS footer { padding: 10px; font-size: 12px; }
+</style>
+
+<script>
+
+</script>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+	<footer>
+		<span class="red" data-bind="STATUS.error__text"></span>
+	</footer>
+</body>
