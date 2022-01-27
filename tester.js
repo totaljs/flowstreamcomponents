@@ -151,20 +151,6 @@ tester.test = function(name, callback) {
 					const instance = flow.meta.flow[id];
 					const testInstance = flow.meta.flow[testConnectionId];
 
-					instance.httproute = NOOP;
-					instance.save = NOOP;
-					instance.io = NOOP;
-					instance.toinput = NOOP;
-					instance.output = NOOP;
-					instance.newvariables = function(vars) {
-						instance.variables && instance.variables(vars);
-					};
-					instance.reconfigure = function(conf){
-						for (let key in conf)
-							instance.config[key] = conf[key];
-						instance.configure && instance.configure();
-					};
-
 					const test = {};
 
 					test.input = function(inputIndex, data, handler) {
@@ -293,6 +279,30 @@ module.exports = function(callback) {
 		const test = tester.tests[this.id];
 		test.onError && test.onError(a, b, c, d);
 		test.onerror && test.onerror(a, b, c, d);
+	};
+
+	flow.onconnect = function(instance) {
+		instance.httproute = NOOP;
+		instance.save = function() {
+			if (instance.outputs && instance.outputs.length) {
+				var testConection = instance.connections.output;
+				instance.connections = {};
+				instance.outputs.forEach(function(out){
+					instance.connections[out.id] = testConection
+				});
+			}
+		};
+		instance.io = NOOP;
+		instance.toinput = NOOP;
+		instance.output = NOOP;
+		instance.newvariables = function(vars) {
+			instance.variables && instance.variables(vars);
+		};
+		instance.reconfigure = function(conf){
+			for (let key in conf)
+				instance.config[key] = conf[key];
+			instance.configure && instance.configure();
+		};
 	};
 
 	tester.beg = new Date();
