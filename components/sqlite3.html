@@ -35,6 +35,11 @@
 				return $.send('error', { error: 'unsupported function' });
 			}
 
+			if (data.fn === 'exec') {
+				let result = db.exec(data.prepare);
+				return $.send('output2', result);
+			}
+
 			let stmt = db.prepare(data.prepare);
 			let result = data.data ? stmt[data.fn](data.data) : stmt[data.fn]();
 			$.send('output', result);
