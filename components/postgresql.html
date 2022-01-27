@@ -9,6 +9,7 @@
 	exports.inputs = [{ id: 'input', name: 'Input' }];
 	exports.outputs = [{ id: 'output', name: 'Output' }];
 	exports.npm = ['pg'];
+	exports.POOLS = {};
 
 	exports.make = function(instance, config) {
 
@@ -37,14 +38,14 @@
 			instance.close();
 
 			// already existing connection, use it
-			if (PG_POOLS[config.connection]) {
-				PG = PG_POOLS[config.connection];
+			if (exports.POOLS[config.connection]) {
+				PG = exports.POOLS[config.connection];
 				PG.count++;
 				return;
 			}
 
 			var pool = new Pool({ connectionString: config.connection });
-			PG = PG_POOLS[config.connection] = {
+			PG = exports.POOLS[config.connection] = {
 				pool,
 				count: 1,
 				string: config.connection
@@ -67,7 +68,7 @@
 				PG.count--;
 				if (PG.count === 0) {// last component using this connection so destroy it
 					PG.pool.end();
-					delete PG_POOLS[config.connection];
+					delete exports.POOLS[config.connection];
 				}
 				PG = null;
 			}
@@ -75,8 +76,6 @@
 
 		instance.configure();
 	};
-
-	var PG_POOLS = {};
 
 </script>
 
