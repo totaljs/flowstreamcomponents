@@ -9,12 +9,13 @@
 	exports.inputs = [{ id: 'input', name: 'Input' }];
 	exports.outputs = [{ id: 'output', name: 'Output' }, { id: 'error', name: 'Error' }];
 	exports.npm = ['better-sqlite3'];
+	exports.DBS = {};
 
 	exports.make = function(instance, config) {
 
 		const Database = require('better-sqlite3');
-		var db;
-		var fns = ['run', 'get', 'all'];
+		var db, file;
+		var fns = ['run', 'get', 'all', 'exec'];
 
 		instance.message = function($) {
 			if (!db) {
@@ -40,21 +41,36 @@
 		};
 
 		instance.configure = function() {
-			// "config" is changed
-			db = new Database(PATH.databases(config.filename || `${instance.id}.sqlite`), { verbose: console.log });
+
+			let newfile = PATH.databases(config.filename || `${instance.id}.sqlite`);
+			if (file === newfile)
+				return;
+
+			file = newfile;
+
+			let tmp = exports.DBS[file];
+			if (tmp) {
+				db = tmp.db;
+				tmp.count++;
+				return;
+			}
+
+			db = new Database(file, { verbose: console.log });
+			exports.DBS[file] = {
+				db,
+				count: 1
+			};
 		};
 
 		instance.close = function() {
-			// this instance is closed
-			db && db.close();
-		};
-
-		instance.variables = function(variables) {
-			// FlowStream variables are changed
-		};
-
-		instance.variables2 = function(variables) {
-			// Global variables are changed
+			if (file && db) {
+				exports.DBS[file].count--;
+				if (exports.DBS[file].count === 0) {
+					db && db.close();
+					db = null;
+					delete exports.DBS[file];
+				}
+			}
 		};
 
 		instance.configure();
@@ -91,7 +107,7 @@ Functions:
 	<div class="padding">
 		<div class="row">
 			<div class="col-md-4">
-				<div data---="input__?.filename">Filename (optional)</div>
+				<div data---="input__?.filename__placeholder:mydatabase">Filename (optional)</div>
 			</div>
 		</div>
 	</div>
