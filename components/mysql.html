@@ -9,6 +9,7 @@
 	exports.inputs = [{ id: 'input', name: 'Input' }];
 	exports.outputs = [{ id: 'output', name: 'Output' }];
 	exports.npm = ['mysql2'];
+	exports.POOLS = {};
 
 	exports.make = function(instance, config) {
 
@@ -35,13 +36,11 @@
 				MYSQL.count--;
 				if (MYSQL.count === 0) {// last component using this connection so destroy it
 					MYSQL.pool.end();
-					delete MYSQL_POOLS[config.connection];
+					delete exports.POOLS[config.connection];
 				}
 				MYSQL = null;
 			}
 		};
-
-		console.log(MYSQL_POOLS);
 
 		instance.configure = function() {
 
@@ -52,14 +51,14 @@
 			instance.close();
 
 			// already existing connection, use it
-			if (MYSQL_POOLS[config.connection]) {
-				MYSQL = MYSQL_POOLS[config.connection];
+			if (exports.POOLS[config.connection]) {
+				MYSQL = exports.POOLS[config.connection];
 				MYSQL.count++;
 				return;
 			}
 
 			var pool = mysql.createPool(config.connection);
-			MYSQL = MYSQL_POOLS[config.connection] = {
+			MYSQL = exports.POOLS[config.connection] = {
 				pool,
 				count: 1,
 				string: config.connection
@@ -74,8 +73,6 @@
 		instance.configure();
 
 	};
-
-	var MYSQL_POOLS = {};
 
 </script>
 
@@ -99,25 +96,6 @@ Expected data:
 				<div class="help">e.g.: mysql://user:password@localhost:3306/dbname</div>
 			</div>
 		</div>
-		<!--<div class="row m">
-			<div class="col-md-4">
-				<div data---="input__?.host__placeholder:localhost;required:1">Hostname</div>
-			</div>
-			<div class="col-md-4">
-				<div data---="input__?.port__type:number;required:1__5432">Port</div>
-			</div>
-			<div class="col-md-4">
-				<div data---="input__?.database__placeholder:mydb;required:1">Database</div>
-			</div>
-		</div>
-		<div class="row m">
-			<div class="col-md-4">
-				<div data---="input__?.user">Username</div>
-			</div>
-			<div class="col-md-4">
-				<div data---="input__?.password">Password</div>
-			</div>
-		</div>-->
 	</div>
 </settings>
 
