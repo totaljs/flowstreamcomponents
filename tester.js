@@ -92,6 +92,7 @@ tester.stop = function() {
 	process.exit(this.stats.failed > 0);
 };
 
+// this is the 'describe' function in require('../tester')(async function(describe, done) {
 tester.test = function(name, callback) {
 
 	let testName = name;
