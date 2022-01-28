@@ -142,8 +142,6 @@ tester.test = function(name, callback) {
 			// Add component to flowstream
 			var comp = flow.add(testName, data);
 
-
-
 			let conns = {};
 			let is;
 
@@ -155,8 +153,6 @@ tester.test = function(name, callback) {
 
 			if (!is)
 				conns = { output: tester.dummyConnection };
-
-			console.log(conns);
 
 			const componentConnection = { [componentConnectionId]: { component: testName, connections: conns } };
 
