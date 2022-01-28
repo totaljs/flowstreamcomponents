@@ -118,10 +118,11 @@ tester.test = function(name, callback) {
 
 		// Connection Ids
 		const componentConnectionId = 'com_' + testName + '_' + UID();
-		const testConnectionId = 'com_TEST_' + UID();
+		const dummyConnectionId = 'com_DUMMY_' + UID();
+		tester.dummyConnection = [{ id: dummyConnectionId, index: 'input' }];
 
-		// Register TEST component
-		flow.register('TEST', instance => {
+		// Register DUMMY component
+		flow.register('DUMMY', instance => {
 			instance.inputs = [{ id: 'input', name: 'Input' }];
 
 			instance.message = function(msg) {
@@ -131,25 +132,41 @@ tester.test = function(name, callback) {
 			};
 		});
 
-		// Add TEST component to flowstream
+		// Add DUMMY component to flowstream
 		flow.use(`{
-			"${testConnectionId}": {
-				"component": "TEST",
+			"${dummyConnectionId}": {
+				"component": "DUMMY",
 				"connections": {}
 			}
 		}`, function() {
 			// Add component to flowstream
-			flow.add(testName, data);
+			var comp = flow.add(testName, data);
 
-			const componentConnection = { [componentConnectionId]: { component: testName, connections: { output: [{ id: testConnectionId, index: 'input' }] } } };
 
-			// Connect component to TEST component
+
+			let conns = {};
+			let is;
+
+			// add connection from every output to DUMMY compponent
+			(comp.outputs || []).forEach(function(c){
+				is = true;
+				return conns[c.id] = tester.dummyConnection;
+			});
+
+			if (!is)
+				conns = { output: tester.dummyConnection };
+
+			console.log(conns);
+
+			const componentConnection = { [componentConnectionId]: { component: testName, connections: conns } };
+
+			// Connect component to DUMMY component
 			flow.insert(componentConnection, function() {
 
 				if (callback) {
 					const id = componentConnectionId;
 					const instance = flow.meta.flow[id];
-					const testInstance = flow.meta.flow[testConnectionId];
+					const testInstance = flow.meta.flow[dummyConnectionId];
 
 					const test = {};
 
@@ -161,7 +178,7 @@ tester.test = function(name, callback) {
 							data = handler;
 						}
 
-						// Tell TEST component, that next incoming message is from "inputIndex"
+						// Tell DUMMY component, that next incoming message is from "inputIndex"
 						testInstance.__input__ = inputIndex;
 
 						const inputTest = {};
@@ -285,10 +302,9 @@ module.exports = function(callback) {
 		instance.httproute = NOOP;
 		instance.save = function() {
 			if (instance.outputs && instance.outputs.length) {
-				var testConection = instance.connections.output;
 				instance.connections = {};
 				instance.outputs.forEach(function(out){
-					instance.connections[out.id] = testConection
+					instance.connections[out.id] = tester.dummyConnection;
 				});
 			}
 		};
