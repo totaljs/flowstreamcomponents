@@ -71,17 +71,17 @@ describe('increment', function(test) {
 All outcoming messages from component can be catched with `test.message` or `test.output` delegate. In callback you get [FlowStream message](https://docs.totaljs.com/total4/40844001ni51c/) but it's extended with test handlers (more in **Handlers**)
 
 ```js
-test('test', function (test) {
+describe('test', function (test) {
     test.output = function (msg) {
 
         // Check if message is from 'output1' index and data of message is 'total.js'
-        if (msg.index === 'output1' && msg.data === 'total.js')
+        if (msg.output === 'output1' && msg.data === 'total.js')
             test.ok();
         else
             test.fail();
 
         // Shorthand - If condition inside 'msg.ok()' is not true, 'msg.fail' is called automatically
-        test.ok(msg.index === 'output1' && msg.data === 'total.js');
+        test.ok(msg.output === 'output1' && msg.data === 'total.js');
     };
 });
 ```
@@ -141,7 +141,7 @@ exports.make = function(instance, config) {
 }
 
 // Test
-test('test', function (test) {
+describe('test', function (test) {
   test.onerror = function (a, b, c, d) {
     console.log(a, b, c, d);
   };
