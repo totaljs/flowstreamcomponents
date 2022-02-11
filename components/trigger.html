@@ -26,7 +26,7 @@
 					}
 					break;
 				case 'date':
-					val = config.random ? NOW.add('-' + U.random(500, 10)) : config.data.parseDate();
+					val = config.random ? NOW.add('-' + U.random(500, 10) + ' seconds') : config.data.parseDate();
 					break;
 				case 'object':
 					try {
