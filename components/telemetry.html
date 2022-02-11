@@ -1,0 +1,105 @@
+<script total>
+
+	exports.name = 'Telemetry';
+	exports.group = 'Common';
+	exports.version = '3';
+	exports.icon = 'fa fa-rss-square';
+	exports.author = 'Martin Smola';
+	exports.config = { paths: {}, interval: null }; // { name, path }
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+
+	exports.make = function(instance, config) {
+		var last = { items: [] };
+		var interval;
+
+		instance.message = function($) {
+			const data = { items: [] };
+			const paths = config.paths;
+
+			for (const path in paths)
+				data.items.push({ key: path, value: U.get($.data, paths[path]) || '' });
+
+			if (!interval)
+				instance.status(data);
+			else
+				last = data;
+
+			$.destroy();
+		};
+
+		instance.trigger = function() {
+			instance.status({ items: [] });
+		}
+
+		instance.configure = function() {
+			clearInterval(interval);
+			if (config.interval) {
+				interval = setInterval(() => instance.status(last), config.interval);
+			} else
+				interval = null;
+		};
+
+		instance.configure();
+
+		instance.close = () => clearInterval(interval);
+
+	};
+
+</script>
+
+<style>
+	.CLASS footer > div { margin: 10px; }
+	.CLASS pre { font-size: 10px; margin: 0; padding: 5px; background-color: #F0F0F0; border-radius: var(--radius); }
+	.CLASS button { float: right; height: 20px; font-size: 11px; border: 1px solid #E0E0E0; border-radius: var(--radius); color: #000; background-color: transparent; margin: 0; padding: 0 5px; }
+	.CLASS button:hover { background-color: #F8F8F8; }
+	.CLASS button:active { background-color: #E0E0E0; }
+	.CLASS .telemetry-item > span { float: right; font-size: 14px; }
+
+	.ui-dark .CLASS pre { background-color: #404040; tab-size: 2; }
+	.ui-dark .CLASS button { border-color: #404040; color: #FFF; }
+	.ui-dark .CLASS button:hover { background-color: #303030; }
+	.ui-dark .CLASS button:active { background-color: #404040; }
+</style>
+
+<readme>
+The component shows data in a template.
+Assuming this incomming data:
+```javascript
+{
+	speed: 1,
+	nested: { value: 2 },
+	array: [{ value: 3 }]
+}
+```
+The paths bust be defined as:
+```
+speed         // -> 1
+nested.value  // -> 2
+array.0.value // -> 3
+```
+</readme>
+
+<settings>
+	<div class="padding">
+		<div data---="input__?.interval__type:number__500">Update interval (in ms)</div>
+		<div class="help m">Leave empty to update immediately when new data comes in.</div>
+		<div data---="keyvalue__?.paths__placeholderkey:Type a property name;placeholdervalue:Type a path and press enter">Properties to show in the template</div>
+		<div class="help">Path supports js dot notation like `data.arr.0.value`, following is not supported `data.arr[0].value`</div>
+	</div>
+</settings>
+
+<body>
+	<header>
+		<button class="exec" data-exec="FUNC.trigger">Clear</button>
+		<i class="ICON"></i>NAME
+	</header>
+	<footer>
+		<div data-bind="!STATUS__template" class="">
+			<script type="text/html">
+				{{foreach item in value.items}}
+					<div class="telemetry-item"><b class="mr5">{{item.key}}:</b><span>{{item.value}}</span></div>
+				{{end}}
+			</script>
+		</div>
+	</footer>
+</body>
