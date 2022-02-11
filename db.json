@@ -418,6 +418,28 @@
 		"readme": "This component monitors last line in some text file with the help of `tail` command in the Linux systems.\n\n__Data Example__:\n\n```js\n{\n\tvalue: 'Some meessage'\n\tdate: Date\n}\n```"
 	},
 	{
+		"id": "telemetry",
+		"group": "Common",
+		"name": "Telemetry",
+		"url": "https://cdn.totaljs.com/flowstream/components/telemetry.html",
+		"author": "Martin Smola",
+		"icon": "fa fa-rss-square",
+		"color": "",
+		"version": "3",
+		"readme": "The component shows data in a template.\nAssuming this incomming data:\n```javascript\n{\n\tspeed: 1,\n\tnested: { value: 2 },\n\tarray: [{ value: 3 }]\n}\n```\nThe paths bust be defined as:\n```\nspeed         // -> 1\nnested.value  // -> 2\narray.0.value // -> 3\n```"
+	},
+	{
+		"id": "test",
+		"group": "",
+		"name": "Test",
+		"url": "https://cdn.totaljs.com/flowstream/components/test.html",
+		"author": "Total Avengers",
+		"icon": "fa fa-info",
+		"color": "",
+		"version": "1",
+		"readme": "Test"
+	},
+	{
 		"id": "timer",
 		"group": "Triggers",
 		"name": "Timer",
