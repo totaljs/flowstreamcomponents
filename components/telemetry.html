@@ -12,12 +12,14 @@
 		var last = { items: [] };
 		var interval;
 
+		const get = (obj, path) => path.split(".").reduce((r, k) => r?.[k], obj);
+
 		instance.message = function($) {
 			const data = { items: [] };
 			const paths = config.paths;
 
 			for (const path in paths)
-				data.items.push({ key: path, value: U.get($.data, paths[path]) || '' });
+				data.items.push({ key: path, value: get($.data, paths[path]) || '' });
 
 			if (!interval)
 				instance.status(data);
