@@ -1,0 +1,188 @@
+<script total>
+
+	exports.name = 'Influxdb';
+	exports.group = 'Databases';
+	exports.icon = 'fa fa-database';
+	exports.author = 'Martin Smola';
+	exports.version = '1';
+	exports.config = {};
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }];
+	exports.npm = ['@influxdata/influxdb-client'];
+	exports.DBS = {};
+
+	exports.make = function(instance, config) {
+
+		const { InfluxDB, Point } = require('@influxdata/influxdb-client');
+
+		var INFLUX;
+
+		instance.message = function($) {
+			var data = $.data;
+
+			if (!INFLUX)
+				return $.send('output', { error: 'InfluxDB connection not configured' });
+
+            if (config.api === 'write') {
+
+                const point = new Point(data.measurement);
+                config.tags.forEach(t => {
+                    point.tag(t, data.tags[t]);
+                });
+
+                for (const field in config.fields) {
+                    switch(config.fields[field]) {
+                        case 'boolean':
+                            point.booleanField(field, data.fields[field]);
+                            break;
+                        case 'float':
+                            point.floatField(field, data.fields[field]);
+                            break;
+                        case 'int':
+                            point.intField(field, data.fields[field]);
+                            break;
+                        case 'string':
+                            point.stringField(field, data.fields[field]);
+                            break;
+                    }
+                }
+
+                const writeApi = INFLUX.client.getWriteApi(config.org, config.bucket);
+                writeApi.writePoint(point);
+                writeApi
+                    .close()
+                    .then(() => {
+                        console.log('FINISHED')
+                    })
+                    .catch(e => {
+                        console.error(e)
+                        console.log('Finished ERROR')
+                    })
+
+            } else if (config.api === 'query') {
+
+                const queryApi = INFLUX.client.getQueryApi(config.org);
+
+                const rows = [];
+                queryApi.queryRows(data.query, {
+                    next(row, tableMeta) {
+                        const o = tableMeta.toObject(row);
+                        rows.push(o);
+                    },
+                    error(error) {
+                        console.error(error);
+                        instance.throw('InfluDB:Query failed:' + error);
+                    },
+                    complete() {
+                        instance.send('output', rows);
+                    },
+                });
+
+            } else
+                instance.throw({ error: 'Unknown action:' + config.api });
+		};
+
+		instance.close = function(callback) {
+			if (INFLUX) {
+				INFLUX.count--;
+				if (INFLUX.count === 0) {// last component using this connection so destroy it
+					delete exports.DBS[config.connection];
+				}
+				INFLUX = null;
+			}
+		};
+
+		instance.configure = function() {
+
+            const id = `${config.url}-${config.token}`;
+
+			// same connection, ignore
+			if (INFLUX && INFLUX.id === id)
+				return;
+
+			// already existing connection, use it
+			if (exports.DBS[id]) {
+				INFLUX = exports.DBS[id];
+				INFLUX.count++;
+				return;
+			}
+
+            const { url, token } = config;
+            const client = new InfluxDB({ url, token });
+
+			INFLUX = exports.DBS[id] = {
+				client,
+				count: 1,
+				id
+			};
+
+			instance.status({ error: '', msg: '' });
+		};
+
+		instance.configure();
+
+	};
+
+</script>
+
+<readme>
+InfluxDB
+
+## Input
+Expected data for "Write data":
+```javascript
+{
+    measurement: '<measurement-name>',
+	fields: {
+        fieldname: <fieldvalue>,
+    },
+    tags: {
+        tagname: '<tagvalue>'
+    }
+}
+```
+
+Expected data for "Execute a Flux query":
+```javascript
+{
+    query: 'from(bucket: "Some Bucket") |> range(start: -1h)'
+}
+```
+</readme>
+
+<settings>
+	<div class="padding">
+		<div class="row m">
+			<div class="col-md-12">
+				<div data---="input__?.url__placeholder:https\://example.com;required:1" class="m">Server url</div>
+				<div data---="input__?.token__required:1" class="m">Token</div>
+				<div data---="input__?.org__required:1" class="m">Organization</div>
+				<div data---="input__?.bucket__required:1" class="m">Bucket</div>
+                <hr>
+				<div data---="input__?.api__dirsource:write|Write data,query|Execute a Flux query__write"class="m">Action</div>
+				<div data-bind="?.api__show:value==='write'">
+					<div data---="keyvalue__?.fields__placeholderkey:Enter property name;placeholdervalue:Enter the property type and hit enter">Fields</div>
+					<div class="help m">List of supported types: boolean, int, float and string</div>
+					<div data---="textboxlist__?.tags__placeholderkey:Enter tag name">Tags</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</settings>
+
+<style>
+	.CLASS footer { padding: 10px; font-size: 12px; }
+</style>
+
+<script>
+
+</script>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+	<footer>
+		<span class="red" data-bind="STATUS.error__text"></span>
+	</footer>
+</body>
