@@ -1,0 +1,204 @@
+<script total>
+
+	exports.name = 'MongoDB Query';
+	exports.group = 'Databases';
+	exports.icon = 'fa fa-database';
+	exports.author = 'Martin Smola';
+	exports.version = '1';
+	exports.config = {};
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }];
+	exports.npm = ['mongodb', 'mquery'];
+
+	exports.make = function(instance, config) {
+
+		REPO.mongodb = REPO.mongodb || {};
+
+		const { MongoClient } = require('mongodb');
+		const mquery = require('mquery');
+
+		var MONGO;
+        var COLS = {};
+		var fn;
+
+		instance.message = function($) {
+			var data = $.data;
+
+			if (!MONGO)
+				return $.send('output', { error: 'MongoDB connection not configured' });
+
+			if (!data.database || !data.collection)
+				return $.send('output', { error: 'Database or Collection not specified.' });
+
+			let id = `${data.database}/${data.collection}`;
+
+			if (!COLS[id]) {
+				const db = MONGO.client.db(data.database);
+				const collection = db.collection(data.collection);
+				COLS[id] = collection;
+			}
+
+			var query = mquery(COLS[id]);
+			query.$useProjection = true;
+
+			const builder = fn(query, data.data);
+
+			builder.exec(function(err, data){
+
+				instance.send('output', { err, data });
+			});
+
+		};
+
+		instance.close = function(callback) {
+			if (MONGO) {
+				MONGO.count--;
+				if (MONGO.count === 0) {// last component using this connection so destroy it
+                    MONGO.client.close();
+					MONGO.client.removeAllListeners();
+					delete REPO.mongodb[config.connection];
+				}
+				MONGO = null;
+                COLS = {};
+			}
+		};
+
+		instance.configure = async function() {
+
+			if (!config.fn) {
+				fn = null;
+				return instance.status({ state: 'Missing query function' });
+			}
+
+			fn = new Function('query', 'data', config.fn);
+
+			if (config.string)
+				config.connection = config.string;
+
+			if (!config.connection)
+				return  instance.status({ state: 'Missing connection string' });
+
+			// same connection, ignore
+			if (MONGO && MONGO.string === config.connection)
+				return instance.status({ state: 'Connected' });
+
+			// already existing connection, use it
+			if (REPO.mongodb[config.connection]) {
+				instance.close();
+				MONGO = REPO.mongodb[config.connection];
+				MONGO.count++;
+				return instance.status({ state: 'Connected' });
+			}
+
+			instance.close();
+
+			const client = await connect();
+
+			if (!client)
+				return instance.status({ state: 'Failed to connect' });
+
+			instance.status({ state: 'Connected' });
+
+			MONGO = REPO.mongodb[config.connection] = {
+				client,
+				count: 1,
+				string: config.connection,
+				name: config.name
+			};
+		};
+
+		instance.configure();
+
+		async function connect() {
+
+			const client = new MongoClient(config.connection, { useNewUrlParser: true, useUnifiedTopology: true });
+
+			try {
+				await client.connect();
+				await client.db("admin").command({ ping: 1 });
+				var dbs = await client.db("admin").command({ listDatabases: 1 });
+			} catch(e) {
+				instance.throw(e.message);
+				return null;
+			}
+
+			return client;
+		};
+
+		instance.call = function(data, reply) {
+			var arr = [];
+
+			for (const key in REPO.mongodb)
+				arr.push({ id: REPO.mongodb[key].string, name: REPO.mongodb[key].name });
+
+			reply(arr);
+		};
+	};
+
+</script>
+
+<readme>
+Uses mquery under the hood. Here is the [documentation](https://www.npmjs.com/package/mquery)
+
+## Input
+
+Example
+```javascript
+{
+    database: 'database-name',
+    collection: 'collection-name',
+	data: <any> // this prop will be passed into the query function
+}
+```
+
+## Important
+In the `.select()` you cannot use inclusion and exclusion together.
+This is invalid: `.select('firstname -lastname')`
+Valid exclusion: `.select('-lastname')` or `.select('-email -lastname')` etc.
+Valid inclusion: `.select('name email')` or `.select('email lastname')` etc.
+</readme>
+<script>
+	ON('configure_mongodbquery', function(data) {
+		data.call(function(response) {
+			SET('%connections', response);
+		});
+	});
+</script>
+<settings>
+	<div class="padding">
+		<div class="row m">
+			<div class="col-md-12">
+				<div class="m"><b>Select Connection</b></div>
+				<div data---="input__?.string__dirsource:%connections;dirraw:1;placeholder:Select connection;dirempty:No connection" class="m"></div>
+				<hr />
+				<div class="m"><b>or create new one</b></div>
+				<div data---="input__?.name__required:1" class="m">Connection name</div>
+				<div data---="input__?.connection__required:1">Connection string (without the database name)</div>
+				<div class="help m">e.g.: mongodb+srv://user:pswd@xyz.mongodb.net/?retryWrites=true&w=majority</div>
+			</div>
+		</div>
+		<div class="row m">
+			<div class="col-md-12">
+				<div data---="codemirror__?.fn__type:javascript;required:true;height:300" class="m">Query editor</div>
+				<a href="https://www.npmjs.com/package/mquery" target="_blank"><i class="fa fa-info mr5"></i>mquery documentation</a>
+			</div>
+		</div>
+	</div>
+</settings>
+
+<style>
+	.CLASS footer { padding: 10px; font-size: 12px; }
+</style>
+
+<script>
+
+</script>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+	<footer>
+		<span data-bind="STATUS.state__text"></span>
+	</footer>
+</body>
