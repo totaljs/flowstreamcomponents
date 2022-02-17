@@ -132,6 +132,17 @@
 		"readme": "This component registers an HTTP Route and sends request data next.\n\n__Output data__:\n\n```js\n{\n\t\"route\": String,\n\t\"params\": Object,\n\t\"query\": Object,\n\t\"body\": Object,\n\t\"files\": Array,\n\t\"headers\": Object,\n\t\"url\": String,\n\t\"ip\": String,\n\t\"cookies\": Object\n}\n```"
 	},
 	{
+		"id": "influxdb",
+		"group": "Databases",
+		"name": "Influxdb",
+		"url": "https://cdn.totaljs.com/flowstream/components/influxdb.html",
+		"author": "Martin Smola",
+		"icon": "fa fa-database",
+		"color": "",
+		"version": "1",
+		"readme": "InfluxDB\n\n## Input\nExpected data for \"Write data\":\n```javascript\n{\n    measurement: '<measurement-name>',\n\tfields: {\n        fieldname: <fieldvalue>,\n    },\n    tags: {\n        tagname: '<tagvalue>'\n    }\n}\n```\n\nExpected data for \"Execute a Flux query\":\n```javascript\n{\n    query: 'from(bucket: \"Some Bucket\") |> range(start: -1h)'\n}\n```"
+	},
+	{
 		"id": "input",
 		"group": "FlowStream",
 		"name": "Input",
@@ -176,6 +187,28 @@
 		"readme": "The component compares incoming data with previous data."
 	},
 	{
+		"id": "mongodb-insert",
+		"group": "Databases",
+		"name": "MongoDB Insert",
+		"url": "https://cdn.totaljs.com/flowstream/components/mongodb-insert.html",
+		"author": "Martin Smola",
+		"icon": "fa fa-database",
+		"color": "",
+		"version": "1",
+		"readme": "## Input\n\nExample\n```javascript\n{\n    database: 'database-name',\n    collection: 'collection-name',\n\tdata: { ... },  // data to insert, object for `insertOne` and an array of objects for `insertMany`\n\toptions: { ... }// insert options as passed to `insertOne(data, options)` or `insertMany(data, options)`\n}\n```"
+	},
+	{
+		"id": "mongodb-query",
+		"group": "Databases",
+		"name": "MongoDB Query",
+		"url": "https://cdn.totaljs.com/flowstream/components/mongodb-query.html",
+		"author": "Martin Smola",
+		"icon": "fa fa-database",
+		"color": "",
+		"version": "1",
+		"readme": "Uses mquery under the hood. Here is the [documentation](https://www.npmjs.com/package/mquery)\n\n## Input\n\nExample\n```javascript\n{\n    database: 'database-name',\n    collection: 'collection-name',\n\tdata: <any> // this prop will be passed into the query function\n}\n```\n\n## Important\nIn the `.select()` you cannot use inclusion and exclusion together.\nThis is invalid: `.select('firstname -lastname')`\nValid exclusion: `.select('-lastname')` or `.select('-email -lastname')` etc.\nValid inclusion: `.select('name email')` or `.select('email lastname')` etc."
+	},
+	{
 		"id": "mqtt-broker",
 		"group": "MQTT",
 		"name": "MQTT Broker",
@@ -218,6 +251,17 @@
 		"color": "",
 		"version": "1",
 		"readme": "MySQL\n\n## Input\nExpected data:\n```javascript\n{\n\tquery: 'SELECT * FROM tblname;'\n}\n```"
+	},
+	{
+		"id": "nosql",
+		"group": "Databases",
+		"name": "NoSQL",
+		"url": "https://cdn.totaljs.com/flowstream/components/nosql.html",
+		"author": "Total Avengers",
+		"icon": "fa fa-database",
+		"color": "",
+		"version": "1",
+		"readme": "## Outputs\n- response from nosql engine\n## Settings\n- collection: (optional) if not set, incomming data object must have a 'collection' property set\n- method: (optional) if not set, incomming data object must have a 'method' property set\n## Input\n```javascript\n{\n\tcollection: 'users', // optional, will override settings value\n\tmethod: 'find', // optional, will override settings value\n\t// for Insert, Update\n\tdata: { ... },\n\t// for Query, Read, Update, Remove\n\tfilter: [\n\t\t['where', 'sensor', 'temp'], // builder.where('sensor', 'temp');\n\t\t['limit', 2]                 // builder.limit(2);\n\t],\n\tupsert: true // only for update, if set then document will be inserted if it doesn't exist\n\taddid: true  // only for insert and update, if set then id prop will be automaticaly generated (for update only when upsert is also set)\n}\n```\n## Insert\n- inserts recieved data\n- expects data to be an Object\n- returns error, success, id\n## Read\n- returns first document found\n- requires `filter`\n- returns error, response\n## Update\n- updates document(s)\n- expects data to be an Object with all the props to be updated\n- requires `filter`\n- returns error, response\n- if response is 0 then update failed\n## Remove\n- removes document\n- requires `filter`\n- returns error, response\n- if response is 0 then remove failed\n## Query\n- returns all documents found\n- requires `filter`\n- returns error, response"
 	},
 	{
 		"id": "opensync",
