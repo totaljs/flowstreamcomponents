@@ -2,12 +2,30 @@
 
 	exports.name = 'Publish';
 	exports.group = 'FlowStream';
-	exports.version = '1';
+	exports.version = '2';
 	exports.icon = 'fa fa-crosshairs';
 	exports.author = 'Peter Širka';
 	exports.config = { name: '', readme: '' };
 	exports.inputs = [{ id: 'data', name: 'Data' }];
 	exports.type = 'output2';
+
+	exports.call = function(data, answer) {
+		// "this" means FlowStream instance
+		this.io(function(err, response) {
+			var arr = [];
+			for (var flow of response) {
+				for (var com of flow.items) {
+					if (com.type === 'input') {
+						com.id = flow.id + '_' + com.id;
+						com.name = '<b>' + flow.name.encode() + ':</b> ' + com.name.encode();
+						arr.push(com);
+					}
+				}
+			}
+			arr.quicksort('name');
+			answer(arr);
+		});
+	};
 
 	exports.make = function(instance, config) {
 
@@ -42,23 +60,6 @@
 
 		instance.configure = function() {
 			refresh();
-		};
-
-		instance.call = function(data, answer) {
-			instance.io(function(err, response) {
-				var arr = [];
-				for (var flow of response) {
-					for (var com of flow.items) {
-						if (com.type === 'input') {
-							com.id = flow.id + '_' + com.id;
-							com.name = '<b>' + flow.name.encode() + ':</b> ' + com.name.encode();
-							arr.push(com);
-						}
-					}
-				}
-				arr.quicksort('name');
-				answer(arr);
-			});
 		};
 
 		setTimeout(refresh, 3000);
