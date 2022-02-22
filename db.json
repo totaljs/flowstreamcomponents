@@ -326,7 +326,7 @@
 		"author": "Peter Širka",
 		"icon": "fa fa-crosshairs",
 		"color": "",
-		"version": "1",
+		"version": "2",
 		"readme": "The component publish the data to the specific `Input` component."
 	},
 	{
@@ -447,7 +447,7 @@
 		"author": "Peter Širka",
 		"icon": "fa fa-broadcast-tower",
 		"color": "",
-		"version": "1",
+		"version": "2",
 		"readme": "The component subscribes to the specific `Output` component."
 	},
 	{
