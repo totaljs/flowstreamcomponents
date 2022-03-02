@@ -7,6 +7,7 @@
 	exports.outputs = [{ id: 'message', name: 'Message' }];
 	exports.author = 'Martin Smola';
 	exports.version = '1';
+	exports.type = 'mqttsubscribe';
 
 	exports.make = function(instance, config) {
 
@@ -38,22 +39,22 @@
 
 		instance.close = function() {
 			if (subscribed && broker)
-				broker.unsubscibe(instance.id, topic);
+				broker.unsubscribe(instance.id, topic);
 		};
 
 		setTimeout(instance.configure, 2000);
+	};
 
-		instance.call = function(data, answer) {
-			var arr = [];
+	exports.call = function(data, answer) {
+		var arr = [];
 
-			var instances = instance.main.instances();
+		var instances = this.instances();
 
-			instances = instances.filter(i => i.module.name === 'MQTT Broker');
-			for (let com of instances)
-				arr.push({ id: com.id, name: `${com.state.name} (${com.state.status})` });
+		instances = instances.filter(i => i.module.type === 'mqttbroker');
+		for (let com of instances)
+			arr.push({ id: com.id, name: `${com.state.name} (${com.state.status})` });
 
-			answer(arr);
-		};
+		answer(arr);
 	};
 </script>
 
@@ -71,7 +72,7 @@ MQTT Subscribe
 	ON('configure_mqttsubscribe', function(data) {
 		data.call(function(response) {
 			SET('%brokers', response);
-		});
+		}, true);
 	});
 </script>
 
