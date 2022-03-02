@@ -73,6 +73,7 @@ __Output data__:
 			</div>
 			<div class="col-md-9 m">
 				<div data---="input__?.url__required:1">Relative URL address</div>
+				<div class="help">Relative path to: <span data-bind="window.location.origin__text"></span></div>
 			</div>
 		</div>
 		<div class="row">
@@ -90,7 +91,7 @@ __Output data__:
 </settings>
 
 <style>
-	.CLASS footer { font-size: 12px; padding: 10px; }
+	.CLASS footer { padding: 10px; }
 	.CLASS footer span { font-family: var(--monospace); }
 	.CLASS footer .method { background-color: var(--color); color: #FFF; padding: 2px 3px; border-radius: var(--radius); }
 </style>
@@ -100,6 +101,6 @@ __Output data__:
 		<i class="ICON"></i>NAME
 	</header>
 	<footer>
-		<div><span data-bind="CONFIG.method__text" class="method"></span> <span data-bind="CONFIG.url__text"></span></div>
+		<div><span data-bind="CONFIG.method__text" class="method"></span> <a data-bind="CONFIG.url__text__href:window.location.origin + value" target="_blank"></a></div>
 	</footer>
 </body>
