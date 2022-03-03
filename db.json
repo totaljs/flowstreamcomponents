@@ -55,6 +55,17 @@
 		"readme": "The component delays processing of a message."
 	},
 	{
+		"id": "downloader",
+		"group": "",
+		"name": "Downloader",
+		"url": "https://cdn.totaljs.com/flowstream/components/downloader.html",
+		"author": "Total Avengers",
+		"icon": "fa fa-download",
+		"color": "",
+		"version": "1",
+		"readme": "## Input\n```js\n{\n\turl: 'https://example.com/file.jpg', // file url\n}\n```\n\n## Output\nA response object as returned by [DOWNLOAD()](https://docs.totaljs.com/total4/407ff001jy51c/#88aab001hd51c) function.\n```js\n{\n\tfilename: '/tmp/xyz.ext',\n\t...\n}\n```\nThe file will be automaticaly deleted once the message is destroyed."
+	},
+	{
 		"id": "end",
 		"group": "Common",
 		"name": "End",
@@ -217,7 +228,7 @@
 		"icon": "fa fa-exchange-alt",
 		"color": "",
 		"version": "1",
-		"readme": "MQTT Broker"
+		"readme": ""
 	},
 	{
 		"id": "mqtt-publish",
