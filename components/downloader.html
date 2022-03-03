@@ -25,9 +25,12 @@
 			const filename = 'tmp/{0}.{1}'.format(UID(), U.getExtension(url));
 
 			DOWNLOAD(data.url, filename, function(err, response){
-				console.log('RESPONSE', err, response);
-				delete response.stream;
-				$.send('output', response);
+				if (err) {
+					instance.throw(err);
+					return;
+				}
+				const { filename, body, origin, status, headers } = response;
+				$.send('output', { filename, body, origin, status, headers });
 				$.on('terminate', () => {
 					unlink(PATH.root(filename)).catch(e => console.log('[Downloader] Failed to unlink file: ' + filename  + ' | ' + e.message));
 				});
