@@ -1,0 +1,81 @@
+<script total>
+
+	exports.name = 'Downloader';
+	exports.icon = 'fa fa-download';
+	exports.author = 'Total Avengers';
+	exports.version = '1';
+	exports.config = {};
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }];
+
+	exports.make = function(instance, config) {
+
+		const { unlink } = require('fs').promises;
+
+		const get = (obj, path) => path.split(".").reduce((r, k) => r?.[k], obj);
+
+		instance.message = function($) {
+			var data = $.data;
+			const urlpath = config.urlpath || 'url';
+
+			const url = get(data, urlpath);
+			if (!url)
+				return;
+
+			const filename = 'tmp/{0}.{1}'.format(UID(), U.getExtension(url));
+
+			DOWNLOAD(data.url, filename, function(err, response){
+				console.log('RESPONSE', err, response);
+				$.send('output', response);
+				$.on('terminate', () => {
+					console.log('UNLINKING', filename);
+					unlink(PATH.root(filename)).catch(e => console.log('[Downloader] Failed to unlink file: ' + filename  + ' | ' + e.message));
+				});
+			});
+		};
+
+		instance.configure = function() {
+			// "config" is changed
+		};
+
+		instance.configure();
+
+	};
+
+</script>
+
+<readme>
+## Input
+```js
+{
+	url: 'https://example.com/file.jpg', // file url
+}
+```
+
+## Output
+A response object as returned by [DOWNLOAD()](https://docs.totaljs.com/total4/407ff001jy51c/#88aab001hd51c) function.
+```js
+{
+	filename: '/tmp/xyz.ext',
+	...
+}
+```
+The file will be automaticaly deleted once the message is destroyed.
+
+</readme>
+
+<settings>
+	<div class="padding">
+		<div data---="input__?.urlpath">Path to URL in the incomming object (default 'url')</div>
+		<div class="help m">Supports dot notation like so: "path.to.url" or "arr.0.url" if the "arr" is an array. "arr[0].url" is not supported</div>
+	</div>
+</settings>
+
+<style>
+</style>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+</body>
