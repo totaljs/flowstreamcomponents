@@ -26,9 +26,9 @@
 
 			DOWNLOAD(data.url, filename, function(err, response){
 				console.log('RESPONSE', err, response);
+				delete response.stream;
 				$.send('output', response);
 				$.on('terminate', () => {
-					console.log('UNLINKING', filename);
 					unlink(PATH.root(filename)).catch(e => console.log('[Downloader] Failed to unlink file: ' + filename  + ' | ' + e.message));
 				});
 			});
