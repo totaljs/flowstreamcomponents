@@ -38,7 +38,7 @@
 
 		instance.close = function() {
 			disconnect(NOOP);
-			notifysubscribers();
+			notifypubsub();
 		};
 
 		instance.configure();
@@ -69,7 +69,7 @@
 
 			client.on('connect', function() {
 				state();
-				notifysubscribers();
+				notifypubsub();
 			});
 
 			client.on('reconnect', function() {
@@ -137,9 +137,8 @@
 			}
 		};
 
-		function notifysubscribers() {
-			var instances = instance.main.instances().filter(i => i.module.type === 'mqttsubscribe');
-			console.log('NOTIFY', instances);
+		function notifypubsub() {
+			var instances = instance.main.instances().filter(i => i.module.type === 'mqttsubscribe' || i.module.type === 'mqttpublish');
 			for (let com of instances)
 				com.configure();
 		}
