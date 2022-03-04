@@ -133,7 +133,7 @@
 			var sub = subscribtions[topic];
 			if (sub) {
 				subscribtions[topic] = sub.remove(componentid);
-				client.connected && !subscribtions[topic].length && client.unsubscribe(topic);
+				client && client.connected && !subscribtions[topic].length && client.unsubscribe(topic);
 			}
 		};
 
