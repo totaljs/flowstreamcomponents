@@ -1,0 +1,257 @@
+<script total>
+
+	exports.name = 'DS18B20';
+	exports.group = 'Raspberry Pi';
+	exports.icon = 'fa fa-code';
+	exports.author = 'Martin Smola';
+	exports.version = '1';
+	exports.config = {};
+	//exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }];
+
+	exports.make = function(instance, config) {
+		var sensors = {};
+		var values = {};
+		var interval;
+
+		instance.message = function($) {
+
+			ONEWIRE.list((err, list) => {
+				$.data = [];
+
+				list.wait((id, next) => {
+					if (!sensors[id])
+						return next();
+
+					ONEWIRE.readDS18B20(id, config, function (err, data) {
+
+						if (err) {
+							instance.throw(err);
+							//$.data[id] = -127;
+						} else {
+							let val = Math.round(data * 100) / 100;
+							values[id] = values[id] || [];
+							values[id].unshift(val);
+
+							if (values[id].length > 10)
+								values[id] = values[id].slice(0, 10);
+							$.data.push({ id, name: sensors[id], value: val, history: values[id], ts: Date.now() });
+						}
+
+						next();
+
+					});
+				}, function done(){
+					$.send('output');
+				});
+			});
+
+		};
+
+		instance.configure = function() {
+			sensors = {};
+			Object.keys(config.map).forEach(s => {
+				sensors[config.map[s]] = s;
+			});
+			if (!isNaN(config.interval) && config.interval < 30)
+				config.interval = 30;
+			instance.message(instance.newmessage({}));
+			clearInterval(interval);
+			interval = setInterval(() => {
+				instance.message(instance.newmessage({}));
+			}, (config.interval || 60) * 1000); // default 1 minute
+		};
+
+		instance.configure();
+
+	};
+
+	exports.call = function call(data, next){
+		ONEWIRE.list((err, list) => {
+			if (err) {
+				console.log('list error', err);
+				next([]);
+			} else {
+				next(list.map(d => ({ name: d, id: d })));
+			}
+		});
+	};
+
+	var Fs = require('fs');
+	var Path = require('path');
+
+    var ONEWIRE = {
+        W1_DIR: '/sys/bus/w1/devices/w1_bus_master1',
+        W1_MASTER: 'w1_master_slaves',
+        list: (callback) => {
+            const filepath = Path.join(ONEWIRE.W1_DIR, ONEWIRE.W1_MASTER);
+            Fs.stat(filepath, function(err){
+                if (err)
+                    return callback(err);
+
+                Fs.readFile(filepath, 'utf8', function(err, data){
+                    if (err)
+                        return callback(err);
+
+                    var devices = data.split('\n').trim();
+                    callback(null, devices);
+                });
+            });
+        },
+        readDS18B20: function(id, options, callback){
+
+            if (!id)
+                return callback('No id specified');
+
+            if (typeof(options) === 'function') {
+                callback = options;
+                options = {};
+            }
+
+            const filepath = Path.join(ONEWIRE.W1_DIR, id, 'w1_slave');
+
+            Fs.stat(filepath, function(err){
+                if (err)
+                    return callback(`Sensor ${id} not found`);
+
+                Fs.readFile(filepath, 'utf8', function(err, data){
+                    if (err)
+                        return callback(err);
+
+                    var temp = ONEWIRE.parseTemperature(data, options.digits, options.degF);
+                    callback(null, temp);
+                });
+            });
+        },
+        readDS2438: function(id, options, callback){
+
+            if (!id)
+                return callback('No id specified');
+
+            if (typeof(options) === 'function') {
+                callback = options;
+                options = {};
+            }
+
+            const dir = Path.join(ONEWIRE.W1_DIR, id);
+
+            Fs.readdir(dir, function(err, list) {
+                if (err)
+                    return callback(`Sensor ${id} not found`);
+
+                var i = 0;
+                list.forEach(function(f) {
+                    if (f === 'temperature' || f === 'vad' || f === 'vdd' || f === 'iad')
+                        return i++;
+                });
+
+                if (i < 4)
+                    return callback(`Error reading sensor ${id}`);
+
+                var temperature, vad, vdd, iad = '-1';
+
+                (async () => {
+                    try {
+                        temperature = await read(Path.join(dir, 'temperature'));
+                        vad = await read(Path.join(dir, 'vad'));
+                        vdd = await read(Path.join(dir, 'vdd'));
+                    } catch(e){
+                        return callback(`Error reading sensor ${id}, ${e.code}`);
+                    }
+                    try {
+                        iad = await read(Path.join(dir, 'iad'));
+                    } catch(e){
+                        console.log(e);
+                    }
+
+                    temperature = +temperature.trim() / 256;
+                    vdd = +vdd.trim() / 100;
+                    vad = +vad.trim() / 100;
+                    iad = +iad.trim() / (4.096 * 4700);
+
+                    if (temperature === 0 || vdd === 0 || vad === 0)
+                        return callback(`Error reading sensor ${id}`);
+
+                    /* Compute light (Light sensor BPW 34 S on IAD Input of the DS2438Z) */
+                    var lux = iad * (!isNaN(options.lumcoeficient) ? options.lumcoeficient : 12000.0);
+
+                    var humidity = 0;
+                    if (options.zerooffset && options.slope)
+                        humidity = ONEWIRE.hum(vad, options.zerooffset, options.slope / 1000)
+                    else
+                        humidity = (vad / vdd - 0.16) / 0.0062 / (1.0546 - 0.00216 * temperature );
+
+                    callback(null, { temperature: temperature.format(2), humidity: humidity.format(2), liminosity: lux });
+                })();
+            });
+        },
+        parseTemperature: function parseTemperature(data, digits, degF) {
+            var arr = data.split('\n');
+            var digits = digits !== undefined ? digits : 2;
+            let temp = null;
+
+            // Ensure "crc=00" is not present since this indicates the sensor has been disconnected.
+            if (arr[0].indexOf('YES') > -1 && arr[0].indexOf('crc=00') === -1) {
+                var out = data.match(/t=(-?(\d+))/);
+                if (out !== null) {
+                    temp = parseInt(out[1], 10) / 1000;
+                    if (degF) {
+                        temp = (temp * (9 / 5)) + 32;
+                    }
+                    temp = temp.round(digits);
+                }
+            } else
+                console.log('Failed to parse DS18B20', arr);
+
+            return temp;
+        },
+        hum: function hum(vad, offset, slope) {
+            offset = (offset / 0.05) * 0.033;
+            slope = (slope / 0.05) * 0.033;
+            return (vad - offset) / slope;
+        }
+    };
+
+</script>
+
+<readme>
+
+</readme>
+
+<settings>
+	<div class="padding">
+		<div data-bind="%onewire_devices__text:value.map(s => s.id).join(', ')"></div>
+		<div data---="keyvalue__?.map__placeholderkey:Sensor name;placeholdervalue:Type a sensor id and hit enter" class="m">Name/ID map</div>
+		<div data---="input__?.interval__type:number">Interval in seconds (default 60s, minimum 30s)</div>
+		<!--<div data---="input__?.id__dirsource:%onewire_devices;required:1" class="m">Device</div>
+		<div data---="input__?.action__dirsource:onewire_actions" class="m">@(Action)</div>
+   <div data-bind="settings.rpionewire.action__hide:value == 'list'">-->
+		<!--<div data-bind="settings.rpionewire.action__show:value == 'readDS2438'">
+	 <div data---="textbox__lumcoeficient__type:number">@(Luminosity coeficient of adjustment) (@(default) 12000)</div>
+	 <div class="help m">Result = sensor-value x coeficient</div>
+	 <div data---="textbox__zerooffset__type:number" class="m">@(Zero offset) (V)</div>
+	 <div data---="textbox__slope__type:number" class="m">@(Slope) (mV/%RH)</div>
+	</div>-->
+	</div>
+	</div>
+</settings>
+
+<style>
+	.CLASS footer { padding: 10px; font-size: 12px; }
+</style>
+
+<script>
+
+ON('configure_ds18b20', function(data) {
+    data.call(function(response) {
+        SET('%onewire_devices', response);
+    }, true);
+});
+
+</script>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+</body>
