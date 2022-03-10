@@ -66,6 +66,17 @@
 		"readme": "## Input\n```js\n{\n\turl: 'https://example.com/file.jpg', // file url\n}\n```\n\n## Output\nA response object as returned by [DOWNLOAD()](https://docs.totaljs.com/total4/407ff001jy51c/#88aab001hd51c) function.\n```js\n{\n\tfilename: '/tmp/xyz.ext',\n\t...\n}\n```\nThe file will be automaticaly deleted once the message is destroyed."
 	},
 	{
+		"id": "rpi-ds18b20",
+		"group": "Raspberry Pi",
+		"name": "DS18B20",
+		"url": "https://cdn.totaljs.com/flowstream/components/rpi-ds18b20.html",
+		"author": "Martin Smola",
+		"icon": "fa fa-code",
+		"color": "",
+		"version": "1",
+		"readme": ""
+	},
+	{
 		"id": "end",
 		"group": "Common",
 		"name": "End",
@@ -460,6 +471,17 @@
 		"color": "",
 		"version": "2",
 		"readme": "The component subscribes to the specific `Output` component."
+	},
+	{
+		"id": "switch",
+		"group": "",
+		"name": "Switch",
+		"url": "https://cdn.totaljs.com/flowstream/components/switch.html",
+		"author": "Total Avengers",
+		"icon": "fa fa-random",
+		"color": "",
+		"version": "1",
+		"readme": ""
 	},
 	{
 		"id": "tail",
