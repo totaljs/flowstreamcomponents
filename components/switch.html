@@ -1,0 +1,324 @@
+<script total>
+
+	exports.name = 'Switch';
+	exports.icon = 'fa fa-random';
+	exports.author = 'Total Avengers';
+	exports.version = '1';
+	exports.config = { conditions: [] };
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output1', name: 'Output #1' }];
+
+	exports.make = function(instance, config) {
+
+		var check;
+		var COND = [];
+
+		const get = (obj, path) => path.split(".").reduce((r, k) => r?.[k], obj);
+
+		instance.message = function($) {
+			var data = $.data;
+			console.log(config.path, data);
+			if (config.path) {
+				if (typeof data !== 'object' || Array.isArray(data) || data == null)
+					return;
+				data = get(data, config.path);
+			}
+
+			var sent = false;
+			console.log('GOT DATA', data, instance.outputs);
+			for (let i = 0; i < COND.length; i++) {
+				let ok = COND[i](data);
+				if (ok) {
+					console.log($.send('output' + (i + 1), data));
+					sent = true;
+				}
+				console.log('ok', ok, 'output' + (i + 1), instance.outputs[i], instance.connections);
+			}
+			!sent && $.destroy();
+		};
+
+		instance.configure = function() {
+
+			const conditions = config.conditions;
+			COND = [];
+
+			conditions.forEach((cond, index) => {
+				const { operator, value, datatype } = cond;
+
+				if (datatype === 'any') {
+					COND[index] = new Function('value', 'return ' + value);
+					return;
+				}
+
+				switch (operator) {
+					case 'isnull':
+						COND[index] = (v) => v == null;
+						return;
+					case 'true':
+					case 'false':
+						COND[index] = (v) => v == operator.parseBoolean();
+						return;
+				}
+
+				switch (datatype) {
+					case 'string':
+						COND[index] = compile.string(operator, value);
+						break;
+					case 'number':
+						COND[index] = compile.number(operator, value);
+						break;
+					case 'array':
+						COND[index] = compile.array(operator, value);
+						break;
+					case 'object':
+						COND[index] = compile.object(operator, value);
+						break;
+				}
+			});
+
+			instance.outputs = [];
+
+			COND.forEach((fn, i) => {
+				instance.outputs.push({ id: 'output' + (i + 1), name: conditions[i].name || 'Output #' + (i + 1) });
+				if (typeof fn !== 'function')
+					instance.throw('Invalid settings for output: ' + (i + 1));
+			});
+
+			//instance.outputs = COND.map((c, i) => ({ id: 'output' + (i + 1), name: 'Output #' + (i + 1) }));
+			instance.save();
+		};
+
+		const compile = {
+			number_ops: { gt: '>', lt: '<', eq: '==', seq: '===', sneq: '!==', ge: '>=',le: '<=', between: 'between', notbetween: 'notbetween', isnull: 'isnull' },
+			number: (operator, value) => {
+
+				if (!compile.number_ops[operator])
+					return console.log('unknown operator', operator);
+
+				value = U.parseFloat(value);
+				if (isNaN(value))
+					return;
+
+				if (operator === 'isnull')
+					return (v) => v == null;
+
+				var fn;
+
+				if (operator === 'between') {
+					const [ value, value2 ] = value.split(',').trim();
+					fn = new Function('val','return val > ' + value + ' && val < ' + value2 + ';');
+				} else if (operator === 'notbetween') {
+					const [ value, value2 ] = value.split(',').trim();
+					fn = new Function('val','return val < ' + value + ' && val > ' + value2 + ';');
+				} else {
+					fn = new Function('val','return val ' + compile.number_ops[operator] + ' ' + value + ';');
+				}
+
+				return function(val) {
+					if (typeof val !== 'number')
+						return false;
+					return fn(val);
+				};
+
+			},
+			/*boolean: ({ operator, value }) => {
+
+				value = value.parseBoolean();
+				return function(val) {
+					return val === value;
+				};
+
+			},*/
+			string: (operator, value) => {
+
+				if (operator === 'isempty')
+					return (val) => val == '';
+
+				var fn;
+
+				switch(operator) {
+					case 'eq':
+						fn = val => val == value;
+						break;
+					case 'seq':
+						fn = val => val === value;
+						break;
+					case 'sneq':
+						fn = val => val !== value;
+						break;
+					case 'indexOf':
+						fn = val => val.indexOf(value) > -1;
+						break;
+					case 'startsWith':
+					case 'endsWith':
+						fn = val => val[operator](value);
+						break;
+					case 'regex':
+						var match = value.match(new RegExp('^/(.*?)/([gimy]*)$'));
+						if (!match.length || match.length < 2)
+							return;
+						else
+							fn = val => new RegExp(match[1], match[2]).test(val);
+						break;
+				}
+
+				return function(value) {
+					if (typeof value !== 'string')
+						return false;
+					return fn(value);
+				};
+			},
+			array: (operator, value) => {
+
+				switch(operator) {
+					case 'includes':
+						fn = val => val.includes(value);
+						break;
+					case 'isnull':
+						fn = val => val == null;
+						break;
+				}
+
+				return function(value) {
+					if (!(value instanceof Array))
+						return false;
+					return fn(value);
+				};
+
+			},
+			object: (operator, value) => {
+
+				switch(operator) {
+					case 'haskey':
+						fn = val => val.hasOwnProperty(value);
+						break;
+					case 'isnull':
+						fn = val => val == null;
+						break;
+				}
+
+				return function(value) {
+					if (!(value instanceof Array))
+						return false;
+					return fn(value);
+				};
+
+			}
+		};
+
+		instance.configure();
+
+	};
+
+</script>
+
+<readme>
+
+</readme>
+
+<settings>
+	<div class="padding">
+		<div data---="input__?.path">Path to a property</div>
+		<div class="help m">Supports dot notation: position.longitude or sensor.0.value for arrays, does not support sensor[0].value</div>
+		<section class="switch-conditions">
+			<label class="ui-input-label">Switch conditions</label>
+			<div data-bind="?.conditions__template:.switch-condition -> data-index" data---="movable__?.conditions__selector:.dragme;exec:FUNC.switch_condition_dragged">
+				<script type="text/html">
+				{{ foreach con in value }}
+				<div class="switch-condition dragme" data-index="{{ $index }}" draggable="true">
+					<div class="row">
+						<div class="col-md-1">
+							# {{ ($index + 1) }}
+						</div>
+						<div class="col-md-2">
+							<div data---="input__?.conditions[{{ $index }}].datatype__dirsource:REPO.switch_datatypes">Datatype</div>
+						</div>
+						<div class="col-md-6">
+							<div class="input-group">
+								<label class="ui-input-label">Operator + value:</label>
+								<div data-bind="?.conditions[{{ $index }}].datatype__config:'dirsource:' + REPO.switch_operators[value]" data---="input__?.conditions[{{ $index }}].operator__dirsource:REPO.switch_operators.string"></div>
+								<div data---="input__?.conditions[{{ $index }}].value__placeholder:value"></div>
+							</div>
+						</div>
+						<div class="col-md-2">
+							<div data---="input__?.conditions[{{ $index }}].name">Output name</div>
+						</div>
+						<div class="col-md-1">
+							<i class="fa fa-trash red exec" data-exec="FUNC.switch_remove_condition"></i>
+						</div>
+					</div>
+				</div>
+				{{ end }}
+				</script>
+			</div>
+			<div class="help m">Each condition corresponds to an output index. First condition --> First output, etc.</div>
+			<button class="button-add exec" data-exec="FUNC.switch_add_condition">ADD</button>
+		</section>
+	</div>
+</settings>
+
+<script>
+
+	FUNC.switch_add_condition = function(el) {
+		var scope = el.scope();
+		PUSH(scope.path + '.conditions', { operator: '==', datatype: 'string', value: '' });
+	};
+
+	FUNC.switch_remove_condition = function(el) {
+		var path = el.scope().path;
+		var config = GET(path);
+		var index = el.closest('.switch_condition').attrd('index');
+		config.conditions.splice(index, 1);
+		SET(path, config);
+		console.log(config);
+	};
+
+	FUNC.switch_condition_dragged = function(list, dragged, target) {
+		dragged = $(dragged);
+		var dragged_index = dragged.attrd('index');
+		var target_index = $(target).attrd('index');
+		var path = dragged.scope().path;
+		var config = GET(path);
+		var dragged_item = config.conditions.splice(dragged_index, 1)[0];
+		config.conditions.splice(target_index, 0, dragged_item);
+		SET(path, config);
+	};
+
+	REPO.switch_datatypes = [{ id: 'number', name: 'Number' }, { id: 'string', name: 'String' }, { id: 'boolean', name: 'Boolean' }, { id: 'array', name: 'Array' }, { id: 'object', name: 'Object' }, { id: 'any', name: 'Any' }];
+	REPO.switch_operators = {
+		number: 'gt|>,lt|<,eq|==,seq|===,sneq|!==,ge|>=,le|<=,between|between,isnull|is null',
+		string: 'eq|==,seq|===,sneq|!==,isnull|is null,isempty|is empty,indexOf|index of,startsWith|starts with,endsWith|ends with,regex|regular expression',
+		boolean: 'true|true,false|false,isnull|is null',
+		array: 'includes|includes,isnull|is null',
+		object: 'haskey|has key,isnull|is null',
+		any: 'expression|expression,'
+	};
+
+</script>
+
+<style>
+	.CLASS footer { padding: 10px; font-size: 12px; }
+
+	.button-add { height: 24px; font-size: 12px; border: 1px solid #E0E0E0; border-radius: var(--radius); color: #000; background-color: #f0f0f0; margin: 0; padding: 0px 8px; }
+	.button-add:hover { background-color: #F8F8F8; }
+	.button-add:active { background-color: #E0E0E0; }
+
+	.ui-dark .button-add { border-color: #404040; color: #FFF; }
+	.ui-dark .button-add:hover { background-color: #303030; }
+	.ui-dark .button-add:active { background-color: #404040; }
+
+	.input-group { clear: both; height: 56px; }
+	.input-group > div:nth-child(2) .ui-input-control { border-right: none; border-bottom-right-radius: 0; border-top-right-radius: 0; width: 120px; float: left; background-color: #f0f0f0; }
+	.input-group > div:last-child .ui-input-control { border-bottom-left-radius: 0; border-top-left-radius: 0; float: left; width: calc(100% - 120px); }
+
+	.switch-conditions { border: 1px solid #e0e0e0; padding: 8px; border-radius: 3px; }
+	.switch-conditions > label { display: block; margin: -8px -8px 8px -8px; height: 32px; line-height: 32px; padding: 0 8px; background-color: #f0f0f0; }
+	.switch-condition { border: 1px solid #e0e0e0; border-radius: 3px; padding: 8px; margin-bottom:4px; }
+	.switch-condition > .row > .col-md-1 { height: 56px; line-height: 56px; }
+</style>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+</body>
