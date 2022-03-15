@@ -11,15 +11,22 @@
 	exports.make = function(instance, config) {
 
 		instance.configure = function() {
+			var broker = instance.main.find(config.broker);
 
+			if (broker) {
+				instance.status({ status: broker.state.status });
+			} else {
+				instance.status({ status: 'Broker not found' });
+			}
 		};
 
 		instance.message = function($) {
 			var broker = instance.main.find(config.broker);
-			if (!broker)
-				return instance.status('No broker');
-
-			broker.publish($.data.topic, $.data.message);
+			if (broker)
+				broker.publish($.data.topic, $.data.message);
+			else
+				instance.status({ status: 'Broker not found' });
+			$.destroy();
 		};
 
 		instance.configure();
@@ -65,7 +72,7 @@ Input:
 	ON('configure_mqttpublish', function(data) {
 		data.call(function(response) {
 			SET('%brokers', response);
-		});
+		}, true);
 	});
 </script>
 
