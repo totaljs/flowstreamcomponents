@@ -66,17 +66,6 @@
 		"readme": "## Input\n```js\n{\n\turl: 'https://example.com/file.jpg', // file url\n}\n```\n\n## Output\nA response object as returned by [DOWNLOAD()](https://docs.totaljs.com/total4/407ff001jy51c/#88aab001hd51c) function.\n```js\n{\n\tfilename: '/tmp/xyz.ext',\n\t...\n}\n```\nThe file will be automaticaly deleted once the message is destroyed."
 	},
 	{
-		"id": "rpi-ds18b20",
-		"group": "Raspberry Pi",
-		"name": "DS18B20",
-		"url": "https://cdn.totaljs.com/flowstream/components/rpi-ds18b20.html",
-		"author": "Martin Smola",
-		"icon": "fa fa-code",
-		"color": "",
-		"version": "1",
-		"readme": ""
-	},
-	{
 		"id": "end",
 		"group": "Common",
 		"name": "End",
@@ -209,6 +198,17 @@
 		"readme": "The component compares incoming data with previous data."
 	},
 	{
+		"id": "modify",
+		"group": "",
+		"name": "Modify",
+		"url": "https://cdn.totaljs.com/flowstream/components/modify.html",
+		"author": "Total Avengers",
+		"icon": "fa fa-random",
+		"color": "",
+		"version": "1",
+		"readme": ""
+	},
+	{
 		"id": "mongodb-insert",
 		"group": "Databases",
 		"name": "MongoDB Insert",
@@ -238,7 +238,7 @@
 		"author": "Martin Smola",
 		"icon": "fa fa-exchange-alt",
 		"color": "",
-		"version": "1",
+		"version": "2",
 		"readme": ""
 	},
 	{
@@ -249,7 +249,7 @@
 		"author": "Martin Smola",
 		"icon": "fa fa-sign-out",
 		"color": "",
-		"version": "1",
+		"version": "2",
 		"readme": "MQTT Publish\n\nInput:\n```javascript\n{\n\ttopic: 'some/topic',\n\tmessage: { some: 'data' },\n\t// optional\n\toptions: {\n\t\tqos: 0|1|2,\n\t\tretain: true|false\n\t}\n}\n```"
 	},
 	{
@@ -284,6 +284,17 @@
 		"color": "",
 		"version": "1",
 		"readme": "## Outputs\n- response from nosql engine\n## Settings\n- collection: (optional) if not set, incomming data object must have a 'collection' property set\n- method: (optional) if not set, incomming data object must have a 'method' property set\n## Input\n```javascript\n{\n\tcollection: 'users', // optional, will override settings value\n\tmethod: 'find', // optional, will override settings value\n\t// for Insert, Update\n\tdata: { ... },\n\t// for Query, Read, Update, Remove\n\tfilter: [\n\t\t['where', 'sensor', 'temp'], // builder.where('sensor', 'temp');\n\t\t['limit', 2]                 // builder.limit(2);\n\t],\n\tupsert: true // only for update, if set then document will be inserted if it doesn't exist\n\taddid: true  // only for insert and update, if set then id prop will be automaticaly generated (for update only when upsert is also set)\n}\n```\n## Insert\n- inserts recieved data\n- expects data to be an Object\n- returns error, success, id\n## Read\n- returns first document found\n- requires `filter`\n- returns error, response\n## Update\n- updates document(s)\n- expects data to be an Object with all the props to be updated\n- requires `filter`\n- returns error, response\n- if response is 0 then update failed\n## Remove\n- removes document\n- requires `filter`\n- returns error, response\n- if response is 0 then remove failed\n## Query\n- returns all documents found\n- requires `filter`\n- returns error, response"
+	},
+	{
+		"id": "rpi-ds18b20",
+		"group": "Raspberry Pi",
+		"name": "OneWire",
+		"url": "https://cdn.totaljs.com/flowstream/components/rpi-ds18b20.html",
+		"author": "Martin Smola",
+		"icon": "fa fa-code",
+		"color": "",
+		"version": "1",
+		"readme": "## Output\n```js\n{\n\t\"ts\": 1646643556666,      // timestamp\n\t\"ignorelist\": []          // list of ignored devices, the devices not in the \"Name/ID map\" in config form\n\t\"sensors\": [\n\t\t{\n\t\t\t\"id\": \"28-3c01e076b84d\", // onewire sensor id\n\t\t\t\"name\": \"livingroom\",    // friedly name assigned in the config form\n\t\t\t\"value\": 21.06,          // current value\n\t\t\t// optionaly, if enabled, the last 10 values, 1st(21.06) is most recent\n\t\t\t\"history\": [ 21.06, 21.13, 21.06, 21.06, 21.13, 21.13, 21.06, 21.06, 21.08, 21.09 ],\n\t\t},\n\t\t...\n]\n```"
 	},
 	{
 		"id": "opensync",
@@ -478,10 +489,10 @@
 		"name": "Switch",
 		"url": "https://cdn.totaljs.com/flowstream/components/switch.html",
 		"author": "Total Avengers",
-		"icon": "fa fa-random",
+		"icon": "fa fa-sitemap fa-rotate-270",
 		"color": "",
 		"version": "1",
-		"readme": ""
+		"readme": "## Source and Path\nUse the **Source** dropdown to select where to look for the value to use in the conditions check.\nSet a **Path** if the value is not the data itself. It supports dot notation: `position.longitude` or `sensor.0.value` for arrays, it does not support `sensor[0].value`.\n**Expression** supports javascript syntax. Should return a value which will be used in condition check as `data`. Available variables: data, repo, variables, variables2\n**Expressions example:**\n```js\ndata.value - variables.offset\n```\n\n## Conditions\nEach of the **Conditions** corresponds to an output in the exact same order. First condition -> First output.\n\n**Operator**\nNot all operators work on all data types. For example it is not possible to use `&gt;` or `&lt;` for strings, etc.\n*index of* only works for data of type array or string.\n**Expression operator**\nIn this case the **type** field is ignored and the expression in the **value** field must return `true` or `false`. Available variables: data, repo, variables, variables2.\nExpressions operator example:\n```js\ndata.value > variables.threshold;\n```\nor with a conditions\n```js\nif (typeof data.value !== 'number') return false; else return data.value > parseInt(variables.threshold);\n```\n\n**Expression type**\nThe expression in the **value** field must return a value which will be used in the given operation. Available variables: data, repo, variables, variables2.\nExpressions example:\n```js\ndata.value - variables.offset\n```\n\n**Between operator** only works with datatype number and the value must be two comma separated values. e.g.: `2,4` so the condition becomes `val &gt; 2 && val &lt; 4`"
 	},
 	{
 		"id": "tail",
@@ -537,5 +548,27 @@
 		"color": "",
 		"version": "2",
 		"readme": "The component triggers data into the Flow."
+	},
+	{
+		"id": "zigbee2mqtt-bridge",
+		"group": "Zigbee2MQTT",
+		"name": "Zigbee2MQTT Bridge",
+		"url": "https://cdn.totaljs.com/flowstream/components/zigbee2mqtt-bridge.html",
+		"author": "Martin Smola",
+		"icon": "fa fa-exchange",
+		"color": "",
+		"version": "1",
+		"readme": "[Documentation](https://www.zigbee2mqtt.io/guide/getting-started/)\nThis component requires a MQTT Broker\nSupported request commands: `permit_join`, `health_check`, `restart`, `devices`, `groups`, `extensions`\nInput:\n```javascript\n{\n\tcommand: 'permit_join'\n}\n```"
+	},
+	{
+		"id": "zigbee2mqtt-devices",
+		"group": "Zigbee2MQTT",
+		"name": "Zigbee2MQTT Devices",
+		"url": "https://cdn.totaljs.com/flowstream/components/zigbee2mqtt-devices.html",
+		"author": "Martin Smola",
+		"icon": "fa fa-cube",
+		"color": "",
+		"version": "1",
+		"readme": "Please read the [device documentation](https://www.zigbee2mqtt.io/supported-devices/) to learn about the message structure.\nInput:\n```javascript\n{\n\tcommand: 'get|set|availability',\n\tdeviceid: '0x65454....', // id or friendly name\n\tmessage: { ... },\n\t// not implemented // data: <anything> // this will be passed to the output along with the response from the bridge\n}\n```\n\nOutput:\n```javascript\n{\n\tresult: { ... },\n\t// not implemented // data: <value-of-data-property-from-input>\n}\n```"
 	}
 ]
