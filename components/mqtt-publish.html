@@ -6,27 +6,25 @@
 	exports.config = { broker: '' };
 	exports.inputs = [{ id: 'message', name: 'Message' }];
 	exports.author = 'Martin Smola';
-	exports.version = '1';
+	exports.version = '2';
+	exports.flags = ['mqttbroker-dep'];
 
 	exports.make = function(instance, config) {
 
 		instance.configure = function() {
 			var broker = instance.main.find(config.broker);
-
-			if (broker) {
-				instance.status({ status: broker.state.status });
-			} else {
-				instance.status({ status: 'Broker not found' });
-			}
+			if (!broker)
+				instance.status('Broker not found');
+			else
+				instance.status(broker.state.status);
 		};
 
 		instance.message = function($) {
 			var broker = instance.main.find(config.broker);
-			if (broker)
-				broker.publish($.data.topic, $.data.message);
-			else
-				instance.status({ status: 'Broker not found' });
-			$.destroy();
+			if (!broker)
+				return;
+
+			broker.publish($.data.topic, $.data.message);
 		};
 
 		instance.configure();
@@ -37,7 +35,7 @@
 
 		var instances = this.instances();
 
-		instances = instances.filter(i => i.module.type === 'mqttbroker');
+		instances = instances.filter(i => i.module.flags && i.module.flags.includes('mqttbroker'));
 		for (let com of instances)
 			arr.push({ id: com.id, name: `${com.state.name} (${com.state.status})` });
 
@@ -93,7 +91,7 @@ Input:
 	<footer>
 		<div data-bind="!STATUS__template__show">
 			<script type="text/html">
-				<div><b>{{ value.status }}</b>Status</div>
+				<div><b>{{ value }}</b>Status</div>
 			</script>
 		</div>
 	</footer>
