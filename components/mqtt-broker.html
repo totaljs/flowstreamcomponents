@@ -7,7 +7,6 @@
 	exports.outputs = [{ id: 'output', name: 'Messages' }];
 	exports.author = 'Martin Smola';
 	exports.version = '2';
-	exports.type = 'mqttbroker';
 	exports.npm = ['mqtt'];
 	exports.flags = ['mqttbroker'];
 
@@ -86,10 +85,7 @@
 			});
 
 			client.on('close', function(err) {
-				if (err && err.toString().indexOf('Error')) {
-
-				}
-				console.log('Broker close', err);
+				console.log('Broker closed', err);
 				state();
 			});
 
@@ -151,7 +147,7 @@
 		};
 
 		function notifypubsub() {
-			var instances = instance.main.instances().filter(i => i.module.flags && i.module.flags.indexOf('mqttbroker-dep') > -1 && i.config.broker === instance.id);
+			var instances = instance.main.instances().filter(i => i.module.flags && i.module.flags.includes('mqttbroker-dep') > -1 && i.config.broker === instance.id);
 			for (let com of instances)
 				com.configure();
 		}
