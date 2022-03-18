@@ -7,7 +7,7 @@
 	exports.outputs = [{ id: 'message', name: 'Message' }];
 	exports.author = 'Martin Smola';
 	exports.version = '1';
-	exports.type = 'mqttsubscribe';
+	exports.flags = ['mqttbroker-dep'];
 
 	exports.make = function(instance, config) {
 
@@ -21,20 +21,19 @@
 
 			topic = config.topic;
 
-			instance.status({ status: 'Not configured', topic });
 			broker = instance.main.find(config.broker);
 
 			if (broker) {
 				broker.subscribe(instance.id, topic);
 				subscribed = true;
-				instance.status({ status: 'Subscribed', topic });
+				instance.status({ status: broker.state.status + ' (subscribed)', topic });
 			} else {
 				instance.status({ status: 'Broker not found', topic });
 			}
 		};
 
-		instance.onmessage = function(topic, message, match) {
-			instance.send('message', { topic, message, match });
+		instance.onmessage = function(topic, message, match, ts) {
+			instance.send('message', { topic, message, match, ts });
 		};
 
 		instance.close = function() {
@@ -42,7 +41,7 @@
 				broker.unsubscribe(instance.id, topic);
 		};
 
-		setTimeout(instance.configure, 2000);
+		instance.configure();
 	};
 
 	exports.call = function(data, answer) {
@@ -50,7 +49,7 @@
 
 		var instances = this.instances();
 
-		instances = instances.filter(i => i.module.type === 'mqttbroker');
+		instances = instances.filter(i => i.module.flags && i.module.flags.includes('mqttbroker'));
 		for (let com of instances)
 			arr.push({ id: com.id, name: `${com.state.name} (${com.state.status})` });
 
