@@ -1,0 +1,266 @@
+<script total>
+
+	exports.name = 'Modify';
+	exports.icon = 'fa fa-random';
+	exports.author = 'Total Avengers';
+	exports.version = '1';
+	exports.config = { rules: [{ rule: 'set', sourcepath: 'data.value', source: 'data', targetpath: 'data.valueF', target: 'data' }] };
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }];
+
+	exports.make = function(instance, config) {
+
+		var Rules = [];
+
+		instance.message = function($) {
+
+			for (let i = 0; i < Rules.length; i++) {
+				try {
+					const { getValue, setValue } = Rules[i];
+					var data = getValue($.data, $.repo, instance.main.variables, instance.main.variables2, get);
+					setValue(data, $, instance.main.variables, set);
+				} catch(e) {
+					console.error('muj error', e);
+				}
+			}
+
+			$.send('output');
+		};
+
+		instance.configure = function() {
+
+			if (!config.rules || !config.rules.length)
+				return;
+
+			const rules = config.rules;
+			Rules = [];
+
+			rules.forEach(function eachCondition(cond, index){
+
+				const { rule, source, sourcepath, target, targetpath } = cond;
+				var getValue, setValue;
+
+				if (source === 'expression')
+					getValue = new Function('data', 'repo', 'variables', 'variables2', 'return ' + target + ';');
+				else if (source === 'string')
+					getValue = () => sourcepath;
+				else if (source === 'number') {
+					getValue = () => Number(sourcepath);
+				} else {
+					try {
+						var str = 'if ({0}) return {1}; if (typeof {1} !== \'object\' || {1} == null) return; return {2};'.format(sourcepath ? 'false' : 'true', source, sourcepath ? 'get({0}, \'{1}\')'.format(source, sourcepath) : sourcepath);
+						getValue = new Function('data', 'repo', 'variables', 'variables2', 'get', str);
+					} catch(e) {
+						instance.throw(e.stack);
+						console.error(str);
+						getValue = NOOP;
+					};
+				}
+
+				// targetpath => data | repo | variables | variables2
+				if (!targetpath) {
+					switch(target) {
+						case 'data':
+						case 'repo':
+							setValue = (data, msg) => msg[target] = data;
+							break;
+						case 'variables':
+						case 'variables2':
+							setValue = (data, msg) => instance.main[target] = data;
+							break;
+					};
+				} else {
+					try {
+						var t = target;
+						if (target === 'data' || target === 'repo')
+							t = '$.' + target;
+						else
+							t = 'instance.main.' + target;
+						var str = 'if (typeof {0} !== \'object\' || {0} == null) {0} = {1}; return set({0}, \'{2}\', value)'.format(t, isNaN(targetpath[0]) ? '{}' : '[]', targetpath);
+						setValue = new Function('value', '$', 'instance', 'set', str);
+					} catch(e) {
+						instance.throw(e.stack);
+						console.error(e);
+						console.error(str);
+						setValue = NOOP;
+					};
+				}
+
+				Rules.push({ getValue, setValue });
+			});
+		};
+
+		instance.configure();
+
+		const get = (obj, path) => path.split(".").reduce((r, k) => r?.[k], obj);
+		const set = (obj, path, value) => {
+			var ok = true;
+			var props = path.split('.').trim();
+
+			var plen = props.length;
+			if (!plen)
+				return false;
+
+			var path = props.map(p => isNaN(p) ? p : `[${p}]`).join('.').replace(/\.\[/g, '[');
+			var paths = [];
+			props.reduce((prev, curr) => {
+				curr = isNaN(curr) ? curr : `[${curr}]`;
+				let p = prev + (prev && curr[0] !== '[' ? '.' : '') + curr;
+				paths.push(p);
+				return p;
+			}, '');
+
+			if (path[0] !== '[')
+				path = '.' + path;
+			var fn = new Function('o', 'v', 'o' + path + ' = v;');
+
+			if (plen === 1) {
+				var isobject = isNaN(props[0]);
+				if ((isobject && typeof(obj) === 'object') || (!isobject && obj instanceof Array))
+					obj[props[0]] = value;
+				else
+					ok = false;
+			} else {
+				paths.forEach((p, index) => {
+					var islast = plen === index + 1;
+					if (!islast) {
+						var t = get(obj, p);
+						var type = isNaN(props[index + 1]) ? '{}' : '[]';
+						if (t == null)
+							new Function('target', 'target.' + p + ' = ' + type + ';')(obj);
+					} else
+						fn(obj, value);
+				});
+			}
+
+			return ok;
+		}
+	};
+
+</script>
+
+<readme>
+
+</readme>
+
+<settings>
+	<div class="padding">
+		<section class="modify-rules m">
+			<label class="ui-input-label">Rules</label>
+			<div class="modify-thead">
+				<div class="row">
+					<div class="col-md-2">Rule</div>
+					<div class="col-md-4">Target</div>
+					<div class="col-md-5">Source</div>
+					<div class="col-md-1">Action</div>
+				</div>
+			</div>
+			<div data-bind="?.rules__template:.modify-rule -> data-index" data---="movable__?.rules__selector:.dragme;exec:FUNC.modify_rule_dragged">
+				<script type="text/html">
+					{{ foreach rule in value }}
+					<div class="modify-rule dragme" data-index="{{ $index }}" draggable="true">
+						<div class="row">
+							<div class="col-md-2">
+								<div data---="input__?.rules[{{ $index }}].rule__dirsource:REPO.modify_rules"></div>
+							</div>
+							<div class="col-md-4">
+								<div class="modify-input-group">
+									<div data---="input__?.rules[{{ $index }}].target__dirsource:REPO.modify_targets"></div>
+									<div data---="input__?.rules[{{ $index }}].targetpath__placeholder:value"></div>
+								</div>
+							</div>
+							<div class="col-md-5">
+								<div class="modify-input-group">
+									<div data---="input__?.rules[{{ $index }}].source__dirsource:REPO.modify_sources"></div>
+									<div data---="input__?.rules[{{ $index }}].sourcepath__placeholder:value"></div>
+								</div>
+							</div>
+							<div class="col-md-1">
+								<i class="fa fa-trash red exec" data-exec="FUNC.modify_remove_rule"></i>
+							</div>
+						</div>
+					</div>
+					{{ end }}
+				</script>
+			</div>
+			<div class="help m">Each rule will be applied in the order from top to bottom.</div>
+			<button class="button-add exec" data-exec="FUNC.modify_add_rule">ADD</button>
+		</section>
+		<button class="button exec" style="width: 200px;" data-exec="FUNC.modify_readme"><i class="fa fa-info-circle blue"></i>Show configuration info</button>
+	</div>
+</settings>
+
+<script>
+
+	FUNC.modify_readme = function() {
+		EXEC('flow/readme', flow.info.selected.component);
+	};
+
+	FUNC.modify_add_rule = function(el) {
+		var scope = el.scope();
+		PUSH(scope.path + '.rules', { rule: 'set', source: '', sourcetype: '', target: '', targettype: '' });
+	};
+
+	FUNC.modify_remove_rule = function(el) {
+		var path = el.scope().path;
+		var config = GET(path);
+		var index = el.closest('.modify_rule').attrd('index');
+		config.rules.splice(index, 1);
+		SET(path, config);
+		console.log(config);
+	};
+
+	FUNC.modify_rule_dragged = function(list, dragged, target) {
+		dragged = $(dragged);
+		var dragged_index = dragged.attrd('index');
+		var target_index = $(target).attrd('index');
+		var path = dragged.scope().path;
+		var config = GET(path);
+		var dragged_item = config.rules.splice(dragged_index, 1)[0];
+		config.rules.splice(target_index, 0, dragged_item);
+		SET(path, config);
+	};
+
+	FUNC.modify_tooltip = function(el) {
+		var opt = {};
+		opt.element = el;
+		var id = el.attrd('id');
+		opt.html = REPO.switch_tooltips[id];
+
+		SETTER('tooltip', 'show', opt);
+	};
+
+	REPO.modify_sources = 'string|String,number|Number,data|Message data,repo|Message repository,variables|Local variables,variables2|Global variables,expression|Expression'.split(',').map(d => { const [ id, name ] = d.split('|'); return { id, name }; });
+	REPO.modify_targets = 'data|Message data,repo|Message repository,variables|Local variables,variables2|Global variables'.split(',').map(d => { const [ id, name ] = d.split('|'); return { id, name }; });
+	REPO.modify_rules = 'set|Set,modify|Modify,remove|Remove,move|Move'.split(',').map(d => { const [ id, name ] = d.split('|'); return { id, name }; });
+
+</script>
+
+<style>
+	.CLASS footer { padding: 10px; font-size: 12px; }
+
+	.button-add { height: 24px; font-size: 12px; border: 1px solid #E0E0E0; border-radius: var(--radius); color: #000; background-color: #f0f0f0; margin: 0; padding: 2px 10px; }
+	.button-add:hover { background-color: #F8F8F8; }
+	.button-add:active { background-color: #E0E0E0; }
+
+	.ui-dark .button-add { border-color: #404040; color: #FFF; }
+	.ui-dark .button-add:hover { background-color: #303030; }
+	.ui-dark .button-add:active { background-color: #404040; }
+
+	.modify-input-group { clear: both; height: 36px; }
+	.modify-input-group > div:first-child .ui-input-control { border-right: none; border-bottom-right-radius: 0; border-top-right-radius: 0; width: 120px; float: left; background-color: #f0f0f0; }
+	.modify-input-group > div:last-child .ui-input-control { border-bottom-left-radius: 0; border-top-left-radius: 0; float: left; width: calc(100% - 120px); }
+	.modify-input-group.wide > div:first-child .ui-input-control { width: 200px; }
+	.modify-input-group.wide > div:last-child .ui-input-control { width: calc(100% - 200px); }
+	.modify-rules { border: 1px solid #e0e0e0; padding: 8px; border-radius: 3px; }
+	.modify-rule { border: 1px solid #e0e0e0; border-radius: 3px; padding: 8px; margin-bottom:4px; }
+	.modify-rule > .row > .col-md-1 { height: 36px; line-height: 36px; }
+	.modify-help { background-color: #e7e7ff; border-radius: 3px; padding: 4px; }
+	.modify-thead { padding: 8px; margin-bottom:4px; }
+</style>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+</body>
