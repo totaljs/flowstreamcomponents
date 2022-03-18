@@ -37,8 +37,7 @@
 		};
 
 		instance.close = function() {
-			disconnect(NOOP);
-			notifypubsub();
+			disconnect(notifypubsub);
 		};
 
 		instance.configure();
@@ -64,6 +63,7 @@
 			state();
 
 			var broker = config.secure ? 'mqtts://' : 'mqtt://' + config.host + ':' + config.port;
+			config.name = '[MQTT] ' + config.host + ':' + config.port;
 
 			client = mqtt.connect(broker, config);
 
@@ -85,12 +85,12 @@
 			});
 
 			client.on('close', function(err) {
-				console.log('Broker closed', err);
+				console.log(config.name + ' close', err);
 				state();
 			});
 
 			client.on('error', function(err) {
-				console.log('Broker error', err);
+				console.log(config.name + ' error', err);
 				state();
 			});
 		};
@@ -123,7 +123,7 @@
 
 			client && client.publish(topic, data, options, function(err){
 				if (err)
-					console.log('error', err);
+					console.log(config.name + ' publish error', err);
 			});
 		};
 
