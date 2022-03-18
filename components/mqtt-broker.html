@@ -6,9 +6,10 @@
 	exports.config = { host: 'localhost', port: 1883, secure: false };
 	exports.outputs = [{ id: 'output', name: 'Messages' }];
 	exports.author = 'Martin Smola';
-	exports.version = '1';
+	exports.version = '2';
 	exports.type = 'mqttbroker';
 	exports.npm = ['mqtt'];
+	exports.flags = ['mqttbroker'];
 
 	exports.make = function(instance, config) {
 
@@ -78,7 +79,7 @@
 
 			client.on('message', function(topic, message) {
 				message = message.toString();
-				if (message[0] === '{')
+				if (message[0] === '{' || message[0] === '[')
 					message = message.parseJSON(true);
 
 				onmessage(topic, message);
@@ -86,16 +87,20 @@
 
 			client.on('close', function(err) {
 				if (err && err.toString().indexOf('Error')) {
+
 				}
+				console.log('Broker close', err);
 				state();
 			});
 
 			client.on('error', function(err) {
+				console.log('Broker error', err);
 				state();
 			});
 		};
 
 		function onmessage(topic, message) {
+			let ts = new Date();
 			for (const sub in subscribtions) {
 				var match = mqttWildcard(topic, sub);
 				if (match) {
@@ -103,22 +108,30 @@
 					const len = ids.length;
 					for (let i = 0; i < len; i++) {
 						const com = instance.main.find(ids[i]);
-						com && com.onmessage(topic, message, match);
+						com && com.onmessage(topic, message, match, ts);
 					}
 				}
 			}
-			instance.send('output', { topic, message });
+			instance.send('output', { topic, message, ts });
 		}
 
 		instance.publish = function(topic, message, options) {
-			client && client.publish(topic, message, options, function(err){
+			var isstring = typeof(message) === 'string';
+			var data = '';
+			if (isstring)
+				data = message;
+			else
+				try {
+					data = JSON.stringify(message);
+				} catch(e) {}
+
+			client && client.publish(topic, data, options, function(err){
 				if (err)
 					console.log('error', err);
 			});
 		};
 
 		instance.subscribe = function(componentid, topic) {
-			console.log('SUB', componentid, topic);
 			var self = this;
 			subscribtions[topic] = subscribtions[topic] || [];
 			if (subscribtions[topic].indexOf(componentid) > -1)
@@ -138,7 +151,7 @@
 		};
 
 		function notifypubsub() {
-			var instances = instance.main.instances().filter(i => i.module.type === 'mqttsubscribe' || i.module.type === 'mqttpublish');
+			var instances = instance.main.instances().filter(i => i.module.flags && i.module.flags.indexOf('mqttbroker-dep') > -1 && i.config.broker === instance.id);
 			for (let com of instances)
 				com.configure();
 		}
