@@ -260,7 +260,7 @@
 		"author": "Martin Smola",
 		"icon": "fa fa-sign-in",
 		"color": "",
-		"version": "1",
+		"version": "2",
 		"readme": "MQTT Subscribe"
 	},
 	{
@@ -548,27 +548,5 @@
 		"color": "",
 		"version": "2",
 		"readme": "The component triggers data into the Flow."
-	},
-	{
-		"id": "zigbee2mqtt-bridge",
-		"group": "Zigbee2MQTT",
-		"name": "Zigbee2MQTT Bridge",
-		"url": "https://cdn.totaljs.com/flowstream/components/zigbee2mqtt-bridge.html",
-		"author": "Martin Smola",
-		"icon": "fa fa-exchange",
-		"color": "",
-		"version": "1",
-		"readme": "[Documentation](https://www.zigbee2mqtt.io/guide/getting-started/)\nThis component requires a MQTT Broker\nSupported request commands: `permit_join`, `health_check`, `restart`, `devices`, `groups`, `extensions`\nInput:\n```javascript\n{\n\tcommand: 'permit_join'\n}\n```"
-	},
-	{
-		"id": "zigbee2mqtt-devices",
-		"group": "Zigbee2MQTT",
-		"name": "Zigbee2MQTT Devices",
-		"url": "https://cdn.totaljs.com/flowstream/components/zigbee2mqtt-devices.html",
-		"author": "Martin Smola",
-		"icon": "fa fa-cube",
-		"color": "",
-		"version": "1",
-		"readme": "Please read the [device documentation](https://www.zigbee2mqtt.io/supported-devices/) to learn about the message structure.\nInput:\n```javascript\n{\n\tcommand: 'get|set|availability',\n\tdeviceid: '0x65454....', // id or friendly name\n\tmessage: { ... },\n\t// not implemented // data: <anything> // this will be passed to the output along with the response from the bridge\n}\n```\n\nOutput:\n```javascript\n{\n\tresult: { ... },\n\t// not implemented // data: <value-of-data-property-from-input>\n}\n```"
 	}
 ]
