@@ -1,0 +1,104 @@
+<script total>
+
+	exports.name = 'Print JSON';
+	exports.group = 'Common';
+	exports.version = '3';
+	exports.icon = 'fa fa-print';
+	exports.author = 'Martin Smola';
+	exports.config = { repo: false, data: true };
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+
+	exports.make = function(instance, config) {
+		instance.message = function($) {
+
+			var data = $.data;
+
+			if (config.data !== false) {
+				if (data instanceof Buffer)
+					data = data.toString('hex').substring(0, 200);
+			}
+
+			var count = 0;
+
+			for (var key in config) {
+				if (config[key])
+					count++;
+			}
+
+			var output = count > 1 ? {} : null;
+
+			if (config.repo) {
+				if (output)
+					output.repo = $.repo;
+				else
+					output = $.repository;
+			}
+
+			if (config.data) {
+				if (output)
+					output.data = $.data;
+				else
+					output = $.data;
+			}
+
+			output && instance.status(output);
+			$.destroy();
+		};
+
+		instance.trigger = function() {
+			instance.status('');
+		}
+
+	};
+
+</script>
+
+<style>
+	.CLASS footer > div { margin: 10px; }
+	.CLASS pre { font-size: 10px; margin: 0; padding: 5px; background-color: #F0F0F0; border-radius: var(--radius); }
+	.CLASS button { float: right; height: 20px; font-size: 11px; border: 1px solid #E0E0E0; border-radius: var(--radius); color: #000; background-color: transparent; margin: 0; padding: 0 5px; }
+	.CLASS button:hover { background-color: #F8F8F8; }
+	.CLASS button:active { background-color: #E0E0E0; }
+	.CLASS .ui-objecttree { background-color: #f0f0f0; padding: 4px; }
+
+	.ui-dark .CLASS pre { background-color: #404040; tab-size: 2; }
+	.ui-dark .CLASS button { border-color: #404040; color: #FFF; }
+	.ui-dark .CLASS button:hover { background-color: #303030; }
+	.ui-dark .CLASS button:active { background-color: #404040; }
+</style>
+
+<readme>
+The component prints incoming data in a JSON format.
+</readme>
+
+<settings>
+	<div class="padding">
+		<div data---="input__?.repo__type:checkbox">Shows repository</div>
+		<div data---="input__?.data__type:checkbox">Shows data</div>
+	</div>
+</settings>
+
+<script>
+	FUNC.printjson_click = function(type, data) { // type = path/data
+		navigator.clipboard.writeText(type === 'path' ? data : STRINGIFY(data)).catch(e => console.error(e));
+	};
+
+	$('body').on('click', '.ui-objecttree .fa-copy, .ui-objecttree .fa-link', function(){
+		var el = $(this);
+		var iscopy = el.hclass('fa-copy');
+		el.tclass(iscopy ? 'fa-copy' : 'fa-link').tclass('fa-check');
+		setTimeout(function(){
+			el.tclass('fa-check').tclass(iscopy ? 'fa-copy' : 'fa-link');
+		}, 2000);
+	});
+</script>
+
+<body>
+	<header>
+		<button class="exec" data-exec="FUNC.trigger">Clear</button>
+		<i class="ICON"></i>NAME
+	</header>
+	<footer>
+		<div data---="objecttree__!STATUS__exec:FUNC.printjson_click" class="selectable"></div>
+	</footer>
+</body>
