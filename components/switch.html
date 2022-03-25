@@ -98,7 +98,7 @@
 						};
 						return;
 					case 'expression':
-						var fn = new Function('data', 'repo', 'variables', 'variables2', 'return ' + value + ';');
+						var fn = new Function('data', 'repo', 'variables', 'variables2', value.indexOf('return') > -1 ? value : 'return ' + value + ';');
 						COND[index] = (v, data, repo) => {
 							try {
 								var result = fn(data, repo, instance.main.variables, instance.main.variables2);
@@ -143,7 +143,7 @@
 						}
 
 						if (type === 'expression')
-							fnEx = new Function('data', 'repo', 'variables', 'variables2', 'return ' + value + ';');
+							fnEx = new Function('data', 'repo', 'variables', 'variables2', value.indexOf('return') > -1 ? value : 'return ' + value + ';');
 
 						COND[index] = (val1, data, repo) => {
 							var val2;
