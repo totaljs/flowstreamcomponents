@@ -352,6 +352,17 @@
 		"readme": "The component prints incoming data in a JSON format."
 	},
 	{
+		"id": "printjson",
+		"group": "Common",
+		"name": "Print JSON",
+		"url": "https://cdn.totaljs.com/flowstream/components/printjson.html",
+		"author": "Martin Smola",
+		"icon": "fa fa-print",
+		"color": "",
+		"version": "1",
+		"readme": "The component prints incoming data in a JSON format."
+	},
+	{
 		"id": "process",
 		"group": "Linux Monitoring",
 		"name": "Process",
