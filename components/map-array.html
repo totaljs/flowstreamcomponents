@@ -1,0 +1,261 @@
+<script total>
+
+	exports.name = 'Map array';
+	exports.icon = 'fa fa-random';
+	exports.author = 'Total Avengers';
+	exports.version = '1';
+	exports.config = { rules: [] };
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }];
+
+	exports.make = function(instance, config) {
+
+		var Rules = [];
+
+		instance.message = function($) {
+
+			var arr, newarr = [];
+
+			if (config.path) {
+				try {
+					arr = get(config.path);
+				} catch(e) {}
+			} else {
+				arr = $.data;
+			}
+
+			if (!config.map)
+				return instance.throw('No configuration');
+			if (!Array.isArray(arr))
+				return instance.throw('Input data is not an array');
+
+			var len = arr.length;
+			for (let i = 0; i < len; i++) {
+				try {
+					var item = arr[i];
+					if (typeof(item) !== 'object' || Array.isArray(item))
+						continue;
+					var val = getNewObj(arr[i], config.map);
+					newarr[i] = val;
+				} catch(e) {
+					instance.throw(e.stack);
+				}
+			}
+
+			$.data = newarr;
+			$.send('output', );
+		};
+
+		instance.configure = function() {
+
+
+		};
+
+		instance.configure();
+		// from obj to result -> obj.name to result.name
+		const getNewObj = (obj, map) => {
+			var result = config.array ? [] : {};
+			var len = map.length;
+			for (let i = 0; i < len; i++) {
+				var paths = map[i]; // { source: 'path.to.value', target: 'new.path.to.value' }
+				var val = get(obj, paths.source);
+
+				if (val) {
+					if (config.array) {
+						result.push(val);
+						continue;
+					}
+
+					if (!paths.target)// no path, ignore it
+						continue;
+
+					if (paths.target === '...') // keep the same path
+						paths.target = paths.source;
+
+					if (config.array)
+						result.push(val);
+					else
+						set(result, paths.target, val);
+				} else {
+					if (config.array)
+						result.push(null);
+				}
+			}
+			return result;
+		};
+
+		const get = (obj, path) => path.split(".").reduce((r, k) => r?.[k], obj);
+		const set = (obj, path, value) => {
+			var ok = true;
+			var props = path.split('.').trim();
+
+			var plen = props.length;
+			if (!plen)
+				return false;
+
+			var path = props.map(p => isNaN(p) ? p : `[${p}]`).join('.').replace(/\.\[/g, '[');
+			var paths = [];
+			props.reduce((prev, curr) => {
+				curr = isNaN(curr) ? curr : `[${curr}]`;
+				let p = prev + (prev && curr[0] !== '[' ? '.' : '') + curr;
+				paths.push(p);
+				return p;
+			}, '');
+
+			if (path[0] !== '[')
+				path = '.' + path;
+			var fn = new Function('o', 'v', 'o' + path + ' = v;');
+
+			if (plen === 1) {
+				var isobject = isNaN(props[0]);
+				if ((isobject && typeof(obj) === 'object') || (!isobject && obj instanceof Array))
+					obj[props[0]] = value;
+				else
+					ok = false;
+			} else {
+				paths.forEach((p, index) => {
+					var islast = plen === index + 1;
+					if (!islast) {
+						var t = get(obj, p);
+						var type = isNaN(paths[index + 1]) ? '{}' : '[]';
+
+						if (t == null)
+							new Function('target', 'set', 'target' + (p[0] === '[' ? '' : '.') + p + ' = ' + type + ';')(obj, set);
+
+					} else {
+						fn(obj, value);
+					}
+				});
+			}
+
+			return ok;
+		}
+	};
+
+</script>
+
+<readme>
+## The input must be an array of objects !!
+
+This component can iterate over an array and only take properties listed in the configuration.
+### Example data:
+```js
+	[
+		{ sensor: { temperature: 25, humidity: 50, ... some more properties }},
+		{ sensor: { temperature: 24, humidity: 55, ... some more properties }},
+		{ sensor: { temperature: 23, humidity: 60, ... some more properties }}
+	]
+```
+### Example configuration:
+`sensor.temperature` -> `temp`
+`sensor.humidity` -> `hum`
+
+### Example output:
+```js
+	[
+		{ temp: 25, hum: 50 },
+		{ temp: 24, hum: 55 },
+		{ temp: 23, hum: 60 }
+	]
+```
+
+If `Return an Array of Arrays` is checked then
+each of the Map properties will be pushed to a new array, see example bellow
+
+### Example given the data above and this configuration:
+`Return an Array of Arrays` -> **checked**
+**Map**
+`sensor.temperature`
+`sensor.humidity`
+
+### Example output:
+```js
+	[
+		[25, 50],
+		[24, 55],
+		[23, 60],
+	]
+```
+</readme>
+
+<settings>
+	<div class="padding">
+		<div data---="input__?.array__type:checkbox" class="m">Return an Array of Arrays (Default: Array of Objects)</div>
+		<section class="maparray-section m">
+			<label>Map</label>
+			<!--<div data---="keyvalue___?.map__placeholderkey:Type a path to property;placeholdervalue:Type a new path to a property" class="maparray-keyvalue"></div>-->
+
+			<div data-bind="?.map__template:.maparray-item -> data-index">
+				<script type="text/html">
+					{{ foreach item in value }}
+					<div class="maparray-item" data-index="{{ $index }}">
+						<div class="row">
+							<div class="" data-bind="?.array__.col-md-11:value__.col-md-5:!value">
+								<div data---="input__?.map[{{ $index }}].source" class="m"></div>
+							</div>
+							<div class="col-md-1" data-bind="?.array__hide">
+								<div class="m" style="line-height: 35px;">--&gt;</div>
+							</div>
+							<div class="col-md-5" data-bind="?.array__hide">
+								<div data---="input__?.map[{{ $index }}].target"></div>
+							</div>
+							<div class="col-md-1">
+								<i class="fa fa-trash red exec" data-exec="FUNC.maparray_remove_item" data-index="{{ $index }}"></i>
+							</div>
+						</div>
+					</div>
+					{{ end }}
+				</script>
+			</div>
+			<div class="help m" data-bind="?.array__hide">You can use 3 dots(...) in the right field to keep the same path.</div>
+			<button class="button-add exec" data-exec="FUNC.maparray_add_item">ADD</button>
+		</section>
+		<button class="button exec" style="width: 200px;" data-exec="FUNC.maparray_readme"><i class="fa fa-info-circle blue"></i>Show configuration info</button>
+	</div>
+</settings>
+
+<script>
+
+	FUNC.maparray_readme = function() {
+		EXEC('flow/readme', flow.info.selected.component);
+	};
+
+	FUNC.maparray_add_item = function(el) {
+		console.log('ADDING', el);
+		var scope = el.scope();
+		PUSH(scope.path + '.map', { source: '', target: '' });
+	};
+
+	FUNC.maparray_remove_item = function(el) {
+		console.log('REMOVING', el);
+		var path = el.scope().path;
+		var config = GET(path);
+		var index = el.attrd('index');
+		config.map.splice(index, 1);
+		SET(path, config);
+	};
+
+</script>
+
+<style>
+	.CLASS footer { padding: 10px; font-size: 12px; }
+
+	.CLASS .button-add { height: 24px; font-size: 12px; border: 1px solid #E0E0E0; border-radius: var(--radius); color: #000; background-color: #f0f0f0; margin: 0; padding: 2px 10px; }
+	.CLASS .button-add:hover { background-color: #F8F8F8; }
+	.CLASS .button-add:active { background-color: #E0E0E0; }
+
+	.CLASS .ui-dark .button-add { border-color: #404040; color: #FFF; }
+	.CLASS .ui-dark .button-add:hover { background-color: #303030; }
+	.CLASS .ui-dark .button-add:active { background-color: #404040; }
+
+	.maparray-section > label { display: block; background-color: #f0f0f0; margin: -8px -8px 8px; padding: 8px; border-bottom: 1px solid #e0e0e0; }
+	.maparray-section { border: 1px solid #e0e0e0; padding: 8px; border-radius: 3px; }
+	.maparray-keyvalue .ui-keyvalue-item-key { width: 50% !important; }
+	.maparray-keyvalue .ui-keyvalue-item-value { margin: 0 32px 0 50% !important; }
+</style>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+</body>
