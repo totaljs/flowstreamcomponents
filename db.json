@@ -176,6 +176,17 @@
 		"readme": "The component logs incoming messages into the Total.js Cloud Logger."
 	},
 	{
+		"id": "map-array",
+		"group": "",
+		"name": "Map array",
+		"url": "https://cdn.totaljs.com/flowstream/components/map-array.html",
+		"author": "Total Avengers",
+		"icon": "fa fa-random",
+		"color": "",
+		"version": "1",
+		"readme": "## The input must be an array of objects !!\n\nThis component can iterate over an array and only take properties listed in the configuration.\n### Example data:\n```js\n\t[\n\t\t{ sensor: { temperature: 25, humidity: 50, ... some more properties }},\n\t\t{ sensor: { temperature: 24, humidity: 55, ... some more properties }},\n\t\t{ sensor: { temperature: 23, humidity: 60, ... some more properties }}\n\t]\n```\n### Example configuration:\n`sensor.temperature` -> `temp`\n`sensor.humidity` -> `hum`\n\n### Example output:\n```js\n\t[\n\t\t{ temp: 25, hum: 50 },\n\t\t{ temp: 24, hum: 55 },\n\t\t{ temp: 23, hum: 60 }\n\t]\n```\n\nIf `Return an Array of Arrays` is checked then\neach of the Map properties will be pushed to a new array, see example bellow\n\n### Example given the data above and this configuration:\n`Return an Array of Arrays` -> **checked**\n**Map**\n`sensor.temperature`\n`sensor.humidity`\n\n### Example output:\n```js\n\t[\n\t\t[25, 50],\n\t\t[24, 55],\n\t\t[23, 60],\n\t]\n```"
+	},
+	{
 		"id": "memory",
 		"group": "Linux Monitoring",
 		"name": "Memory",
@@ -205,8 +216,8 @@
 		"author": "Total Avengers",
 		"icon": "fa fa-random",
 		"color": "",
-		"version": "1",
-		"readme": ""
+		"version": "2",
+		"readme": "This component allows you to set/modify/move/remove properties of the incomming data.\nFor eaxample, to set the message data to a string `Hello world` select *Message data* in the rule dropdown and leave the text field empty. \nThen in the bellow dropdown select `string` and enter the desired string in the text field.\nResult: \n- before: $.data -> 'Hello world'\n- after:  $.data -> 'New string'\n\n## Expression\nAvailable params are: `data`, `repo`, `variables` ,`variables2`\nWhere data is message.data, repo is message.repo --> [Documentation](https://docs.totaljs.com/total4/40844001ni51c)\nAnd variable are local variables which can be set in the Variables dialog accessible on the main toolbar(the button between Plus icon and Bug icon)\nFor example, we want message data to be the value of (data.value + variables.offset)\nResult: \n- before: $.data --> `{ value: 100 }` / variables --> `{ offset: 20, ... many other properties }`\n- after:  $.data -> `{ value: 120 }`\nThe expression: `data.value + variables.offset`"
 	},
 	{
 		"id": "mongodb-insert",
@@ -491,7 +502,7 @@
 		"author": "Total Avengers",
 		"icon": "fa fa-sitemap fa-rotate-270",
 		"color": "",
-		"version": "1",
+		"version": "2",
 		"readme": "## Source and Path\nUse the **Source** dropdown to select where to look for the value to use in the conditions check.\nSet a **Path** if the value is not the data itself. It supports dot notation: `position.longitude` or `sensor.0.value` for arrays, it does not support `sensor[0].value`.\n**Expression** supports javascript syntax. Should return a value which will be used in condition check as `data`. Available variables: data, repo, variables, variables2\n**Expressions example:**\n```js\ndata.value - variables.offset\n```\n\n## Conditions\nEach of the **Conditions** corresponds to an output in the exact same order. First condition -> First output.\n\n**Operator**\nNot all operators work on all data types. For example it is not possible to use `&gt;` or `&lt;` for strings, etc.\n*index of* only works for data of type array or string.\n**Expression operator**\nIn this case the **type** field is ignored and the expression in the **value** field must return `true` or `false`. Available variables: data, repo, variables, variables2.\nExpressions operator example:\n```js\ndata.value > variables.threshold;\n```\nor with a conditions\n```js\nif (typeof data.value !== 'number') return false; else return data.value > parseInt(variables.threshold);\n```\n\n**Expression type**\nThe expression in the **value** field must return a value which will be used in the given operation. Available variables: data, repo, variables, variables2.\nExpressions example:\n```js\ndata.value - variables.offset\n```\n\n**Between operator** only works with datatype number and the value must be two comma separated values. e.g.: `2,4` so the condition becomes `val &gt; 2 && val &lt; 4`"
 	},
 	{
