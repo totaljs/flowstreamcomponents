@@ -3,8 +3,8 @@
 	exports.name = 'Modify';
 	exports.icon = 'fa fa-random';
 	exports.author = 'Total Avengers';
-	exports.version = '2';
-	exports.config = { rules: [] };
+	exports.version = '3';
+	exports.config = { rules: [{ rule: 'set', sourcepath: '', source: 'data', targetpath: '', target: 'data' }] };
 	exports.inputs = [{ id: 'input', name: 'Input' }];
 	exports.outputs = [{ id: 'output', name: 'Output' }];
 
@@ -17,9 +17,7 @@
 			for (let i = 0; i < Rules.length; i++) {
 				try {
 					const { getValue, setValue } = Rules[i];
-
 					var data = getValue($.data, $.repo, instance.main.variables, instance.main.variables2, get);
-
 					setValue(data, $, instance, set);
 				} catch(e) {
 					instance.throw(e.stack);
@@ -139,15 +137,11 @@
 					var islast = plen === index + 1;
 					if (!islast) {
 						var t = get(obj, p);
-						var type = isNaN(paths[index + 1]) ? '{}' : '[]';
-						console.log('GOT HERE', paths[index + 1], type, t, p , obj, '----', 'target' + (p[0] === '[' ? '' : '.') + p + ' = ' + type + ';');
+						var type = isNaN(props[index + 1]) ? '{}' : '[]';
 						if (t == null)
-							new Function('target', 'set', 'target' + (p[0] === '[' ? '' : '.') + p + ' = ' + type + ';')(obj, set);
-						console.log('GOT THERE', obj);
-					} else {
-						console.log('FN', fn.toString());
+							new Function('target', 'target.' + p + ' = ' + type + ';')(obj);
+					} else
 						fn(obj, value);
-					}
 				});
 			}
 
@@ -174,6 +168,13 @@
 	- before: $.data --> `{ value: 100 }` / variables --> `{ offset: 20, ... many other properties }`
 	- after:  $.data -> `{ value: 120 }`
 	The expression: `data.value + variables.offset`
+
+	More examples:
+	`data + 1000`
+	`data.temperature + variables.offset`
+	`data.val / data.coeficient`
+	`data.items.map(item => item.temperature)` - input: data.items = [{ temperature: 25, ... }, { temp... }] --> output: data.items = [ 25, ... ]
+
 </readme>
 
 <settings>
