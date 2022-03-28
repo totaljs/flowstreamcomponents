@@ -381,7 +381,7 @@
 		"author": "Peter Širka",
 		"icon": "fa fa-crosshairs",
 		"color": "",
-		"version": "2",
+		"version": "3",
 		"readme": "The component publish the data to the specific `Input` component."
 	},
 	{

@@ -2,7 +2,7 @@
 
 	exports.name = 'Publish';
 	exports.group = 'FlowStream';
-	exports.version = '2';
+	exports.version = '3';
 	exports.icon = 'fa fa-crosshairs';
 	exports.author = 'Peter Širka';
 	exports.config = { name: '', readme: '' };
@@ -71,7 +71,7 @@
 	ON('configure_publish', function(data) {
 		data.call(function(response) {
 			SET('%inputs', response);
-		});
+		}, true);
 	});
 </script>
 
