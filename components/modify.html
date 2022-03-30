@@ -1,10 +1,10 @@
 <script total>
-
+	exports.id = 'modify';
 	exports.name = 'Modify';
 	exports.icon = 'fa fa-random';
 	exports.author = 'Total Avengers';
-	exports.version = '3';
-	exports.config = { rules: [{ rule: 'set', sourcepath: '', source: 'data', targetpath: '', target: 'data' }] };
+	exports.version = '1';
+	exports.config = { rules: [] };
 	exports.inputs = [{ id: 'input', name: 'Input' }];
 	exports.outputs = [{ id: 'output', name: 'Output' }];
 
@@ -17,8 +17,10 @@
 			for (let i = 0; i < Rules.length; i++) {
 				try {
 					const { getValue, setValue } = Rules[i];
+
 					var data = getValue($.data, $.repo, instance.main.variables, instance.main.variables2, get);
 					setValue(data, $, instance, set);
+
 				} catch(e) {
 					instance.throw(e.stack);
 				}
@@ -43,10 +45,18 @@
 				if (rule === 'remove') {
 
 					getValue = NOOP;
-					var is$ = source === 'data' || source === 'repo';
-					var base = (is$ ? '$.' : 'instance.main.') + source;
+					var is$ = target === 'data' || target === 'repo';
+					var base = (is$ ? '$.' : 'instance.main.') + target;
 
-					setValue = new Function('value', '$', 'instance', 'set', 'set({0}, {1}, null);'.format(base, sourcepath));
+					if (!targetpath) {
+						if (is$) // set $.data or $.repo to null
+							setValue = (d, $) => { $[target] = null; };
+						else // ignore variables or variables2
+							setValue = NOOP;
+					} else {
+						setValue = new Function('data', '$', 'instance', 'set', 'set({0}, {1}, null);'.format(base, sourcepath));
+					}
+
 					Rules.push({ getValue, setValue });
 					return;
 				}
@@ -54,7 +64,7 @@
 				if (rule === 'set' || rule === 'move') {
 
 					if (source === 'expression')
-						getValue = new Function('data', 'repo', 'variables', 'variables2', value.indexOf('return') > -1 ? value : 'return ' + value + ';');
+						getValue = new Function('data', 'repo', 'variables', 'variables2', sourcepath.indexOf('return') > -1 ? sourcepath : 'return ' + sourcepath + ';');
 					else if (source === 'string')
 						getValue = () => sourcepath; // sourcepath is the actual string value
 					else if (source === 'number') {
@@ -77,9 +87,9 @@
 
 				// targetpath => data | repo | variables | variables2
 				if (!targetpath)
-					str = base + ' = value;';
+					str = base + ' = data;';
 				else
-					str = 'if (typeof {0} !== \'object\' || {0} == null) {0} = {1}; set({0}, \'{2}\', value);'.format(base, isNaN(targetpath[0]) ? '{}' : '[]', targetpath);
+					str = 'if (typeof {0} !== \'object\' || {0} == null) {0} = {1}; set({0}, \'{2}\', data);'.format(base, isNaN(targetpath[0]) ? '{}' : '[]', targetpath);
 
 				if (rule === 'move' && sourcepath) {
 					var is$2 = source === 'data' || source === 'repo';
@@ -90,19 +100,20 @@
 				}
 
 				try {
-					setValue = new Function('value', '$', 'instance', 'set', str);
+					setValue = new Function('data', '$', 'instance', 'set', str);
 				} catch(e) {
 					instance.throw(e.stack);
 					console.error(e);
 					console.error(str);
 					setValue = NOOP;
 				};
-
 				Rules.push({ getValue, setValue });
 			});
 		};
 
-		instance.configure();
+		try {
+			instance.configure();
+		} catch (e) { console.error(e);}
 
 		const get = (obj, path) => path.split(".").reduce((r, k) => r?.[k], obj);
 		const set = (obj, path, value) => {
@@ -137,11 +148,12 @@
 					var islast = plen === index + 1;
 					if (!islast) {
 						var t = get(obj, p);
-						var type = isNaN(props[index + 1]) ? '{}' : '[]';
+						var type = isNaN(paths[index + 1]) ? '{}' : '[]';
 						if (t == null)
-							new Function('target', 'target.' + p + ' = ' + type + ';')(obj);
-					} else
+							new Function('target', 'set', 'target' + (p[0] === '[' ? '' : '.') + p + ' = ' + type + ';')(obj, set);
+					} else {
 						fn(obj, value);
+					}
 				});
 			}
 
@@ -153,27 +165,25 @@
 
 <readme>
 	This component allows you to set/modify/move/remove properties of the incomming data.
-	For eaxample, to set the message data to a string `Hello world` select *Message data* in the rule dropdown and leave the text field empty. 
+	For eaxample, to set the message data to a string `Hello world` select *Message data* in the rule dropdown and leave the text field empty.
 	Then in the bellow dropdown select `string` and enter the desired string in the text field.
-	Result: 
+	Result:
 	- before: $.data -> 'Hello world'
 	- after:  $.data -> 'New string'
 
 	## Expression
 	Available params are: `data`, `repo`, `variables` ,`variables2`
 	Where data is message.data, repo is message.repo --> [Documentation](https://docs.totaljs.com/total4/40844001ni51c)
-	And variable are local variables which can be set in the Variables dialog accessible on the main toolbar(the button between Plus icon and Bug icon)
+	And variables are local variables which can be set in the Variables dialog accessible on the main toolbar(the button between Plus icon and Bug icon)
 	For example, we want message data to be the value of (data.value + variables.offset)
-	Result: 
+	Result:
 	- before: $.data --> `{ value: 100 }` / variables --> `{ offset: 20, ... many other properties }`
 	- after:  $.data -> `{ value: 120 }`
 	The expression: `data.value + variables.offset`
 
-	More examples:
-	`data + 1000`
-	`data.temperature + variables.offset`
-	`data.val / data.coeficient`
-	`data.items.map(item => item.temperature)` - input: data.items = [{ temperature: 25, ... }, { temp... }] --> output: data.items = [ 25, ... ]
+	### Important
+	- `Remove` -> `Message data / Message repo` -> `<empty path>` will set `Message data / Message repo` to `null`;
+	- `Remove` -> `Local variables / Global variables` -> `<empty path>` will be ignored but `Remove` -> `Local variables / Global variables` -> `myVar` will work.
 
 </readme>
 
@@ -188,18 +198,17 @@
 						<div class="row">
 							<div class="col-md-3">
 								<div data---="input__?.rules[{{ $index }}].rule__dirsource:REPO.modify_rules" class="m"></div>
-								<div data---="input__?.rules[{{ $index }}].each__type:checkbox">for each item in array<br>()</div>
 							</div>
 							<div class="col-md-1">
 								<div class="m">--&gt;</div>
-								<div>to:</div>
+								<div data-bind="?.rules[{{ $index }}].rule__hide:value == 'remove'">to:</div>
 							</div>
 							<div class="col-md-7">
 								<div class="modify-input-group m">
 									<div data---="input__?.rules[{{ $index }}].target__dirsource:REPO.modify_targets"></div>
 									<div data---="input__?.rules[{{ $index }}].targetpath__placeholder:value"></div>
 								</div>
-								<div class="modify-input-group" data-bind="?.rules[{{ $index }}].target__hide:value == 'remove'">
+								<div class="modify-input-group" data-bind="?.rules[{{ $index }}].rule__hide:value == 'remove'">
 									<div data---="input__?.rules[{{ $index }}].source__dirsource:REPO.modify_sources"></div>
 									<div data---="input__?.rules[{{ $index }}].sourcepath__placeholder:value"></div>
 								</div>
@@ -236,7 +245,6 @@
 		var index = el.closest('.modify_rule').attrd('index');
 		config.rules.splice(index, 1);
 		SET(path, config);
-		console.log(config);
 	};
 
 	FUNC.modify_rule_dragged = function(list, dragged, target) {
@@ -262,7 +270,6 @@
 	REPO.modify_sources = 'string|String,number|Number,data|Message data,repo|Message repository,variables|Local variables,variables2|Global variables,expression|Expression'.split(',').map(d => { const [ id, name ] = d.split('|'); return { id, name }; });
 	REPO.modify_targets = 'data|Message data,repo|Message repository,variables|Local variables,variables2|Global variables'.split(',').map(d => { const [ id, name ] = d.split('|'); return { id, name }; });
 	REPO.modify_rules = 'set|Set,remove|Remove,move|Move'.split(',').map(d => { const [ id, name ] = d.split('|'); return { id, name }; });
-
 </script>
 
 <style>
