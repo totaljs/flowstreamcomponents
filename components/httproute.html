@@ -3,7 +3,7 @@
 	exports.name = 'HTTP Route';
 	exports.group = 'Triggers';
 	exports.icon = 'fa fa-route';
-	exports.version = '1';
+	exports.version = '2';
 	exports.config = { url: '', method: '', timeout: 5000, limit: 5120, upload: false, response: 'empty' };
 	exports.outputs = [{ id: 'output', name: 'Output' }];
 
@@ -101,6 +101,6 @@ __Output data__:
 		<i class="ICON"></i>NAME
 	</header>
 	<footer>
-		<div><span data-bind="CONFIG.method__text" class="method"></span> <a data-bind="CONFIG.url__text__href:window.location.origin + value" target="_blank"></a></div>
+		<div data-bind="CONFIG.method__show" class="hidden"><span data-bind="CONFIG.method__text" class="method"></span> <a data-bind="CONFIG.url__text__href:window.location.origin + value" target="_blank"></a></div>
 	</footer>
 </body>
