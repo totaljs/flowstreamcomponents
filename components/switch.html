@@ -337,8 +337,8 @@ data.value - variables.offset
 								<div data---="input__?.conditions[{{ $index }}].operator__dirsource:REPO.switch_operators"></div>
 							</div>
 							<div class="col-md-6">
-								<div class="switch-input-group" data-bind="?.conditions[{{ $index }}].operator__hide:value == 'true' || value == 'false' || value == 'isnull' || value == 'isempty'">
-									<div data---="input__?.conditions[{{ $index }}].type__dirsource:REPO.switch_valuetypes"></div>
+								<div data-bind="?.conditions[{{ $index }}].operator__hide:value == 'true' || value == 'false' || value == 'isnull' || value == 'isempty'__.switch-input-group:value!=='expression'">
+									<div data---="input__?.conditions[{{ $index }}].type__dirsource:REPO.switch_valuetypes" data-bind="?.conditions[{{ $index }}].operator__hide:value==='expression'"></div>
 									<div data---="input__?.conditions[{{ $index }}].value__placeholder:value"></div>
 								</div>
 							</div>
@@ -356,7 +356,7 @@ data.value - variables.offset
 			<div class="help m">Each condition corresponds to an output index. First condition --> First output, etc.</div>
 			<button class="button-add exec" data-exec="FUNC.switch_add_condition">ADD</button>
 		</section>
-		<button class="button exec" style="width: 200px;" data-exec="FUNC.switch_readme"><i class="fa fa-info-circle blue"></i>Show configuration info</button>
+		<button type="button" class="button exec" style="width: 200px;" data-exec="FUNC.switch_readme"><i class="fa fa-info-circle blue"></i>Show configuration info</button>
 	</div>
 </settings>
 
