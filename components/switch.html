@@ -374,7 +374,7 @@ data.value - variables.offset
 	FUNC.switch_remove_condition = function(el) {
 		var path = el.scope().path;
 		var config = GET(path);
-		var index = el.closest('.switch_condition').attrd('index');
+		var index = el.closest('.switch-condition').attrd('index');
 		config.conditions.splice(index, 1);
 		SET(path, config);
 		console.log(config);
