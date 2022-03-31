@@ -55,6 +55,17 @@
 		"readme": "[node-schedule](https://www.npmjs.com/package/node-schedule) on npmjs.com\n\nSyntax:\n`cron string | data (only string supported) | comment`\n\n## Cron string:\n`* * * * * *`\nMeaning of each `*` explained bellow, in order from left to right\nsecond (0 - 59, OPTIONAL)\nminute (0 - 59)\nhour (0 - 23)\nday of month (1 - 31)\nmonth (1 - 12)\nday of week (0 - 7) (0 or 7 is Sun)\n\nor\n`@startup` to run once at the start or restart of an app (after 5 seconds)\n\n### Examples of cron string:\n```\n0 16 * * *      -> trigger every day at 16:00\n* 0 16 * * *    -> trigger at 16:00 every day and it will keep triggering every second until 16:01\n20,40 19 * * *  -> every day at 19:20 and 19:40\n*/5 * * * *     -> trigger every 5 seconds\n0 20 * * 1      -> every monday at 20:00\n@startup        -> runs once at startup\n```\n\n### Full example:\n```\n* 0 16 * * * | hello data | this is hello comment\n@startup | start\n```"
 	},
 	{
+		"id": "date",
+		"group": "Common",
+		"name": "Date",
+		"url": "https://cdn.totaljs.com/flowstream/components/date.html",
+		"author": "Total Avengers",
+		"icon": "fa fa-calendar",
+		"color": "",
+		"version": "1",
+		"readme": ""
+	},
+	{
 		"id": "delay",
 		"group": "Common",
 		"name": "Delay",
@@ -150,7 +161,7 @@
 		"author": "",
 		"icon": "fa fa-route",
 		"color": "",
-		"version": "1",
+		"version": "2",
 		"readme": "This component registers an HTTP Route and sends request data next.\n\n__Output data__:\n\n```js\n{\n\t\"route\": String,\n\t\"params\": Object,\n\t\"query\": Object,\n\t\"body\": Object,\n\t\"files\": Array,\n\t\"headers\": Object,\n\t\"url\": String,\n\t\"ip\": String,\n\t\"cookies\": Object\n}\n```"
 	},
 	{
