@@ -1,0 +1,133 @@
+<script total>
+
+	exports.id = 'cron';
+	exports.name = 'Cron';
+	exports.icon = 'fa fa-clock';
+	exports.author = 'Total Avengers';
+	exports.version = '1';
+	exports.config = { jobs: [] };
+	exports.outputs = [{ id: 'output', name: 'Output' }];
+	exports.npm = ['node-schedule'];
+
+	exports.make = function(instance, config) {
+		var schedule = require('node-schedule');
+
+		var startup = true;
+		var jobs = [];
+
+		instance.configure = function() {
+			startJobs(config.jobs);
+		};
+
+		instance.close = function() {
+			jobs.length && jobs.forEach(function(job){
+				job && job.cancel();
+				if (!job)
+					console.log('no job', jobs);
+			});
+		};
+
+		instance.configure();
+
+		function startJobs(newjobs) {
+
+			jobs.forEach(function(job){
+				job && job.cancel();
+			});
+
+			jobs = [];
+
+			newjobs.forEach(function(job){
+				job = job.split('|').trim();
+
+				if (job[0] === '@startup' && startup) {
+					setTimeout(() => {
+						instance.send('output', job[1]);
+					}, 5000);
+					return;
+				}
+
+				var j = schedule.scheduleJob(job[0], function(){
+
+					var value = job[1];
+
+					if (job[1] === '@ts')
+						value = Date.now();
+
+					instance.send('output', value);
+				});
+
+				jobs.push(j);
+			});
+
+			instance.status(newjobs.length || '0');
+
+			startup = false;
+		}
+
+	};
+
+</script>
+
+<readme>
+[node-schedule](https://www.npmjs.com/package/node-schedule) on npmjs.com
+
+Syntax:
+`cron string | data (only string supported) | comment`
+
+## Cron string:
+`* * * * * *`
+Meaning of each `*` explained bellow, in order from left to right
+second (0 - 59, OPTIONAL)
+minute (0 - 59)
+hour (0 - 23)
+day of month (1 - 31)
+month (1 - 12)
+day of week (0 - 7) (0 or 7 is Sun)
+
+or
+`@startup` to run once at the start or restart of an app (after 5 seconds)
+
+### Examples of cron string:
+```
+0 16 * * *      -> trigger every day at 16:00
+* 0 16 * * *    -> trigger at 16:00 every day and it will keep triggering every second until 16:01
+20,40 19 * * *  -> every day at 19:20 and 19:40
+*/5 * * * *     -> trigger every 5 seconds
+0 20 * * 1      -> every monday at 20:00
+@startup        -> runs once at startup
+```
+
+### Full example:
+```
+* 0 16 * * * | hello data | this is hello comment
+@startup | start
+```
+</readme>
+
+<settings>
+	<div class="padding">
+		<div data---="textboxlist__?.jobs__maxlength:50;placeholder:enter value like '* 1 * * * * | day' and hit enter" class="m">Cron jobs</div>
+		<button class="button exec" style="width: 200px;" data-exec="FUNC.cron_readme"><i class="fa fa-info-circle blue"></i>Show configuration info</button>
+	</div>
+</settings>
+
+<script>
+
+	FUNC.cron_readme = function() {
+		EXEC('flow/readme', flow.info.selected.component);
+	};
+
+</script>
+
+<style>
+	.CLASS footer { padding: 10px; font-size: 12px; }
+	.CLASS footer span { float: right; font-weight: bold; }
+</style>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+	<footer><span data-bind="!STATUS__text"></span>Number of jobs:</footer>
+</body>
