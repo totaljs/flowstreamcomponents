@@ -35,5 +35,6 @@ jobs:
         server-dir: flowstream/
         local-dir: build/
         state-name:	.components-sync-state.json
+        protocol: ftps
 
 
