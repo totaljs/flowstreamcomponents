@@ -28,7 +28,6 @@ jobs:
     - name: FTP Deployer
       uses: sand4rt/ftp-deployer@v1.3
       with:
-        sftp: true # optional
         host: ${{ secrets.KEYCDN_SERVER }}
         username: ${{ secrets.KEYCDN_USERNAME }}
         password: ${{ secrets.KEYCDN_PASSWORD }}
