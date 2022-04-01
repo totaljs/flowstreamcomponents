@@ -36,5 +36,6 @@ jobs:
         local-dir: build/
         state-name: .components-sync-state.json
         protocol: ftps
+        log-level: verbose
 
 
