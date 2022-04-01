@@ -1,0 +1,37 @@
+name: Upload to KeyCDN
+
+on: workflow_dispatch
+
+jobs:
+  ftp-upload:
+    name: 🎉 Upload
+    runs-on: ubuntu-latest
+    steps:
+    - name: 🚚 Get latest code
+      uses: actions/checkout@v2
+      
+    - uses: actions/setup-node@v3
+      with:
+        node-version: '14'
+
+    - name: Update db.json and move it all to ./build/
+      run: |
+        mkdir build
+        mkdir build/components
+        cp components/* build/components
+        node db.js
+        cp db.json build/components/db.json
+        ls build
+        
+    - name: 📂 Sync files
+      uses: SamKirkland/FTP-Deploy-Action@4.3.0
+      with:
+        server: ${{ secrets.server }}
+        username: ${{ secrets.username }}
+        password: ${{ secrets.password }}
+        dry-run: true
+        server-dir: flowstream/
+        local-dir: build/
+        state-name:	flowstream/.comonents-sync-state.json
+
+
