@@ -33,6 +33,6 @@ jobs:
         dry-run: true
         server-dir: flowstream/
         local-dir: build/
-        state-name:	flowstream/.comonents-sync-state.json
+        state-name:	flowstream/.components-sync-state.json
 
 
