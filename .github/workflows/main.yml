@@ -16,26 +16,22 @@ jobs:
 
     - name: Update db.json and move it all to ./build/
       run: |
-        mkdir build
-        mkdir build/components
-        cp components/* build/components
-        touch build/.components-sync-state.json
+        mkdir dist
+        mkdir dist/components
+        cp components/* dist/components
+        touch dist/.components-sync-state.json
         npm install total4
         node db.js
-        cp db.json build/components/db.json
-        ls build/components -la
+        cp db.json dist/components/db.json
+        ls dist/components -la
         
-    - name: 📂 Sync files
-      uses: SamKirkland/FTP-Deploy-Action@4.3.0
+    - name: FTP Deployer
+      uses: sand4rt/ftp-deployer@v1.3
       with:
-        server: ${{ secrets.KEYCDN_SERVER }}
+        sftp: true # optional
+        host: ${{ secrets.KEYCDN_SERVER }}
         username: ${{ secrets.KEYCDN_USERNAME }}
         password: ${{ secrets.KEYCDN_PASSWORD }}
-        # dry-run: true
-        server-dir: flowstream-test/
-        local-dir: build/
-        state-name: .components-sync-state.json
-        protocol: ftps
-        log-level: verbose
-
+        remote_folder: flowstream-test
+        local_folder: dist # optional, local path, default is: dist
 
