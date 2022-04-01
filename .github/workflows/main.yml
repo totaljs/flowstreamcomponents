@@ -31,10 +31,10 @@ jobs:
         server: ${{ secrets.KEYCDN_SERVER }}
         username: ${{ secrets.KEYCDN_USERNAME }}
         password: ${{ secrets.KEYCDN_PASSWORD }}
-        dry-run: true
-        server-dir: flowstream/
+        # dry-run: true
+        server-dir: flowstream-test/
         local-dir: build/
-        state-name:	.components-sync-state.json
+        state-name: .components-sync-state.json
         protocol: ftps
 
 
