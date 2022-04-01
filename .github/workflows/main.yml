@@ -19,6 +19,7 @@ jobs:
         mkdir build
         mkdir build/components
         cp components/* build/components
+        touch build/.components-sync-state.json
         npm install total4
         node db.js
         cp db.json build/components/db.json
@@ -33,6 +34,6 @@ jobs:
         dry-run: true
         server-dir: flowstream/
         local-dir: build/
-        state-name:	flowstream/.components-sync-state.json
+        state-name:	.components-sync-state.json
 
 
