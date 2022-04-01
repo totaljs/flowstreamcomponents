@@ -19,6 +19,7 @@ jobs:
         mkdir build
         mkdir build/components
         cp components/* build/components
+        npm install total4
         node db.js
         cp db.json build/components/db.json
         ls build
@@ -26,9 +27,9 @@ jobs:
     - name: 📂 Sync files
       uses: SamKirkland/FTP-Deploy-Action@4.3.0
       with:
-        server: ${{ secrets.server }}
-        username: ${{ secrets.username }}
-        password: ${{ secrets.password }}
+        server: ${{ secrets.KEYCDN_SERVER }}
+        username: ${{ secrets.KEYCDN_USERNAME }}
+        password: ${{ secrets.KEYCDN_PASSWORD }}
         dry-run: true
         server-dir: flowstream/
         local-dir: build/
