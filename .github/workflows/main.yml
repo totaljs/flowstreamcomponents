@@ -23,7 +23,7 @@ jobs:
         npm install total4
         node db.js
         cp db.json build/components/db.json
-        ls build
+        ls build/components -la
         
     - name: 📂 Sync files
       uses: SamKirkland/FTP-Deploy-Action@4.3.0
