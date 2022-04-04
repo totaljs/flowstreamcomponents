@@ -19,7 +19,6 @@ jobs:
         mkdir dist
         mkdir dist/components
         cp components/* dist/components
-        touch dist/.components-sync-state.json
         npm install total4
         node db.js
         cp db.json dist/components/db.json
@@ -31,6 +30,6 @@ jobs:
         host: ${{ secrets.KEYCDN_SERVER }}
         username: ${{ secrets.KEYCDN_USERNAME }}
         password: ${{ secrets.KEYCDN_PASSWORD }}
-        remote_folder: /flowstream-test
-        local_folder: dist # optional, local path, default is: dist
+        remote_folder: /flowstream-test/components
+        local_folder: dist/components # optional, local path, default is: dist
 
