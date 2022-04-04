@@ -1,0 +1,28 @@
+<script total>
+
+	exports.id = 'kill';
+	exports.name = 'Kill';
+	exports.color = '#E73323';
+	exports.icon = 'fa fa-skull';
+	exports.author = 'Total Avengers';
+	exports.version = '1';
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+
+	exports.make = function(instance, config) {
+		instance.message = function($) {
+			$.destroy();
+			instance.main.kill();
+		};
+	};
+
+</script>
+
+<readme>
+Be careful because this component will kill the current Flow instance. It's targeted only for exceptional cases.
+</readme>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+</body>
