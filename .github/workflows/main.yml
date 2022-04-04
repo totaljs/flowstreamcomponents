@@ -31,6 +31,6 @@ jobs:
         host: ${{ secrets.KEYCDN_SERVER }}
         username: ${{ secrets.KEYCDN_USERNAME }}
         password: ${{ secrets.KEYCDN_PASSWORD }}
-        remote_folder: flowstream-test
+        remote_folder: /flowstream-test
         local_folder: dist # optional, local path, default is: dist
 
