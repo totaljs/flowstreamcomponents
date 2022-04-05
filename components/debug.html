@@ -2,10 +2,10 @@
 
 	exports.name = 'Debug';
 	exports.group = 'Common';
-	exports.version = '3';
+	exports.version = '1';
 	exports.icon = 'fa fa-print';
 	exports.author = 'Total Avengers';
-	exports.config = { repo: false, data: true };
+	exports.config = { repo: false, data: true, name: 'Debug' };
 	exports.inputs = [{ id: 'input', name: 'Log window' }];
 
 	exports.make = function(instance, config) {
@@ -42,7 +42,7 @@
 					output = $.data;
 			}
 
-			output && instance.status({ date: new Date(), data: output });
+			output && instance.status({ name: config.name, date: new Date(), data: output });
 			$.destroy();
 		};
 
@@ -70,6 +70,7 @@
 	.CLASS footer { padding: 10px; }
 	.CLASS pre, .debugform pre { font-size: 10px; margin: 0; padding: 5px; background-color: #F0F0F0; border-radius: var(--radius); }
 	.debugform .date { font-size: 11px; margin-bottom: 5px; }
+	.debugform .name { float: right; font-size: 11px; font-weight: bold; }
 </style>
 
 <readme>
@@ -78,6 +79,7 @@ The component prints incoming data into the JSON format.
 
 <settings>
 	<div class="padding">
+		<div data---="input__?.name" class="m">Name</div>
 		<div data---="input__?.repo__type:checkbox">Shows repository</div>
 		<div data---="input__?.data__type:checkbox">Shows data</div>
 	</div>
@@ -128,7 +130,7 @@ The component prints incoming data into the JSON format.
 
 		exports.status = function(data) {
 			if (data && data.date)
-				$('#debugformbody').prepend('<div class="m"><div class="date"><i class="fa fa-calendar mr5"></i>{0}</div><pre class="json">{1}</pre></div>'.format(data.date.format('[ts]'), Thelpers.jsonformat(JSON.stringify(data.data, '\t'))));
+				$('#debugformbody').prepend('<div class="m"><div class="name">{0}</div><div class="date"><i class="fa fa-calendar mr5"></i>{1}</div><pre class="json">{2}</pre></div>'.format(data.name, data.date.format('[ts]'), Thelpers.jsonformat(JSON.stringify(data.data, '\t'))));
 		};
 
 	});
