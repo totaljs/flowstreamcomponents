@@ -1,0 +1,136 @@
+<script total>
+
+	exports.name = 'Debug';
+	exports.group = 'Common';
+	exports.version = '3';
+	exports.icon = 'fa fa-print';
+	exports.author = 'Total Avengers';
+	exports.config = { repo: false, data: true };
+	exports.inputs = [{ id: 'input', name: 'Log window' }];
+
+	exports.make = function(instance, config) {
+
+		instance.message = function($) {
+
+			var data = $.data;
+
+			if (config.data !== false) {
+				if (data instanceof Buffer)
+					data = data.toString('hex').substring(0, 200);
+			}
+
+			var count = 0;
+
+			for (var key in config) {
+				if (config[key])
+					count++;
+			}
+
+			var output = count > 1 ? {} : null;
+
+			if (config.repo) {
+				if (output)
+					output.repo = $.repo;
+				else
+					output = $.repository;
+			}
+
+			if (config.data) {
+				if (output)
+					output.data = $.data;
+				else
+					output = $.data;
+			}
+
+			output && instance.status({ date: new Date(), data: output });
+			$.destroy();
+		};
+
+		instance.trigger = function() {
+
+			var components = instance.main.meta.components;
+			var schema = instance.main.meta.flow;
+
+			for (var key in schema) {
+				var m = schema[key];
+				if (m.component) {
+					var c = components[m.component];
+					if (c.name === 'Debug')
+						m.status({});
+				}
+			}
+
+		};
+
+	};
+
+</script>
+
+<style>
+	.CLASS footer { padding: 10px; }
+	.CLASS pre, .debugform pre { font-size: 10px; margin: 0; padding: 5px; background-color: #F0F0F0; border-radius: var(--radius); }
+	.debugform .date { font-size: 11px; margin-bottom: 5px; }
+</style>
+
+<readme>
+The component prints incoming data into the JSON format.
+</readme>
+
+<settings>
+	<div class="padding">
+		<div data---="input__?.repo__type:checkbox">Shows repository</div>
+		<div data---="input__?.data__type:checkbox">Shows data</div>
+	</div>
+</settings>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+	<footer>
+		<div><button class="button" name="toggle"><i class="far fa-eye"></i>Toggle</button></div>
+	</footer>
+</body>
+
+<script>
+
+	TOUCH(function(exports, reinit) {
+
+		var services = [];
+
+		if (!reinit) {
+
+			if (!W.debugwindow) {
+				CACHEPATH('common.$debug', '1 week');
+				W.debugwindow = [];
+				W.debugwindowclear = function() {
+					for (var key in flow.data) {
+						var com = flow.data[key];
+						if (com.name === 'debug') {
+							flowinstances.instances[key].clear();
+							break;
+						}
+					}
+				};
+
+				$(document.body).append('<div data---="box__common.$debug__if:debugform;align:right;width:420;background:false;transparent:true;title:Debug panel;icon:fa fa-bug;zindex:5"><nav><button class="exec" data-exec="debugwindowclear"><i class="fa fa-trash-alt"></i>Clear</button></nav><div class="padding debugform" id="debugformbody"></div></div>');
+
+				exports.element.on('click', 'button', function() {
+					SET('common.$debug', common.$debug ? '' : 'debugform');
+				});
+			}
+		}
+
+		exports.clear = function() {
+			exports.trigger();
+			$('#debugformbody').empty();
+		};
+
+		exports.status = function(data) {
+			if (data && data.date)
+				$('#debugformbody').prepend('<div class="m"><div class="date"><i class="fa fa-calendar mr5"></i>{0}</div><pre class="json">{1}</pre></div>'.format(data.date.format('[ts]'), Thelpers.jsonformat(JSON.stringify(data.data, '\t'))));
+		};
+
+	});
+
+</script>
