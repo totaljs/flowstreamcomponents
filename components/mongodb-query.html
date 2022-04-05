@@ -70,22 +70,24 @@
 				return instance.status({ state: 'Missing query function' });
 			}
 
+			var connection = config.connection;
+
 			fn = new Function('query', 'data', config.fn);
 
 			if (config.string)
-				config.connection = config.string;
+				connection = config.string;
 
-			if (!config.connection)
+			if (!connection)
 				return  instance.status({ state: 'Missing connection string' });
 
 			// same connection, ignore
-			if (MONGO && MONGO.string === config.connection)
+			if (MONGO && MONGO.string === connection)
 				return instance.status({ state: 'Connected' });
 
 			// already existing connection, use it
-			if (REPO.mongodb[config.connection]) {
+			if (REPO.mongodb[connection]) {
 				instance.close();
-				MONGO = REPO.mongodb[config.connection];
+				MONGO = REPO.mongodb[connection];
 				MONGO.count++;
 				return instance.status({ state: 'Connected' });
 			}
@@ -99,10 +101,12 @@
 
 			instance.status({ state: 'Connected' });
 
-			MONGO = REPO.mongodb[config.connection] = {
+			config.string = connection;
+
+			MONGO = REPO.mongodb[connection] = {
 				client,
 				count: 1,
-				string: config.connection,
+				string: connection,
 				name: config.name
 			};
 		};
@@ -151,6 +155,14 @@ Example
 }
 ```
 
+## Query editor
+```js
+// query; mquery instance
+// data; data from the incomming object
+
+query.find(); // return all documents
+```
+
 ## Important
 In the `.select()` you cannot use inclusion and exclusion together.
 This is invalid: `.select('firstname -lastname')`
@@ -171,10 +183,12 @@ Valid inclusion: `.select('name email')` or `.select('email lastname')` etc.
 				<div class="m"><b>Select Connection</b></div>
 				<div data---="input__?.string__dirsource:%connections;dirraw:1;placeholder:Select connection;dirempty:No connection" class="m"></div>
 				<hr />
-				<div class="m"><b>or create new one</b></div>
-				<div data---="input__?.name__required:1" class="m">Connection name</div>
-				<div data---="input__?.connection__required:1">Connection string (without the database name)</div>
-				<div class="help m">e.g.: mongodb+srv://user:pswd@xyz.mongodb.net/?retryWrites=true&w=majority</div>
+				<div data-bind="?.string__config [data---]:'required:' + (!value)__hide">
+					<div class="m"><b>or create new one</b></div>
+					<div data---="input__?.name__required:1" class="m">Connection name</div>
+					<div data---="input__?.connection__required:1">Connection string (without the database name)</div>
+					<div class="help m">e.g.: mongodb+srv://user:pswd@xyz.mongodb.net/?retryWrites=true&w=majority</div>
+				</div>
 			</div>
 		</div>
 		<div class="row m">
