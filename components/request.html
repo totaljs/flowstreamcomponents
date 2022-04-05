@@ -2,7 +2,7 @@
 
 	exports.name = 'Request';
 	exports.group = 'Common';
-	exports.version = '2';
+	exports.version = '3';
 	exports.icon = 'fas fa-cloud-download';
 	exports.author = 'Peter Širka';
 	exports.config = { url: '', method: 'GET', dnscache: true, insecure: false, nocookies: true, xhr: false, parse: true, timeout: 10000, limit: 1024 * 500, responsebody: true, headers: {}, cookies: {}, serialize: null };
@@ -24,11 +24,17 @@
 
 			var opt = {};
 
-			for (var key in config.headers)
+			for (var key in config.headers) {
+				if (!opt.headers)
+					opt.headers = {};
 				opt.headers[$.variables(key)] = $.variables(config.headers[key]);
+			}
 
-			for (var key in config.cookies)
+			for (var key in config.cookies) {
+				if (!opt.cookies)
+					opt.cookies = {};
 				opt.cookies[$.variables(key)] = $.variables(config.cookies[key]);
+			}
 
 			opt.method = config.method;
 			opt.url = $.variables(config.url);
