@@ -1,0 +1,116 @@
+<script total>
+
+	exports.name = 'RSS reader';
+	exports.group = 'Common';
+	exports.version = '2';
+	exports.icon = 'fa fa-rss';
+	exports.author = 'Peter Širka';
+	exports.config = { url: '', onlynew: true };
+	exports.inputs = [{ id: 'input', name: 'Trigger' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }];
+
+	exports.make = function(instance, config) {
+
+
+		var cache = [];
+		var cachelimit = 50;
+
+		instance.close = function() {
+			cache = null;
+		};
+
+		instance.trigger = function() {
+
+			if (!config.url)
+				return;
+
+			var opt = {};
+			opt.method = 'GET';
+			opt.custom = true;
+			opt.url = config.url;
+			REQUEST(opt, function(err, response) {
+				response.stream.on('data', U.streamer('<item>', '</item>', function(xml) {
+					var item = xml.parseXML(true);
+					if (item) {
+
+						var obj = {};
+						obj.title = item.item_title;
+						obj.id = obj.title.makeid();
+
+						if (config.onlynew) {
+							if (cache.indexOf(obj.id) !== -1)
+								return;
+							if (cache.unshift(obj.id) > cachelimit)
+								cache.pop();
+						}
+
+						obj.description = item.item_description;
+						obj.link = item.item_link;
+
+						if (item.item_image_url)
+							obj.image = item.item_image_url;
+						else if (item['item_enclosure__'])
+							obj.image = item['item_enclosure__'].url;
+
+						var date = item.item_pubDate || item.item_pubdate;
+						if (date)
+							obj.date = new Date(date);
+
+						instance.newmessage().send('output', obj);
+					}
+				}));
+			});
+		};
+
+		instance.message = function($) {
+			$.destroy();
+			instance.trigger();
+		};
+
+	};
+
+</script>
+
+<style>
+	.CLASS .padding { padding: 0 10px 10px; }
+	.CLASS footer { padding: 5px 10px; font-size: 11px; }
+	.CLASS button { width: 100%; height: 24px; border: 1px solid #E0E0E0; border-radius: var(--radius); color: #000; background-color: #F0F0F0; margin: 0; }
+	.CLASS button:hover { background-color: #F8F8F8; }
+	.CLASS button:active { background-color: #E0E0E0; }
+	.ui-dark .CLASS button { border-color: #404040; color: #FFF; background-color: #222; }
+	.ui-dark .CLASS button:hover { background-color: #303030; }
+	.ui-dark .CLASS button:active { background-color: #404040; }
+</style>
+
+<settings>
+	<div class="padding">
+		<div data---="input__?.url__type:url;required:1">URL address</div>
+		<div class="help m">Example: <code>https://blog.totaljs.com/rss/</code></div>
+		<div data---="input__?.onlynew__type:checkbox">Send only not processed</div>
+	</div>
+</settings>
+
+<readme>
+The component downloads every item from RSS source.
+
+__Example__:
+```js
+{
+	title: String,
+	description: String,
+	link: String,
+	image: String, // optional
+	date: Date // optional
+}
+```
+</readme>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+	<div class="padding">
+		<button class="exec" data-exec="FUNC.trigger">Download</button>
+	</div>
+	<footer data-bind="CONFIG.url__text__show"></footer>
+</body>
