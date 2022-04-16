@@ -22,6 +22,17 @@
 		"readme": "This component monitors open connections to the specific port in the Linux systems for the specific process. It uses `netstat` command.\n\n__Data Example__:\n\n```js\n{\n\tport: 80,\n\tconnections: 54\n}\n```"
 	},
 	{
+		"id": "restcors",
+		"group": "REST API",
+		"name": "CORS",
+		"url": "https://cdn.totaljs.com/flowstream/components/restcors.html",
+		"author": "Peter Širka",
+		"icon": "fab fa-html5",
+		"color": "",
+		"version": "1",
+		"readme": "The component enables Cross-Origin Resource Sharing `CORS`, so the web browser will be able to communicate directly with the REST API. The functionality will work only with a defined Proxy endpoint for this Flow."
+	},
+	{
 		"id": "counter",
 		"group": "Common",
 		"name": "Counter",
@@ -492,7 +503,7 @@
 		"icon": "fa fa-road",
 		"color": "",
 		"version": "1",
-		"readme": "This component registers an HTTP Route and sends request data next. It stores `controller` instance in the `message.refs.controller` property. You must respond to the REST response component.\n\n__Output data__:\n\n```js\n{\n\t\"route\": String,\n\t\"params\": Object,\n\t\"query\": Object,\n\t\"body\": Object,\n\t\"files\": Array,\n\t\"headers\": Object,\n\t\"url\": String,\n\t\"ip\": String\n}\n```"
+		"readme": "This component registers an HTTP Route and sends request data next. It stores `controller` instance in the `message.refs.controller` property. You must respond to the REST response component.\n\n< __IMPORTANT__:<br>The component works only with a defined Proxy endpoint in the Flow settings.\n\n__Output data__:\n\n```js\n{\n\t\"route\": String,\n\t\"params\": Object,\n\t\"query\": Object,\n\t\"body\": Object,\n\t\"files\": Array,\n\t\"headers\": Object,\n\t\"url\": String,\n\t\"ip\": String\n}\n```"
 	},
 	{
 		"id": "rpi-gpio",

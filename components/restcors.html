@@ -1,0 +1,30 @@
+<script total>
+
+	exports.name = 'CORS';
+	exports.group = 'REST API';
+	exports.icon = 'fab fa-html5';
+	exports.version = '1';
+	exports.author = 'Peter Širka';
+	exports.config = {};
+	exports.meta = { singleton: true };
+
+	exports.make = function(instance, config) {
+		var route = CORS();
+		instance.close = function() {
+			route && route.remove && route.remove();
+			route = null;
+		};
+	};
+
+</script>
+
+<readme>
+The component enables Cross-Origin Resource Sharing `CORS`, so the web browser will be able to communicate directly with the REST API. The functionality will work only with a defined Proxy endpoint for this Flow.
+</readme>
+
+<body>
+	<div class="padding center">
+		<i class="fa-3x fab fa-html5" style="color:#BD6B27"></i>
+		<div class="mt10 fs12">CORS enabled</div>
+	</div>
+</body>
