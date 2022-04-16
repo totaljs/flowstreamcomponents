@@ -19,8 +19,8 @@
 			if (token === maintoken) {
 				$.send('output');
 			} else {
-				ctrl.status = config.status;
-				ctrl.json({ error: config.error });
+				ctrl.status = config.code;
+				ctrl.json([{ name: config.code + '', error: config.error }]);
 				$.destroy();
 			}
 		};
@@ -31,7 +31,6 @@
 
 		instance.configure = function() {
 			maintoken = instance.replace(config.token);
-			console.log('--->', maintoken);
 		};
 
 	};
