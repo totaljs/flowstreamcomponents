@@ -242,6 +242,17 @@
 		"readme": "This component monitors a memory consumption (in MB) in the Linux systems. It uses `free` command.\n\n__Data Example__:\n\n```js\n{\n\tfree: 0,\n\ttotal: 0,\n\tused: 0\n}\n```"
 	},
 	{
+		"id": "model",
+		"group": "Transformation",
+		"name": "Model",
+		"url": "https://cdn.totaljs.com/flowstream/components/model.html",
+		"author": "Peter Širka",
+		"icon": "fab fa-wpforms",
+		"color": "",
+		"version": "1",
+		"readme": "This component prepares incoming data according to the defined schema. Output is prepared model or Error."
+	},
+	{
 		"id": "modified",
 		"group": "Common",
 		"name": "Modified",
@@ -462,6 +473,28 @@
 		"readme": "The component makes a HTTP request. The response data will be serialized as the payload.\n\n__Response__:\n\n```json\n{\n\tstatus: Number,\n\theaders: { key: value },\n\tcookies: { key: value },\n\thost: String,\n\tbody: String/Object/Buffer\n}\n```"
 	},
 	{
+		"id": "restresponse",
+		"group": "REST API",
+		"name": "Response",
+		"url": "https://cdn.totaljs.com/flowstream/components/restresponse.html",
+		"author": "Peter Širka",
+		"icon": "fa fa-retweet",
+		"color": "",
+		"version": "1",
+		"readme": "This component can respond on the REST Route component."
+	},
+	{
+		"id": "restroute",
+		"group": "REST API",
+		"name": "Route",
+		"url": "https://cdn.totaljs.com/flowstream/components/restroute.html",
+		"author": "Peter Širka",
+		"icon": "fa fa-road",
+		"color": "",
+		"version": "1",
+		"readme": "This component registers an HTTP Route and sends request data next. It stores `controller` instance in the `message.refs.controller` property. You must respond to the REST response component.\n\n__Output data__:\n\n```js\n{\n\t\"route\": String,\n\t\"params\": Object,\n\t\"query\": Object,\n\t\"body\": Object,\n\t\"files\": Array,\n\t\"headers\": Object,\n\t\"url\": String,\n\t\"ip\": String\n}\n```"
+	},
+	{
 		"id": "rpi-gpio",
 		"group": "Raspberry",
 		"name": "RPIgpio",
@@ -518,14 +551,25 @@
 	},
 	{
 		"id": "rssreader",
-		"group": "Common",
+		"group": "Transformation",
 		"name": "RSS reader",
 		"url": "https://cdn.totaljs.com/flowstream/components/rssreader.html",
 		"author": "Peter Širka",
 		"icon": "fa fa-rss",
 		"color": "",
-		"version": "2",
+		"version": "1",
 		"readme": "The component downloads every item from RSS source.\n\n__Example__:\n```js\n{\n\ttitle: String,\n\tdescription: String,\n\tlink: String,\n\timage: String, // optional\n\tdate: Date // optional\n}\n```"
+	},
+	{
+		"id": "serverextension",
+		"group": "Common",
+		"name": "Server extension",
+		"url": "https://cdn.totaljs.com/flowstream/components/serverextension.html",
+		"author": "Peter Širka",
+		"icon": "fa fa-flag-checkered",
+		"color": "",
+		"version": "1",
+		"readme": "The component installs Total.js server-side extension. In other words: it can evaluate JavaScript code when the component is initialized or the component settings is changed."
 	},
 	{
 		"id": "sms",
@@ -614,6 +658,17 @@
 		"color": "",
 		"version": "2",
 		"readme": "The component triggers data into the Flow in the specified interval."
+	},
+	{
+		"id": "resttokenauth",
+		"group": "REST API",
+		"name": "Token Auth",
+		"url": "https://cdn.totaljs.com/flowstream/components/resttokenauth.html",
+		"author": "Peter Širka",
+		"icon": "fa fa-key",
+		"color": "",
+		"version": "1",
+		"readme": "This component must be used only with REST Route component. It reads a token from the request header and compares it with the token declared in the configuration."
 	},
 	{
 		"id": "trigger",

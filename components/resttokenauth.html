@@ -1,0 +1,89 @@
+<script total>
+
+	exports.name = 'Token Auth';
+	exports.group = 'REST API';
+	exports.icon = 'fa fa-key';
+	exports.version = '1';
+	exports.author = 'Peter Širka';
+	exports.config = { token: '', code: 401, header: 'x-token', error: 'Unauthorized' };
+	exports.inputs = [{ id: 'input', name: 'Request' }];
+	exports.outputs = [{ id: 'output', name: 'Request' }];
+
+	exports.make = function(instance, config) {
+
+		var maintoken = '';
+
+		instance.message = function($) {
+			var ctrl = $.refs.controller;
+			var token = ctrl.headers[config.header];
+			if (token === maintoken) {
+				$.send('output');
+			} else {
+				ctrl.status = config.status;
+				ctrl.json({ error: config.error });
+				$.destroy();
+			}
+		};
+
+		instance.variables = instance.variables2 = function() {
+			instance.configure();
+		};
+
+		instance.configure = function() {
+			maintoken = instance.replace(config.token);
+			console.log('--->', maintoken);
+		};
+
+	};
+
+</script>
+
+<readme>
+This component must be used only with REST Route component. It reads a token from the request header and compares it with the token declared in the configuration.
+</readme>
+
+<settings>
+	<div class="padding">
+		<div data---="input__?.token__required:1;camouflage:1">Token</div>
+		<div class="help"><span class="link exec" data-exec="tmptokenauthgenerate">Generate token</span>. It can contain a global variable in the form <code>{variable}</code>.</div>
+		<hr />
+		<div class="row">
+			<div class="col-md-3 m">
+				<div data---="input__?.code__required:1;type:number">Status code</div>
+			</div>
+			<div class="col-md-3 m">
+				<div data---="input__?.header__required:1;type:lower">Header</div>
+			</div>
+			<div class="col-md-6 m">
+				<div data---="input__?.error__required:1">Error message</div>
+			</div>
+		</div>
+	</div>
+</settings>
+
+<style>
+	.CLASS footer { padding: 10px; }
+	.CLASS footer span { font-family: var(--monospace); }
+	.CLASS footer .code { background-color: var(--color); color: #FFF; padding: 2px 3px; border-radius: var(--radius); }
+</style>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+	<footer>
+		<div><span data-bind="CONFIG.code__text" class="code"></span> <span data-bind="CONFIG.header__text"></span></div>
+	</footer>
+</body>
+
+<script>
+
+	TOUCH(function(exports, reinit) {
+		if (!W.tmptokenauthgenerate) {
+			W.tmptokenauthgenerate = function(el) {
+				el.scope().set('token', W['GUI' + 'D'](30), 'show');
+			};
+		}
+	});
+
+</script>

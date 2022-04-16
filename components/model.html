@@ -1,0 +1,497 @@
+<script total>
+
+	exports.name = 'Model';
+	exports.group = 'Transformation';
+	exports.icon = 'fab fa-wpforms';
+	exports.author = 'Peter Širka';
+	exports.version = '1';
+	exports.config = { name: 'Model', path: '', schema: [], rewrite: true };
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }, { id: 'error', name: 'Error' }];
+
+	exports.make = function(instance, config) {
+
+		const DEFERR = 'Invalid data';
+		var path;
+
+		var preparenumber = function(val, err, max, min, float) {
+			if (val != null && val != '') {
+				val = typeof(val) === 'string' ? (float ? val.parseFloat() : val.parseInt()) : val;
+				val = max ? (val > max || val < min ? null : val) : val;
+			} else
+				val = null;
+			return val;
+		};
+
+		instance.preparedata = function(item, val, err) {
+			switch (item.type) {
+				case 'string':
+					if (val == null)
+						val = '';
+					else
+						val += '';
+					if (item.required && !val)
+						err.push({ name: item.name, error: DEFERR });
+					return val;
+
+				case 'upper':
+					if (val == null)
+						val = '';
+					else
+						val += '';
+					if (item.required && !val)
+						err.push({ name: item.name, error: DEFERR });
+					return val ? val.toUpperCase() : '';
+
+				case 'lower':
+					if (val == null)
+						val = '';
+					else
+						val += '';
+					if (item.required && !val)
+						err.push({ name: item.name, error: DEFERR });
+					return val ? val.toLowerCase() : '';
+
+				case 'lower':
+					if (val == null)
+						val = '';
+					else
+						val += '';
+					if (item.required && !val)
+						err.push({ name: item.name, error: DEFERR });
+					return val ? val.slug() : '';
+
+				case 'capitalize':
+					if (val == null)
+						val = '';
+					else
+						val += '';
+					if (item.required && !val)
+						err.push({ name: item.name, error: DEFERR });
+					return val ? val.capitalize() : '';
+
+				case 'email':
+					if (val == null)
+						val = '';
+					else
+						val += '';
+					val = val.replace(/\s/g, '');
+					val = val && val.isEmail() ? val : '';
+
+					if (item.required && !val)
+						err.push({ name: item.name, error: DEFERR });
+
+					return val;
+
+				case 'phone':
+					if (val == null)
+						val = '';
+					else
+						val += '';
+					val = val.trim().replace(/\s|\.|-|\(|\)/g, '');
+					val = val && val.isPhone() ? val : '';
+
+					if (item.required && !val)
+						err.push({ name: item.name, error: DEFERR });
+
+					return val;
+
+				case 'boolean':
+					return val == true || val === 'on' || val === 'true' || val == 1;
+				case 'zip':
+					if (val != null)
+						val += '';
+					else
+						val = '';
+					val = val.replace(/\s/g, '');
+					val = val && val.isZIP() ? val : '';
+
+					if (item.required && !val)
+						err.push({ name: item.name, error: DEFERR });
+
+					return val;
+
+				case 'date':
+					if (val) {
+						if (val instanceof Date)
+							return val;
+						switch (typeof(val)) {
+							case 'string':
+							case 'number':
+								return val.parseDate();
+						}
+					}
+
+					if (item.required && !val)
+						err.push({ name: item.name, error: DEFERR });
+					return null;
+
+				case 'object':
+					return val;
+
+				case 'number':
+				case 'float':
+					val = preparenumber(val, err, null, true);
+					if (item.required && val == null)
+						err.push({ name: item.name, error: DEFERR });
+					return val || 0;
+				case 'integer':
+					var max = 2147483647;
+					val = preparenumber(val, err, max, -max);
+					if (item.required && val == null)
+						err.push({ name: item.name, error: DEFERR });
+					return val || 0;
+				case 'smallint':
+					var max = 32768;
+					val = preparenumber(val, err, max, -max);
+					if (item.required && val == null)
+						err.push({ name: item.name, error: DEFERR });
+					return val || 0;
+				case 'tinyint':
+					val = preparenumber(val, err, 255, 0);
+					if (item.required && val == null)
+						err.push({ name: item.name, error: DEFERR });
+					return val || 0;
+				case 'base64':
+
+					if (val == null)
+						val = '';
+					else
+						val += '';
+
+					val = val.isBase64() ? val : '';
+					if (item.required && !val)
+						err.push({ name: item.name, error: DEFERR });
+					return val;
+
+				case 'json':
+
+					if (val == null)
+						val = '';
+					else
+						val += '';
+
+					val = val.isJSON() ? val : '';
+					if (item.required && !val)
+						err.push({ name: item.name, error: DEFERR });
+					return val;
+
+				case 'url':
+
+					if (val == null)
+						val = '';
+					else
+						val += '';
+
+					val = val.isURL() ? val : '';
+
+					if (item.required && !val)
+						err.push({ name: item.name, error: DEFERR });
+
+					return val;
+
+				case 'uid':
+
+					if (val == null)
+						val = '';
+					else
+						val += '';
+
+					val = val.trim();
+					val = val.isUID() ? val : '';
+
+					if (item.required && !val)
+						err.push({ name: item.name, error: DEFERR });
+
+					return val;
+
+				case 'guid':
+
+					if (val == null)
+						val = '';
+					else
+						val += '';
+
+					val = val.trim();
+					val = val.isGUID() ? val : '';
+
+					if (item.required && !val)
+						err.push({ name: item.name, error: DEFERR });
+
+					return val;
+
+				default:
+					var model = instance.main.meta.flow[item.type];
+					return model ? model.validatedata(val || {}, err).data : null;
+			}
+		};
+
+		instance.validatedata = function(data, err) {
+
+			var obj = {};
+
+			if (!err)
+				err = [];
+
+			if (typeof(data) !== 'object') {
+				data = data + '';
+				if (data.isJSON()) {
+					data = data.parseJSON(true);
+				} else {
+					err.push({ error: 'Invalid data' });
+					return { error: err };
+				}
+			}
+
+			if (!data) {
+				err.push({ error: 'Invalid data' });
+				return { error: err };
+
+			}
+
+			for (var item of config.schema) {
+				var val = data[item.name];
+				if (item.array) {
+
+					if (!(val instanceof Array))
+						val = [val];
+
+					obj[item.name] = [];
+
+					for (var m of val) {
+						var r = instance.preparedata(item, m, err);
+						obj[item.name].push(r);
+					}
+
+					if (item.required && !obj[item.name].length)
+						err.push({ name: item.name, error: DEFERR });
+
+				} else
+					obj[item.name] = instance.preparedata(item, val, err);
+			}
+
+			return { data: obj, error: err.length ? err : null };
+		};
+
+		var findvalue = function(data) {
+			var obj = data;
+			for (var m of path) {
+				obj = obj[m];
+				if (!obj)
+					return null;
+			}
+			return obj;
+		};
+
+		instance.message = function($) {
+
+			var data = $.data;
+
+			if (path)
+				data = findvalue(data);
+
+			var output = instance.validatedata(data);
+
+			if (output.error) {
+				instance.send('error', output.error);
+			} else {
+				if (path && config.rewrite)
+					data = output.data;
+				instance.send('output', path && config.rewrite ? $.data : output.data);
+			}
+		};
+
+		instance.configure = function() {
+			path = config.path ? config.path.split('.') : null;
+		};
+
+	};
+
+</script>
+
+<readme>
+This component prepares incoming data according to the defined schema. Output is prepared model or Error.
+</readme>
+
+<settings>
+	<div class="CLASS-settings">
+		<div class="padding bg-smoke">
+			<div data---="input__?.name__required:1" class="m">Model name</div>
+			<div data---="input__?.path__placeholder:path.to.property">Load data from the specific property/field</div>
+			<div class="help">Optional. The data for the model will be loaded from the specific property/field.</div>
+			<div data-bind="?.path__show" class="hidden">
+				<hr />
+				<div data---="input__?.rewrite__type:checkbox"><b>Rewrite value only</b> (otherwise, it will replace entire message data)</div>
+			</div>
+		</div>
+		<div class="padding">
+			<div class="caption m">
+				<div class="toolbar">
+					<nav>
+						<button class="exec" data-exec="tmprestmodel.add"><i class="fa fa-plus-circle"></i>Add</button>
+					</nav>
+				</div>
+				<label>Fields</label>
+			</div>
+			<div data-bind="?.schema__template:figure --> data-id__show:value && value.length" class="fields">
+				<script type="text/html">
+					{{ foreach m in value }}
+					<figure data-id="{{ m.id }}">
+						<div class="controls">
+							<span class="exec" data-exec="tmprestmodel.rem"><i class="far fa-trash-alt red"></i></span>
+						</div>
+						<div class="required exec{{ if m.required }} is{{ fi }}" data-exec="tmprestmodel.required">required</div>
+						<div class="array exec{{ if m.array }} is{{ fi }}" data-exec="tmprestmodel.array">[array]</div>
+						<div class="type hellip exec monospace" data-exec="tmprestmodel.type">{{ m.type | restmodeltype | raw }}</div>
+						<div class="name edit hellip" data-edit="exec:tmprestmodel.name;required:1">{{ m.name }}</div>
+					</figure>
+					{{ end }}
+				</script>
+			</div>
+		</div>
+	</div>
+</settings>
+
+<style>
+	.CLASS-settings .fields { border: 1px solid #E0E0E0; border-radius: var(--radius); }
+	.CLASS-settings figure { height: 26px; border-top: 1px solid #E0E0E0; line-height: 26px; font-size: 12px; }
+	.CLASS-settings figure:first-child { border-top: 0; }
+	.CLASS-settings figure .name { margin-right: 350px; padding: 0 8px; }
+	.CLASS-settings figure .type { float: right; width: 180px; border-left: 1px solid #E0E0E0; padding: 0 8px; cursor: pointer; }
+	.CLASS-settings figure .required { float: right; width: 70px; padding: 0 8px; border-left: 1px solid #E0E0E0; text-align: center; font-size: 11px; cursor: pointer; text-decoration: line-through; }
+	.CLASS-settings figure .required.is { font-weight: bold; text-decoration: none; }
+	.CLASS-settings figure .array { float: right; width: 70px; padding: 0 8px; border-left: 1px solid #E0E0E0; text-align: center; font-size: 11px; cursor: pointer; text-decoration: line-through;}
+	.CLASS-settings figure .array.is { font-weight: bold; text-decoration: none; }
+	.CLASS-settings figure .controls { float: right; width: 30px; padding: 0; margin: 0; border-left: 1px solid #E0E0E0; text-align: center; }
+	.CLASS-settings figure .controls span { cursor: pointer; }
+
+	.ui-dark .CLASS-settings .fields { border-color: #404040; }
+	.ui-dark .CLASS-settings figure { border-top-color: #404040; }
+	.ui-dark .CLASS-settings figure .type { border-left-color: #404040; }
+	.ui-dark .CLASS-settings figure .required { border-left-color: #404040; }
+	.ui-dark .CLASS-settings figure .array { border-left-color: #404040; }
+	.ui-dark .CLASS-settings figure .controls { border-left-color: #404040; }
+</style>
+
+<body>
+	<header>
+		<i class="ICON"></i><b>Model:</b> <span data-bind="CONFIG.name__text"></span>
+	</header>
+</body>
+
+<script>
+
+	TOUCH(function(exports, reinit) {
+
+		exports.settings = function(meta) {
+
+			var tmp = W.tmprestmodel;
+
+			if (!tmp) {
+
+				tmp = {};
+				tmp.add = function(el) {
+					var scope = el.scope();
+					scope.push('schema', { id: Math.random().toString(36).substring(4), name: 'name', type: 'string', required: true, array: false });
+					scope.change('*');
+				};
+
+				tmp.rem = function(el) {
+					var id = ATTRD(el);
+					var scope = el.scope();
+					var model = scope.get();
+					var index = model.schema.findIndex('id', id);
+					model.schema.splice(index, 1);
+					scope.update('schema');
+					scope.change('*');
+				};
+
+				tmp.type = function(el) {
+					var opt = {};
+					opt.element = el;
+					opt.align = 'left';
+					opt.raw = true;
+					opt.items = tmp.types;
+					opt.callback = function(selected) {
+						var scope = el.scope();
+						var id = ATTRD(el);
+						var item = scope.get().schema.findItem('id', id);
+						if (item)
+							item.type = selected.id;
+						el.html(selected.name);
+						scope.change('*');
+					};
+					SETTER('directory/show', opt);
+				};
+
+				tmp.name = function(opt, next) {
+					opt.value = opt.value.replace(/(;|\s|,)/g, '').trim();
+					if (opt.value) {
+						var scope = opt.element.scope();
+						var id = ATTRD(opt.element);
+						var item = scope.get().schema.findItem('id', id);
+						item.name = opt.value;
+						scope.change('*');
+						next(true);
+					} else
+						next(opt.html);
+				};
+
+				tmp.required = function(el) {
+					var id = ATTRD(el);
+					var scope = el.scope();
+					var item = scope.get().schema.findItem('id', id);
+					item.required = !item.required;
+					el.tclass('is', item.required);
+					scope.change('*');
+				};
+
+				tmp.array = function(el) {
+					var id = ATTRD(el);
+					var scope = el.scope();
+					var item = scope.get().schema.findItem('id', id);
+					item.array = !item.array;
+					el.tclass('is', item.array);
+					scope.change('*');
+				};
+
+				Thelpers.restmodeltype = function(val) {
+					return tmp.types.findValue('id', val, 'name', DEF.empty);
+				};
+
+				W.tmprestmodel = tmp;
+			}
+
+			tmp.types = [];
+			tmp.types.push({ id: 'string', name: 'String' });
+			tmp.types.push({ id: 'number', name: 'Number' });
+			tmp.types.push({ id: 'email', name: 'Email address' });
+			tmp.types.push({ id: 'phone', name: 'Phone number' });
+			tmp.types.push({ id: 'boolean', name: 'Boolean' });
+			tmp.types.push({ id: 'zip', name: 'ZIP' });
+			tmp.types.push({ id: 'date', name: 'Date' });
+			tmp.types.push({ id: 'float', name: 'Float' });
+			tmp.types.push({ id: 'integer', name: 'Integer' });
+			tmp.types.push({ id: 'tinyint', name: 'Tinyint' });
+			tmp.types.push({ id: 'smallint', name: 'Smallint' });
+			tmp.types.push({ id: 'upper', name: 'String - Upper case' });
+			tmp.types.push({ id: 'lower', name: 'String - Lower case' });
+			tmp.types.push({ id: 'slug', name: 'String - Slug' });
+			tmp.types.push({ id: 'capitalize', name: 'String - Capitalize' });
+			tmp.types.push({ id: 'uid', name: 'UI' + 'D' });
+			tmp.types.push({ id: 'guid', name: 'GUI' + 'D' });
+			tmp.types.push({ id: 'object', name: 'Object' });
+			tmp.types.push({ id: 'json', name: 'JSON' });
+			tmp.types.push({ id: 'base64', name: 'Base64' });
+
+			for (var key in flow.data) {
+				var m = flow.data[key];
+				if (m.Component.name === 'Model')
+					tmp.types.push({ id: m.id, name: 'Model: <b>' + m.config.name.encode() + '</b>' });
+			}
+
+		};
+
+	});
+
+</script>

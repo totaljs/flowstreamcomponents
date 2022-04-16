@@ -1,0 +1,122 @@
+<script total>
+
+	exports.name = 'Route';
+	exports.group = 'REST API';
+	exports.icon = 'fa fa-road';
+	exports.version = '1';
+	exports.author = 'Peter Širka';
+	exports.config = { url: '', method: '', timeout: 5000, limit: 5120, upload: false, send: 'all' };
+	exports.outputs = [{ id: 'output', name: 'Output' }];
+
+	exports.make = function(instance, config) {
+
+		var prev = null;
+
+		instance.configure = function() {
+
+			if (prev) {
+				prev && prev.remove();
+				prev = null;
+			}
+
+			if (config.url && config.method) {
+
+				var flags = [config.timeout];
+
+				config.upload && flags.push('upload');
+				prev = ROUTE(config.method + ' ' + config.url, function() {
+
+					var ctrl = this;
+					var msg = instance.newmessage();
+					var data;
+
+					switch (config.send) {
+						case 'payload':
+							data = ctrl.body;
+							break;
+						case 'query':
+							data = ctrl.query;
+							break;
+						case 'files':
+							data = ctrl.files;
+							break;
+						case 'params':
+							data = ctrl.params;
+							break;
+						case 'headers':
+							data = ctrl.headers;
+							break;
+						default:
+							data = { payload: ctrl.body, query: ctrl.query, files: ctrl.files, user: ctrl.user, url: ctrl.url, headers: ctrl.headers, params: ctrl.params, ip: ctrl.ip };
+							break;
+					}
+
+					msg.refs.controller = ctrl;
+					msg.send('output', data);
+				}, flags, config.limit);
+			}
+		};
+
+		instance.configure();
+	};
+
+</script>
+
+<readme>
+This component registers an HTTP Route and sends request data next. It stores `controller` instance in the `message.refs.controller` property. You must respond to the REST response component.
+
+__Output data__:
+
+```js
+{
+	"route": String,
+	"params": Object,
+	"query": Object,
+	"body": Object,
+	"files": Array,
+	"headers": Object,
+	"url": String,
+	"ip": String
+}
+```
+</readme>
+
+<settings>
+	<div class="padding">
+		<div class="row">
+			<div class="col-md-3 m">
+				<div data---="input__?.method__required:1;dirsource:GET|GET,POST|POST,PUT|PUT,PATCH|PATCH,DELETE|DELETE">Method</div>
+			</div>
+			<div class="col-md-9 m">
+				<div data---="input__?.url__required:1">Relative URL address</div>
+				<div class="help">Relative path to: <span data-bind="window.location.origin__text"></span></div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-3 m">
+				<div data---="input__?.timeout__required:1;type:number">Timeout</div>
+			</div>
+			<div class="col-md-3 m">
+				<div data---="input__?.limit__required:1;type:number;ricon:!kB;align:1">Request limit</div>
+			</div>
+			<div class="col-md-3 m">
+				<div data---="input__?.send__required:1;dirsource:all|Everything,payload|Payload,query|Query arguments,files|Files,params|Dynamic params,headers|Headers">Send to output</div>
+			</div>
+		</div>
+	</div>
+</settings>
+
+<style>
+	.CLASS footer { padding: 10px; }
+	.CLASS footer span { font-family: var(--monospace); }
+	.CLASS footer .method { background-color: var(--color); color: #FFF; padding: 2px 3px; border-radius: var(--radius); }
+</style>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+	<footer data-bind="CONFIG.method__show" class="hidden">
+		<div><span data-bind="CONFIG.method__text" class="method"></span> <a data-bind="CONFIG.url__text__href:flow.head.proxyurl + value.substring(1)" target="_blank"></a></div>
+	</footer>
+</body>

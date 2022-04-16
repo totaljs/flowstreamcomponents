@@ -1,0 +1,82 @@
+<script total>
+
+	exports.name = 'Server extension';
+	exports.group = 'Common';
+	exports.version = '1';
+	exports.icon = 'fa fa-flag-checkered';
+	exports.author = 'Peter Širka';
+	exports.config = { name: 'My extension', install: '', uninstall: '', icon: exports.icon };
+
+	exports.make = function(instance, config) {
+
+		var install = null;
+		var uninstall = null;
+
+		instance.configure = function() {
+
+			if (uninstall) {
+				uninstall.call(instance, instance);
+				uninstall = null;
+				setTimeout(instance.configure, 1000);
+				return;
+			}
+
+			try {
+				install = config.install ? new Function('instance', config.install) : null;
+				uninstall = config.uninstall ? new Function('instance', config.uninstall) : null;
+			} catch (e) {
+				install = null;
+				uninstall = null;
+				instance.throw('Code: ' + e.message);
+			}
+
+			install && install.call(instance, instance);
+
+		};
+
+		instance.close = function() {
+			uninstall && uninstall.call(instance, instance);
+			uninstall = null;
+			install = null;
+		};
+
+		instance.configure();
+
+	};
+
+</script>
+
+<readme>
+The component installs Total.js server-side extension. In other words: it can evaluate JavaScript code when the component is initialized or the component settings is changed.
+</readme>
+
+<settings>
+	<div class="padding bg-smoke">
+		<div class="row">
+			<div class="col-md-9 m">
+				<div data---="input__?.name__required:1;placeholder:e.g. Database">Name</div>
+			</div>
+			<div class="col-md-3 m">
+				<div data---="input__?.icon__type:icon">Icon</div>
+			</div>
+		</div>
+	</div>
+	<div class="padding">
+		<div class="ui-input-label">Installation code:</div>
+		<div data---="codemirror__?.install__type:javascript;height:300;tabs:true;trim:true"></div>
+		<div class="help m">The code will be executed when the configuration is changed or the component instance is initialized.</div>
+		<div class="ui-input-label">Uninstallation code:</div>
+		<div data---="codemirror__?.uninstall__type:javascript;height:300;tabs:true;trim:true"></div>
+		<div class="help">The code above will be executed when the configuration is changed or the component instance is removed.</div>
+	</div>
+</settings>
+
+<body>
+	<div class="padding center" data-bind="CONFIG__template">
+		<script type="text/html">
+			<i class="fa-2x {{ value.icon }}"></i>
+			<div class="mt10 fs12">{{ value.name }}</div>
+			<div class="help npt nmt">Server extension</div>
+		</script>
+	</div>
+</body>
