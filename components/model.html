@@ -11,7 +11,6 @@
 
 	exports.make = function(instance, config) {
 
-		const DEFERR = 'Invalid data';
 		var path;
 
 		var preparenumber = function(val, err, max, min, float) {
@@ -31,7 +30,7 @@
 					else
 						val += '';
 					if (item.required && !val)
-						err.push({ name: item.name, error: DEFERR });
+						err.push({ name: item.name, error: item.error });
 					return val;
 
 				case 'upper':
@@ -40,7 +39,7 @@
 					else
 						val += '';
 					if (item.required && !val)
-						err.push({ name: item.name, error: DEFERR });
+						err.push({ name: item.name, error: item.error });
 					return val ? val.toUpperCase() : '';
 
 				case 'lower':
@@ -49,7 +48,7 @@
 					else
 						val += '';
 					if (item.required && !val)
-						err.push({ name: item.name, error: DEFERR });
+						err.push({ name: item.name, error: item.error });
 					return val ? val.toLowerCase() : '';
 
 				case 'lower':
@@ -58,7 +57,7 @@
 					else
 						val += '';
 					if (item.required && !val)
-						err.push({ name: item.name, error: DEFERR });
+						err.push({ name: item.name, error: item.error });
 					return val ? val.slug() : '';
 
 				case 'capitalize':
@@ -67,7 +66,7 @@
 					else
 						val += '';
 					if (item.required && !val)
-						err.push({ name: item.name, error: DEFERR });
+						err.push({ name: item.name, error: item.error });
 					return val ? val.capitalize() : '';
 
 				case 'email':
@@ -79,7 +78,7 @@
 					val = val && val.isEmail() ? val : '';
 
 					if (item.required && !val)
-						err.push({ name: item.name, error: DEFERR });
+						err.push({ name: item.name, error: item.error });
 
 					return val;
 
@@ -92,7 +91,7 @@
 					val = val && val.isPhone() ? val : '';
 
 					if (item.required && !val)
-						err.push({ name: item.name, error: DEFERR });
+						err.push({ name: item.name, error: item.error });
 
 					return val;
 
@@ -107,7 +106,7 @@
 					val = val && val.isZIP() ? val : '';
 
 					if (item.required && !val)
-						err.push({ name: item.name, error: DEFERR });
+						err.push({ name: item.name, error: item.error });
 
 					return val;
 
@@ -123,7 +122,7 @@
 					}
 
 					if (item.required && !val)
-						err.push({ name: item.name, error: DEFERR });
+						err.push({ name: item.name, error: item.error });
 					return null;
 
 				case 'object':
@@ -133,24 +132,24 @@
 				case 'float':
 					val = preparenumber(val, err, null, true);
 					if (item.required && val == null)
-						err.push({ name: item.name, error: DEFERR });
+						err.push({ name: item.name, error: item.error });
 					return val || 0;
 				case 'integer':
 					var max = 2147483647;
 					val = preparenumber(val, err, max, -max);
 					if (item.required && val == null)
-						err.push({ name: item.name, error: DEFERR });
+						err.push({ name: item.name, error: item.error });
 					return val || 0;
 				case 'smallint':
 					var max = 32768;
 					val = preparenumber(val, err, max, -max);
 					if (item.required && val == null)
-						err.push({ name: item.name, error: DEFERR });
+						err.push({ name: item.name, error: item.error });
 					return val || 0;
 				case 'tinyint':
 					val = preparenumber(val, err, 255, 0);
 					if (item.required && val == null)
-						err.push({ name: item.name, error: DEFERR });
+						err.push({ name: item.name, error: item.error });
 					return val || 0;
 				case 'base64':
 
@@ -161,7 +160,7 @@
 
 					val = val.isBase64() ? val : '';
 					if (item.required && !val)
-						err.push({ name: item.name, error: DEFERR });
+						err.push({ name: item.name, error: item.error });
 					return val;
 
 				case 'json':
@@ -173,7 +172,7 @@
 
 					val = val.isJSON() ? val : '';
 					if (item.required && !val)
-						err.push({ name: item.name, error: DEFERR });
+						err.push({ name: item.name, error: item.error });
 					return val;
 
 				case 'url':
@@ -186,7 +185,7 @@
 					val = val.isURL() ? val : '';
 
 					if (item.required && !val)
-						err.push({ name: item.name, error: DEFERR });
+						err.push({ name: item.name, error: item.error });
 
 					return val;
 
@@ -201,7 +200,7 @@
 					val = val.isUID() ? val : '';
 
 					if (item.required && !val)
-						err.push({ name: item.name, error: DEFERR });
+						err.push({ name: item.name, error: item.error });
 
 					return val;
 
@@ -216,7 +215,7 @@
 					val = val.isGUID() ? val : '';
 
 					if (item.required && !val)
-						err.push({ name: item.name, error: DEFERR });
+						err.push({ name: item.name, error: item.error });
 
 					return val;
 
@@ -333,7 +332,7 @@ This component prepares incoming data according to the defined schema. Output is
 				</div>
 				<label>Fields</label>
 			</div>
-			<div data-bind="?.schema__template:figure --> data-id__show:value && value.length" class="fields">
+			<div data-bind="?.schema__template:figure --> data-id__show:value && value.length" class="fields m">
 				<script type="text/html">
 					{{ foreach m in value }}
 					<figure data-id="{{ m.id }}">
@@ -343,20 +342,27 @@ This component prepares incoming data according to the defined schema. Output is
 						<div class="required exec{{ if m.required }} is{{ fi }}" data-exec="tmprestmodel.required">required</div>
 						<div class="array exec{{ if m.array }} is{{ fi }}" data-exec="tmprestmodel.array">[array]</div>
 						<div class="type hellip exec monospace" data-exec="tmprestmodel.type">{{ m.type | restmodeltype | raw }}</div>
-						<div class="name edit hellip" data-edit="exec:tmprestmodel.name;required:1">{{ m.name }}</div>
+						<div class="name">
+							<div class="monospace edit hellip" data-edit="exec:tmprestmodel.name;required:1">{{ m.name }}</div>
+							<div class="error">Error message: <span class="edit hellip" data-edit="exec:tmprestmodel.error;required:1">{{ m.error | empty }}</span></div>
+						</div>
 					</figure>
 					{{ end }}
 				</script>
 			</div>
+			<div class="message message-alert">If you want to declare a nested object, then you can create another model and link it with this model.</div>
 		</div>
 	</div>
 </settings>
 
 <style>
 	.CLASS-settings .fields { border: 1px solid #E0E0E0; border-radius: var(--radius); }
-	.CLASS-settings figure { height: 26px; border-top: 1px solid #E0E0E0; line-height: 26px; font-size: 12px; }
+	.CLASS-settings figure { height: 40px; border-top: 1px solid #E0E0E0; line-height: 40px; font-size: 12px; }
 	.CLASS-settings figure:first-child { border-top: 0; }
-	.CLASS-settings figure .name { margin-right: 350px; padding: 0 8px; }
+	.CLASS-settings figure .name { margin-right: 350px; padding: 6px 8px 0; line-height: 14px; }
+	.CLASS-settings figure .name > div:first-child { font-weight: bold; outline: 0; }
+	.CLASS-settings figure .error { font-size: 11px; color: #888; }
+	.CLASS-settings figure .error span { color: #B9261A; outline: 0; min-width: 150px; }
 	.CLASS-settings figure .type { float: right; width: 180px; border-left: 1px solid #E0E0E0; padding: 0 8px; cursor: pointer; }
 	.CLASS-settings figure .required { float: right; width: 70px; padding: 0 8px; border-left: 1px solid #E0E0E0; text-align: center; font-size: 11px; cursor: pointer; text-decoration: line-through; }
 	.CLASS-settings figure .required.is { font-weight: bold; text-decoration: none; }
@@ -392,7 +398,7 @@ This component prepares incoming data according to the defined schema. Output is
 				tmp = {};
 				tmp.add = function(el) {
 					var scope = el.scope();
-					scope.push('schema', { id: Math.random().toString(36).substring(4), name: 'name', type: 'string', required: true, array: false });
+					scope.push('schema', { id: Math.random().toString(36).substring(4), name: 'name', type: 'string', required: true, array: false, error: 'Invalid value' });
 					scope.change('*');
 				};
 
@@ -431,6 +437,18 @@ This component prepares incoming data according to the defined schema. Output is
 						var id = ATTRD(opt.element);
 						var item = scope.get().schema.findItem('id', id);
 						item.name = opt.value;
+						scope.change('*');
+						next(true);
+					} else
+						next(opt.html);
+				};
+
+				tmp.error = function(opt, next) {
+					if (opt.value) {
+						var scope = opt.element.scope();
+						var id = ATTRD(opt.element);
+						var item = scope.get().schema.findItem('id', id);
+						item.error = opt.value;
 						scope.change('*');
 						next(true);
 					} else
