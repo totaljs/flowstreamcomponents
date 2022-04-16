@@ -1,0 +1,371 @@
+<script total>
+
+	exports.id = 'dataset';
+	exports.name = 'CSV Dataset';
+	exports.group = 'Dashboard';
+	exports.version = '1';
+	exports.icon = 'fa fa-database';
+	exports.author = 'Peter Širka';
+	exports.config = { name: '', unit: '', icon: '', color: '', decimals: 2, type: 'daily', sum: 0 };
+	exports.inputs = [{ id: 'input', name: 'Value' }];
+
+	exports.make = function(instance, config) {
+
+		var uid = (instance.main.id + '_' + instance.id).makeid();
+		var filename_meta = PATH.private('dataset_' + uid + '.meta');
+		var filename_data = PATH.private('dataset_' + uid + '.csv');
+		var meta = {};
+
+		var updatestatus = function() {
+			instance.status({ id: uid, keys: meta.keys });
+		};
+
+		F.Fs.readFile(filename_meta, function(err, response) {
+			meta = response ? response.toString('utf8').parseJSON(true) : CLONE(config);
+			if (!meta.keys)
+				meta.keys = {};
+			meta.id = uid;
+			updatestatus();
+			F.Fs.lstat(filename_data, function(err) {
+				if (err)
+					F.Fs.appendFile(filename_data, 'key,value,min,max,sum,count,tshour,tsday,tsweek,tsmonth,tsyear\n', NOOP);
+			});
+		});
+
+		instance.close = function(removed) {
+			if (removed) {
+				F.Fs.unlink(filename_meta, NOOP);
+				F.Fs.unlink(filename_data, NOOP);
+				db = null;
+			}
+		};
+
+		instance.insert = function(data) {
+
+			var writer = null;
+			var write = false;
+			var key = data.key || data.id || 'Value';
+
+			if (!meta.keys[key])
+				meta.keys[key] = {};
+
+			var tmp = meta.keys[key];
+
+			if (tmp.count && config.type !== 'lastvalue' && config.type !== 'logger') {
+				var date = tmp.date;
+				switch (config.type) {
+					case 'hourly':
+						write = date.getHours() !== NOW.getHours();
+						break;
+					case 'daily':
+						write = date.getDate() !== NOW.getDate();
+						break;
+					case 'monthly':
+						write = date.getMonth() !== NOW.getMonth();
+						break;
+					case 'weekly':
+						write = date.format('w') !== NOW.format('w');
+						break;
+					case 'yearly':
+						write = date.getFullYear() !== NOW.getFullYear();
+						break;
+				}
+			}
+
+			if (write) {
+				writer = {};
+				writer.key = key;
+				writer.value = tmp.value;
+				writer.min = tmp.min;
+				writer.max = tmp.max;
+				writer.sum = tmp.sum;
+				writer.count = tmp.count;
+				writer.date = tmp.date;
+			}
+
+			tmp.date = NOW;
+			tmp.value = data.value;
+
+			if (writer) {
+
+				tmp.min = tmp.value;
+				tmp.max = tmp.value;
+				tmp.count = 0;
+
+				if (config.sum) {
+					if (config.sum === 1)
+						tmp.sum = tmp.value;
+					else
+						tmp.sum = (tmp.sum || 0) + tmp.value;
+				}
+
+			} else {
+
+				if (tmp.min == null || tmp.value < tmp.min)
+					tmp.min = tmp.value;
+
+				if (tmp.max == null || tmp.value > tmp.max)
+					tmp.max = tmp.value;
+
+				if (config.sum)
+					tmp.sum = (tmp.sum || 0) + tmp.value;
+
+				if (config.type === 'logger') {
+					writer = {};
+					writer.key = key;
+					writer.value = tmp.value;
+					writer.min = tmp.min;
+					writer.max = tmp.max;
+					writer.sum = tmp.sum;
+					writer.count = (tmp.count || 0) + 1;
+					writer.date = tmp.date;
+				}
+			}
+
+			tmp.count = (tmp.count || 0) + 1;
+
+			updatestatus();
+			F.Fs.writeFile(filename_meta, JSON.stringify(meta, null, '\t'), NOOP);
+
+			if (!writer)
+				return;
+
+			var values = [];
+
+			// 0 key
+			// 1 value
+			// 2 min
+			// 3 max
+			// 4 sum
+			// 5 count
+			// 6 tsh
+			// 7 tsd
+			// 8 tsw
+			// 9 tsm
+			// 10 tsy
+
+			var ts = writer.date.format('yyyyMMddHH');
+
+			values.push(writer.key);
+			values.push(writer.value + '');
+			values.push((writer.min != null ? writer.min : '') + '');
+			values.push((writer.max != null ? writer.max : '') + '');
+			values.push((writer.sum != null ? writer.sum : '') + '');
+			values.push((writer.count != null ? writer.count : '') + '');
+			values.push(ts);
+			values.push(ts.substring(0, 8));
+			values.push(writer.date.format('yyyyww'));
+			values.push(ts.substring(0, 6));
+			values.push(ts.substring(0, 4));
+
+			F.Fs.appendFile(filename_data, values.join(',') + '\n', NOOP);
+		};
+
+		var updatefile = function(fn) {
+			F.Fs.readFile(filename_data, function(err, data) {
+				var lines = data.toString('utf8').split('\n');
+				fn(lines);
+				F.Fs.writeFile(filename_data, lines.join('\n'), NOOP);
+			});
+		};
+
+		instance.trigger = function(msg) {
+			if (msg.type === 'remove') {
+				// msg.key
+				delete meta.keys[msg.key];
+				updatestatus();
+				F.Fs.writeFile(filename_meta, JSON.stringify(meta, null, '\t'), NOOP);
+				updatefile(function(lines) {
+					var counter = 0;
+					var key = msg.key + ',';
+					while (true) {
+						var line = lines[counter];
+						if (line == null)
+							break;
+						if (line.substring(0, key.length) === key)
+							lines.splice(counter, 1);
+						else
+							counter++;
+					}
+				});
+			} else if (msg.type === 'rename') {
+				// msg.key
+				// msg.name
+				meta.keys[msg.name] = meta.keys[msg.key];
+				delete meta.keys[msg.key];
+				updatestatus();
+				F.Fs.writeFile(filename_meta, JSON.stringify(meta, null, '\t'), NOOP);
+				updatefile(function(lines) {
+					var counter = 0;
+					var key = msg.key + ',';
+					while (true) {
+						var line = lines[counter];
+						if (line == null)
+							break;
+						if (line.substring(0, key.length) === key)
+							lines[counter] = msg.name + ',' + line.substring(key.length);
+						counter++;
+					}
+				});
+			}
+		};
+
+		instance.message = function($) {
+
+			var data = $.data;
+			var type = typeof(data);
+
+			if (type === 'number')
+				data = { value: data };
+
+			instance.insert(CLONE(data));
+			$.destroy();
+		};
+
+		instance.configure = function() {
+			COPY(config, meta);
+			F.Fs.writeFile(filename_meta, JSON.stringify(meta, null, '\t'), NOOP);
+		};
+
+	};
+
+</script>
+
+<style>
+	.CLASS hr { margin: 10px 0; }
+	.CLASS [contenteditable] { outline: 0 }
+	.CLASS .padding { padding: 10px; font-size: 12px; }
+	.CLASS .padding .meta { height: 16px; font-size: 11px; }
+	.CLASS .padding .meta span { color: #888; margin-right: 5px; width: 30px; float: left; }
+</style>
+
+<settings>
+	<div class="padding">
+		<div class="row">
+			<div class="col-md-6 m">
+				<div data---="input__?.name__required:1;placeholder:Dataset name">Name</div>
+			</div>
+			<div class="col-md-3 m">
+				<div data---="input__?.type__dirsource:lastvalue|Last value only,logger|Logger,hourly|Hourly,daily|Daily,weekly|Weeekly,monthly|Monthly,yearly|Yearly;required:1">Type</div>
+			</div>
+			<div class="col-md-3 m">
+				<div data---="input__?.sum__dirsource:0|Disabled,1|Periodical sum,2|Total sum;type:number">Calculate the sum</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-3 m">
+				<div data---="input__?.unit__align:1">Unit</div>
+			</div>
+			<div class="col-md-3 m">
+				<div data---="input__?.decimals__align:1;type:number__2">Decimals</div>
+			</div>
+			<div class="col-md-3 m">
+				<div data---="input__?.icon__type:icon">Icon</div>
+			</div>
+			<div class="col-md-3 m">
+				<div data---="input__?.color__type:color">Color</div>
+			</div>
+		</div>
+		<hr />
+	</div>
+</settings>
+
+<readme>
+The component stores data as CSV Dataset for e.g. Dashboard application. Dataset is stored in `/private/` path that is available with the help of the Flow access token.
+
+CSV file contains only processed values, which aren't closed and stored in the `.meta` file.
+
+```js
+{
+	key: String,    // optional, e.g. device_id | device_name
+	value: Number   // measured value
+}
+```
+</readme>
+
+<script>
+	TOUCH(function(exports, reinit) {
+
+		var laststatus;
+
+		exports.configure = function(config, isinit) {
+			if (!isinit) {
+				exports.status(laststatus);
+				exports.rebind('status');
+			}
+		};
+
+		exports.status = function(status, isinit) {
+			laststatus = status;
+			if (status) {
+				status.type = exports.config.type;
+				for (var key in status.keys)
+					status.keys[key].unit = exports.config.unit;
+			}
+		};
+
+		exports.rename = function(meta, next) {
+
+			var id = ATTRD(meta.element);
+			var value = meta.value.replace(/\"|\,/g, '');
+
+			if (id !== value) {
+				next(false);
+				// Due to "enter" key
+				setTimeout(ASETTER('approve/show', 'Are you sure you want to rename "{0}" to <b>"{1}"</b>?'.format(id, value), '"fa fa-trash-alt" Remove', function() {
+					exports.trigger({ type: 'rename', key: id, name: value });
+					next(value);
+				}), 200);
+			} else
+				next(false);
+
+		};
+
+		exports.click = function(el) {
+			var id = ATTRD(el);
+			SETTER('approve/show', 'Are you sure you want to remove selected key <b>"{0}"</b>?'.format(id.encode()), '"fa fa-trash-alt" Remove', function() {
+				exports.trigger({ type: 'remove', key: id });
+			});
+		};
+
+	});
+</script>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+	<footer>
+		<div class="padding">
+			<div data-bind="CONFIG__template">
+				<script type="text/html">
+					<span class="badge badge-medium badge-color mr5">{{ value.type }}</span> {{ if value.icon }}<i class="{{ value.icon }} mr5"></i>{{ fi }}<b>{{ value.name }}</b>
+				</script>
+			</div>
+			<div data-bind="STATUS__template__show" class="keys hidden">
+				<script type="text/html">
+
+					<div class="selectable">
+						<div class="meta mt5">
+							<span>Meta:</span><div>dataset_{{ value.id }}.meta</div>
+						</div>
+						{{ if value.type !== 'lastvalue' }}
+						<div class="meta">
+							<span>Data:</span><div>dataset_{{ value.id }}.csv</div>
+						</div>
+						{{ fi }}
+					</div>
+					<hr />
+					<div class="selectable">
+					{{ foreach m in value.keys }}
+						<div class="keyvalue small" data-id="{{ m.key }}">
+							<span><i class="fa fa-trash-alt red clickable"></i><b class="edit" data-edit="required:1;offsetWidth:150;exec:TOUCH.rename" data-id="{{ m.key }}">{{ m.key }}</b></span>
+							<div class="right">{{ m.value.value }} {{ m.value.unit }}</div>
+						</div>
+					{{ end }}
+					</div>
+				</script>
+			</div>
+		</div>
+	</footer>
+</body>

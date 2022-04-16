@@ -66,6 +66,17 @@
 		"readme": "[node-schedule](https://www.npmjs.com/package/node-schedule) on npmjs.com\n\nSyntax:\n`cron string | data (only string supported) | comment`\n\n## Cron string:\n`* * * * * *`\nMeaning of each `*` explained bellow, in order from left to right\nsecond (0 - 59, OPTIONAL)\nminute (0 - 59)\nhour (0 - 23)\nday of month (1 - 31)\nmonth (1 - 12)\nday of week (0 - 7) (0 or 7 is Sun)\n\nor\n`@startup` to run once at the start or restart of an app (after 5 seconds)\n\n### Examples of cron string:\n```\n0 16 * * *      -> trigger every day at 16:00\n* 0 16 * * *    -> trigger at 16:00 every day and it will keep triggering every second until 16:01\n20,40 19 * * *  -> every day at 19:20 and 19:40\n*/5 * * * *     -> trigger every 5 seconds\n0 20 * * 1      -> every monday at 20:00\n@startup        -> runs once at startup\n```\n\n### Full example:\n```\n* 0 16 * * * | hello data | this is hello comment\n@startup | start\n```"
 	},
 	{
+		"id": "csvdataset",
+		"group": "Dashboard",
+		"name": "CSV Dataset",
+		"url": "https://cdn.totaljs.com/flowstream/components/csvdataset.html",
+		"author": "Peter Širka",
+		"icon": "fa fa-database",
+		"color": "",
+		"version": "1",
+		"readme": "The component stores data as CSV Dataset for e.g. Dashboard application. Dataset is stored in `/private/` path that is available with the help of the Flow access token.\n\nCSV file contains only processed values, which aren't closed and stored in the `.meta` file.\n\n```js\n{\n\tkey: String,    // optional, e.g. device_id | device_name\n\tvalue: Number   // measured value\n}\n```"
+	},
+	{
 		"id": "date",
 		"group": "Common",
 		"name": "Date",
