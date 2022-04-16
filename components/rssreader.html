@@ -74,12 +74,6 @@
 <style>
 	.CLASS .padding { padding: 0 10px 10px; }
 	.CLASS footer { padding: 5px 10px; font-size: 11px; }
-	.CLASS button { width: 100%; height: 24px; border: 1px solid #E0E0E0; border-radius: var(--radius); color: #000; background-color: #F0F0F0; margin: 0; }
-	.CLASS button:hover { background-color: #F8F8F8; }
-	.CLASS button:active { background-color: #E0E0E0; }
-	.ui-dark .CLASS button { border-color: #404040; color: #FFF; background-color: #222; }
-	.ui-dark .CLASS button:hover { background-color: #303030; }
-	.ui-dark .CLASS button:active { background-color: #404040; }
 </style>
 
 <settings>
@@ -91,7 +85,7 @@
 </settings>
 
 <readme>
-The component downloads every item from RSS source.
+The component downloads every item from the RSS source. A message on to this `Trigger` input starts downloading RSS data.
 
 __Example__:
 ```js
@@ -110,7 +104,7 @@ __Example__:
 		<i class="ICON"></i>NAME
 	</header>
 	<div class="padding">
-		<button class="exec" data-exec="FUNC.trigger">Download</button>
+		<button class="exec button" data-exec="FUNC.trigger">Download</button>
 	</div>
 	<footer data-bind="CONFIG.url__text__show"></footer>
 </body>

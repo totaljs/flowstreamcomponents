@@ -569,7 +569,7 @@
 		"icon": "fa fa-rss",
 		"color": "",
 		"version": "1",
-		"readme": "The component downloads every item from RSS source.\n\n__Example__:\n```js\n{\n\ttitle: String,\n\tdescription: String,\n\tlink: String,\n\timage: String, // optional\n\tdate: Date // optional\n}\n```"
+		"readme": "The component downloads every item from the RSS source. A message on to this `Trigger` input starts downloading RSS data.\n\n__Example__:\n```js\n{\n\ttitle: String,\n\tdescription: String,\n\tlink: String,\n\timage: String, // optional\n\tdate: Date // optional\n}\n```"
 	},
 	{
 		"id": "serverextension",
