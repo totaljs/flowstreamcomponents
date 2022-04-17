@@ -1,0 +1,86 @@
+<script total>
+
+	exports.name = 'Duration';
+	exports.group = 'Stats';
+	exports.version = '1';
+	exports.icon = 'fa fa-stopwatch';
+	exports.author = 'Peter Širka';
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }];
+
+	exports.make = function(instance, config) {
+
+		var stats = {};
+
+		stats.min = null;
+		stats.max = null;
+		stats.avg = 0;
+		stats.last = 0;
+		stats.count = 0;
+
+		instance.message = function($) {
+			var duration = ((Date.now() - $.duration) / 1000).floor(2);
+
+			if (stats.min === null || stats.min > duration)
+				stats.min = duration;
+
+			if (stats.max === null || stats.max < duration)
+				stats.max = duration;
+
+			stats.avg = ((stats.max + stats.min) / 2).floor(2);
+			stats.last = duration;
+			stats.count++;
+
+			instance.status(stats);
+			$.send('output', stats);
+		};
+
+	};
+
+</script>
+
+<readme>
+The component counts message duration. All values except `count` are defined in seconds.
+
+__Output__:
+
+```js
+{
+	min: Number,
+	max: Number,
+	avg: Number,
+	last: Number,
+	count: Number
+}
+```
+</readme>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+	<footer data-bind="STATUS__template" style="padding:10px">
+		<script type="text/html">
+			<div class="keyvalue small">
+				<span>Min</span>
+				<div class="right">{{ value.min }} sec.</div>
+			</div>
+			<div class="keyvalue small">
+				<span>Max</span>
+				<div class="right">{{ value.max }} sec.</div>
+			</div>
+			<div class="keyvalue small">
+				<span>Avg</span>
+				<div class="right">{{ value.avg }} sec.</div>
+			</div>
+			<div class="keyvalue small">
+				<span>Last</span>
+				<div class="right">{{ value.last }} sec.</div>
+			</div>
+			<div class="keyvalue small">
+				<span>Count</span>
+				<div class="right">{{ value.count }}x</div>
+			</div>
+		</script>
+	</footer>
+</body>
