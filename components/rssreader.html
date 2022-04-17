@@ -5,7 +5,7 @@
 	exports.version = '1';
 	exports.icon = 'fa fa-rss';
 	exports.author = 'Peter Širka';
-	exports.config = { url: '', onlynew: true };
+	exports.config = { url: '', type: 'a' };
 	exports.inputs = [{ id: 'input', name: 'Trigger' }];
 	exports.outputs = [{ id: 'output', name: 'Output' }];
 
@@ -28,6 +28,9 @@
 			opt.method = 'GET';
 			opt.custom = true;
 			opt.url = config.url;
+
+			var output = config.type === 'a' || config.type === 'b' ? [] : null;
+
 			REQUEST(opt, function(err, response) {
 				response.stream.on('data', U.streamer('<item>', '</item>', function(xml) {
 					var item = xml.parseXML(true);
@@ -37,7 +40,7 @@
 						obj.title = item.item_title;
 						obj.id = obj.title.makeid();
 
-						if (config.onlynew) {
+						if (config.type === 'b' || config.type === 'd') {
 							if (cache.indexOf(obj.id) !== -1)
 								return;
 							if (cache.unshift(obj.id) > cachelimit)
@@ -56,9 +59,15 @@
 						if (date)
 							obj.date = new Date(date);
 
-						instance.newmessage().send('output', obj);
+						if (config.type === 'b' || config.type === 'c')
+							instance.newmessage().send('output', obj);
+						else
+							output.push(obj);
 					}
 				}));
+				response.stream.on('end', function() {
+					output && output.length && instance.newmessage().send('output', output);
+				});
 			});
 		};
 
@@ -80,7 +89,7 @@
 	<div class="padding">
 		<div data---="input__?.url__type:url;required:1">URL address</div>
 		<div class="help m">Example: <code>https://blog.totaljs.com/rss/</code></div>
-		<div data---="input__?.onlynew__type:checkbox">Send only not processed</div>
+		<div data---="input__?.type__dirsource:a|Send all items,b|Send only new items,c|Send every item separately,d|Send only new items separately">Output</div>
 	</div>
 </settings>
 
