@@ -18,6 +18,15 @@
 		stats.last = 0;
 		stats.count = 0;
 
+		instance.trigger = function() {
+			stats.min = null;
+			stats.avg = 0;
+			stats.max = null;
+			stats.last = null;
+			stats.count = 0;
+			instance.status(stats);
+		};
+
 		instance.message = function($) {
 			var duration = ((Date.now() - $.duration) / 1000).floor(2);
 
@@ -59,28 +68,31 @@ __Output__:
 	<header>
 		<i class="ICON"></i>NAME
 	</header>
-	<footer data-bind="STATUS__template" style="padding:10px">
-		<script type="text/html">
-			<div class="keyvalue small">
-				<span>Min</span>
-				<div class="right">{{ value.min }} sec.</div>
-			</div>
-			<div class="keyvalue small">
-				<span>Max</span>
-				<div class="right">{{ value.max }} sec.</div>
-			</div>
-			<div class="keyvalue small">
-				<span>Avg</span>
-				<div class="right">{{ value.avg }} sec.</div>
-			</div>
-			<div class="keyvalue small">
-				<span>Last</span>
-				<div class="right">{{ value.last }} sec.</div>
-			</div>
-			<div class="keyvalue small">
-				<span>Count</span>
-				<div class="right">{{ value.count }}x</div>
-			</div>
-		</script>
+	<footer style="padding:10px">
+		<button class="exec button" data-exec="FUNC.trigger">Reset</button>
+		<div data-bind="STATUS__template" class="mt10">
+			<script type="text/html">
+				<div class="keyvalue small">
+					<span>Min</span>
+					<div class="right">{{ value.min | empty }} sec.</div>
+				</div>
+				<div class="keyvalue small">
+					<span>Max</span>
+					<div class="right">{{ value.max | empty }} sec.</div>
+				</div>
+				<div class="keyvalue small">
+					<span>Avg</span>
+					<div class="right">{{ value.avg | empty }} sec.</div>
+				</div>
+				<div class="keyvalue small">
+					<span>Last</span>
+					<div class="right">{{ value.last | empty }} sec.</div>
+				</div>
+				<div class="keyvalue small">
+					<span>Count</span>
+					<div class="right">{{ value.count | empty }}</div>
+				</div>
+			</script>
+		</div>
 	</footer>
 </body>
