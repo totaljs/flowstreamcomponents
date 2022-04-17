@@ -59,13 +59,14 @@
 						builder.push('model=$.data');
 
 					var AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
-					fn = new AsyncFunction('$', builder.join(',') + ';' + code);
+					fn = new AsyncFunction('$', builder.join(',') + ';try{' + code+'}catch(e){$.instance.status({error:e.message});$.destroy();}');
 				} else {
 					fn = null;
 				}
+				instance.status(EMPTYOBJECT);
 			} catch (e) {
 				fn = null;
-				instance.throw('Code: ' + e.message);
+				instance.status({ error: e.message });
 			}
 		};
 
@@ -95,4 +96,5 @@ The component simulates Total.js Schema Workflow operation. It can process data 
 	<header>
 		<i class="ICON"></i>NAME: <b data-bind="CONFIG.name__text"></b>
 	</header>
+	<footer data-bind="STATUS.error__text span__show" style="padding:10px" class="fs12 red"><i class="fa fa-bug mr5"></i><b>ERROR:</b> <span></span></footer>
 </body>
