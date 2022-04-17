@@ -1,0 +1,98 @@
+<script total>
+
+	exports.name = 'Workflow';
+	exports.group = 'REST API';
+	exports.version = '1';
+	exports.icon = 'fa fa-code';
+	exports.author = 'Peter Širka';
+	exports.config = { name: 'Name', code: '// [Properties]\n// $ {Message}\n// controller {Object} A controller instance\n// user {Object} A user instance if exists\n// headers {Object} Request headers\n// query {Object} URL query arguments\n// params {Object} A dynamic URL params\n// ip {String} IP address\n\n// [Functions]\n// respond(data {Object}) Responds with data\n// success(data {Object} optional) Response with success object\n// invalid(error {String}) Error handling\n\nsuccess();' };
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }, { id: 'error', name: 'Error' }];
+
+	exports.make = function(instance, config) {
+
+		var fn;
+
+		instance.message = function($) {
+			if (fn) {
+				try {
+					fn($);
+				} catch (e) {
+					$.destroy();
+					$.throw(e);
+				}
+			}
+		};
+
+		instance.configure = function() {
+			try {
+				var code = config.code;
+				if (code) {
+
+					var builder = ['var controller=$.refs.controller||EMPTYOBJECT'];
+
+					if (code.indexOf('headers') !== -1)
+						builder.push('headers=controller.headers||EMPTYOBJECT');
+
+					if (code.indexOf('params') !== -1)
+						builder.push('params=controller.params||EMPTYOBJECT');
+
+					if (code.indexOf('query') !== -1)
+						builder.push('query=controller.query||EMPTYOBJECT');
+
+					if (code.indexOf('respond') !== -1)
+						builder.push('respond=(data)=>$.send(\'output\',data)');
+
+					if (code.indexOf('success') !== -1)
+						builder.push('success=(data)=>$.send(\'output\',{success:true,value:data})');
+
+					if (code.indexOf('invalid') !== -1)
+						builder.push('invalid=(err)=>$.send(\'error\',[{error:err+\'\'}])');
+
+					if (code.indexOf('user') !== -1)
+						builder.push('user=controller.user');
+
+					if (code.indexOf('ip') !== -1)
+						builder.push('ip=controller.ip||\'\'');
+
+					if (code.indexOf('model') !== -1)
+						builder.push('model=$.data');
+
+					var AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
+					fn = new AsyncFunction('$', builder.join(',') + ';' + code);
+				} else {
+					fn = null;
+				}
+			} catch (e) {
+				fn = null;
+				instance.throw('Code: ' + e.message);
+			}
+		};
+
+		instance.close = function() {
+			fn = null;
+		};
+
+		instance.configure();
+
+	};
+
+</script>
+
+<readme>
+The component simulates Total.js Schema Workflow operation. It can process data and store/read them into the database.
+</readme>
+
+<settings>
+	<div class="padding">
+		<div data---="input__?.name__required:1" class="m">Workflow name</div>
+		<div class="ui-input-label">Code:</div>
+		<div data---="codemirror__?.code__type:javascript;minheight:300;parent:auto;margin:140;tabs:true;trim:true" class="m"></div>
+	</div>
+</settings>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME: <b data-bind="CONFIG.name__text"></b>
+	</header>
+</body>
