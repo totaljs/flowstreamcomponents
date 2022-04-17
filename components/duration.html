@@ -28,7 +28,7 @@
 		};
 
 		instance.message = function($) {
-			var duration = ((Date.now() - $.duration) / 1000).floor(2);
+			var duration = ((Date.now() - $.duration) / 1000).floor(3);
 
 			if (stats.min === null || stats.min > duration)
 				stats.min = duration;
@@ -36,7 +36,7 @@
 			if (stats.max === null || stats.max < duration)
 				stats.max = duration;
 
-			stats.avg = ((stats.max + stats.min) / 2).floor(2);
+			stats.avg = ((stats.max + stats.min) / 2).floor(3);
 			stats.last = duration;
 			stats.count++;
 
