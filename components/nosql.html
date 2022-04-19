@@ -26,10 +26,13 @@
 
 			if (method === 'insert') {
 
-				config.addid && !data.data.id && (data.data.id = UID());
-				nosql.insert(data.data).callback(function(err) {
-					$.send('output', { success: err ? false : true, result: data.data });
-				});
+				if (typeof(data.data) === 'object') {
+					config.addid && !data.data.id && (data.data.id = UID());
+					nosql.insert(data.data).callback(function(err) {
+						$.send('output', { success: err ? false : true, result: data.data });
+					});
+				} else
+					$.send('output', { success: false, error: 'invalid data' });
 
 			} else if (method === 'read' || method === 'query') {
 
