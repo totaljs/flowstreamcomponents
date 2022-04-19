@@ -3,7 +3,7 @@
 	exports.name = 'HTTP Route';
 	exports.group = 'Triggers';
 	exports.icon = 'fa fa-route';
-	exports.version = '2';
+	exports.version = '3';
 	exports.config = { url: '', method: '', timeout: 5000, limit: 5120, upload: false, response: 'empty' };
 	exports.outputs = [{ id: 'output', name: 'Output' }];
 
@@ -20,7 +20,7 @@
 				if (config.response === 'custom')
 					msg.refs.response = next;
 				else
-					msg.on('end', msg => next({ type: config.response, body: msg.data instanceof Buffer ? msg.data.toString('base64') : msg.data }));
+					msg.on('end', msg => next({ type: config.response, body: msg.data instanceof Buffer ? msg.data.toString('base64') : msg.data, status: msg.repo.status, headers: msg.repo.headers }));
 			}
 
 			msg.send('output');
