@@ -64,6 +64,7 @@
 			} else if (method === 'remove') {
 
 				let builder = nosql.remove();
+				let filter = data.filter;
 				applyFilter(builder, filter);
 				builder.callback(function(err, count) {
 					$.send('output', { success: err ? false : true, result: count || 0 });
