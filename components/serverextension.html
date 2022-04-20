@@ -22,7 +22,7 @@
 			}
 
 			try {
-				install = config.install ? new Function('instance', config.install) : null;
+				install = config.install ? new Function('instance', 'require', config.install) : null;
 				uninstall = config.uninstall ? new Function('instance', config.uninstall) : null;
 			} catch (e) {
 				install = null;
@@ -30,7 +30,7 @@
 				instance.throw('Code: ' + e.message);
 			}
 
-			install && install.call(instance, instance);
+			install && install.call(instance, instance, require);
 
 		};
 
