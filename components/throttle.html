@@ -1,0 +1,90 @@
+<script total>
+
+	exports.name = 'Throttle';
+	exports.group = 'Common';
+	exports.version = '1';
+	exports.icon = 'fa fa-filter';
+	exports.author = 'Peter Širka';
+	exports.config = { limit: 1, delay: 0 };
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Outputs' }];
+
+	exports.make = function(instance, config) {
+
+		var pending = [];
+		var running = 0;
+
+		var check = function() {
+			if (running < config.limit) {
+
+				var diff = config.limit - running;
+				var items = pending.splice(0, diff);
+
+				running += items.length;
+
+				if (config.delay) {
+					setTimeout(function() {
+						for (var item of items)
+							item.send('output');
+					}, config.delay);
+				} else {
+					for (var item of items)
+						item.send('output');
+				}
+			}
+
+			instance.status(pending.length, 500);
+		};
+
+		var end = function() {
+			running--;
+			check();
+		};
+
+		instance.message = function($) {
+			$.on('end', end);
+			pending.push($);
+			check();
+		};
+
+		instance.trigger = function() {
+			var item = pending.shift();
+			if (item) {
+				running++;
+				item.send('output');
+			}
+			check();
+		};
+
+	};
+
+</script>
+
+<readme>
+The component sends only limited count of messages.
+</readme>
+
+<settings>
+	<div class="padding">
+		<div class="row">
+			<div class="col-md-3 m">
+				<div data---="input__?.limit__required:1;type:number">Limit</div>
+			</div>
+			<div class="col-md-3 m">
+				<div data---="input__?.delay__required:0;align:1;type:number;ricon:!ms">Delay</div>
+			</div>
+		</div>
+	</div>
+</settings>
+
+<style>
+	.CLASS .status { font-size: 35px; margin: 0; padding: 0 10px 10px; font-weight: bold; text-align: center; }
+</style>
+
+<body>
+	<header>
+		<button class="button exec" data-exec="FUNC.trigger">Send</button>
+		<i class="ICON"></i>NAME
+	</header>
+	<footer data-bind="STATUS__text:(value || 0).format(0)" class="status"></footer>
+</body>
