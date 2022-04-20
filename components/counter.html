@@ -28,20 +28,8 @@
 </script>
 
 <style>
-	.CLASS .status { font-size: 35px; margin: 0; padding: 0 10px 5px; font-weight: bold; }
-	.CLASS button { float: right; height: 20px; font-size: 11px; border: 1px solid #E0E0E0; border-radius: var(--radius); color: #000; background-color: transparent; margin: 0; padding: 0 5px; }
-	.CLASS button:hover { background-color: #F8F8F8; }
-	.CLASS button:active { background-color: #E0E0E0; }
-	.ui-dark .CLASS button { border-color: #404040; color: #FFF; }
-	.ui-dark .CLASS button:hover { background-color: #303030; }
-	.ui-dark .CLASS button:active { background-color: #404040; }
+	.CLASS .status { font-size: 35px; margin: 0; padding: 0 10px 10px; font-weight: bold; text-align: center; }
 </style>
-
-<script>
-	FUNC.fcounter_reset = function(el) {
-		SETTER('websocket/send', { TYPE: 'trigger', id: el.attrd2('id') });
-	};
-</script>
 
 <readme>
 The component counts incoming messages.
@@ -49,10 +37,8 @@ The component counts incoming messages.
 
 <body>
 	<header>
-		<button class="exec" data-exec="FUNC.fcounter_reset">Reset</button>
+		<button class="exec button" data-exec="FUNC.trigger">Reset</button>
 		<i class="ICON"></i>NAME
 	</header>
-	<footer>
-		<div data-bind="!STATUS__text:value.format(0)__show:value>=0" class="status hidden"></div>
-	</footer>
+	<footer data-bind="!STATUS__text:(value || 0).format(0)" class="status"></footer>
 </body>
