@@ -5,18 +5,20 @@
 	exports.version = '1';
 	exports.icon = 'fa fa-code';
 	exports.author = 'Peter Širka';
-	exports.config = { name: 'Name', code: '// [Properties]\n// $ {Message}\n// controller {Object} A controller instance\n// user {Object} A user instance if exists\n// headers {Object} Request headers\n// query {Object} URL query arguments\n// params {Object} A dynamic URL params\n// ip {String} IP address\n\n// [Functions]\n// respond(data {Object}) Responds with data\n// success(data {Object} optional) Response with success object\n// invalid(error {String}) Error handling\n\nsuccess();' };
+	exports.config = { name: 'Name', code: 'success();' };
 	exports.inputs = [{ id: 'input', name: 'Input' }];
 	exports.outputs = [{ id: 'output', name: 'Output' }, { id: 'error', name: 'Error' }];
+	exports.meta = { settingswidth: 1400 };
 
 	exports.make = function(instance, config) {
 
+		var repo = {};
 		var fn;
 
 		instance.message = function($) {
 			if (fn) {
 				try {
-					fn($);
+					fn($, repo);
 				} catch (e) {
 					$.destroy();
 					$.throw(e);
@@ -59,7 +61,8 @@
 						builder.push('model=$.data');
 
 					var AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
-					fn = new AsyncFunction('$', builder.join(',') + ';try{' + code+'}catch(e){$.instance.status({error:e.message});$.destroy();}');
+					fn = new AsyncFunction('$', 'repo', builder.join(',') + ';try{' + code+'}catch(e){$.instance.status({error:e.message});$.destroy();}');
+
 				} else {
 					fn = null;
 				}
@@ -72,6 +75,7 @@
 
 		instance.close = function() {
 			fn = null;
+			repo = null;
 		};
 
 		instance.configure();
@@ -88,9 +92,40 @@ The component simulates Total.js Schema Workflow operation. It can process data 
 	<div class="padding">
 		<div data---="input__?.name__required:1" class="m">Workflow name</div>
 		<div class="ui-input-label">Code:</div>
-		<div data---="codemirror__?.code__type:javascript;minheight:300;parent:auto;margin:140;tabs:true;trim:true" class="m"></div>
+		<div data---="codemirror__?.code__type:javascript;minheight:300;parent:auto;margin:145;tabs:true;trim:true"></div>
+		<div class="help"><i class="fa fa-book"></i><span class="link exec" data-exec="comworkflowsettingshelp">Documentation</span></div>
 	</div>
 </settings>
+
+<script>
+TOUCH(function(instance) {
+
+	W.comworkflowsettingshelp = function() {
+	var md = `
+__Properties__:
+- \`$ {Message}\`
+- \`controller {Object}\` A controller instance
+- \`user {Object}\` A user instance if exists
+- \`headers {Object}\` Request headers
+- \`query {Object}\` URL query arguments
+- \`params {Object}\` A dynamic URL params
+- \`ip {String}\` IP address
+
+__Functions__:
+- \`respond(data {Object})\` Responds with data
+- \`success(data {Object}\` optional) Response with success object
+- \`invalid(error {String})\` Error handling`;
+		FUNC.readme('Documentation: Workflow', md);
+	};
+
+	instance.settings = function() {
+		if (!W.comworkflowsettingsskip) {
+			W.comworkflowsettingsskip = true;
+			W.comworkflowsettingshelp();
+		}
+	};
+});
+</script>
 
 <body>
 	<header>
