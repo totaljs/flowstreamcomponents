@@ -5,7 +5,7 @@
 	exports.icon = 'fa fa-road';
 	exports.version = '1';
 	exports.author = 'Peter Širka';
-	exports.config = { url: '', method: '', timeout: 5000, limit: 5120, upload: false, send: 'all' };
+	exports.config = { url: '/', method: 'GET', timeout: 5000, limit: 5120, upload: false, send: 'all' };
 	exports.outputs = [{ id: 'output', name: 'Output' }];
 
 	exports.make = function(instance, config) {
@@ -91,7 +91,7 @@ __Output data__:
 			</div>
 			<div class="col-md-9 m">
 				<div data---="input__?.url__required:1">Relative URL address</div>
-				<div class="help">Relative path to: <span data-bind="window.location.origin__text"></span></div>
+				<div class="help">Relative path to: <span data-bind="flow.head.proxyurl__text"></span></div>
 			</div>
 		</div>
 		<div class="row">
