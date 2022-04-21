@@ -1,12 +1,13 @@
 <script total>
 
+	exports.id = 'mqttpublish';
 	exports.name = 'MQTT Publish';
 	exports.icon = 'fa fa-sign-out';
 	exports.group = 'MQTT';
 	exports.config = { broker: '' };
 	exports.inputs = [{ id: 'message', name: 'Message' }];
 	exports.author = 'Martin Smola';
-	exports.version = '2';
+	exports.version = '3';
 	exports.flags = ['mqttbroker-dep'];
 
 	exports.make = function(instance, config) {
@@ -25,6 +26,7 @@
 				return;
 
 			broker.publish($.data.topic, $.data.message);
+			$.end();
 		};
 
 		instance.configure();
