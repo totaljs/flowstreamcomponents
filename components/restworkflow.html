@@ -49,7 +49,7 @@
 						builder.push('success=(data)=>$.send(\'output\',{success:true,value:data})');
 
 					if (code.indexOf('invalid') !== -1)
-						builder.push('invalid=(err)=>$.send(\'error\',[{error:err+\'\'}])');
+						builder.push('invalid=(err)=>$.send(\'error\',[{error:err.toString()}])');
 
 					if (code.indexOf('user') !== -1)
 						builder.push('user=controller.user');
