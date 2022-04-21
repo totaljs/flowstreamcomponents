@@ -8,6 +8,7 @@
 	exports.config = { name: 'Name', code: '// [Properties]\n// $ {Message}\n// controller {Object} A controller instance\n// user {Object} A user instance if exists\n// headers {Object} Request headers\n// query {Object} URL query arguments\n// params {Object} A dynamic URL params\n// ip {String} IP address\n\n// [Functions]\n// respond(data {Object}) Responds with data\n// success(data {Object} optional) Response with success object\n// invalid(error {String}) Error handling\n\nsuccess();' };
 	exports.inputs = [{ id: 'input', name: 'Input' }];
 	exports.outputs = [{ id: 'output', name: 'Output' }, { id: 'error', name: 'Error' }];
+	exports.meta = { settingswidth: 1400 };
 
 	exports.make = function(instance, config) {
 
