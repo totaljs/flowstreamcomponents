@@ -22,7 +22,10 @@
 			return val;
 		};
 
-		instance.preparedata = function(item, val, err) {
+		instance.preparedata = function(item, val, err, parent) {
+
+			var path = (parent ? (parent + '.') : '') + item.name;
+
 			switch (item.type) {
 				case 'string':
 					if (val == null)
@@ -30,7 +33,7 @@
 					else
 						val += '';
 					if (item.required && !val)
-						err.push({ name: item.name, error: item.error });
+						err.push({ name: item.name, path: path, error: item.error });
 					return val;
 
 				case 'upper':
@@ -39,7 +42,7 @@
 					else
 						val += '';
 					if (item.required && !val)
-						err.push({ name: item.name, error: item.error });
+						err.push({ name: item.name, path: path, error: item.error });
 					return val ? val.toUpperCase() : '';
 
 				case 'lower':
@@ -48,7 +51,7 @@
 					else
 						val += '';
 					if (item.required && !val)
-						err.push({ name: item.name, error: item.error });
+						err.push({ name: item.name, path: path, error: item.error });
 					return val ? val.toLowerCase() : '';
 
 				case 'lower':
@@ -57,7 +60,7 @@
 					else
 						val += '';
 					if (item.required && !val)
-						err.push({ name: item.name, error: item.error });
+						err.push({ name: item.name, path: path, error: item.error });
 					return val ? val.slug() : '';
 
 				case 'capitalize':
@@ -66,7 +69,7 @@
 					else
 						val += '';
 					if (item.required && !val)
-						err.push({ name: item.name, error: item.error });
+						err.push({ name: item.name, path: path, error: item.error });
 					return val ? val.capitalize() : '';
 
 				case 'email':
@@ -78,7 +81,7 @@
 					val = val && val.isEmail() ? val : '';
 
 					if (item.required && !val)
-						err.push({ name: item.name, error: item.error });
+						err.push({ name: item.name, path: path, error: item.error });
 
 					return val;
 
@@ -91,7 +94,7 @@
 					val = val && val.isPhone() ? val : '';
 
 					if (item.required && !val)
-						err.push({ name: item.name, error: item.error });
+						err.push({ name: item.name, path: path, error: item.error });
 
 					return val;
 
@@ -106,7 +109,7 @@
 					val = val && val.isZIP() ? val : '';
 
 					if (item.required && !val)
-						err.push({ name: item.name, error: item.error });
+						err.push({ name: item.name, path: path, error: item.error });
 
 					return val;
 
@@ -122,7 +125,7 @@
 					}
 
 					if (item.required && !val)
-						err.push({ name: item.name, error: item.error });
+						err.push({ name: item.name, path: path, error: item.error });
 					return null;
 
 				case 'object':
@@ -132,24 +135,24 @@
 				case 'float':
 					val = preparenumber(val, err, null, true);
 					if (item.required && val == null)
-						err.push({ name: item.name, error: item.error });
+						err.push({ name: item.name, path: path, error: item.error });
 					return val || 0;
 				case 'integer':
 					var max = 2147483647;
 					val = preparenumber(val, err, max, -max);
 					if (item.required && val == null)
-						err.push({ name: item.name, error: item.error });
+						err.push({ name: item.name, path: path, error: item.error });
 					return val || 0;
 				case 'smallint':
 					var max = 32768;
 					val = preparenumber(val, err, max, -max);
 					if (item.required && val == null)
-						err.push({ name: item.name, error: item.error });
+						err.push({ name: item.name, path: path, error: item.error });
 					return val || 0;
 				case 'tinyint':
 					val = preparenumber(val, err, 255, 0);
 					if (item.required && val == null)
-						err.push({ name: item.name, error: item.error });
+						err.push({ name: item.name, path: path, error: item.error });
 					return val || 0;
 				case 'base64':
 
@@ -160,7 +163,7 @@
 
 					val = val.isBase64() ? val : '';
 					if (item.required && !val)
-						err.push({ name: item.name, error: item.error });
+						err.push({ name: item.name, path: path, error: item.error });
 					return val;
 
 				case 'json':
@@ -172,7 +175,7 @@
 
 					val = val.isJSON() ? val : '';
 					if (item.required && !val)
-						err.push({ name: item.name, error: item.error });
+						err.push({ name: item.name, path: path, error: item.error });
 					return val;
 
 				case 'url':
@@ -185,7 +188,7 @@
 					val = val.isURL() ? val : '';
 
 					if (item.required && !val)
-						err.push({ name: item.name, error: item.error });
+						err.push({ name: item.name, path: path, error: item.error });
 
 					return val;
 
@@ -200,7 +203,7 @@
 					val = val.isUID() ? val : '';
 
 					if (item.required && !val)
-						err.push({ name: item.name, error: item.error });
+						err.push({ name: item.name, path: path, error: item.error });
 
 					return val;
 
@@ -215,19 +218,20 @@
 					val = val.isGUID() ? val : '';
 
 					if (item.required && !val)
-						err.push({ name: item.name, error: item.error });
+						err.push({ name: item.name, path: path, error: item.error });
 
 					return val;
 
 				default:
 					var model = instance.main.meta.flow[item.type];
-					return model ? model.validatedata(val || {}, err).data : null;
+					return model ? model.validatedata(val || {}, err, path).data : null;
 			}
 		};
 
-		instance.validatedata = function(data, err) {
+		instance.validatedata = function(data, err, parent) {
 
 			var obj = {};
+			var plus = parent ? (parent + '.') : '';
 
 			if (!err)
 				err = [];
@@ -237,13 +241,13 @@
 				if (data.isJSON()) {
 					data = data.parseJSON(true);
 				} else {
-					err.push({ error: 'Invalid data' });
+					err.push({ name: parent, error: 'Invalid data' });
 					return { error: err };
 				}
 			}
 
 			if (!data) {
-				err.push({ error: 'Invalid data' });
+				err.push({ name: parent, error: 'Invalid data' });
 				return { error: err };
 
 			}
@@ -257,16 +261,17 @@
 
 					obj[item.name] = [];
 
-					for (var m of val) {
-						var r = instance.preparedata(item, m, err);
+					for (var i = 0; i < val.length; i++) {
+						var m = val[i];
+						var r = instance.preparedata(item, m, err, plus);
 						obj[item.name].push(r);
 					}
 
 					if (item.required && !obj[item.name].length)
-						err.push({ name: item.name, error: DEFERR });
+						err.push({ name: item.name, path: plus + item.name, error: DEFERR });
 
 				} else
-					obj[item.name] = instance.preparedata(item, val, err);
+					obj[item.name] = instance.preparedata(item, val, err, parent);
 			}
 
 			return { data: obj, error: err.length ? err : null };
@@ -289,14 +294,15 @@
 			if (path)
 				data = findvalue(data);
 
-			var output = instance.validatedata(data);
+			var err = [];
+			var output = instance.validatedata(data, err);
 
 			if (output.error) {
-				instance.send('error', output.error);
+				$.send('error', output.error);
 			} else {
 				if (path && config.rewrite)
 					data = output.data;
-				instance.send('output', path && config.rewrite ? $.data : output.data);
+				$.send('output', path && config.rewrite ? $.data : output.data);
 			}
 		};
 
@@ -506,7 +512,7 @@ This component prepares incoming data according to the defined schema. Output is
 
 			for (var key in flow.data) {
 				var m = flow.data[key];
-				if (m.Component.name === 'Model')
+				if (m.Component && m.Component.name === 'Model')
 					tmp.types.push({ id: m.id, name: 'Model: <b>' + m.config.name.encode() + '</b>' });
 			}
 
