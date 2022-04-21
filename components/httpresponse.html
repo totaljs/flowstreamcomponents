@@ -1,0 +1,41 @@
+<script total>
+
+	exports.id = 'httpresponse';
+	exports.name = 'HTTP Response';
+	exports.icon = 'fa fa-reply';
+	exports.author = 'Total Avengers';
+	exports.version = '1';
+	exports.config = {};
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+
+	exports.make = function(instance, config) {
+
+		instance.message = function($) {
+			var data = $.data;
+			if ($.refs.response)
+				$.refs.response({ type: config.type || 'json', body: $.data instanceof Buffer ? $.data.toString('base64') : $.data, status: $.status, headers: $.headers });
+			else
+				instance.throw('NO RESPONSE FN');
+		};
+	};
+
+</script>
+
+<readme>
+	This component only works with HTTP Route which must have set `Response` to `Custom`
+</readme>
+
+<settings>
+	<div class="padding">
+		<div data---="input__?.type__required:1;dirsource:empty|Empty response,json|JSON,text|Text,html|HTML,xml|XML">Response</div>
+	</div>
+</settings>
+
+<style>
+</style>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+</body>
