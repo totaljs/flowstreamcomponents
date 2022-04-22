@@ -1,0 +1,113 @@
+<script total>
+
+	exports.name = 'Stopwatch';
+	exports.group = 'Stats';
+	exports.version = '3';
+	exports.icon = 'fa fa-stopwatch';
+	exports.author = 'Peter Širka';
+	exports.config = { name: 'Stopwatch', delay: 1000 };
+	exports.inputs = [{ id: 'input', name: 'Counter' }];
+
+	exports.make = function(instance, config) {
+
+		var max = 9;
+		var results = [];
+		var timeout;
+		var count = 0;
+		var ts;
+
+		var flush = function() {
+			var diff = Date.now() - ts;
+			timeout = null;
+			if (results.unshift({ date: new Date(), duration: (diff / 1000).floor(3), count: count }) > max)
+				results.pop();
+			count = 0;
+			instance.status(results, 1000);
+		};
+
+		instance.message = function($) {
+
+			$.destroy();
+
+			if (timeout)
+				clearTimeout(timeout);
+			else
+				ts = Date.now();
+
+			count++;
+			timeout = setTimeout(flush, config.delay);
+		};
+
+		instance.destroy = function() {
+			if (timeout) {
+				clearTimeout(timeout);
+				timeout = null;
+			}
+			results = null;
+		};
+
+		instance.trigger = function() {
+			results = [];
+			instance.status(results);
+		};
+
+		instance.configure = function() {
+
+			if (timeout) {
+				clearTimeout(timeout);
+				timeout = null;
+			}
+
+			if (results.length)
+				results = [];
+
+			count = 0;
+
+		};
+
+	};
+
+</script>
+
+<style>
+	.CLASS footer { padding: 10px; width: 220px; }
+	.CLASS .result { height: 22px; font-size: 11px; border-top: 1px solid #E0E0E0; line-height: 22px; }
+	.CLASS .result .ts { margin-right: 100px; }
+	.CLASS .result .duration { float: right; width: 100px; text-align: right; }
+</style>
+
+<settings>
+	<div class="padding">
+		<div class="row">
+			<div class="col-md-8 m">
+				<div data---="input__?.name__required:1">Name</div>
+			</div>
+			<div class="col-md-4 m">
+				<div data---="input__?.delay__type:number;required:1;align:1;ricon:!ms">Idle time delay</div>
+			</div>
+		</div>
+	</div>
+</settings>
+
+<readme>
+The component runs a simple stopwatch for incomming messages.
+</readme>
+
+<body>
+	<header>
+		<i class="ICON"></i><span data-bind="CONFIG.name__text"></span>
+	</header>
+	<footer>
+		<div><button class="exec button" data-exec="FUNC.trigger">Reset</button></div>
+		<div data-bind="STATUS__template__show:value && value.length" class="mt10">
+			<script type="text/html">
+				{{ foreach m in value }}
+				<div class="result">
+					<span class="duration">{{ m.duration }} sec</span>
+					<div class="ts">{{ m.date | format('[time]') }} ({{ m.count }})</div>
+				</div>
+				{{ end }}
+			</script>
+		</div>
+	</footer>
+</body>
