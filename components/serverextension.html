@@ -15,7 +15,7 @@
 		instance.configure = function() {
 
 			if (uninstall) {
-				uninstall.call(instance, instance);
+				uninstall.call(instance, instance, require);
 				uninstall = null;
 				setTimeout(instance.configure, 1000);
 				return;
@@ -23,7 +23,7 @@
 
 			try {
 				install = config.install ? new Function('instance', 'require', config.install) : null;
-				uninstall = config.uninstall ? new Function('instance', config.uninstall) : null;
+				uninstall = config.uninstall ? new Function('instance', 'require', config.uninstall) : null;
 			} catch (e) {
 				install = null;
 				uninstall = null;
@@ -35,7 +35,7 @@
 		};
 
 		instance.close = function() {
-			uninstall && uninstall.call(instance, instance);
+			uninstall && uninstall.call(instance, instance, require);
 			uninstall = null;
 			install = null;
 		};
