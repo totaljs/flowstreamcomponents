@@ -61,7 +61,9 @@
 						builder.push('model=$.data');
 
 					var AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
-					fn = new AsyncFunction('$', 'repo', builder.join(',') + ';try{' + code+'}catch(e){$.instance.status({error:e.message});$.destroy();}');
+					var body = builder.join(',') + ';try{' + code + '}catch(e){$.instance.status({error:e.message});$.destroy();}';
+
+					fn = code.indexOf('await ') === -1 ? new Function('$', 'repo', body) : new AsyncFunction('$', 'repo', body);
 
 					if (config.clear)
 						repo = {};
