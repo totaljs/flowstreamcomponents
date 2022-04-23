@@ -1,16 +1,19 @@
 <script total>
 
 	exports.name = 'Model';
-	exports.group = 'Transformation';
+	exports.group = 'Transformations';
 	exports.icon = 'fab fa-wpforms';
 	exports.author = 'Peter Širka';
 	exports.version = '1';
 	exports.config = { name: 'Model', path: '', schema: [], rewrite: true };
 	exports.inputs = [{ id: 'input', name: 'Input' }];
 	exports.outputs = [{ id: 'output', name: 'Output' }, { id: 'error', name: 'Error' }];
+	exports.meta = { settingswidth: 1200 };
 
 	exports.make = function(instance, config) {
 
+		var deferr = 'Invalid value';
+		var defvalues = {};
 		var path;
 
 		var preparenumber = function(val, err, max, min, float) {
@@ -29,87 +32,83 @@
 			switch (item.type) {
 				case 'string':
 					if (val == null)
-						val = '';
+						val = defvalues[item.name] || '';
 					else
 						val += '';
 					if (item.required && !val)
-						err.push({ name: item.name, path: path, error: item.error });
+						err.push({ name: item.name, path: path, error: item.error || deferr });
 					return val;
 
 				case 'upper':
 					if (val == null)
-						val = '';
+						val = defvalues[item.name] || '';
 					else
 						val += '';
 					if (item.required && !val)
-						err.push({ name: item.name, path: path, error: item.error });
+						err.push({ name: item.name, path: path, error: item.error || deferr });
 					return val ? val.toUpperCase() : '';
 
 				case 'lower':
 					if (val == null)
-						val = '';
+						val = defvalues[item.name] || '';
 					else
 						val += '';
 					if (item.required && !val)
-						err.push({ name: item.name, path: path, error: item.error });
+						err.push({ name: item.name, path: path, error: item.error || deferr });
 					return val ? val.toLowerCase() : '';
-
-				case 'lower':
-					if (val == null)
-						val = '';
-					else
-						val += '';
-					if (item.required && !val)
-						err.push({ name: item.name, path: path, error: item.error });
-					return val ? val.slug() : '';
 
 				case 'capitalize':
 					if (val == null)
-						val = '';
+						val = defvalues[item.name] || '';
 					else
 						val += '';
 					if (item.required && !val)
-						err.push({ name: item.name, path: path, error: item.error });
+						err.push({ name: item.name, path: path, error: item.error || deferr });
 					return val ? val.capitalize() : '';
 
 				case 'email':
 					if (val == null)
-						val = '';
+						val = defvalues[item.name] || '';
 					else
 						val += '';
 					val = val.replace(/\s/g, '');
 					val = val && val.isEmail() ? val : '';
 
 					if (item.required && !val)
-						err.push({ name: item.name, path: path, error: item.error });
+						err.push({ name: item.name, path: path, error: item.error || deferr });
 
 					return val;
 
 				case 'phone':
 					if (val == null)
-						val = '';
+						val = defvalues[item.name] || '';
 					else
 						val += '';
 					val = val.trim().replace(/\s|\.|-|\(|\)/g, '');
 					val = val && val.isPhone() ? val : '';
 
 					if (item.required && !val)
-						err.push({ name: item.name, path: path, error: item.error });
+						err.push({ name: item.name, path: path, error: item.error || deferr });
 
 					return val;
 
 				case 'boolean':
+
+					if (val == null)
+						return defvalues[item.name] || false;
+
 					return val == true || val === 'on' || val === 'true' || val == 1;
+
 				case 'zip':
-					if (val != null)
-						val += '';
+					if (val == null)
+						val = defvalues[item.name] || '';
 					else
-						val = '';
+						val += '';
 					val = val.replace(/\s/g, '');
 					val = val && val.isZIP() ? val : '';
 
 					if (item.required && !val)
-						err.push({ name: item.name, path: path, error: item.error });
+						err.push({ name: item.name, path: path, error: item.error || deferr });
 
 					return val;
 
@@ -122,80 +121,103 @@
 							case 'number':
 								return val.parseDate();
 						}
-					}
+					} else
+						val = defvalues[item.name] ? (defvalues[item.name] == NOOP ? new Date() : defvalues[item.name]) : null;
 
 					if (item.required && !val)
-						err.push({ name: item.name, path: path, error: item.error });
+						err.push({ name: item.name, path: path, error: item.error || deferr });
 					return null;
 
 				case 'object':
+
+					if (val == null && defvalues[item.name] != null)
+						val = defvalues[item.name];
+
 					return val;
 
 				case 'number':
 				case 'float':
 					val = preparenumber(val, err, null, true);
+
+					if (val == null && defvalues[item.name] != null)
+						val = defvalues[item.name];
+
 					if (item.required && val == null)
-						err.push({ name: item.name, path: path, error: item.error });
+						err.push({ name: item.name, path: path, error: item.error || deferr });
 					return val || 0;
 				case 'integer':
 					var max = 2147483647;
 					val = preparenumber(val, err, max, -max);
+
+					if (val == null && defvalues[item.name] != null)
+						val = defvalues[item.name];
+
 					if (item.required && val == null)
-						err.push({ name: item.name, path: path, error: item.error });
+						err.push({ name: item.name, path: path, error: item.error || deferr });
 					return val || 0;
 				case 'smallint':
 					var max = 32768;
 					val = preparenumber(val, err, max, -max);
+
+					if (val == null && defvalues[item.name] != null)
+						val = defvalues[item.name];
+
 					if (item.required && val == null)
-						err.push({ name: item.name, path: path, error: item.error });
+						err.push({ name: item.name, path: path, error: item.error || deferr });
 					return val || 0;
 				case 'tinyint':
 					val = preparenumber(val, err, 255, 0);
+
+					if (val == null && defvalues[item.name] != null)
+						val = defvalues[item.name];
+
 					if (item.required && val == null)
-						err.push({ name: item.name, path: path, error: item.error });
+						err.push({ name: item.name, path: path, error: item.error || deferr });
 					return val || 0;
 				case 'base64':
 
 					if (val == null)
-						val = '';
+						val = defvalues[item.name] || '';
 					else
 						val += '';
 
 					val = val.isBase64() ? val : '';
+
 					if (item.required && !val)
-						err.push({ name: item.name, path: path, error: item.error });
+						err.push({ name: item.name, path: path, error: item.error || deferr });
+
 					return val;
 
 				case 'json':
 
 					if (val == null)
-						val = '';
+						val = defvalues[item.name] || '';
 					else
 						val += '';
 
 					val = val.isJSON() ? val : '';
 					if (item.required && !val)
-						err.push({ name: item.name, path: path, error: item.error });
+						err.push({ name: item.name, path: path, error: item.error || deferr });
 					return val;
 
 				case 'url':
 
 					if (val == null)
-						val = '';
+						val = defvalues[item.name] || '';
 					else
 						val += '';
 
 					val = val.isURL() ? val : '';
 
 					if (item.required && !val)
-						err.push({ name: item.name, path: path, error: item.error });
+						err.push({ name: item.name, path: path, error: item.error || deferr });
 
 					return val;
 
 				case 'uid':
 
 					if (val == null)
-						val = '';
+						val = defvalues[item.name] || '';
 					else
 						val += '';
 
@@ -203,14 +225,14 @@
 					val = val.isUID() ? val : '';
 
 					if (item.required && !val)
-						err.push({ name: item.name, path: path, error: item.error });
+						err.push({ name: item.name, path: path, error: item.error || deferr });
 
 					return val;
 
 				case 'guid':
 
 					if (val == null)
-						val = '';
+						val = defvalues[item.name] || '';
 					else
 						val += '';
 
@@ -218,7 +240,7 @@
 					val = val.isGUID() ? val : '';
 
 					if (item.required && !val)
-						err.push({ name: item.name, path: path, error: item.error });
+						err.push({ name: item.name, path: path, error: item.error || deferr });
 
 					return val;
 
@@ -249,7 +271,6 @@
 			if (!data) {
 				err.push({ name: parent, error: 'Invalid data' });
 				return { error: err };
-
 			}
 
 			for (var item of config.schema) {
@@ -268,7 +289,7 @@
 					}
 
 					if (item.required && !obj[item.name].length)
-						err.push({ name: item.name, path: plus + item.name, error: DEFERR });
+						err.push({ name: item.name, path: plus + item.name, error: deferr });
 
 				} else
 					obj[item.name] = instance.preparedata(item, val, err, parent);
@@ -308,6 +329,36 @@
 
 		instance.configure = function() {
 			path = config.path ? config.path.split('.') : null;
+			defvalues = {};
+			for (var item of config.schema) {
+				if (item.default) {
+					switch (item.type) {
+						case 'tinyint':
+						case 'smallint':
+						case 'integer':
+						case 'number':
+						case 'float':
+							defvalues[item.name] = item.default.parseFloat();
+							break;
+						case 'object':
+							try {
+								defvalues[item.name] = new Function('return ' + item.default)();
+							} catch (e) {
+								instance.throw(e);
+							}
+							break;
+						case 'date':
+							defvalues[item.name] = item.default === 'now' ? NOOP : item.default.parseDate('yyyy-MM-dd HH:mm:ss');
+							break;
+						case 'boolean':
+							defvalues[item.name] = item.default === 'true' || item.default === 'on' || item.default === '1';
+							break;
+						default:
+							defvalues[item.name] = item.default;
+							break;
+					}
+				}
+			}
 		};
 
 		instance.configure();
@@ -343,16 +394,22 @@ This component prepares incoming data according to the defined schema. Output is
 			<div data-bind="?.schema__template:figure --> data-id__show:value && value.length" class="fields m">
 				<script type="text/html">
 					{{ foreach m in value }}
-					<figure data-id="{{ m.id }}">
+					<figure data-id="{{ m.id }}"{{ if m.required }} class="isrequired"{{ fi }}>
 						<div class="controls">
-							<span class="exec" data-exec="tmprestmodel.rem"><i class="far fa-trash-alt red"></i></span>
+							<span class="exec" data-exec="tmprestmodel.move" data-type="up" title="Move up"><i class="far fa fa-arrow-up"></i></span>
+							<span class="exec" data-exec="tmprestmodel.move" data-type="down" title="Move down"><i class="far fa fa-arrow-down"></i></span>
+							<span class="exec" data-exec="tmprestmodel.rem" title="Remove"><i class="far fa-trash-alt red"></i></span>
 						</div>
 						<div class="required exec{{ if m.required }} is{{ fi }}" data-exec="tmprestmodel.required">required</div>
-						<div class="array exec{{ if m.array }} is{{ fi }}" data-exec="tmprestmodel.array">[array]</div>
+						<div class="array exec{{ if m.array }} is{{ fi }}" data-exec="tmprestmodel.array">Array</div>
 						<div class="type hellip exec monospace" data-exec="tmprestmodel.type">{{ m.type | restmodeltype | raw }}</div>
+						<div class="default">
+							<div class="edit monospace b" data-edit="exec:tmprestmodel.default;selectall:1">{{ m.default | empty }}</div>
+							<div class="help nmt">Default value</div>
+						</div>
 						<div class="name">
 							<div class="monospace edit hellip" data-edit="exec:tmprestmodel.name;required:1">{{ m.name }}</div>
-							<div class="error">Error message: <span class="edit hellip" data-edit="exec:tmprestmodel.error;required:1">{{ m.error | empty }}</span></div>
+							<div class="error">Error message: <span class="edit hellip" data-edit="exec:tmprestmodel.error;required:1">{{ m.error | empty('Invalid value') }}</span></div>
 						</div>
 					</figure>
 					{{ end }}
@@ -365,23 +422,28 @@ This component prepares incoming data according to the defined schema. Output is
 
 <style>
 	.CLASS-settings .fields { border: 1px solid #E0E0E0; border-radius: var(--radius); }
-	.CLASS-settings figure { height: 40px; border-top: 1px solid #E0E0E0; line-height: 40px; font-size: 12px; }
-	.CLASS-settings figure:first-child { border-top: 0; }
+	.CLASS-settings figure { height: 40px; border-top: 1px solid #E0E0E0; line-height: 39px; font-size: 12px; }
+	.CLASS-settings figure:first-child { border-top: 0; line-height: 40px; }
+	.CLASS-settings figure .edit-open { background-color: #F0F0F0; }
 	.CLASS-settings figure .name { margin-right: 350px; padding: 6px 8px 0; line-height: 14px; }
 	.CLASS-settings figure .name > div:first-child { font-weight: bold; outline: 0; }
 	.CLASS-settings figure .error { font-size: 11px; color: #888; }
 	.CLASS-settings figure .error span { color: #B9261A; outline: 0; min-width: 150px; }
-	.CLASS-settings figure .type { float: right; width: 180px; border-left: 1px solid #E0E0E0; padding: 0 8px; cursor: pointer; }
+	.CLASS-settings figure .default { float: right; width: 180px; border-left: 1px solid #E0E0E0; padding: 0 8px; cursor: pointer; line-height: 16px; padding-top: 4px; height: 40px; }
+	.CLASS-settings figure .type { float: right; width: 180px; border-left: 1px solid #E0E0E0; padding: 0 8px; cursor: pointer; background-color: rgba(0,0,0,0.03); }
 	.CLASS-settings figure .required { float: right; width: 70px; padding: 0 8px; border-left: 1px solid #E0E0E0; text-align: center; font-size: 11px; cursor: pointer; text-decoration: line-through; }
-	.CLASS-settings figure .required.is { font-weight: bold; text-decoration: none; }
+	.CLASS-settings figure .required.is { font-weight: bold; text-decoration: none; color: #EC8632; }
 	.CLASS-settings figure .array { float: right; width: 70px; padding: 0 8px; border-left: 1px solid #E0E0E0; text-align: center; font-size: 11px; cursor: pointer; text-decoration: line-through;}
-	.CLASS-settings figure .array.is { font-weight: bold; text-decoration: none; }
-	.CLASS-settings figure .controls { float: right; width: 30px; padding: 0; margin: 0; border-left: 1px solid #E0E0E0; text-align: center; }
-	.CLASS-settings figure .controls span { cursor: pointer; }
+	.CLASS-settings figure .array.is { font-weight: bold; text-decoration: none; color: #EC8632; }
+	.CLASS-settings figure .controls { float: right; width: 70px; padding: 0; margin: 0; border-left: 1px solid #E0E0E0; text-align: center; }
+	.CLASS-settings figure .controls span { cursor: pointer; margin-left: 5px; }
+	.CLASS-settings figure .controls span:first-child { margin-left: 0; }
+	.CLASS-settings figure.isrequired { background-color: rgba(255,254,209,0.3); }
+	.CLASS-settings figure.ismoved { background-color: rgba(92,29,196,0.3) !important; }
 
 	.ui-dark .CLASS-settings .fields { border-color: #404040; }
 	.ui-dark .CLASS-settings figure { border-top-color: #404040; }
-	.ui-dark .CLASS-settings figure .type { border-left-color: #404040; }
+	.ui-dark .CLASS-settings figure .type { border-left-color: #404040; background-color: rgba(100,100,100,0.04); }
 	.ui-dark .CLASS-settings figure .required { border-left-color: #404040; }
 	.ui-dark .CLASS-settings figure .array { border-left-color: #404040; }
 	.ui-dark .CLASS-settings figure .controls { border-left-color: #404040; }
@@ -406,7 +468,7 @@ This component prepares incoming data according to the defined schema. Output is
 				tmp = {};
 				tmp.add = function(el) {
 					var scope = el.scope();
-					scope.push('schema', { id: Math.random().toString(36).substring(4), name: 'name', type: 'string', required: true, array: false, error: 'Invalid value' });
+					scope.push('schema', { id: Math.random().toString(36).substring(4), name: 'name', type: 'string', required: true, array: false });
 					scope.change('*');
 				};
 
@@ -451,12 +513,61 @@ This component prepares incoming data according to the defined schema. Output is
 						next(opt.html);
 				};
 
+				tmp.move = function(el) {
+
+					var scope = el.scope();
+					var id = ATTRD(el);
+					var container = el.closest('figure');
+					var schema = scope.get().schema;
+					var index = schema.findIndex('id', id);
+					var is = false;
+					var isup = el.attrd('type') === 'up';
+
+					if (isup) {
+						if (index > 0) {
+							var a = schema[index];
+							schema[index] = schema[index - 1];
+							schema[index - 1] = a;
+							is = true;
+						}
+					} else {
+						if (index <= schema.length - 1) {
+							var a = schema[index];
+							schema[index] = schema[index + 1];
+							schema[index + 1] = a;
+							is = true;
+						}
+					}
+
+					if (is) {
+						NODEMOVE(container, isup);
+						scope.change('*');
+						container.aclass('ismoved').rclass('ismoved', 500);
+					}
+				};
+
+				tmp.default = function(opt, next) {
+					if (opt.value) {
+						var scope = opt.element.scope();
+						var id = ATTRD(opt.element);
+						var item = scope.get().schema.findItem('id', id);
+
+						if (opt.value === '---')
+							delete opt.value;
+
+						item.default = opt.value || undefined;
+						scope.change('*');
+						next(true);
+					} else
+						next(opt.html);
+				};
+
 				tmp.error = function(opt, next) {
 					if (opt.value) {
 						var scope = opt.element.scope();
 						var id = ATTRD(opt.element);
 						var item = scope.get().schema.findItem('id', id);
-						item.error = opt.value;
+						item.error = opt.value || undefined;
 						scope.change('*');
 						next(true);
 					} else
@@ -469,6 +580,7 @@ This component prepares incoming data according to the defined schema. Output is
 					var item = scope.get().schema.findItem('id', id);
 					item.required = !item.required;
 					el.tclass('is', item.required);
+					el.closest('figure').tclass('isrequired', item.required);
 					scope.change('*');
 				};
 
