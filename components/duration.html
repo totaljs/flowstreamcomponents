@@ -80,23 +80,23 @@ __Output__:
 			<script type="text/html">
 				<div class="keyvalue small">
 					<span>Min</span>
-					<div class="right">{{ value.min | empty }} sec.</div>
+					<div class="right">{{ value.min | format(3) | empty }} sec.</div>
 				</div>
 				<div class="keyvalue small">
 					<span>Max</span>
-					<div class="right">{{ value.max | empty }} sec.</div>
+					<div class="right">{{ value.max | format(3) | empty }} sec.</div>
 				</div>
 				<div class="keyvalue small">
 					<span>Avg</span>
-					<div class="right">{{ value.avg | empty }} sec.</div>
+					<div class="right">{{ value.avg | format(3) | empty }} sec.</div>
 				</div>
 				<div class="keyvalue small">
 					<span>Last</span>
-					<div class="right">{{ value.last | empty }} sec.</div>
+					<div class="right">{{ value.last | format(3) | empty }} sec.</div>
 				</div>
 				<div class="keyvalue small">
 					<span>Count</span>
-					<div class="right b">{{ value.count | empty }}</div>
+					<div class="right b">{{ value.count | format(3) | empty }}</div>
 				</div>
 			</script>
 		</div>
