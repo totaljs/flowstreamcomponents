@@ -46,7 +46,8 @@
 
 			} else if (method === 'update') {
 
-				if (!data.filter)
+				let filter = data.filter;
+				if (!filter)
 					return $.send('output', { success: false, err: '[NoSQL] Cannot update all the records, filter required' });
 
 				let upsert = data.upsert || config.upsert;
