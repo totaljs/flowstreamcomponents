@@ -21,6 +21,7 @@
 						ctrl.success();
 						break;
 					case 'empty':
+					default:
 						ctrl.empty();
 						break;
 				}
@@ -51,7 +52,7 @@ This component can respond on the REST Route component.
 <style>
 	.CLASS footer { padding: 10px; }
 	.CLASS footer span { font-family: var(--monospace); }
-	.CLASS footer .code { background-color: var(--color); color: #FFF; padding: 2px 3px; border-radius: var(--radius); }
+	.CLASS footer .code { color: #FFF; padding: 2px 3px; border-radius: var(--radius); }
 </style>
 
 <body>
@@ -59,6 +60,6 @@ This component can respond on the REST Route component.
 		<i class="ICON"></i>NAME
 	</header>
 	<footer>
-		<span data-bind="CONFIG.code__text" class="code"></span> <span data-bind="CONFIG.type__text"></span>
+		<span data-bind="CONFIG.code__text__exec:el.css('background-color', value >= 400 ? '#E73323' : '#4285F4')" class="code"></span> <span data-bind="CONFIG.type__text"></span>
 	</footer>
 </body>

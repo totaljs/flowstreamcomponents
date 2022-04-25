@@ -1,0 +1,110 @@
+<script total>
+
+	exports.name = 'Data sorter';
+	exports.group = 'Common';
+	exports.icon = 'fa fa-random';
+	exports.author = 'Peter Širka';
+	exports.version = '1';
+	exports.config = { conditions: [] };
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+
+	exports.make = function(instance, config) {
+
+		var fn = null;
+
+		instance.message = function($) {
+			if (fn) {
+				try {
+					fn(instance, $);
+				} catch (e) {
+					$.destroy();
+					instance.status(e + '');
+				}
+			} else
+				$.destroy();
+		}
+
+		instance.configure = function() {
+
+			var builder = [];
+			var old = JSON.stringify(instance.outputs || []);
+
+			var outputs = [];
+
+			for (var i = 0; i < config.conditions.length; i++) {
+				var item = config.conditions[i];
+				outputs.push({ id: 'output' + i, name: item.name });
+				builder.push('if(' + item.if + '){$.send(\'output' + i + '\');return;}');
+			}
+
+			try {
+
+				fn = new Function('instance', '$', 'var value=$.data;' + builder.join('') + '$.destroy();');
+
+				if (JSON.stringify(outputs) !== old) {
+					instance.outputs = outputs;
+					instance.save();
+				}
+
+			} catch (e) {
+				instance.status(e + '');
+			}
+
+		};
+
+		// Due to redrawing of outputs
+		setTimeout(instance => instance && instance.configure(), 1500, instance);
+	};
+
+</script>
+
+<readme>
+The component sort data according to the custom defined conditions. You can define unlimited count of outputs with various conditions.
+</readme>
+
+<style>
+	.CLASS footer > div { padding: 10px; font-size: 12px; }
+	.CLASS footer .newbie { display: none; }
+	.CLASS.isnewbie footer .newbie { display: block; font-size: 12px; color: red; }
+	.CLASSsettings .item { padding: 8px 10px; font-size: 12px; }
+	.CLASSsettings .item i { margin-right: 5px; }
+</style>
+
+<settings>
+	<div class="padding CLASSsettings">
+		<div data---="listform__?.conditions__autofocus:1;empty:You do not have defined any rules">
+
+			<script type="text/html">
+				<div class="item"><i class="fa fa-arrow-right"></i>{{ name }}</div>
+			</script>
+
+			<script type="text/html">
+				<div class="padding">
+					<div data---="input__?.name__required:1__''" class="m">Name</div>
+					<div data---="input__?.if__required:1__'value != null'">Condition</div>
+					<div class="help m"><i class="fa fa-exclamation-triangle"></i><code>value</code> represents a message data. Example: <code>value.age > 18</code></div>
+					<div data---="validate__?" class="toolbar">
+						<button name="submit"><i class="fa fa-floppy-o"></i>Save</button>
+						<button name="remove">Remove</button>
+						<button name="cancel">Cancel</button>
+					</div>
+				</div>
+			</script>
+
+			<script type="text/html">
+				<div style="margin-top:10px"><button class="button button-inline" name="create"><i class="fa fa-plus-circle green"></i>Create rule</button></div>
+			</script>
+
+		</div>
+	</div>
+</settings>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+	<footer>
+		<div data-bind="STATUS__text__show" class="red"></div>
+		<div class="newbie"><i class="fa fa-clock-o mr5"></i>Waits for applying</div>
+	</footer>
+</body>

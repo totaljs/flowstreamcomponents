@@ -5,7 +5,7 @@
 	exports.version = '1';
 	exports.icon = 'fa fa-code';
 	exports.author = 'Peter Širka';
-	exports.config = { name: 'Name', code: 'success();' };
+	exports.config = { name: 'Name', code: 'success();', clear: false };
 	exports.inputs = [{ id: 'input', name: 'Input' }];
 	exports.outputs = [{ id: 'output', name: 'Output' }, { id: 'error', name: 'Error' }];
 	exports.meta = { settingswidth: 1400 };
@@ -49,7 +49,7 @@
 						builder.push('success=(data)=>$.send(\'output\',{success:true,value:data})');
 
 					if (code.indexOf('invalid') !== -1)
-						builder.push('invalid=(err)=>$.send(\'error\',[{error:err+\'\'}])');
+						builder.push('invalid=(err)=>$.send(\'error\',[{error:err.toString()}])');
 
 					if (code.indexOf('user') !== -1)
 						builder.push('user=controller.user');
@@ -61,11 +61,16 @@
 						builder.push('model=$.data');
 
 					var AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
-					fn = new AsyncFunction('$', 'repo', builder.join(',') + ';try{' + code+'}catch(e){$.instance.status({error:e.message});$.destroy();}');
+					var body = builder.join(',') + ';try{' + code + '}catch(e){$.instance.status({error:e.message});$.destroy();}';
 
-				} else {
+					fn = code.indexOf('await ') === -1 ? new Function('$', 'repo', body) : new AsyncFunction('$', 'repo', body);
+
+					if (config.clear)
+						repo = {};
+
+				} else
 					fn = null;
-				}
+
 				instance.status(EMPTYOBJECT);
 			} catch (e) {
 				fn = null;
@@ -91,8 +96,9 @@ The component simulates Total.js Schema Workflow operation. It can process data 
 <settings>
 	<div class="padding">
 		<div data---="input__?.name__required:1" class="m">Workflow name</div>
+		<div data---="input__?.clear__type:checkbox" class="m b">Clear repository object</div>
 		<div class="ui-input-label">Code:</div>
-		<div data---="codemirror__?.code__type:javascript;minheight:300;parent:auto;margin:145;tabs:true;trim:true"></div>
+		<div data---="codemirror__?.code__type:javascript;minheight:300;parent:auto;margin:185;tabs:true;trim:true"></div>
 		<div class="help"><i class="fa fa-book"></i><span class="link exec" data-exec="comworkflowsettingshelp">Documentation</span></div>
 	</div>
 </settings>
