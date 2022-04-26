@@ -7,8 +7,8 @@
 		"author": "Peter Širka",
 		"icon": "fa fa-code",
 		"color": "",
-		"version": "2",
-		"readme": "This component executes a custom JavaScript code as it is."
+		"version": "3",
+		"readme": "This component executes a custom JavaScript code as it is.\n\nTo send data to the default output use `send(somedata);`\nTo send data to specific output when number of outputs > 1 use `$.send('outputX', somedata)` where `X` is output index, see example bellow:\n- first output--> `send(somedata)` or `$.send('output', somedata)`\n- second output --> `$.send('output2', somedata)`\n- ...\n- 5th output --> `$.send('output5', somedata)`\n- etc."
 	},
 	{
 		"id": "connections",
@@ -67,7 +67,7 @@
 	},
 	{
 		"id": "csvdataset",
-		"group": "Dashboard",
+		"group": "Stats",
 		"name": "CSV Dataset",
 		"url": "https://cdn.totaljs.com/flowstream/components/csvdataset.html",
 		"author": "Peter Širka",
@@ -75,6 +75,17 @@
 		"color": "",
 		"version": "1",
 		"readme": "The component stores data as CSV Dataset for e.g. Dashboard application. Dataset is stored in `/private/` path that is available with the help of the Flow access token.\n\nCSV file contains only processed values, which aren't closed and stored in the `.meta` file.\n\n```js\n{\n\tkey: String,    // optional, e.g. device_id | device_name\n\tvalue: Number   // measured value\n}\n```"
+	},
+	{
+		"id": "datasorter",
+		"group": "Common",
+		"name": "Data sorter",
+		"url": "https://cdn.totaljs.com/flowstream/components/datasorter.html",
+		"author": "Peter Širka",
+		"icon": "fa fa-random",
+		"color": "",
+		"version": "1",
+		"readme": "The component sort data according to the custom defined conditions. You can define unlimited count of outputs with various conditions."
 	},
 	{
 		"id": "date",
@@ -119,6 +130,17 @@
 		"color": "",
 		"version": "1",
 		"readme": "## Input\n```js\n{\n\turl: 'https://example.com/file.jpg', // file url\n}\n```\n\n## Output\nA response object as returned by [DOWNLOAD()](https://docs.totaljs.com/total4/407ff001jy51c/#88aab001hd51c) function.\n```js\n{\n\tfilename: '/tmp/xyz.ext',\n\t...\n}\n```\nThe file will be automaticaly deleted once the message is destroyed."
+	},
+	{
+		"id": "duration",
+		"group": "Stats",
+		"name": "Duration",
+		"url": "https://cdn.totaljs.com/flowstream/components/duration.html",
+		"author": "Peter Širka",
+		"icon": "fa fa-stopwatch",
+		"color": "",
+		"version": "1",
+		"readme": "The component counts message duration. All values except `count` are defined in seconds.\n\n__Output__:\n\n```js\n{\n\tmin: Number,\n\tmax: Number,\n\tavg: Number,\n\tlast: Number,\n\tcount: Number\n}\n```"
 	},
 	{
 		"id": "end",
@@ -187,6 +209,17 @@
 		"readme": "This component monitors HDD consumption (in MB) in the Linux systems. It uses `df` command.\n\n__Data Example__:\n\n```js\n{\n\tfree: 0,\n\ttotal: 0,\n\tused: 0\n}\n```"
 	},
 	{
+		"id": "httpresponse",
+		"group": "",
+		"name": "HTTP Response",
+		"url": "https://cdn.totaljs.com/flowstream/components/httpresponse.html",
+		"author": "Total Avengers",
+		"icon": "fa fa-reply",
+		"color": "",
+		"version": "1",
+		"readme": "This component only works with HTTP Route which must have set `Response` to `Custom`"
+	},
+	{
 		"id": "httproute",
 		"group": "Triggers",
 		"name": "HTTP Route",
@@ -194,7 +227,7 @@
 		"author": "",
 		"icon": "fa fa-route",
 		"color": "",
-		"version": "2",
+		"version": "3",
 		"readme": "This component registers an HTTP Route and sends request data next.\n\n__Output data__:\n\n```js\n{\n\t\"route\": String,\n\t\"params\": Object,\n\t\"query\": Object,\n\t\"body\": Object,\n\t\"files\": Array,\n\t\"headers\": Object,\n\t\"url\": String,\n\t\"ip\": String,\n\t\"cookies\": Object\n}\n```"
 	},
 	{
@@ -265,7 +298,7 @@
 	},
 	{
 		"id": "model",
-		"group": "Transformation",
+		"group": "Transformations",
 		"name": "Model",
 		"url": "https://cdn.totaljs.com/flowstream/components/model.html",
 		"author": "Peter Širka",
@@ -337,7 +370,7 @@
 		"author": "Martin Smola",
 		"icon": "fa fa-sign-out",
 		"color": "",
-		"version": "2",
+		"version": "3",
 		"readme": "MQTT Publish\n\nInput:\n```javascript\n{\n\ttopic: 'some/topic',\n\tmessage: { some: 'data' },\n\t// optional\n\toptions: {\n\t\tqos: 0|1|2,\n\t\tretain: true|false\n\t}\n}\n```"
 	},
 	{
@@ -484,6 +517,17 @@
 		"readme": "This component reads a specific value according to the entered path."
 	},
 	{
+		"id": "restremember",
+		"group": "REST API",
+		"name": "Remember",
+		"url": "https://cdn.totaljs.com/flowstream/components/restremember.html",
+		"author": "Peter Širka",
+		"icon": "fa fa-save",
+		"color": "",
+		"version": "1",
+		"readme": "The primary goal of this component is to remember data. The component contains two inputs:\n\n- Remember input for remembering data\n- Request input as a trigger for obtaining data, then remembered data would extend the request message (its data), and the component will send it to the Response output"
+	},
+	{
 		"id": "request",
 		"group": "Common",
 		"name": "Request",
@@ -573,7 +617,7 @@
 	},
 	{
 		"id": "rssreader",
-		"group": "Transformation",
+		"group": "Transformations",
 		"name": "RSS reader",
 		"url": "https://cdn.totaljs.com/flowstream/components/rssreader.html",
 		"author": "Peter Širka",
@@ -614,6 +658,17 @@
 		"color": "",
 		"version": "1",
 		"readme": "SQLite3 [Documentation](https://github.com/JoshuaWise/better-sqlite3/blob/HEAD/docs/api.md)\n\n```js\n{\n\t// query\n\tprepare: 'INSERT INTO cats (name, age) VALUES (?, ?)',\n\n\t// function name: run, get, all, exec\n\tfn: 'run',\n\n\t// data, optional\n\tdata: ['Joey', 2] // string/number or array\n\n}\n```\n\nFunctions:\n\t- [run](https://github.com/JoshuaWise/better-sqlite3/blob/HEAD/docs/api.md#runbindparameters---object)\n\t- [get](https://github.com/JoshuaWise/better-sqlite3/blob/HEAD/docs/api.md#getbindparameters---row)\n\t- [all](https://github.com/JoshuaWise/better-sqlite3/blob/HEAD/docs/api.md#allbindparameters---array-of-rows)\n\t- [exec](https://github.com/JoshuaWise/better-sqlite3/blob/HEAD/docs/api.md#execstring---this)"
+	},
+	{
+		"id": "stopwatch",
+		"group": "Stats",
+		"name": "Stopwatch",
+		"url": "https://cdn.totaljs.com/flowstream/components/stopwatch.html",
+		"author": "Peter Širka",
+		"icon": "fa fa-stopwatch",
+		"color": "",
+		"version": "3",
+		"readme": "The component runs a simple stopwatch for incomming messages."
 	},
 	{
 		"id": "subscribe",
@@ -671,6 +726,17 @@
 		"readme": "Test"
 	},
 	{
+		"id": "throttle",
+		"group": "Common",
+		"name": "Throttle",
+		"url": "https://cdn.totaljs.com/flowstream/components/throttle.html",
+		"author": "Peter Širka",
+		"icon": "fa fa-filter",
+		"color": "",
+		"version": "1",
+		"readme": "The component sends only limited count of messages."
+	},
+	{
 		"id": "timer",
 		"group": "Triggers",
 		"name": "Timer",
@@ -702,5 +768,16 @@
 		"color": "",
 		"version": "2",
 		"readme": "The component triggers data into the Flow."
+	},
+	{
+		"id": "restworkflow",
+		"group": "REST API",
+		"name": "Workflow",
+		"url": "https://cdn.totaljs.com/flowstream/components/restworkflow.html",
+		"author": "Peter Širka",
+		"icon": "fa fa-code",
+		"color": "",
+		"version": "1",
+		"readme": "The component simulates Total.js Schema Workflow operation. It can process data and store/read them into the database."
 	}
 ]
