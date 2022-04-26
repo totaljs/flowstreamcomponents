@@ -56,14 +56,8 @@
 <style>
 	.CLASS footer > div { margin: 10px; }
 	.CLASS pre { font-size: 10px; margin: 0; padding: 5px; background-color: #F0F0F0; border-radius: var(--radius); }
-	.CLASS button { float: right; height: 20px; font-size: 11px; border: 1px solid #E0E0E0; border-radius: var(--radius); color: #000; background-color: transparent; margin: 0; padding: 0 5px; }
-	.CLASS button:hover { background-color: #F8F8F8; }
-	.CLASS button:active { background-color: #E0E0E0; }
-
+	.CLASS .noscrollbar { max-height: 250px; }
 	.ui-dark .CLASS pre { background-color: #404040; tab-size: 2; }
-	.ui-dark .CLASS button { border-color: #404040; color: #FFF; }
-	.ui-dark .CLASS button:hover { background-color: #303030; }
-	.ui-dark .CLASS button:active { background-color: #404040; }
 </style>
 
 <readme>
@@ -79,12 +73,14 @@ The component prints incoming data in a JSON format.
 
 <body>
 	<header>
-		<button class="exec" data-exec="FUNC.trigger">Clear</button>
+		<button class="exec button" data-exec="FUNC.trigger">Clear</button>
 		<i class="ICON"></i>NAME
 	</header>
 	<footer>
 		<div data-bind="!STATUS__html pre:Thelpers.jsonformat(JSON.stringify(value, null, '\t'))__show" class="hidden selectable">
-			<pre class="json"></pre>
+			<div class="noscrollbar">
+				<pre class="json"></pre>
+			</div>
 		</div>
 	</footer>
 </body>

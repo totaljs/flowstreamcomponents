@@ -61,16 +61,7 @@ The component remembers the data for repeating the action.
 	.CLASS .padding { padding: 0 10px 10px; }
 	.CLASS pre { font-size: 10px; margin: 0; padding: 5px; background-color: #F0F0F0; border-radius: var(--radius); }
 	.CLASS footer > div { margin: 10px; }
-	.CLASS button { width: 100%; height: 24px; border: 1px solid #E0E0E0; border-radius: var(--radius); color: #000; background-color: #F0F0F0; margin: 0; }
-	.CLASS button:hover { background-color: #F8F8F8; }
-	.CLASS button:active { background-color: #E0E0E0; }
-	.CLASS button:disabled { background-color: #F0F0F0; color: #A0A0A0; cursor: not-allowed; }
-	.CLASS .mini { width: initial; float: right; height: 20px; font-size: 11px; border: 1px solid #E0E0E0; border-radius: var(--radius); color: #000; background-color: transparent; margin: 0; padding: 0 5px; }
-
-	.ui-dark .CLASS button { border-color: #404040; color: #FFF; background-color: #222; }
-	.ui-dark .CLASS button:hover { background-color: #303030; }
-	.ui-dark .CLASS button:active { background-color: #404040; }
-	.ui-dark .CLASS button:disabled { background-color: #333; color: #666; cursor: not-allowed; }
+	.CLASS .noscrollbar { max-height: 250px; }
 	.ui-dark .CLASS pre { background-color: #404040; tab-size: 2; }
 </style>
 
@@ -83,14 +74,16 @@ The component remembers the data for repeating the action.
 <body>
 	<header>
 		<i class="ICON"></i>NAME
-		<button class="exec mini" data-exec="FUNC.fflashback_clear" data-bind="STATUS.empty__disabled" disabled>Clear</button>
+		<button class="exec button" data-exec="FUNC.fflashback_clear" data-bind="STATUS.empty__disabled" disabled>Clear</button>
 	</header>
 	<div class="padding">
-		<button class="exec" data-exec="FUNC.trigger" data-bind="STATUS.empty__disabled" disabled>Repeat</button>
+		<button class="exec button" data-exec="FUNC.trigger" data-bind="STATUS.empty__disabled" disabled>Repeat</button>
 	</div>
 	<footer>
 		<div data-bind="!STATUS__html pre:Thelpers.jsonformat(JSON.stringify(value.data, null, '\t'))__hide:value.empty" class="hidden selectable">
-			<pre class="json"></pre>
+			<div class="noscrollbar">
+				<pre class="json"></pre>
+			</div>
 		</div>
 	</footer>
 </body>
