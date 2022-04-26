@@ -104,7 +104,7 @@ The component runs a simple stopwatch for incomming messages.
 				{{ foreach m in value }}
 				<div class="result">
 					<span class="duration">{{ m.duration | format(3) }} sec</span>
-					<div class="ts">{{ m.date | format('[time]') }} ({{ m.count }})</div>
+					<div class="ts" title="{{ m.date | format('[ts]') }}">{{ m.date | format('[time]') }} ({{ m.count }})</div>
 				</div>
 				{{ end }}
 			</script>
