@@ -19,8 +19,14 @@
 
 			var obj = {};
 
-			for (var item of config.schema)
-				U.set(obj, item.pathto, U.get(data, item.pathfrom));
+			for (var item of config.schema) {
+				if (item.pathto) {
+					U.set(obj, item.pathto, U.get(data, item.pathfrom));
+				} else {
+					obj = U.get(data, item.pathfrom);
+					break;
+				}
+			}
 
 			if (config.path && config.rewrite)
 				U.set($.data, config.path, obj);
@@ -41,7 +47,7 @@ This component reads specific values according to the configured map.
 	.CLASS-settings figure .edit-open { background-color: #F0F0F0; }
 	.CLASS-settings figure .path { width: 45%; line-height: 14px; float: left; }
 	.CLASS-settings figure .path span { float: left; width: 50px; line-height: 23px; text-align: center; }
-	.CLASS-settings figure .path div { outline: 0; margin-left: 50px; line-height: 23px; padding: 0 5px; }
+	.CLASS-settings figure .path div { outline: 0; margin-left: 50px; line-height: 23px; padding: 0 5px; min-height: 23px; }
 	.CLASS-settings figure .to div { color: #4285F4; }
 	.CLASS-settings figure .from div { color: #B9261A; }
 	.CLASS-settings figure .controls { float: right; width: 30px; padding: 0; margin: 0; border-left: 1px solid #E0E0E0; text-align: center; }
@@ -144,16 +150,12 @@ This component reads specific values according to the configured map.
 
 				tmp.path = function(opt, next) {
 					opt.value = opt.value.replace(/(;|\s|,)/g, '').trim();
-					if (opt.value) {
-						var scope = opt.element.scope();
-						var id = ATTRD(opt.element);
-						var item = scope.get().schema.findItem('id', id);
-						console.log('--->', opt.element.attrd('type'));
-						item['path' + opt.element.attrd('type')] = opt.value;
-						scope.change('*');
-						next(true);
-					} else
-						next(opt.html);
+					var scope = opt.element.scope();
+					var id = ATTRD(opt.element);
+					var item = scope.get().schema.findItem('id', id);
+					item['path' + opt.element.attrd('type')] = opt.value;
+					scope.change('*');
+					next(true);
 				};
 
 				W.tmpread = tmp;
