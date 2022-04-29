@@ -27,13 +27,13 @@
 			for (var key in config.headers) {
 				if (!opt.headers)
 					opt.headers = {};
-				opt.headers[$.variables(key)] = $.variables(config.headers[key]);
+				opt.headers[$.variables(key)] = $.variables(config.headers[key], true);
 			}
 
 			for (var key in config.cookies) {
 				if (!opt.cookies)
 					opt.cookies = {};
-				opt.cookies[$.variables(key)] = $.variables(config.cookies[key]);
+				opt.cookies[$.variables(key)] = $.variables(config.cookies[key], true);
 			}
 
 			opt.method = config.method;
@@ -134,8 +134,9 @@
 </script>
 
 <style>
-	.CLASS .status { font-size: 12px; margin: 0; padding: 10px; overflow-wrap: break-word; }
-	.CLASS .status span { padding: 2px 3px; border-radius: var(--radius); color: #FFF; }
+	.CLASS { max-width: 250px !important; }
+	.CLASS .status { font-size: 11px; margin: 0; padding: 10px; overflow-wrap: break-word; }
+	.CLASS .status span { padding: 2px 3px; border-radius: var(--radius); color: #FFF; float: left; margin-right: 5px; }
 </style>
 
 <readme>
@@ -159,11 +160,12 @@ __Response__:
 		<i class="ICON"></i>NAME
 	</header>
 	<footer class="hidden" data-bind="CONFIG.url__show">
-		<div class="status" data-bind="CONFIG__template">
+		<div class="status monospace" data-bind="CONFIG__template">
 			<script type="text/html">
-				<div class="monospace"><span style="background:{{ value.method | color }}">{{ value.method }}</span> {{ value.url }}</div>
+				<div><span style="background:{{ value.method | color }}">{{ value.method }}</span> {{ value.url }}</div>
 			</script>
 		</div>
+		<div class="clearfix"></div>
 	</footer>
 </body>
 
