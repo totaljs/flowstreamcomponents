@@ -1,0 +1,32 @@
+<script total>
+	exports.id = 'comment';
+	exports.name = 'Comment';
+	exports.icon = 'fa fa-code';
+	exports.author = 'Total.js';
+	exports.version = '1';
+	exports.config = {};
+	exports.meta = { settingswidth: 1100 };
+
+	exports.make = function(instance, config) {
+	};
+
+</script>
+
+<settings>
+	<div class="padding">
+		<div data---="codemirror__?.text__type:markdown;parent:auto;minheight:300;margin:65"></div>
+		<div class="help">Supports Markdown</div>
+	</div>
+</settings>
+
+<style>
+	.CLASS { max-width: 500px !important; }
+	.CLASS footer { padding: 10px; font-size: 12px; }
+</style>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+	<footer data-bind="!CONFIG.text__html:value.markdown(el)" class="markdown-small"></footer>
+</body>

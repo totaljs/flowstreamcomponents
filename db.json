@@ -11,6 +11,16 @@
 		"readme": "This component executes a custom JavaScript code as it is.\n\nTo send data to the default output use `send(somedata);`\nTo send data to specific output when number of outputs > 1 use `$.send('outputX', somedata)` where `X` is output index, see example bellow:\n- first output--> `send(somedata)` or `$.send('output', somedata)`\n- second output --> `$.send('output2', somedata)`\n- ...\n- 5th output --> `$.send('output5', somedata)`\n- etc."
 	},
 	{
+		"id": "comment",
+		"group": "",
+		"name": "Comment",
+		"url": "https://cdn.totaljs.com/flowstream/components/comment.html",
+		"author": "Total.js",
+		"icon": "fa fa-code",
+		"color": "",
+		"version": "1"
+	},
+	{
 		"id": "connections",
 		"group": "Linux Monitoring",
 		"name": "Connections",
