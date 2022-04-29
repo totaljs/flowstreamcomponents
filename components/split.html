@@ -1,0 +1,96 @@
+<script total>
+
+	exports.name = 'Split';
+	exports.icon = 'fa fa-random';
+	exports.group = 'Array';
+	exports.author = 'Total.js';
+	exports.version = '1';
+	exports.config = { path: '' };
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' } ];
+	exports.meta = { settingswidth: 650 };
+
+	exports.make = function(instance, config) {
+		instance.message = function($) {
+			var arr = config.path ? U.get(config.path, $.data) : $.data;
+			$.destroy();
+			if (arr instanceof Array && arr.length) {
+				for (var item of arr)
+					instance.send('output', item);
+			}
+		};
+	};
+
+</script>
+
+<style>
+	.CLASS footer { height: 40px; line-height: 40px; margin: 0 10px; font-size: 12px; }
+</style>
+
+<readme>
+The component splits a message with an array of objects on the input into separate messages with individual objects on the output.
+
+__Input example__:
+
+```js
+[
+	{
+		"email": "michal@totaljs.com",
+		"date": 20220202,
+		"meno": "Michal Klacan"
+	},
+	{
+		"email": "martin@totaljs.com",
+		"date": 20220204,
+		"meno": "Martin Smola"
+	},
+	{
+		"email": "peter@totaljs.com",
+		"datum": 20220210,
+		"meno": "Peter Sirka"
+	}
+]
+```
+
+__Output example__:
+
+```js
+{
+	"email": "michal@totaljs.com",
+	"date": 20220202,
+	"meno": "Michal Klacan"
+}
+```
+
+```js
+{
+	"email": "martin@totaljs.com",
+	"date": 20220204,
+	"meno": "Martin Smola"
+}
+```
+
+```js
+{
+	"email": "peter@totaljs.com",
+	"datum": 20220210,
+	"meno": "Peter Sirka"
+}
+```
+</readme>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+	<footer data-bind="CONFIG.path__show__text span">
+		Path: <span class="b"></span>
+	</footer>
+</body>
+
+<settings>
+	<div class="padding">
+		<div data---="input__?.path__placeholder:path.to.property;monospace:1">Load data from the specific property/field</div>
+		<div class="help">Optional. The data for the splitting will be loaded from the specific property/field.</div>
+	</div>
+</settings>

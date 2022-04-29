@@ -2,71 +2,164 @@
 
 	exports.name = 'Read';
 	exports.group = 'Common';
-	exports.version = '1';
+	exports.version = '2';
 	exports.icon = 'fa fa-filter';
-	exports.author = 'Peter Širka';
-	exports.config = { path: '' };
+	exports.author = 'Total.js';
+	exports.config = { path: '', schema: [] };
 	exports.inputs = [{ id: 'input', name: 'Input' }];
 	exports.outputs = [{ id: 'output', name: 'Output' }];
 
 	exports.make = function(instance, config) {
-
-		var fn;
-
 		instance.message = function($) {
-			if (fn) {
-				var value = $.data && typeof($.data) === 'object' ? fn($.data) : undefined;
-				if (value !== undefined)
-					$.send('output', value);
-				else
-					$.destroy();
-			} else
-				$.destroy();
+
+			var data = $.data;
+
+			if (config.path)
+				data = config.path ? U.get(data, config.path) : $.data;
+
+			var obj = {};
+
+			for (var item of config.schema)
+				U.set(obj, item.pathto, U.get(data, item.pathfrom));
+
+			if (config.path && config.rewrite)
+				U.set($.data, config.path, obj);
+
+			$.send('output', obj);
 		};
-
-		instance.configure = function() {
-			if (config.path) {
-				try {
-					fn = new Function('data', 'return data?.' + config.path.replace(/\s|\./, '?.'));
-				} catch (e) {
-					fn = null;
-					instance.throw(e);
-				}
-			}
-		};
-
-		instance.close = function() {
-			fn = null;
-		};
-
-		instance.configure();
-
 	};
 
 </script>
 
 <readme>
-This component reads a specific value according to the entered path.
+This component reads specific values according to the configured map.
 </readme>
 
 <style>
-	.CLASS footer > div { height: 40px; line-height: 40px; margin: 0 10px; font-size: 12px; }
-	.CLASS footer > span { color: #888; }
-</style>
+	.CLASS-settings .fields { border: 1px solid #E0E0E0; border-radius: var(--radius); }
+	.CLASS-settings figure { height: 24px; border-top: 1px solid #E0E0E0; line-height: 23px; font-size: 11px; }
+	.CLASS-settings figure .edit-open { background-color: #F0F0F0; }
+	.CLASS-settings figure .path { width: 45%; line-height: 14px; float: left; }
+	.CLASS-settings figure .path span { float: left; width: 50px; line-height: 23px; text-align: center; }
+	.CLASS-settings figure .path div { outline: 0; margin-left: 50px; line-height: 23px; padding: 0 5px; }
+	.CLASS-settings figure .to div { color: #4285F4; }
+	.CLASS-settings figure .from div { color: #B9261A; }
+	.CLASS-settings figure .controls { float: right; width: 30px; padding: 0; margin: 0; border-left: 1px solid #E0E0E0; text-align: center; }
+	.CLASS-settings figure .controls span { cursor: pointer; margin-left: 5px; }
+	.CLASS-settings figure .controls span:first-child { margin-left: 0; }
+	.CLASS-settings figure:first-child { border-top: 0; line-height: 24px; }
+	.CLASS-settings figure:first-child div { line-height: 24px; }
+	.CLASS footer { height: 40px; line-height: 40px; padding: 0 10px; font-size: 12px; }
 
-<settings>
-	<div class="padding">
-		<div data---="input__?.path__placeholder:temperature.max;required:1" class="m">Path</div>
-	</div>
-</settings>
+	.ui-dark .CLASS-settings .fields { border-color: #404040; }
+	.ui-dark .CLASS-settings figure { border-top-color: #404040; }
+	.ui-dark .CLASS-settings figure .controls { border-left-color: #404040; }
+</style>
 
 <body>
 	<header>
 		<i class="ICON"></i>NAME
 	</header>
-	<footer>
-		<div>
-			Path: <span data-bind="CONFIG.path__empty__text" class="b"></span>
-		</div>
+	<footer data-bind="CONFIG.path__show__text span">
+		Path: <span class="b"></span>
 	</footer>
 </body>
+
+<settings>
+	<div class="CLASS-settings">
+		<div class="padding bg-smoke">
+			<div data---="input__?.path__placeholder:path.to.property;monospace:1">Load data from the specific property/field</div>
+			<div class="help">Optional. The data for the model will be loaded from the specific property/field.</div>
+			<div data-bind="?.path__show" class="hidden">
+				<hr />
+				<div data---="input__?.rewrite__type:checkbox"><b>Rewrite value only</b> (otherwise, it will replace entire message data)</div>
+			</div>
+		</div>
+		<div class="padding">
+			<div class="caption m">
+				<div class="toolbar">
+					<nav>
+						<button class="exec" data-exec="tmpread.add"><i class="fa fa-plus-circle"></i>Add</button>
+					</nav>
+				</div>
+				<label>Paths</label>
+			</div>
+			<div data-bind="?.schema__template:figure --> data-id__show:value && value.length" class="fields m">
+				<script type="text/html">
+					{{ foreach m in value }}
+					<figure data-id="{{ m.id }}">
+						<div class="controls">
+							<span class="exec" data-exec="tmpread.rem" title="Remove"><i class="far fa-trash-alt red"></i></span>
+						</div>
+						<div class="path from">
+							<span>From</span><div class="monospace edit hellip" data-type="from" data-edit="exec:tmpread.path;required:1">{{ m.pathfrom }}</div>
+						</div>
+						<div class="path to">
+							<span>To</span><div class="edit monospace hellip" data-type="to" data-edit="exec:tmpread.path;selectall:1">{{ m.pathto }}</div>
+						</div>
+					</figure>
+					{{ end }}
+				</script>
+			</div>
+		</div>
+	</div>
+</settings>
+
+<script>
+
+	TOUCH(function(exports, reinit) {
+
+		exports.settings = function(meta) {
+
+			var defitem = { pathfrom: 'Temperature', pathto: 'temperature' };
+
+			if (!meta.config.schema.length) {
+				var obj = CLONE(defitem);
+				obj.id = Math.random().toString(36).substring(4)
+				meta.config.schema.push(obj);
+			}
+
+			var tmp = W.tmpread;
+
+			if (!tmp) {
+
+				tmp = {};
+				tmp.add = function(el) {
+					var scope = el.scope();
+					var obj = CLONE(defitem);
+					obj.id = Math.random().toString(36).substring(4)
+					scope.push('schema', obj);
+					scope.change('*');
+				};
+
+				tmp.rem = function(el) {
+					var id = ATTRD(el);
+					var scope = el.scope();
+					var model = scope.get();
+					var index = model.schema.findIndex('id', id);
+					model.schema.splice(index, 1);
+					scope.update('schema');
+					scope.change('*');
+				};
+
+				tmp.path = function(opt, next) {
+					opt.value = opt.value.replace(/(;|\s|,)/g, '').trim();
+					if (opt.value) {
+						var scope = opt.element.scope();
+						var id = ATTRD(opt.element);
+						var item = scope.get().schema.findItem('id', id);
+						console.log('--->', opt.element.attrd('type'));
+						item['path' + opt.element.attrd('type')] = opt.value;
+						scope.change('*');
+						next(true);
+					} else
+						next(opt.html);
+				};
+
+				W.tmpread = tmp;
+			}
+		};
+
+	});
+
+</script>

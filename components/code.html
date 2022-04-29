@@ -5,7 +5,7 @@
 	exports.group = 'Common';
 	exports.version = '3';
 	exports.icon = 'fa fa-code';
-	exports.author = 'Peter Širka';
+	exports.author = 'Total.js';
 	exports.config = { outputs: 1, code: '// instance {FlowStreamInstance};\n// $ {FlowStreamMessage};\n// vars {Object};\n// repo {Object};\n// data {String/Number/Boolean/Date/Buffer/Object};\n// $.send(\'output\', data); // or simply send(data); which uses the first output\n// $.destroy();\n// $.throw(err);\n\n// IMPORTANT: If you do not perform re-send, you need to destroy this message via $.destroy() method\n// IMPORTANT: methods $.send(), $.destroy() and $.throw() can be executed only once\n\n// $.send(\'output\', data);\n$.destroy();' };
 	exports.inputs = [{ id: 'input', name: 'Input' }];
 	exports.outputs = [{ id: 'output', name: 'Output' }];
