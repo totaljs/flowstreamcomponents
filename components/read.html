@@ -10,6 +10,41 @@
 	exports.outputs = [{ id: 'output', name: 'Output' }];
 
 	exports.make = function(instance, config) {
+
+		var convert = function(item, value) {
+			switch (item.convert) {
+				case 'empty':
+					return value;
+				case 'upper':
+					return value == null ? '' : value.toString().toUpperCase();
+				case 'lower':
+					return value == null ? '' : value.toString().toLowerCase();
+				case 'capitalize':
+					return value == null ? '' : value.toString().capitalize();
+				case 'number':
+					return U.parseFloat(value);
+				case 'string':
+					return typeof(value) === 'string' ? value : value == null ? '' : value.toString();
+				case 'boolean':
+					return U.parseBoolean(value);
+				case 'date':
+					if (value instanceof Date)
+						return value;
+					return value == null ? new Date() : typeof(value) === 'number' ? new Date(value) : value.toString().parseDate();
+				case 'tobase64':
+				case 'tohex':
+					return value instanceof Buffer ? value.toString(item.convert.substring(2)) : value == null ? '' : Buffer.from(value).toString(item.convert.substring(2));
+				case 'frombase64':
+				case 'fromhex':
+					return typeof(value) === 'string' ? Buffer.from(value, item.convert.substring(4)) : null;
+				case 'tojson':
+					return JSON.stringify(value);
+				case 'fromjson':
+					return typeof(value) === 'string' ? value.parseJSON(true) : null;
+			}
+			return value;
+		};
+
 		instance.message = function($) {
 
 			var data = $.data;
@@ -20,10 +55,15 @@
 			var obj = {};
 
 			for (var item of config.schema) {
+				var val = U.get(data, item.pathfrom);
+
+				if (item.convert && item.convert !== 'empty')
+					val = convert(item, val);
+
 				if (item.pathto) {
-					U.set(obj, item.pathto, U.get(data, item.pathfrom));
+					U.set(obj, item.pathto, val);
 				} else {
-					obj = U.get(data, item.pathfrom);
+					obj = val;
 					break;
 				}
 			}
@@ -45,7 +85,8 @@ This component reads specific values according to the configured map.
 	.CLASS-settings .fields { border: 1px solid #E0E0E0; border-radius: var(--radius); }
 	.CLASS-settings figure { height: 24px; border-top: 1px solid #E0E0E0; line-height: 23px; font-size: 11px; }
 	.CLASS-settings figure .edit-open { background-color: #F0F0F0; }
-	.CLASS-settings figure .path { width: 45%; line-height: 14px; float: left; }
+	.CLASS-settings figure .convert { width: 20%; line-height: 23px; float: left; padding: 0 5px; cursor: pointer; }
+	.CLASS-settings figure .path { width: 35%; line-height: 14px; float: left; }
 	.CLASS-settings figure .path span { float: left; width: 50px; line-height: 23px; text-align: center; }
 	.CLASS-settings figure .path div { outline: 0; margin-left: 50px; line-height: 23px; padding: 0 5px; min-height: 23px; }
 	.CLASS-settings figure .to div { color: #4285F4; }
@@ -103,6 +144,9 @@ This component reads specific values according to the configured map.
 						<div class="path to">
 							<span>To</span><div class="edit monospace hellip" data-type="to" data-edit="exec:tmpread.path;selectall:1">{{ m.pathto }}</div>
 						</div>
+						<div class="convert">
+							<div class="exec hellip" data-exec="tmpread.convert">{{ m.convert | tmpreadconvert }}</div>
+						</div>
 					</figure>
 					{{ end }}
 				</script>
@@ -156,6 +200,44 @@ This component reads specific values according to the configured map.
 					item['path' + opt.element.attrd('type')] = opt.value;
 					scope.change('*');
 					next(true);
+				};
+
+				tmp.convert = function(el) {
+					var opt = {};
+					opt.element = el;
+					opt.align = 'left';
+					opt.raw = true;
+					opt.items = tmp.convertors;
+					opt.callback = function(selected) {
+						var scope = el.scope();
+						var id = ATTRD(el);
+						var item = scope.get().schema.findItem('id', id);
+						if (item)
+							item.convert = selected.id;
+						el.html(selected.name);
+						scope.change('*');
+					};
+					SETTER('directory/show', opt);
+				};
+
+				tmp.convertors = [];
+				tmp.convertors.push({ id: 'empty', name: 'No convertor' });
+				tmp.convertors.push({ id: 'upper', name: 'Upper case' });
+				tmp.convertors.push({ id: 'lower', name: 'Lower case' });
+				tmp.convertors.push({ id: 'capitalize', name: 'Capitalize case' });
+				tmp.convertors.push({ id: 'number', name: 'To number' });
+				tmp.convertors.push({ id: 'string', name: 'To string' });
+				tmp.convertors.push({ id: 'boolean', name: 'To boolean' });
+				tmp.convertors.push({ id: 'date', name: 'To date' });
+				tmp.convertors.push({ id: 'tobase64', name: 'To Base64' });
+				tmp.convertors.push({ id: 'tohex', name: 'To Hex' });
+				tmp.convertors.push({ id: 'tojson', name: 'To JSON' });
+				tmp.convertors.push({ id: 'frombase64', name: 'From Base64' });
+				tmp.convertors.push({ id: 'fromhex', name: 'From Hex' });
+				tmp.convertors.push({ id: 'fromjson', name: 'From JSON' });
+
+				Thelpers.tmpreadconvert = function(val) {
+					return tmp.convertors.findValue('id', val, 'name', DEF.empty);
 				};
 
 				W.tmpread = tmp;
