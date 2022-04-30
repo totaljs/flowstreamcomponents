@@ -1,0 +1,67 @@
+<script total>
+
+	exports.name = 'Macro';
+	exports.icon = 'fa fa-scroll';
+	exports.author = 'Total.js';
+	exports.version = '1';
+	exports.config = { code: 'RETURN DATA' };
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }];
+
+	exports.make = function(instance, config) {
+
+		var fn = null;
+		var temp = {};
+
+		instance.message = function($) {
+			if (fn) {
+				var val = fn({ data: $.data, temp: temp });
+				$.send('output', val === undefined ? $.data : val);
+			} else
+				$.send('output');
+		};
+
+		instance.configure = function() {
+			fn = config.code ? NEWMACRO(config.code) : null;
+		};
+
+		instance.close = function() {
+			fn = null;
+		};
+
+		instance.configure();
+
+	};
+
+</script>
+
+<readme>
+The macro component uses Total.js Macro language that allows you to write much simple code like in JavaScript.
+
+- you don't need to solve Upper/Lower case
+- `return EXPRESSION` will return data and send them next
+- `data` keyword contains a message data
+- `temp` keyword can contain a persistent temporary data
+
+__Example__:
+
+```text
+IF DATA>20 AND DATA<35
+	RETURN DATA * 5
+FI
+```
+</readme>
+
+<settings>
+	<div class="padding">
+		<div data---="input__?.clear__type:checkbox" class="m b">Clear temporary data</div>
+		<div data---="codemirror__?.code__type:text;minheight:300;parent:auto;margin:90;tabs:true;trim:true"></div>
+		<div class="help"><a href="https://docs.totaljs.com/total4/pahk001pr41d/" target="_blank"><i class="fa fa-book mr5"></i>Documentation</a></div>
+	</div>
+</settings>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+</body>
