@@ -5,20 +5,29 @@
 	exports.icon = 'fa fa-key';
 	exports.version = '1';
 	exports.author = 'Total.js';
-	exports.config = { token: '', code: 401, header: 'x-token', error: 'Unauthorized' };
+	exports.config = { token: '', code: 401, header: 'x-token', error: 'Unauthorized', ddos: 0 };
 	exports.inputs = [{ id: 'input', name: 'Request' }];
 	exports.outputs = [{ id: 'output', name: 'Request' }];
 
 	exports.make = function(instance, config) {
 
 		var maintoken = '';
+		var ddos = {};
 
 		instance.message = function($) {
 			var ctrl = $.refs.controller;
 			var token = ctrl.headers[config.header];
+
+			if (config.ddos && ddos[ctrl.ip] > config.ddos)
+				token = '';
+
 			if (token === maintoken) {
 				$.send('output');
 			} else {
+
+				if (config.ddos)
+					ddos[ctrl.ip] = (ddos[ctrl.ip] || 0) + 1;
+
 				ctrl.status = config.code;
 				ctrl.json([{ name: config.code + '', error: config.error }]);
 				$.destroy();
@@ -31,6 +40,11 @@
 
 		instance.configure = function() {
 			maintoken = instance.replace(config.token);
+		};
+
+		instance.service = function(counter) {
+			if (counter % 10)
+				ddos = {};
 		};
 
 	};
@@ -55,6 +69,17 @@ This component must be used only with REST Route component. It reads a token fro
 			</div>
 			<div class="col-md-6 m">
 				<div data---="input__?.error__required:1">Error message</div>
+			</div>
+		</div>
+		<hr />
+		<div class="row">
+			<div class="col-md-6 m">
+				<div class="row">
+					<div class="col-md-6">
+						<div data---="input__?.ddos__required:1;type:number">DDOS protection</div>
+					</div>
+				</div>
+				<div class="help">How many times can the client requested your API with a bad key? The internal IP database is cleared every 10 minutes. <code>0</code> disables DDOS protection.</div>
 			</div>
 		</div>
 	</div>
