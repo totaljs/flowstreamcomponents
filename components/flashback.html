@@ -4,7 +4,7 @@
 	exports.group = 'Common';
 	exports.version = '2';
 	exports.icon = 'fa fa-history';
-	exports.author = 'Total.js';
+	exports.author = 'Peter Širka & Jakub Urban';
 	exports.inputs = [{ id: 'input', name: 'Input' }];
 	exports.outputs = [{ id: 'output', name: 'Output' }];
 
@@ -74,7 +74,7 @@ The component remembers the data for repeating the action.
 <body>
 	<header>
 		<i class="ICON"></i>NAME
-		<button class="exec button" data-exec="FUNC.fflashback_clear" data-bind="STATUS.empty__disabled" disabled>Clear</button>
+		<button class="exec button hidden" data-exec="FUNC.fflashback_clear" data-bind="STATUS.empty__hide">Clear</button>
 	</header>
 	<div class="padding">
 		<button class="exec button" data-exec="FUNC.trigger" data-bind="STATUS.empty__disabled" disabled>Repeat</button>
