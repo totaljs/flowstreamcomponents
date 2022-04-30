@@ -41,7 +41,20 @@
 					return JSON.stringify(value);
 				case 'fromjson':
 					return typeof(value) === 'string' ? value.parseJSON(true) : null;
+				case 'ascii':
+					return typeof(value) === 'string' ? value.toASCII() : value == null ? '' : value.toString().toASCII();
+				case 'slug':
+					return typeof(value) === 'string' ? value.slug() : value == null ? '' : value.toString().slug();
+				case 'crc32':
+				case 'crc32unsigned':
+					return typeof(value) === 'string' ? value.hash(item.convert) : value == null ? '' : value.toString().hash(item.convert);
+				case 'md5':
+				case 'sha1':
+				case 'sha256':
+				case 'sha512':
+					return value == null ? '' : F.Crypto.createHash(item.convert).update(value instanceof Buffer ? value : value.toString()).digest('hex');
 			}
+
 			return value;
 		};
 
@@ -229,6 +242,14 @@ This component reads specific values according to the configured map.
 				tmp.convertors.push({ id: 'string', name: 'To string' });
 				tmp.convertors.push({ id: 'boolean', name: 'To boolean' });
 				tmp.convertors.push({ id: 'date', name: 'To date' });
+				tmp.convertors.push({ id: 'ascii', name: 'Remove diacritics' });
+				tmp.convertors.push({ id: 'slug', name: 'To slug' });
+				tmp.convertors.push({ id: 'md5', name: 'To MD5' });
+				tmp.convertors.push({ id: 'sha1', name: 'To SHA1' });
+				tmp.convertors.push({ id: 'sha256', name: 'To SHA256' });
+				tmp.convertors.push({ id: 'sha512', name: 'To SHA512' });
+				tmp.convertors.push({ id: 'crc32', name: 'To CRC32' });
+				tmp.convertors.push({ id: 'crc32unsigned', name: 'To CRC32 unsigned' });
 				tmp.convertors.push({ id: 'tobase64', name: 'To BASE64' });
 				tmp.convertors.push({ id: 'tohex', name: 'To Hex' });
 				tmp.convertors.push({ id: 'tojson', name: 'To JSON' });
