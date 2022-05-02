@@ -1,0 +1,125 @@
+<script total>
+
+	exports.id = 'cheerio';
+	exports.name = 'Cheerio';
+	exports.group = 'HTML';
+	exports.icon = 'fa fa-code';
+	exports.author = 'Total.js';
+	exports.version = '1';
+	exports.config = { fn: '// $: cheerio instance\n// html: html string\nvar body = $(\'body\').html();\nreturn body;', path: '' };
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }];
+
+	exports.npm = ['cheerio'];
+	// exports.meta = { readonly: false, singleton: false, hidden: false };
+
+	exports.make = function(instance, config) {
+
+		// instance.main.variables {Object}
+		// instance.main.variables2 {Object}
+		// instance.save();
+		// instance.replace(str); // replaces {variable_name} for values from "variables" and "variables2"
+		// instance.status(obj, [refresh_delay_in_ms]);
+
+		const cheerio = require('cheerio');
+		var get, fn;
+
+		instance.message = function($) {
+			var data = $.data;
+
+			var input = CLONE(data);
+			var html;
+			if (config.path) {
+				html = get(data);
+			} else {
+				html = data;
+			}
+
+			if (typeof(html) !== 'string') {
+				$.send('output', { error: 'invalid data, expected "data{0}{1}" to be a string'.format(config.path ? '.' : '', config.path) });
+				return;
+			}
+
+			const $$ = cheerio.load(html);
+			var result = fn($$, html);
+
+			$.data = { result, input };
+			$.send('output');
+		};
+
+		instance.configure = function() {
+
+			if (config.path)
+				get = new Function('data', 'return data?.{0};'.format(config.path.replace(/\./g, '?.')));
+
+			if (config.fn) {
+				try {
+					fn = new Function('$', 'html', config.fn);
+					instance.status('');
+				} catch(e){
+					instance.throw(e.stack);
+					instance.status('Invalid code');
+				}
+			} else
+				instance.status('Not configured');
+		};
+
+		instance.configure();
+
+	};
+
+</script>
+
+<readme>
+	Uses [Cheerio](https://cheerio.js.org/index.html)
+	Please refer to the [documentation](https://cheerio.js.org/classes/Cheerio.html) for available functions.
+## Input
+```js
+	<any>
+```
+
+## Output
+```js
+	{
+		result: <the data returned from the code>,
+		input: <incomming data>
+	}
+```
+
+## Example code
+```js
+	// $: cheerio instance
+	// html: html string
+
+	var txt = [];
+	$('ul > li').each(function (i, elem) {
+		txt.push($(this).text());
+	});
+	return txt;
+```
+</readme>
+
+<settings>
+	<div class="padding">
+		<div data---="input__?.path">Path to html</div>
+		<div class="help m">Leave empty if the 'data' itself is the html string, otherwise use dot notation. E.g.: { request: { body: '&lt;html&gt;...&lt;/html&gt;' }} -> `request.body` </div>
+		<div class="ui-input-label">Code:</div>
+		<div data---="codemirror__?.fn__type:javascript;minheight:300;parent:.ui-largeform-body;margin:60;tabs:true;trim:true"></div>
+		<div class="help">Available variables: '&dollar;' -> cheerio instance, 'html' -> html string. Use 'return somedata;' to return whatever you want. Output data -> { result: somedata, input: inputdata }</div>
+	</div>
+</settings>
+
+<style>
+	.CLASS footer { padding: 10px; font-size: 12px; }
+</style>
+
+<script>
+
+</script>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+	<footer data-bind="!STATUS__text__show"></footer>
+</body>
