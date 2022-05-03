@@ -5,17 +5,13 @@
 	exports.icon = 'fa fa-database';
 	exports.version = '1';
 	exports.author = 'Total.js';
-	exports.config = { name: 'API Router', table: 'tbl_product', type: 'query', fields: '*', softdelete: true, where: [], where2: [], limit: 100, error: '' };
-	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.config = { name: 'API Router', tab: 'list', listtable: '', listfilter: [], listwhere: [], listlimit: 100, listsort: '', listpath: '', createtable: '', createerror: '', readtable: '', readfields: '*', readwhere: [], readpath: '', readsort: '', readerror: '', createtable: '', createpath: '', updatetable: '', updateerror: '', updatepath: '', updatewhere: [], removetable: '', removepath: '', removeerror: '', removewhere: [] };
+	exports.inputs = [{ id: 'list', name: 'List' }, { id: 'create', name: 'Create' }, { id: 'read', name: 'Read' }, { id: 'update', name: 'Update' }, { id: 'remove', name: 'Delete' }];
 	exports.outputs = [{ id: 'output', name: 'Output' }, { id: 'error', name: 'Error' }];
 
 	exports.make = function(instance, config) {
 
-		var compiled = null;
-		var fields = '';
-		var fields2 = '';
-		var sort = [];
-		var fn = null;
+		var cache = {};
 
 		instance.message = function($) {
 
@@ -28,49 +24,55 @@
 
 			data = data.data;
 
-			switch (config.type) {
-				case 'insert':
-					builder = DB().insert(config.table, data);
+			switch ($.input) {
+				case 'create':
+					if (config.createtable)
+						builder = DB().insert(config.createtable, data);
 					break;
 				case 'update':
-					builder = DB().update(config.table, data);
+
+					if (config.updatetable) {
+						builder = DB().update(config.updatetable, data);
+						cache.update && cache.update(data.params, data.data, data.query, data.user, $.refs, $, builder);
+						config.updateerror && builder.error(config.updateerror);
+					}
+
 					break;
-				case 'delete':
-					builder = DB().remove(config.table);
-					break;
-				case 'query':
-					builder = DB().find(config.table);
-					config.limit && builder.take(config.limit);
+				case 'remove':
+					if (config.removetable) {
+						builder = DB().remove(config.removetable);
+						cache.remove && cache.remove(data.params, data.data, data.query, data.user, $.refs, $, builder);
+						config.removeerror && builder.error(config.removeerror);
+					}
 					break;
 				case 'read':
-					builder = DB().read(config.table);
+					if (config.readtable) {
+						builder = DB().read(config.readtable);
+						cache.read && cache.read(data.params, data.data, data.query, data.user, $.refs, $, builder);
+						config.readerror && builder.error(config.readerror);
+						if (cache.readsort) {
+							for (var m of cache.readsort)
+								builder.sort(m[0], m[1]);
+						}
+					}
 					break;
 				case 'list':
-					builder = DB().list(config.table);
-					builder.autoquery(query, fields2, config.sort, config.limit);
+					if (config.listtable) {
+						builder = DB().list(config.listtable);
+						builder.autoquery(query, cache.listfields, cache.listsort ? (cache.listsort[0] + '_' + cache.listsort[1]) : null, config.listlimit || 100);
+						cache.list && cache.list(data.params, data.data, data.query, data.user, $.refs, $, builder);
+					}
 					break;
 			}
 
 			if (builder) {
-
-				config.error && builder.error(config.error);
-
-				if (config.type !== 'list') {
-					fields && builder.fields(fields);
-					if (sort && sort.length) {
-						for (var m of sort)
-							builder.sort(m[0], m[1]);
-					}
-				}
-
-				fn && fn(data.params, data.data, data.query, data.user, $.refs, $, builder);
-
 				builder.callback(function(err, response) {
 					if (err) {
 						$.send('error', [{ error: err + '' }]);
 					} else {
-						if (config.setpath) {
-							U.set($.data, config.setpath, response);
+						var path = config[$.input + 'path'];
+						if (path) {
+							U.set($.data, path, response);
 							$.send('output');
 						} else
 							$.send('output', response);
@@ -82,54 +84,66 @@
 
 		instance.configure = function() {
 
-			fields = config.fields === '*' ? '' : config.fields;
-			fields2 = '';
+			config.tab = 'list';
 
-			var builder = [];
+			var types = ['list', 'update', 'read', 'remove'];
+			var builder;
 			var tmp;
 
-			for (var item of config.where) {
-				var val = 'null';
-				switch (item.type) {
-					case '1':
-						val = item.value;
-						break;
-					case '2':
-						val = '\'' + item.value.replace(/'/g, '\\\'') + '\'';
-						break;
-					case '3':
-						val = item.value.parseFloat();
-						break;
-					case '4':
-						val = item.value.toLowerCase();
-						val = val === '1' || item.value === 'true' || val === 'on';
-						break;
-					case '5':
-						val = item.value.toLowerCase();
-						val = val === 'now' ? 'new Date()' : item.value.parseDate('yyyy-MM-dd HH:mm:ss');
-						break;
-					case '6':
-						val = 'null';
-						break;
+			for (var key of types) {
+
+				builder = [];
+
+				for (var item of config[key + 'where']) {
+					var val = 'null';
+					switch (item.type) {
+						case '1':
+							val = item.value;
+							break;
+						case '2':
+							val = '\'' + item.value.replace(/'/g, '\\\'') + '\'';
+							break;
+						case '3':
+							val = item.value.parseFloat();
+							break;
+						case '4':
+							val = item.value.toLowerCase();
+							val = val === '1' || item.value === 'true' || val === 'on';
+							break;
+						case '5':
+							val = item.value.toLowerCase();
+							val = val === 'now' ? 'new Date()' : item.value.parseDate('yyyy-MM-dd HH:mm:ss');
+							break;
+						case '6':
+							val = 'null';
+							break;
+					}
+
+					builder.push('where(\'{0}\', \'{1}\', {2})'.format(item.name, item.comparer, val));
 				}
 
-				builder.push('where(\'{0}\', \'{1}\', {2})'.format(item.name, item.comparer, val));
+				cache[key] = builder.length ? new Function('params', 'data', 'query', 'user', 'refs', '$', 'builder', 'builder.' + builder.join('.')) : null;
 			}
 
-			fn = builder.length ? new Function('params', 'data', 'query', 'user', 'refs', '$', 'builder', 'builder.' + builder.join('.')) : null;
+			types = ['list', 'read'];
 
-			if (config.sort) {
-				sort = [];
-				tmp = config.sort.split(/,|;/);
-				for (var m of tmp) {
-					m = m.trim().split(' ');
-					m[1] = (m[1] || '').toLowerCase() === 'asc';
-					sort.push(m);
-				}
-			} else
-				sort = null;
+			for (var key of types) {
+				var k = key + 'sort';
+				if (config[k]) {
+					cache[k] = [];
+					tmp = config[k].split(/,|;/);
+					for (var m of tmp) {
+						m = m.trim().split(' ');
+						m[1] = (m[1] || '').toLowerCase() === 'asc';
+						cache[k].push(m);
+					}
+				} else
+					cache[k] = null;
+			}
 
-			for (var item of config.where2) {
+			cache.listfields = '';
+
+			for (var item of config.listfilter) {
 				tmp = 'string';
 				switch (item.type) {
 					case '3':
@@ -142,9 +156,8 @@
 						tmp = 'date';
 						break;
 				}
-				fields2 += (fields2 ? ',' : '') + item.name + ':' + tmp;
+				cache.listfields += (cache.listfields ? ',' : '') + item.name + ':' + tmp;
 			}
-
 		};
 
 		instance.configure();
@@ -201,135 +214,245 @@ __Good to know__: If the `data` (payload) can contain special key names in the f
 	<header>
 		<i class="ICON"></i>NAME
 	</header>
-	<footer data-bind="CONFIG__template" class="monospace">
-		<script type="text/html">
-			<span class="badge badge-medium" style="background:{{ value.type | color }}">{{ value.type }}</span> {{ value.table }}
-		</script>
-	</footer>
 </body>
 
 <settings>
-	<div class="CLASS-settings">
-		<div class="padding bg-smoke">
-			<div class="row">
-				<div class="col-md-3 m">
-					<div data---="input__?.type__dirsource:tmpcruddb.commands;required:1">Type</div>
-					<div class="help">Database operation</div>
-				</div>
-				<div class="col-md-3 m">
-					<div data---="input__?.table__required:1;monospace:1;align:1">Table</div>
-					<div class="help">Table or Connection/Table</div>
-				</div>
-				<div class="col-md-6 m">
-					<div data---="input__?.error__monospace:1;icon:fa fa-bug">Error message</div>
-					<div class="help">An error message will be returned when the database returns nothing</div>
-				</div>
-			</div>
 
-			<div data---="input__?.setpath__monospace:1">Path</div>
-			<div class="help">The response from database will be assigned to the <code>message.data</code>. The empty path value will replace the entire message data.</div>
+	<script type="text/html" class="apidatabasestaticfilter">
+		<div data---="listform__?.TYPEwhere__autofocus:1;empty:You do not have defined any rules">
+			<SCR type="text/html">
+				<div class="item monospace"><div class="controls nmr"><button name="up"><i class="fa fa-long-arrow-alt-up"></i></button><button name="down"><i class="fa fa-long-arrow-alt-down"></i></button><button name="remove" class="red"><i class="far fa-trash-alt"></i></button></div><i class="fa fa-filter mr5"></i>{{ name }} {{ comparer }} <b>{{ if type == '6' }}null{{ else }}{{ value }}{{ fi }}</b></div>
+			</SCR>
+			<SCR type="text/html">
+				<div class="padding">
+					<div class="row">
+						<div class="col-sm-3 m">
+							<div data---="input__?.name__required:1;align:1;monospace:1__'id'">Name</div>
+						</div>
+						<div class="col-sm-3 m">
+							<div data---="input__?.comparer__required:1;align:1;dirsource:tmpcruddb.comparers__'='">Comparer</div>
+						</div>
+						<div class="col-sm-3 m">
+							<div data---="input__?.type__required:1;align:1;dirsource:tmpcruddb.types__'1'">Type</div>
+						</div>
+						<div class="col-sm-3 m">
+							<div data---="input__?.value__monospace:1;align:1__''" data-bind="?.type__enable:value!=='6'">Value</div>
+						</div>
+					</div>
+					<div class="help"><b>Expression</b> supports these commands <code>params {Object}</code>, <code>query {Object}</code>, <code>data {Object}</code>, <code>user {Object}</code>.</div>
+					<br />
+					<div data---="validate__?__validonly:true" class="toolbar">
+						<button name="submit"><i class="fa fa-floppy-o"></i>Save</button>
+						<button name="remove">Remove</button>
+						<button name="cancel">Cancel</button>
+					</div>
+				</div>
+			</SCR>
+			<SCR type="text/html">
+				<div style="margin-top:15px"><button class="button button-inline" name="create"><i class="fa fa-plus-circle green"></i>Create</button></div>
+			</SCR>
 		</div>
-		<div class="padding npb" data-bind="?.type__show:value!=='insert'">
+	</script>
 
-			<div class="caption m">
-				<label>Query / Listing</label>
-			</div>
+	<div class="CLASS-settings">
 
-			<div class="row">
-				<div class="col-md-6 m">
-					<div data---="input__?.fields__monospace:1" data-bind="?.type__enable:value==='read'||value==='query'">Fields</div>
-					<div class="help">Seperated by the comma</div>
+		<div class="padding bg-smoke">
+
+			<div data---="input__?.name__required:1" class="m">Name</div>
+
+			<ul class="tabmenu" data---="tabmenu__?.tab__null__'list'">
+				<li data-value="list">List</li>
+				<li data-value="read">Read</li>
+				<li data-value="create">Create</li>
+				<li data-value="update">Update</li>
+				<li data-value="remove">Delete</li>
+			</ul>
+			<div class="clearfix"></div>
+		</div>
+		<div class="padding npt">
+
+			<div data-bind="?.tab__show:value==='list'" class="hidden">
+
+				<div class="caption m">
+					<label><i class="fa fa-list"></i>List input</label>
 				</div>
-				<div class="col-md-3 m">
-					<div data---="input__?.limit__type:number;required:1;monospace:1">Max. limit</div>
-					<div class="help">Max. records to output</div>
-				</div>
-				<div class="col-md-3 m">
-					<div data---="input__?.sort__monospace:1;align:1;placeholder:column asc">Default sort</div>
-					<div class="help"><code>column asc</code> or <code>column desc</code></div>
-				</div>
-			</div>
 
-			<br />
-
-			<div class="panel m">
-				<label class="bg-smoke">Static filter</label>
-				<div class="padding">
-
-					<div data---="listform__?.where__autofocus:1;empty:You do not have defined any rules">
-
-						<script type="text/html">
-							<div class="item monospace"><div class="controls nmr"><button name="up"><i class="fa fa-long-arrow-alt-up"></i></button><button name="down"><i class="fa fa-long-arrow-alt-down"></i></button><button name="remove" class="red"><i class="far fa-trash-alt"></i></button></div><i class="fa fa-filter mr5"></i>{{ name }} {{ comparer }} <b>{{ if type == '6' }}null{{ else }}{{ value }}{{ fi }}</b></div>
-						</script>
-
-						<script type="text/html">
-							<div class="padding">
-								<div class="row">
-									<div class="col-sm-3 m">
-										<div data---="input__?.name__required:1;align:1;monospace:1__'id'">Name</div>
-									</div>
-									<div class="col-sm-3 m">
-										<div data---="input__?.comparer__required:1;align:1;dirsource:tmpcruddb.comparers__'='">Comparer</div>
-									</div>
-									<div class="col-sm-3 m">
-										<div data---="input__?.type__required:1;align:1;dirsource:tmpcruddb.types__'1'">Type</div>
-									</div>
-									<div class="col-sm-3 m">
-										<div data---="input__?.value__monospace:1;align:1__''" data-bind="?.type__enable:value!=='6'">Value</div>
-									</div>
-								</div>
-								<div class="help"><b>Expression</b> supports these commands <code>params {Object}</code>, <code>query {Object}</code>, <code>data {Object}</code>, <code>user {Object}</code>.</div>
-								<br />
-								<div data---="validate__?__validonly:true" class="toolbar">
-									<button name="submit"><i class="fa fa-floppy-o"></i>Save</button>
-									<button name="remove">Remove</button>
-									<button name="cancel">Cancel</button>
-								</div>
-							</div>
-						</script>
-
-						<script type="text/html">
-							<div style="margin-top:15px"><button class="button button-inline" name="create"><i class="fa fa-plus-circle green"></i>Create</button></div>
-						</script>
-
+				<div class="row">
+					<div class="col-md-3 m">
+						<div data---="input__?.listtable__required:1;monospace:1;align:1">Table</div>
+						<div class="help">Table or Connection/Table</div>
+					</div>
+					<div class="col-md-3 m">
+						<div data---="input__?.listlimit__type:number;required:1;monospace:1">Max. limit</div>
+						<div class="help">Max. records to output</div>
+					</div>
+					<div class="col-md-3 m">
+						<div data---="input__?.listsort__monospace:1;align:1;placeholder:column asc">Default sort</div>
+						<div class="help"><code>column asc</code> or <code>column desc</code></div>
+					</div>
+					<div class="col-md-3 m">
+						<div data---="input__?.listpath__monospace:1">Save to path</div>
+						<div class="help">Response to <code>message.data</code></div>
 					</div>
 				</div>
-			</div>
 
-			<div class="panel hidden" data-bind="?.type__show:value==='list'">
-				<label class="bg-smoke">Dynamic filter</label>
-				<div class="padding">
-					<div data---="listform__?.where2__autofocus:1;empty:You do not have defined any rules">
+				<div class="panel m">
+					<label class="bg-smoke">Static filter</label>
+					<div class="padding" data---="loadcontent__null__selector:.apidatabasestaticfilter;replace:TYPE=list"></div>
+				</div>
 
-						<script type="text/html">
-							<div class="item monospace"><div class="controls nmr"><button name="up"><i class="fa fa-long-arrow-alt-up"></i></button><button name="down"><i class="fa fa-long-arrow-alt-down"></i></button><button name="remove" class="red"><i class="far fa-trash-alt"></i></button></div><i class="fa fa-filter mr5"></i>{{ name }} <b>{{ type | tmpcruddbtype }}</b></div>
-						</script>
+				<div class="panel">
+					<label class="bg-smoke">Dynamic filter</label>
+					<div class="padding">
+						<div data---="listform__?.listfilter__autofocus:1;empty:You do not have defined any rules">
 
-						<script type="text/html">
-							<div class="padding">
-								<div class="row">
-									<div class="col-sm-3 m">
-										<div data---="input__?.name__required:1;align:1;monospace:1__'dtcreated'">Name</div>
+							<script type="text/html">
+								<div class="item monospace"><div class="controls nmr"><button name="up"><i class="fa fa-long-arrow-alt-up"></i></button><button name="down"><i class="fa fa-long-arrow-alt-down"></i></button><button name="remove" class="red"><i class="far fa-trash-alt"></i></button></div><i class="fa fa-filter mr5"></i>{{ name }} <b>{{ type | tmpapidatabasetype }}</b></div>
+							</script>
+
+							<script type="text/html">
+								<div class="padding">
+									<div class="row">
+										<div class="col-sm-3 m">
+											<div data---="input__?.name__required:1;align:1;monospace:1__'dtcreated'">Name</div>
+										</div>
+										<div class="col-sm-3 m">
+											<div data---="input__?.type__required:1;align:1;dirsource:tmpcruddb.types2__'5'">Type</div>
+										</div>
 									</div>
-									<div class="col-sm-3 m">
-										<div data---="input__?.type__required:1;align:1;dirsource:tmpcruddb.types2__'5'">Type</div>
+									<div data---="validate__?__validonly:true" class="toolbar">
+										<button name="submit"><i class="fa fa-floppy-o"></i>Save</button>
+										<button name="remove">Remove</button>
+										<button name="cancel">Cancel</button>
 									</div>
 								</div>
-								<div data---="validate__?__validonly:true" class="toolbar">
-									<button name="submit"><i class="fa fa-floppy-o"></i>Save</button>
-									<button name="remove">Remove</button>
-									<button name="cancel">Cancel</button>
-								</div>
-							</div>
-						</script>
+							</script>
 
-						<script type="text/html">
-							<div style="margin-top:15px"><button class="button button-inline" name="create"><i class="fa fa-plus-circle green"></i>Create</button></div>
-						</script>
+							<script type="text/html">
+								<div style="margin-top:15px"><button class="button button-inline" name="create"><i class="fa fa-plus-circle green"></i>Create</button></div>
+							</script>
 
+						</div>
 					</div>
 				</div>
+
 			</div>
+
+			<div data-bind="?.tab__show:value==='read'" class="hidden">
+
+				<div class="caption m">
+					<label><i class="fa fa-glasses"></i>Read input</label>
+				</div>
+
+				<div class="row">
+					<div class="col-md-3 m">
+						<div data---="input__?.readtable__required:1;monospace:1;align:1">Table</div>
+						<div class="help">Table or Connection/Table</div>
+					</div>
+					<div class="col-md-3 m">
+						<div data---="input__?.readsort__monospace:1;align:1;placeholder:column asc">Default sort</div>
+						<div class="help"><code>column asc</code> or <code>column desc</code></div>
+					</div>
+					<div class="col-md-3 m">
+						<div data---="input__?.readpath__monospace:1">Save to path</div>
+						<div class="help">Response to <code>message.data</code></div>
+					</div>
+				</div>
+
+				<hr />
+
+				<div class="row">
+					<div class="col-md-6 m">
+						<div data---="input__?.readfields__monospace:1"><b>Read fields</b></div>
+						<div class="help">Seperate them by the comma. Empty value or <code>*</code> returns all fields (columns).</div>
+					</div>
+					<div class="col-md-6 m">
+						<div data---="input__?.readerror__monospace:1">Error message</div>
+						<div class="help">An error message will be returned when the database returns nothing</div>
+					</div>
+				</div>
+
+				<div class="panel m">
+					<label class="bg-smoke">Static filter</label>
+					<div class="padding" data---="loadcontent__null__selector:.apidatabasestaticfilter;replace:TYPE=read"></div>
+				</div>
+			</div>
+
+			<div data-bind="?.tab__show:value==='create'" class="hidden">
+
+				<div class="caption m">
+					<label><i class="fa fa-plus-circle"></i>Create input</label>
+				</div>
+
+				<div class="row">
+					<div class="col-md-3 m">
+						<div data---="input__?.createtable__required:1;monospace:1;align:1">Table</div>
+						<div class="help">Table or Connection/Table</div>
+					</div>
+					<div class="col-md-3 m">
+						<div data---="input__?.createpath__monospace:1">Save to path</div>
+						<div class="help">Response to <code>message.data</code></div>
+					</div>
+				</div>
+
+			</div>
+
+			<div data-bind="?.tab__show:value==='update'" class="hidden">
+
+				<div class="caption m">
+					<label><i class="fa fa-pencil"></i>Update input</label>
+				</div>
+
+				<div class="row">
+					<div class="col-md-3 m">
+						<div data---="input__?.updatetable__required:1;monospace:1;align:1">Table</div>
+						<div class="help">Table or Connection/Table</div>
+					</div>
+					<div class="col-md-3 m">
+						<div data---="input__?.updatepath__monospace:1">Save to path</div>
+						<div class="help">Response to <code>message.data</code></div>
+					</div>
+					<div class="col-md-6 m">
+						<div data---="input__?.updateerror__monospace:1">Error message</div>
+						<div class="help">An error message will be returned when the database returns nothing</div>
+					</div>
+				</div>
+
+				<div class="panel m">
+					<label class="bg-smoke">Static filter</label>
+					<div class="padding" data---="loadcontent__null__selector:.apidatabasestaticfilter;replace:TYPE=update"></div>
+				</div>
+
+			</div>
+
+			<div data-bind="?.tab__show:value==='remove'" class="hidden">
+
+				<div class="caption m">
+					<label><i class="fa fa-trash-alt"></i>Delete input</label>
+				</div>
+
+				<div class="row">
+					<div class="col-md-3 m">
+						<div data---="input__?.removetable__required:1;monospace:1;align:1">Table</div>
+						<div class="help">Table or Connection/Table</div>
+					</div>
+					<div class="col-md-3 m">
+						<div data---="input__?.removepath__monospace:1">Save to path</div>
+						<div class="help">Response to <code>message.data</code></div>
+					</div>
+					<div class="col-md-6 m">
+						<div data---="input__?.removeerror__monospace:1">Error message</div>
+						<div class="help">An error message will be returned when the database returns nothing</div>
+					</div>
+				</div>
+
+				<div class="panel m">
+					<label class="bg-smoke">Static filter</label>
+					<div class="padding" data---="loadcontent__null__selector:.apidatabasestaticfilter;replace:TYPE=remove"></div>
+				</div>
+
+			</div>
+
 		</div>
 	</div>
 </settings>
@@ -340,12 +463,11 @@ __Good to know__: If the `data` (payload) can contain special key names in the f
 
 		exports.settings = function(meta) {
 
-			var tmp = W.tmpcruddb;
+			var tmp = W.tmpapidatabase;
 
 			if (!tmp) {
 				tmp = {};
 				tmp.commands = [];
-				tmp.commands.push({ id: 'query', name: 'Query' });
 				tmp.commands.push({ id: 'list', name: 'List' });
 				tmp.commands.push({ id: 'read', name: 'Read' });
 				tmp.commands.push({ id: 'insert', name: 'Insert' });
@@ -373,11 +495,11 @@ __Good to know__: If the `data` (payload) can contain special key names in the f
 				tmp.types2.push({ id: '4', name: 'Boolean' });
 				tmp.types2.push({ id: '5', name: 'Date' });
 
-				Thelpers.tmpcruddbtype = function(val) {
+				Thelpers.tmpapidatabasetype = function(val) {
 					return tmp.types2.findValue('id', val, 'name', DEF.empty);
 				};
 
-				W.tmpcruddb = tmp;
+				W.tmpapidatabase = tmp;
 			}
 		};
 
