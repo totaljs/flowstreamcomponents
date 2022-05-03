@@ -5,7 +5,7 @@
 	exports.version = '3';
 	exports.icon = 'fas fa-cloud-download';
 	exports.author = 'Total.js';
-	exports.config = { url: '', method: 'GET', dnscache: true, insecure: false, nocookies: true, xhr: false, parse: true, timeout: 10000, limit: 1024 * 500, responsebody: true, headers: {}, cookies: {}, serialize: null };
+	exports.config = { url: '', method: 'GET', dnscache: true, insecure: false, nocookies: true, xhr: false, parse: true, timeout: 10000, limit: 1024 * 500, responsebody: true, headers: {}, cookies: {}, serialize: null, send: 'all' };
 	exports.inputs = [{ id: 'payload', name: 'Payload' }];
 	exports.outputs = [{ id: 'response', name: 'Response' }, { id: 'error', name: 'Error' }];
 
@@ -27,17 +27,17 @@
 			for (var key in config.headers) {
 				if (!opt.headers)
 					opt.headers = {};
-				opt.headers[$.variables(key)] = $.variables(config.headers[key], true);
+				opt.headers[$.variables(key, true)] = $.variables(config.headers[key], true);
 			}
 
 			for (var key in config.cookies) {
 				if (!opt.cookies)
 					opt.cookies = {};
-				opt.cookies[$.variables(key)] = $.variables(config.cookies[key], true);
+				opt.cookies[$.variables(key, true)] = $.variables(config.cookies[key], true);
 			}
 
 			opt.method = config.method;
-			opt.url = $.variables(config.url);
+			opt.url = $.variables(config.url, true);
 			opt.cook = true;
 
 			if (config.serialize) {
@@ -83,11 +83,29 @@
 			if (config.limit)
 				opt.limit = config.limit;
 
+			if (config.send === 'chunks')
+				opt.custom = true;
+
 			opt.callback = function(err, response) {
 
 				if (err) {
 					$.data = err + '';
 					$.send('error');
+					return;
+				}
+
+				if (opt.custom) {
+					response.stream.on('data', data => $.send('response', data));
+					return;
+				}
+
+				if (config.send === 'headers') {
+					$.send('response', response.headers);
+					return;
+				}
+
+				if (config.send === 'status') {
+					$.send('response', response.status);
 					return;
 				}
 
@@ -118,10 +136,14 @@
 					}
 				}
 
-				if (config.responsebody)
-					$.data = body;
-				else
-					$.data = { headers: response.headers, cookies: response.cookies, status: response.status, host: response.host, body: body };
+				switch (config.send) {
+					case 'all':
+						$.data = { headers: response.headers, cookies: response.cookies, status: response.status, host: response.host, body: body };
+						break;
+					case 'response':
+						$.data = body;
+						break;
+				}
 
 				$.send('response');
 			};
@@ -134,9 +156,8 @@
 </script>
 
 <style>
-	.CLASS { max-width: 250px !important; }
-	.CLASS .status { font-size: 11px; margin: 0; padding: 10px; overflow-wrap: break-word; line-height: 12px; }
-	.CLASS .status span { padding: 2px 3px; border-radius: var(--radius); color: #FFF; float: left; margin-right: 5px; }
+	.CLASS .status { font-size: 12px; margin: 0; padding: 10px; overflow-wrap: break-word; }
+	.CLASS .status span { padding: 2px 3px; border-radius: var(--radius); color: #FFF; }
 </style>
 
 <readme>
@@ -160,12 +181,11 @@ __Response__:
 		<i class="ICON"></i>NAME
 	</header>
 	<footer class="hidden" data-bind="CONFIG.url__show">
-		<div class="status monospace" data-bind="CONFIG__template">
+		<div class="status" data-bind="CONFIG__template">
 			<script type="text/html">
-				<div><span style="background:{{ value.method | color }}">{{ value.method }}</span> {{ value.url }}</div>
+				<div class="monospace"><span style="background:{{ value.method | color }}">{{ value.method }}</span> {{ value.url }}</div>
 			</script>
 		</div>
-		<div class="clearfix"></div>
 	</footer>
 </body>
 
@@ -191,12 +211,14 @@ __Response__:
 				<div data---="input__?.limit__type:number">Max. size</div>
 				<div class="help"><i class="fas fa-calculator"></i><span data-bind="?.limit__text:(value||0).filesize()"></span><br />Response max. size <b>in bytes</b></div>
 			</div>
+			<div class="col-md-6 m">
+				<div data---="input__?.send__required:1;dirsource:all|Everything,response|Response body,chunks|Chunks of buffer,headers|Headers only,status|Status code">Send to output</div>
+			</div>
 		</div>
 	</div>
 	<hr class="nmt nmb" />
 	<div class="padding">
-		<div data---="input__?.serialize__dirsource:json|JSON,urlencoded|URL encode,buffer|Buffer;dirraw:1;placeholder:Choose a specific output;dirempty:None">Serialization</div>
-		<div class="help m">It depends on the HTTP method. For <code>GET</code> method will be data serialized into the URL address otherwise into the request body.</div>
+		<div data---="input__?.serialize__dirsource:json|JSON,urlencoded|URL encode,buffer|Buffer;dirraw:1;placeholder:Choose serialization;dirempty:None" class="m">Data serialization</div>
 		<div data---="keyvalue__?.headers__placeholderkey:Header name;placeholdervalue:Header value and press enter">Headers</div>
 		<div class="help m">Headers support dynamic variables in the form <code>{key}</code></div>
 		<div data---="keyvalue__?.cookies__placeholderkey:Cookie name;placeholdervalue:Cookie value and press enter">Cookies</div>
@@ -206,6 +228,5 @@ __Response__:
 		<div data---="input__?.dnscache__type:checkbox">Enable DNS cache</div>
 		<div data---="input__?.insecure__type:checkbox">Allow insecure connection</div>
 		<div data---="input__?.xhr__type:checkbox">Add XHR header</div>
-		<div data---="input__?.responsebody__type:checkbox">Forward response body only</div>
 	</div>
 </settings>
