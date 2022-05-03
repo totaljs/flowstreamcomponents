@@ -20,18 +20,27 @@
 		var states = { connected: 'Connected', disconnected: 'Disconnected', connecting: 'Connecting ...', connectionfailed: 'Connection failed' };
 
 		instance.state = { id: 'disconnected', title: states.disconnected };
-		var setState = (state, notify) => {
+		var setState = (state) => {
 			instance.state = { id: state, title: states[state] };
 
 			instance.status(states[state], 1000);
-			!notify === false && notifyDeps(state, states[state]);
+			notifyDeps(state, states[state]);
+		};
+
+		var notifyDeps = (type) => {
+			var instances = instance.main.instances().filter(i => i.module.flags && i.module.flags.includes('rabbitmq-dep') > -1 && i.config.manager === instance.id);
+			for (let com of instances)
+				com.configure(type);
 		};
 
 		instance.configure = function() {
-			setState('connecting');
+			instance.close(true);
 
 			if (!config.hostname) // queue name is optional in some cases, not supported here
 				return instance.status('Not configured');
+
+			setState('connecting');
+			instance.status(states.connecting);
 
 			config.port = config.port || 5672;
 			config.vhost = config.vhost || '/';
@@ -57,7 +66,7 @@
 
 			Manager.on('connectFailed', function(){
 				instance.Manager = null;
-				setState('connectionfailed', false);
+				setState('connectionfailed');
 				// notifyDeps('connectfailed'); // this does not happen after connect so the deps should be disconnected
 			});
 
@@ -75,19 +84,13 @@
 			});
 		};
 
-		instance.close = function() {
-			Manager.close();
+		instance.close = function(silent) {
+			Manager && Manager.close();
 			instance.Manager = null;
-			notifyDeps('removed');
+			!silent && notifyDeps('removed');
 		};
 
 		instance.configure();
-
-		var notifyDeps = (type) => {
-			var instances = instance.main.instances().filter(i => i.module.flags && i.module.flags.includes('rabbitmq-dep') > -1 && i.config.manager === instance.id);
-			for (let com of instances)
-				com.configure(type);
-		};
 	};
 
 </script>
