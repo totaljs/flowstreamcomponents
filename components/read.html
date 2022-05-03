@@ -178,7 +178,7 @@ This component reads specific values according to the configured map.
 
 			if (!meta.config.schema.length) {
 				var obj = CLONE(defitem);
-				obj.id = Math.random().toString(36).substring(4)
+				obj.id = Math.random().toString(36).substring(4);
 				meta.config.schema.push(obj);
 			}
 
@@ -190,7 +190,7 @@ This component reads specific values according to the configured map.
 				tmp.add = function(el) {
 					var scope = el.scope();
 					var obj = CLONE(defitem);
-					obj.id = Math.random().toString(36).substring(4)
+					obj.id = Math.random().toString(36).substring(4);
 					scope.push('schema', obj);
 					scope.change('*');
 				};
