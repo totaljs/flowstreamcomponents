@@ -1,0 +1,84 @@
+<script total>
+
+	exports.name = 'API PostgreSQL';
+	exports.icon = 'fa fa-cubes';
+	exports.author = 'Total.js';
+	exports.group = 'REST API';
+	exports.version = '1';
+	exports.config = { name: 'default', url: '', pooling: 2 };
+	exports.outputs = [{ id: 'error', name: 'Error' }];
+	exports.npm = ['querybuilderpg'];
+
+	exports.make = function(instance, config) {
+
+		var QB = require('querybuilderpg');
+		var init = false;
+		var conf;
+
+		instance.configure = function() {
+
+			init && QB.init(conf.name);
+			conf = instance.replace(config);
+
+			if (conf.url) {
+				QB.init(conf.name, conf.url, config.pooling, function(err, data) {
+					var msg = instance.newmessage([{ error: err + ' --> ' + data.query }]);
+					msg.send('error');
+				});
+				init = true;
+			}
+
+		};
+
+		instance.close = function() {
+			conf && require('querybuilderpg').init(conf.name);
+			conf = null;
+			init = false;
+		};
+
+		instance.configure();
+
+	};
+
+</script>
+
+<readme>
+The component initializes QueryBuilder for PostgreSQL database. So you will able to use `API Database` component. Every connection must be separated by the alias.
+
+__Usage in API Database__:
+
+- `tbl_user` is targeted to the `default/tbl_user` alias connection
+- `anotherserver/tbl_user` will use `anotherserver` alias connection
+</readme>
+
+<settings>
+	<div class="padding">
+		<div class="row">
+			<div class="col-md-3">
+				<div data---="input__?.name__required:1">Alias</div>
+				<div class="help">The alias separates various DB connections</div>
+			</div>
+			<div class="col-md-6">
+				<div data---="input__?.url__required:1;camouflage:1">Connection string</div>
+				<div class="help">Example: postgresql://user:pass@localhost:5432/database_name</div>
+			</div>
+			<div class="col-md-3">
+				<div data---="input__?.pooling__required:1;type:number">Pooling</div>
+				<div class="help">How many connections can it keep?</div>
+			</div>
+		</div>
+	</div>
+</settings>
+
+<style>
+	.CLASS footer { padding: 10px; font-size: 12px; }
+</style>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+	<footer>
+		Alias: <b class="monospace" data-bind="CONFIG.name__text"></b>
+	</footer>
+</body>

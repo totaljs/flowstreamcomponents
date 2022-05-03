@@ -1,0 +1,272 @@
+<script total>
+
+	exports.name = 'API Router';
+	exports.group = 'REST API';
+	exports.icon = 'fa fa-crosshairs';
+	exports.version = '1';
+	exports.author = 'Total.js';
+	exports.config = { name: 'API Router', schema: [], color: '', icon: 'fa fa-crosshairs' };
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [];
+
+	exports.make = function(instance, config) {
+
+		var compiled = null;
+
+		instance.message = function($) {
+
+			var data = $.data;
+
+			if (!data.schema)
+				data = data.body;
+
+			if (typeof(data.schema) === 'string') {
+
+				var schema = data.schema;
+				var index = schema.indexOf('/');
+				var key = index === -1 ? schema : schema.substring(0, index);
+
+				var queryindex = schema.indexOf('?');
+				if (index === -1 && queryindex !== -1)
+					key = key.substring(0, queryindex);
+
+				var meta = compiled[key];
+
+				if (meta) {
+
+					index = queryindex;
+
+					var query = index === -1 ? {} : DEF.parsers.urlencoded(schema.substring(index + 1));
+					var arr = (index === -1 ? schema : schema.substring(0, index)).split('/').trim();
+
+					arr.shift();
+
+					if (arr.length === meta.params.length) {
+
+						var params = {};
+						for (var i = 0; i < meta.params.length; i++)
+							params[meta.params[i]] = arr[i];
+
+						data.id = params[meta.params[0]];
+						data.params = params;
+						data.query = query;
+
+						$.refs.params = params;
+						$.refs.query = query;
+
+						var ctrl = $.refs.controller;
+						if (ctrl) {
+							ctrl.params = data.params;
+							ctrl.id = data.id;
+							ctrl.query = data.query;
+							data.ip = ctrl.ip;
+							data.user = ctrl.user;
+							data.session = ctrl.session;
+						}
+
+						$.send(meta.id);
+						return;
+					}
+				}
+
+			}
+
+			$.send('error');
+		};
+
+		instance.configure = function() {
+
+			compiled = {};
+			var outputs = [];
+
+			for (var item of config.schema) {
+
+				var params = item.name.split('/').trim();
+				var name = params.shift();
+
+				for (var i = 0; i < params.length; i++)
+					params[i] = params[i].replace(/\{|\}/g, '');
+
+				compiled[name] = { id: item.id, params: params };
+				outputs.push({ id: item.id, name: item.name });
+			}
+
+			outputs.push({ id: 'error', name: '-- Not found --' });
+
+			var prev = JSON.stringify(instance.outputs);
+			var curr = JSON.stringify(outputs);
+
+			if (prev !== curr) {
+				instance.outputs = outputs;
+				instance.save();
+			}
+
+		};
+
+		instance.configure();
+	};
+
+</script>
+
+<readme>
+This component implements the [Total.js API Router](https://docs.totaljs.com/total4/cc674001rr51c/#total-js-routing) that allows you to provide only one endpoint (route) by adding multiple endpoints divided by keys. The component expects REST Route message or data in the form:
+
+```js
+{
+	"schema": "schema_name/{dynamic_arg_1}/{dynamic_arg_2}?query=arguments",
+	"data": {} // optional, request payload
+}
+```
+
+__Output data:__ will be same data extendend by adding new properties:
+
+- `id {String}` first value from dynamic value
+- `params {Object}` dynamic values
+- `query {Object}` query arguments
+- `user {Object}` optional, inherited from the controller
+- `session {Object}` optional, inherited from the controller
+- `ip {String}` optional, inherited from the controller
+
+If the controller is stored in the `message.refs.controller` property, then its properties like `controller.id`, `controller.params` and `controller.query` will be extendend by values from parsed schema.
+</readme>
+
+<style>
+	.CLASS-settings .fields { border: 1px solid #E0E0E0; border-radius: var(--radius); }
+	.CLASS-settings figure { height: 26px; border-top: 1px solid #E0E0E0; line-height: 25px; font-size: 13px; }
+	.CLASS-settings figure .edit-open { background-color: #F0F0F0; }
+	.CLASS-settings figure .name { line-height: 14px; margin-right: 30px; }
+	.CLASS-settings figure .name div { outline: 0; line-height: 23px; padding: 0 5px; min-height: 25px; font-weight: bold; }
+	.CLASS-settings figure .controls { float: right; width: 30px; padding: 0; margin: 0; border-left: 1px solid #E0E0E0; text-align: center; }
+	.CLASS-settings figure .controls span { cursor: pointer; margin-left: 5px; }
+	.CLASS-settings figure .controls span:first-child { margin-left: 0; }
+	.CLASS-settings figure:first-child { border-top: 0; line-height: 26px; }
+	.CLASS-settings figure:first-child div { line-height: 26px; }
+	.CLASS footer { height: 40px; line-height: 40px; padding: 0 10px; font-size: 12px; }
+	.CLASS header div { border-radius: var(--radius); padding: 3px; background-color: #777; color: #FFF; }
+	.CLASS header div i { background-color: rgba(0,0,0,0.2); }
+
+	.ui-dark .CLASS header div i { background-color: rgba(255,255,255,0.2); }
+	.ui-dark .CLASS-settings .fields { border-color: #404040; }
+	.ui-dark .CLASS-settings figure { border-top-color: #404040; }
+	.ui-dark .CLASS-settings figure .controls { border-left-color: #404040; }
+</style>
+
+<body>
+	<header data-bind="CONFIG__template">
+		<script type="text/html">
+			<div{{ if value.color }} style="background:{{ value.color }}"{{ fi }}>
+				<i class="{{ value.icon }}"></i><span>{{ value.name }}</span>
+			</div>
+		</script>
+	</header>
+</body>
+
+<settings>
+	<div class="CLASS-settings">
+		<div class="padding">
+			<div data---="input__?.name__required:1" class="m">Name</div>
+			<div class="row">
+				<div class="col-md-3 m">
+					<div data---="input__?.color__type:color">Color</div>
+				</div>
+				<div class="col-md-3 m">
+					<div data---="input__?.icon__type:icon">Icon</div>
+				</div>
+			</div>
+			<div class="caption m">
+				<div class="toolbar">
+					<nav>
+						<button class="exec" data-exec="tmpapirouter.add"><i class="fa fa-plus-circle"></i>Add</button>
+					</nav>
+				</div>
+				<label>Schema</label>
+			</div>
+			<div class="message message-alert"><i class="fa fa-exclamation-triangle"></i>Every name of identifier must be unique per Flow. You can use dynamic arguments in the form <code>{argument_name}</code></div>
+			<div data-bind="?.schema__template:figure --> data-id__show:value && value.length" class="fields m">
+				<script type="text/html">
+					{{ foreach m in value }}
+					<figure data-id="{{ m.id }}">
+						<div class="controls">
+							<span class="exec" data-exec="tmpapirouter.rem" title="Remove"><i class="far fa-trash-alt red"></i></span>
+						</div>
+						<div class="name">
+							<div class="monospace edit hellip" data-type="from" data-edit="exec:tmpapirouter.name;required:1">{{ m.name }}</div>
+						</div>
+					</figure>
+					{{ end }}
+				</script>
+			</div>
+			<div class="help">Use names in lower-case. We recommend to keep e.g. <code>users_read/{id}</code> or <code>products_read/{id}</code></div>
+		</div>
+	</div>
+</settings>
+
+<script>
+
+	TOUCH(function(exports, reinit) {
+
+		exports.settings = function(meta) {
+
+			if (!meta.config.schema.length) {
+				var obj = {};
+				obj.id = 'o' + Math.random().toString(36).substring(6);
+				obj.name = 'users_read/{id}';
+				meta.config.schema.push(obj);
+			}
+
+			var tmp = W.tmpapirouter;
+
+			if (!tmp) {
+
+				tmp = {};
+				tmp.add = function(el) {
+					var scope = el.scope();
+					var obj = {};
+					obj.id = 'o' + Math.random().toString(36).substring(6);
+					obj.name = 'users_read/{id}';
+					scope.push('schema', obj);
+					scope.change('*');
+				};
+
+				tmp.rem = function(el) {
+					var id = ATTRD(el);
+					var scope = el.scope();
+					var model = scope.get();
+					var index = model.schema.findIndex('id', id);
+					model.schema.splice(index, 1);
+					scope.update('schema');
+					scope.change('*');
+				};
+
+				tmp.name = function(opt, next) {
+					opt.value = opt.value.replace(/(;|\s|,)/g, '').trim();
+					var scope = opt.element.scope();
+					var id = ATTRD(opt.element);
+					var item = scope.get().schema.findItem('id', id);
+					item.name = opt.value.toLowerCase();
+					scope.change('*');
+					next(true);
+				};
+
+				W.tmpapirouter = tmp;
+			}
+		};
+
+		exports.configure = function() {
+
+			var changes = exports.instance.changes;
+
+			if (changes && changes.newbie) {
+				var outputs = [];
+				for (var item of exports.config.schema)
+					outputs.push({ id: item.id, name: item.name });
+				outputs.push({ id: 'error', name: '-- Not found --' });
+				exports.instance.outputs = outputs;
+				UPD('flow.data');
+			}
+
+		};
+
+	});
+
+</script>

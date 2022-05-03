@@ -1,0 +1,386 @@
+<script total>
+
+	exports.name = 'API Database';
+	exports.group = 'REST API';
+	exports.icon = 'fa fa-database';
+	exports.version = '1';
+	exports.author = 'Total.js';
+	exports.config = { name: 'API Router', table: 'tbl_product', type: 'query', fields: '*', softdelete: true, where: [], where2: [], limit: 100, error: '' };
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }, { id: 'error', name: 'Error' }];
+
+	exports.make = function(instance, config) {
+
+		var compiled = null;
+		var fields = '';
+		var fields2 = '';
+		var sort = [];
+		var fn = null;
+
+		instance.message = function($) {
+
+			var builder = null;
+			var is = false;
+			var data = $.data;
+			var params = data.params || EMPTYOBJECT;
+			var query = data.query || EMPTYOBJECT;
+			var user = data.user || EMPTYOBJECT;
+
+			data = data.data;
+
+			switch (config.type) {
+				case 'insert':
+					builder = DB().insert(config.table, data);
+					break;
+				case 'update':
+					builder = DB().update(config.table, data);
+					break;
+				case 'delete':
+					builder = DB().remove(config.table);
+					break;
+				case 'query':
+					builder = DB().find(config.table);
+					config.limit && builder.take(config.limit);
+					break;
+				case 'read':
+					builder = DB().read(config.table);
+					break;
+				case 'list':
+					builder = DB().list(config.table);
+					builder.autoquery(query, fields2, config.sort, config.limit);
+					break;
+			}
+
+			if (builder) {
+
+				config.error && builder.error(config.error);
+
+				if (config.type !== 'list') {
+					fields && builder.fields(fields);
+					if (sort && sort.length) {
+						for (var m of sort)
+							builder.sort(m[0], m[1]);
+					}
+				}
+
+				fn && fn(data.params, data.data, data.query, data.user, $.refs, $, builder);
+
+				builder.callback(function(err, response) {
+					if (err) {
+						$.send('error', [{ error: err + '' }]);
+					} else {
+						if (config.setpath) {
+							U.set($.data, config.setpath, response);
+							$.send('output');
+						} else
+							$.send('output', response);
+					}
+				});
+			} else
+				$.send('error', [{ error: 'Not configured' }]);
+		};
+
+		instance.configure = function() {
+
+			fields = config.fields === '*' ? '' : config.fields;
+			fields2 = '';
+
+			var builder = [];
+			var tmp;
+
+			for (var item of config.where) {
+				var val = 'null';
+				switch (item.type) {
+					case '1':
+						val = item.value;
+						break;
+					case '2':
+						val = '\'' + item.value.replace(/'/g, '\\\'') + '\'';
+						break;
+					case '3':
+						val = item.value.parseFloat();
+						break;
+					case '4':
+						val = item.value.toLowerCase();
+						val = val === '1' || item.value === 'true' || val === 'on';
+						break;
+					case '5':
+						val = item.value.toLowerCase();
+						val = val === 'now' ? 'new Date()' : item.value.parseDate('yyyy-MM-dd HH:mm:ss');
+						break;
+					case '6':
+						val = 'null';
+						break;
+				}
+
+				builder.push('where(\'{0}\', \'{1}\', {2})'.format(item.name, item.comparer, val));
+			}
+
+			fn = builder.length ? new Function('params', 'data', 'query', 'user', 'refs', '$', 'builder', 'builder.' + builder.join('.')) : null;
+
+			if (config.sort) {
+				sort = [];
+				tmp = config.sort.split(/,|;/);
+				for (var m of tmp) {
+					m = m.trim().split(' ');
+					m[1] = (m[1] || '').toLowerCase() === 'asc';
+					sort.push(m);
+				}
+			} else
+				sort = null;
+
+			for (var item of config.where2) {
+				tmp = 'string';
+				switch (item.type) {
+					case '3':
+						tmp = 'number';
+						break;
+					case '4':
+						tmp = 'boolean';
+						break;
+					case '5':
+						tmp = 'date';
+						break;
+				}
+				fields2 += (fields2 ? ',' : '') + item.name + ':' + tmp;
+			}
+
+		};
+
+		instance.configure();
+	};
+
+</script>
+
+<readme>
+This component can perform some operations on a database with the help of Total.js QueryBuilder. First, you must initialize the connection string for the database via QueryBuilder initialization.
+
+__Input data__:
+
+- `data {Object}` optional - payload
+- `query {Object}` optional - query data, key/value must be string
+- `params {Object}` optional - dynamic values, key/value must be string
+- `user {Object}` optional - a user instance
+
+__Output__:
+
+- `insert` returns Number
+- `update` returns Number
+- `remove` returns Number
+- `query` returns Array of Objects
+- `read` returns Object
+- `list` returns:
+
+```js
+{
+	items: Array,
+	page: Number,
+	pages: Number,
+	count: Number
+}
+```
+
+---
+
+__Good to know__: If the `data` (payload) can contain special key names in the form:
+
+- `+key` increments a value
+- `-key` decrements a value
+- `!key` performs toggle for boolean values
+- `>key` stores only greater value
+- `<key` stores only lower value
+</readme>
+
+<style>
+	.CLASS-settings .fields { border: 1px solid #E0E0E0; border-radius: var(--radius); }
+	.CLASS-settings .item { padding: 7px 10px; }
+	.CLASS footer { padding: 10px; font-size: 12px; }
+</style>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+	<footer data-bind="CONFIG__template" class="monospace">
+		<script type="text/html">
+			<span class="badge badge-medium" style="background:{{ value.type | color }}">{{ value.type }}</span> {{ value.table }}
+		</script>
+	</footer>
+</body>
+
+<settings>
+	<div class="CLASS-settings">
+		<div class="padding bg-smoke">
+			<div class="row">
+				<div class="col-md-3 m">
+					<div data---="input__?.type__dirsource:tmpcruddb.commands;required:1">Type</div>
+					<div class="help">Database operation</div>
+				</div>
+				<div class="col-md-3 m">
+					<div data---="input__?.table__required:1;monospace:1;align:1">Table</div>
+					<div class="help">Table or Connection/Table</div>
+				</div>
+				<div class="col-md-6 m">
+					<div data---="input__?.error__monospace:1;icon:fa fa-bug">Error message</div>
+					<div class="help">An error message will be returned when the database returns nothing</div>
+				</div>
+			</div>
+
+			<div data---="input__?.setpath__monospace:1">Path</div>
+			<div class="help">The response from database will be assigned to the <code>message.data</code>. The empty path value will replace the entire message data.</div>
+		</div>
+		<div class="padding npb" data-bind="?.type__show:value!=='insert'">
+
+			<div class="caption m">
+				<label>Query / Listing</label>
+			</div>
+
+			<div class="row">
+				<div class="col-md-6 m">
+					<div data---="input__?.fields__monospace:1" data-bind="?.type__enable:value==='read'||value==='query'">Fields</div>
+					<div class="help">Seperated by the comma</div>
+				</div>
+				<div class="col-md-3 m">
+					<div data---="input__?.limit__type:number;required:1;monospace:1">Max. limit</div>
+					<div class="help">Max. records to output</div>
+				</div>
+				<div class="col-md-3 m">
+					<div data---="input__?.sort__monospace:1;align:1;placeholder:column asc">Default sort</div>
+					<div class="help"><code>column asc</code> or <code>column desc</code></div>
+				</div>
+			</div>
+
+			<br />
+
+			<div class="panel m">
+				<label class="bg-smoke">Static filter</label>
+				<div class="padding">
+
+					<div data---="listform__?.where__autofocus:1;empty:You do not have defined any rules">
+
+						<script type="text/html">
+							<div class="item monospace"><div class="controls nmr"><button name="up"><i class="fa fa-long-arrow-alt-up"></i></button><button name="down"><i class="fa fa-long-arrow-alt-down"></i></button><button name="remove" class="red"><i class="far fa-trash-alt"></i></button></div><i class="fa fa-filter mr5"></i>{{ name }} {{ comparer }} <b>{{ if type == '6' }}null{{ else }}{{ value }}{{ fi }}</b></div>
+						</script>
+
+						<script type="text/html">
+							<div class="padding">
+								<div class="row">
+									<div class="col-sm-3 m">
+										<div data---="input__?.name__required:1;align:1;monospace:1__'id'">Name</div>
+									</div>
+									<div class="col-sm-3 m">
+										<div data---="input__?.comparer__required:1;align:1;dirsource:tmpcruddb.comparers__'='">Comparer</div>
+									</div>
+									<div class="col-sm-3 m">
+										<div data---="input__?.type__required:1;align:1;dirsource:tmpcruddb.types__'1'">Type</div>
+									</div>
+									<div class="col-sm-3 m">
+										<div data---="input__?.value__monospace:1;align:1__''" data-bind="?.type__enable:value!=='6'">Value</div>
+									</div>
+								</div>
+								<div class="help"><b>Expression</b> supports these commands <code>params {Object}</code>, <code>query {Object}</code>, <code>data {Object}</code>, <code>user {Object}</code>.</div>
+								<br />
+								<div data---="validate__?__validonly:true" class="toolbar">
+									<button name="submit"><i class="fa fa-floppy-o"></i>Save</button>
+									<button name="remove">Remove</button>
+									<button name="cancel">Cancel</button>
+								</div>
+							</div>
+						</script>
+
+						<script type="text/html">
+							<div style="margin-top:15px"><button class="button button-inline" name="create"><i class="fa fa-plus-circle green"></i>Create</button></div>
+						</script>
+
+					</div>
+				</div>
+			</div>
+
+			<div class="panel hidden" data-bind="?.type__show:value==='list'">
+				<label class="bg-smoke">Dynamic filter</label>
+				<div class="padding">
+					<div data---="listform__?.where2__autofocus:1;empty:You do not have defined any rules">
+
+						<script type="text/html">
+							<div class="item monospace"><div class="controls nmr"><button name="up"><i class="fa fa-long-arrow-alt-up"></i></button><button name="down"><i class="fa fa-long-arrow-alt-down"></i></button><button name="remove" class="red"><i class="far fa-trash-alt"></i></button></div><i class="fa fa-filter mr5"></i>{{ name }} <b>{{ type | tmpcruddbtype }}</b></div>
+						</script>
+
+						<script type="text/html">
+							<div class="padding">
+								<div class="row">
+									<div class="col-sm-3 m">
+										<div data---="input__?.name__required:1;align:1;monospace:1__'dtcreated'">Name</div>
+									</div>
+									<div class="col-sm-3 m">
+										<div data---="input__?.type__required:1;align:1;dirsource:tmpcruddb.types2__'5'">Type</div>
+									</div>
+								</div>
+								<div data---="validate__?__validonly:true" class="toolbar">
+									<button name="submit"><i class="fa fa-floppy-o"></i>Save</button>
+									<button name="remove">Remove</button>
+									<button name="cancel">Cancel</button>
+								</div>
+							</div>
+						</script>
+
+						<script type="text/html">
+							<div style="margin-top:15px"><button class="button button-inline" name="create"><i class="fa fa-plus-circle green"></i>Create</button></div>
+						</script>
+
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</settings>
+
+<script>
+
+	TOUCH(function(exports, reinit) {
+
+		exports.settings = function(meta) {
+
+			var tmp = W.tmpcruddb;
+
+			if (!tmp) {
+				tmp = {};
+				tmp.commands = [];
+				tmp.commands.push({ id: 'query', name: 'Query' });
+				tmp.commands.push({ id: 'list', name: 'List' });
+				tmp.commands.push({ id: 'read', name: 'Read' });
+				tmp.commands.push({ id: 'insert', name: 'Insert' });
+				tmp.commands.push({ id: 'update', name: 'Update' });
+				tmp.commands.push({ id: 'delete', name: 'Delete' });
+				tmp.comparers = [];
+				tmp.comparers.push({ id: '=', name: '=' });
+				tmp.comparers.push({ id: '>', name: '>' });
+				tmp.comparers.push({ id: '>=', name: '>=' });
+				tmp.comparers.push({ id: '<', name: '<' });
+				tmp.comparers.push({ id: '<=', name: '<=' });
+				tmp.comparers.push({ id: '<>', name: '<>' });
+
+				tmp.types = [];
+				tmp.types.push({ id: '1', name: 'Expression' });
+				tmp.types.push({ id: '2', name: 'String' });
+				tmp.types.push({ id: '3', name: 'Number' });
+				tmp.types.push({ id: '4', name: 'Boolean' });
+				tmp.types.push({ id: '5', name: 'Date' });
+				tmp.types.push({ id: '6', name: 'NULL' });
+
+				tmp.types2 = [];
+				tmp.types2.push({ id: '2', name: 'String' });
+				tmp.types2.push({ id: '3', name: 'Number' });
+				tmp.types2.push({ id: '4', name: 'Boolean' });
+				tmp.types2.push({ id: '5', name: 'Date' });
+
+				Thelpers.tmpcruddbtype = function(val) {
+					return tmp.types2.findValue('id', val, 'name', DEF.empty);
+				};
+
+				W.tmpcruddb = tmp;
+			}
+		};
+
+	});
+
+</script>
