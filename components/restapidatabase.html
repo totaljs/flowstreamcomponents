@@ -22,7 +22,7 @@
 			var query = data.query || EMPTYOBJECT;
 			var user = data.user || EMPTYOBJECT;
 
-			data = data.data;
+			data = data.data || data.body;
 
 			switch ($.input) {
 				case 'create':
@@ -170,7 +170,7 @@ This component can perform some operations on a database with the help of Total.
 
 __Input data__:
 
-- `data {Object}` optional - payload
+- `data {Object}` or `body {Object}` optional - payload
 - `query {Object}` optional - query data, key/value must be string
 - `params {Object}` optional - dynamic values, key/value must be string
 - `user {Object}` optional - a user instance
@@ -184,7 +184,7 @@ __Output__:
 - `read` returns Object
 - `list` returns:
 
-```js
+```json
 {
 	items: Array,
 	page: Number,
@@ -192,6 +192,14 @@ __Output__:
 	count: Number
 }
 ```
+
+Query parameters for the `List` operation can contain the below fields which can affect filtering according to the values defined in the dynamic filter.
+
+- `sort {String}` can contain field name with `_asc` or `_desc` value
+- `fields {String}` can return only specified fields separated by comma
+- `page {Number}` page number
+- `limit {Number}` max. items per page (default: max. limit)
+- `column_name=VALUE` enables dynamic filtering
 
 ---
 
@@ -239,7 +247,7 @@ __Good to know__: If the `data` (payload) can contain special key names in the f
 							<div data---="input__?.value__monospace:1;align:1__''" data-bind="?.type__enable:value!=='6'">Value</div>
 						</div>
 					</div>
-					<div class="help"><b>Expression</b> supports these commands <code>params {Object}</code>, <code>query {Object}</code>, <code>data {Object}</code>, <code>user {Object}</code>.</div>
+					<div class="help"><b>Expression</b> supports these commands <code>params {Object}</code>, <code>query {Object}</code>, <code>data {Object}</code>, <code>user {Object}</code>. A value for date field can contain <code>now</code> with the current date/time.</div>
 					<br />
 					<div data---="validate__?__validonly:true" class="toolbar">
 						<button name="submit"><i class="fa fa-floppy-o"></i>Save</button>
