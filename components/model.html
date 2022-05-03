@@ -4,9 +4,9 @@
 	exports.group = 'Transformations';
 	exports.icon = 'fab fa-wpforms';
 	exports.author = 'Total.js';
-	exports.version = '1';
+	exports.version = '2';
 	exports.config = { name: 'Model', path: '', schema: [], rewrite: true };
-	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.inputs = [{ id: 'input', name: 'Data' }, { id: 'partial', name: 'Partial data' }];
 	exports.outputs = [{ id: 'output', name: 'Output' }, { id: 'error', name: 'Error' }];
 	exports.meta = { settingswidth: 1200 };
 
@@ -25,7 +25,7 @@
 			return val;
 		};
 
-		instance.preparedata = function(item, val, err, parent) {
+		instance.preparedata = function(item, val, err, parent, partial) {
 
 			var path = (parent ? (parent + '.') : '') + item.name;
 
@@ -246,11 +246,11 @@
 
 				default:
 					var model = instance.main.meta.flow[item.type];
-					return model ? model.validatedata(val || {}, err, path).data : null;
+					return model ? model.validatedata(val || {}, err, partial, path).data : null;
 			}
 		};
 
-		instance.validatedata = function(data, err, parent) {
+		instance.validatedata = function(data, err, partial, parent) {
 
 			var obj = {};
 			var plus = parent ? (parent + '.') : '';
@@ -275,6 +275,10 @@
 
 			for (var item of config.schema) {
 				var val = data[item.name];
+
+				if (partial && val === undefined)
+					continue;
+
 				if (item.array) {
 
 					if (!(val instanceof Array))
@@ -284,7 +288,7 @@
 
 					for (var i = 0; i < val.length; i++) {
 						var m = val[i];
-						var r = instance.preparedata(item, m, err, plus);
+						var r = instance.preparedata(item, m, err, plus, partial);
 						obj[item.name].push(r);
 					}
 
@@ -292,7 +296,7 @@
 						err.push({ name: item.name, path: plus + item.name, error: deferr });
 
 				} else
-					obj[item.name] = instance.preparedata(item, val, err, parent);
+					obj[item.name] = instance.preparedata(item, val, err, parent, partial);
 			}
 
 			return { data: obj, error: err.length ? err : null };
@@ -316,7 +320,7 @@
 				data = findvalue(data);
 
 			var err = [];
-			var output = instance.validatedata(data, err);
+			var output = instance.validatedata(data, err, $.input === 'partial');
 
 			if (output.error) {
 				$.send('error', output.error);
