@@ -1,0 +1,227 @@
+<script total>
+
+	exports.id = 'rabbitmqpublish';
+	exports.name = 'RabbitMQ Publish';
+	exports.group = 'RabbitMQ';
+	exports.icon = 'fa fa-envelope-o';
+	exports.author = 'Total Avengers';
+	exports.version = '1';
+	exports.config = {};
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.flags = ['rabbitmq-dep'];
+
+	exports.npm = ['amqp-connection-manager'];
+
+	exports.make = function(instance, config) {
+
+		var amqp = require('amqp-connection-manager');
+
+		var Manager, channel, ManagerState;
+		var stats = { ack: 0, nack: 0 };
+
+		// initialy the stack is paused
+		var stack = new Stack(instance.id, function(data, next){
+			if (!channel) {
+				return next(false);
+			}
+
+			channel
+				.sendToQueue(config.queuename, Buffer.from(data))
+				.then(function () {
+					next(true);
+					if (stats.ack === Number.MAX_SAFE_INTEGER)
+						stats.ack = 0;
+					stats.ack++;
+					setStatus();
+				})
+				.catch(function (err) {
+					next(false);
+					if (stats.nack === Number.MAX_SAFE_INTEGER)
+						stats.nack = 0;
+					stats.nack++;
+					setStatus();
+				});
+		});
+
+		instance.message = function($) {
+			var d = $.data;
+			var type = typeof(d);
+			if (type !== 'buffer' && type !== 'string')
+				d = JSON.stringify(d);
+
+			stack.push(d);
+			$.destroy();
+		};
+
+		function setStatus(str, timeout) {
+			instance.status({
+				state: str || ManagerState.title,
+				stats
+			});
+		};
+
+		instance.configure = function(state, statetitle) {
+			setStatus('Reconfiguring..');
+			statetitle && instance.status(statetitle, 1000);
+
+			if (state === 'disconnected') {
+				channel && channel.close && channel.close();
+				setStatus('Disconnected', 1000);
+				return;
+			}
+
+			Manager = getManager();
+			if (!Manager) {
+				setStatus('No connection', 1000);
+				return;
+			}
+
+			setStatus(ManagerState.title, 1000);
+
+			channel && channel.close && channel.close();
+			// no state or state === 'connect'
+			channel = createChannel();
+		};
+
+		var createChannel = () => {
+			// Ask the connection manager for a ChannelWrapper.  Specify a setup function to
+			// run every time we reconnect to the broker.
+			return Manager.createChannel({
+				setup: function (chan) {
+					// `channel` here is a regular amqplib `ConfirmChannel`.
+					// Note that `this` here is the channel wrapper instance.
+					setTimeout(_ => { stack && stack.next(); }, 1000);
+					return chan.assertQueue(config.queuename, { durable: true });
+				},
+			});
+		};
+
+		instance.close = function(){
+			stack.destroy();
+			stack = null;
+			channel && channel.close && channel.close();
+		};
+
+		var getManager = () => {
+			var man = instance.main.find(config.manager);
+			if (man && man.Manager) {
+				ManagerState = man.state;
+				return man.Manager;
+			}
+		};
+
+		instance.configure();
+
+		function Stack(id, callback) {
+			var self = this;
+			self.dbname = 'amqp_stack_' + id;
+			self.index = 0;
+			self.callback = callback;
+			self.busy = false;
+			self.db = NOSQL(self.dbname);
+			//NOSQLMEMORY(self.dbname);
+		};
+
+		Stack.prototype.destroy = function() {
+			clearTimeout(this.timeout);
+			this.busy = true;
+			this.callback = () => {};
+			this.data = null;
+		};
+
+		Stack.prototype.next = function() {
+			var self = this;
+			if (self.busy)
+				return;
+			self.busy = true;
+			if (self.timeout) {
+				clearTimeout(self.timeout);
+				self.timeout = null;
+			}
+
+			self.db.find().first().callback(function(err, data){
+				if (data) {
+					var id = data.id;
+					var data = data.data;
+					self.callback(data, function(ok){
+						if (ok) {
+							self.db.remove().where('id', id).callback(function(){
+								self.busy = false;
+								self.next();
+							});
+						} else {
+							self.busy = false;
+							self.timeout = setTimeout(function(){
+								self.next();
+							}, 3000);
+						}
+					});
+				} else
+					self.busy = false;
+			});
+		};
+
+		Stack.prototype.push = function(data) {
+			this.db.insert({ id: this.index++, data: data }).callback((err, result, meta) => {
+				this.next();
+			});
+		};
+	};
+
+	exports.call = function(data, answer) {
+		var arr = [];
+
+		var instances = this.instances();
+
+		instances = instances.filter(i => i.module.flags && i.module.flags.includes('rabbitmq'));
+		for (let com of instances)
+			arr.push({ id: com.id, name: `${com.config.username ? com.config.username + '@' : ''}${com.config.hostname}:${com.config.port}${com.config.vhost}` });
+
+		answer(arr);
+	};
+
+</script>
+
+<readme>
+Uses [amqp-connection-manager](https://github.com/jwalton/node-amqp-connection-manager)
+</readme>
+
+<settings>
+	<div class="padding">
+		<div class="row">
+			<div class="col-md-6">
+				<div data---="input__?.manager__dirsource:%rabbitmqs;dirraw:1;placeholder:Select RabbitMQ connection;dirempty:No connection;required:1" class="m"><b>RabbitMQ Connetion</b></div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-6">
+				<div data---="input__?.queuename__required:1" class="m">Queue name</div>
+				<div class="help m">Supports variables: queue-{queueid} , the {queueid} will be overwritten by the value from variables</div>
+			</div>
+		</div>
+	</div>
+</settings>
+
+<style>
+	.CLASS footer { padding: 10px; font-size: 12px; }
+	.CLASS footer span { float: right; }
+</style>
+
+<script>
+	ON('configure_rabbitmqpublish', function(data) {
+		data.call(function(response) {
+			SET('%rabbitmqs', response);
+		}, true);
+	});
+</script>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+	<footer>
+		<div data-bind="!STATUS.state__text"></div>
+		<div>Ack: <span data-bind="STATUS.stats.ack__text"></span></div>
+		<div>Nack: <span data-bind="STATUS.stats.nack__text"></span></div>
+	</footer>
+</body>

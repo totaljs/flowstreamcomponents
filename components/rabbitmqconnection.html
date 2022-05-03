@@ -1,0 +1,144 @@
+<script total>
+
+	exports.id = 'rabbitmqconnection';
+	exports.name = 'RabbitMQ Connection';
+	exports.group = 'RabbitMQ';
+	exports.icon = 'fa fa-envelope-o';
+	exports.author = 'Total.js';
+	exports.version = '1';
+	exports.config = {};
+	exports.inputs = [];
+	exports.outputs = [];
+	exports.flags = ['rabbitmq'];
+
+	exports.npm = ['amqp-connection-manager'];
+
+	exports.make = function(instance, config) {
+
+		var amqp = require('amqp-connection-manager');
+		var Manager;
+		var states = { connected: 'Connected', disconnected: 'Disconnected', connecting: 'Connecting ...', connectionfailed: 'Connection failed' };
+
+		instance.state = { id: 'disconnected', title: states.disconnected };
+		var setState = (state) => {
+			instance.state = { id: state, title: states[state] };
+
+			instance.status(states[state], 1000);
+			notifyDeps(state, states[state]);
+		};
+
+		var notifyDeps = (type) => {
+			var instances = instance.main.instances().filter(i => i.module.flags && i.module.flags.includes('rabbitmq-dep') > -1 && i.config.manager === instance.id);
+			for (let com of instances)
+				com.configure(type);
+		};
+
+		instance.configure = function() {
+			instance.close(true);
+
+			if (!config.hostname) // queue name is optional in some cases, not supported here
+				return instance.status('Not configured');
+
+			setState('connecting');
+			instance.status(states.connecting);
+
+			config.port = config.port || 5672;
+			config.vhost = config.vhost || '/';
+			if (config.vhost[0] !== '/')
+				config.vhost = '/' + config.vhost;
+
+			var credentials = '';
+			if (config.username)
+				credentials += config.username;
+			if (config.password)
+				credentials += ':' + config.password;
+			if (credentials)
+				credentials += '@';
+
+			var conString = `${config.protocol}://${credentials}${config.hostname}:${config.port}${config.vhost}`;
+
+			// Create a new connection manager
+			Manager = amqp.connect([conString]);
+			Manager.on('connect', function(){
+				instance.Manager = Manager;
+				setState('connected');
+			});
+
+			Manager.on('connectFailed', function(){
+				instance.Manager = null;
+				setState('connectionfailed');
+				// notifyDeps('connectfailed'); // this does not happen after connect so the deps should be disconnected
+			});
+
+			Manager.on('disconnect', function(e){
+				instance.Manager = null;
+				setState('disconnected');
+			});
+
+			Manager.on('error', function(e){
+				console.log('Rabbit Error', e);
+				if (!Manager.isConnected()) {
+					setState('disconnected');
+					instance.Manager = null;
+				}
+			});
+		};
+
+		instance.close = function(silent) {
+			Manager && Manager.close();
+			instance.Manager = null;
+			!silent && notifyDeps('removed');
+		};
+
+		instance.configure();
+	};
+
+</script>
+
+<readme>
+
+</readme>
+
+<settings>
+	<div class="padding">
+		<div class="row">
+			<div class="col-md-6">
+				<div data---="input__?.hostname__placeholder:localhost;required:1" class="m">Hostname or IP address</div>
+			</div>
+			<div class="col-md-6">
+				<div data---="input__?.port__type:number;placeholder:5672__5672" class="m">Port (default: 5672)</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-6">
+				<div data---="input__?.protocol__dirsource:amqp|amqp,amqps|amqps__'amqp'" class="m">Protocol</div>
+			</div>
+			<div class="col-md-6">
+				<div data---="input__?.vhost__placeholder:/" class="m">Virtual host</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-6">
+				<div data---="input__?.username" class="m">Username</div>
+			</div>
+			<div class="col-md-6">
+				<div data---="input__?.password__type:password" class="m">Password</div>
+			</div>
+		</div>
+	</div>
+</settings>
+
+<style>
+	.CLASS footer { padding: 10px; font-size: 12px; }
+</style>
+
+<script>
+
+</script>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+	<footer data-bind="!STATUS__show__text"></footer>
+</body>
