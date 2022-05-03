@@ -1,40 +1,42 @@
 <script total>
 
+	exports.id = 'rabbitmqpublish';
 	exports.name = 'RabbitMQ Publish';
+	exports.group = 'RabbitMQ';
 	exports.icon = 'fa fa-envelope-o';
 	exports.author = 'Total Avengers';
 	exports.version = '1';
 	exports.config = {};
 	exports.inputs = [{ id: 'input', name: 'Input' }];
-	exports.outputs = [{ id: 'output', name: 'Output' }];
 
 	exports.npm = ['amqp-connection-manager'];
-	// exports.meta = { readonly: false, singleton: false, hidden: false };
 
 	exports.make = function(instance, config) {
 
 		var amqp = require('amqp-connection-manager');
 
-		var Manager, channelWrapper;
+		var Manager, channel, ManagerState;
 		var stats = { ack: 0, nack: 0 };
-		var state = 'Disconnected';
 
 		// initialy the stack is paused
 		var stack = new Stack(instance.id, function(data, next){
-			if (!channelWrapper) {
-				console.log('No channelWrapper', stack.busy);
+			if (!channel) {
 				return next(false);
 			}
 
-			channelWrapper
-				.sendToQueue(instance.options.queuename, Buffer.from(data))
+			channel
+				.sendToQueue(config.queuename, Buffer.from(data))
 				.then(function () {
 					next(true);
+					if (stats.ack === Number.MAX_SAFE_INTEGER)
+						stats.ack = 0;
 					stats.ack++;
 					setStatus();
 				})
 				.catch(function (err) {
 					next(false);
+					if (stats.nack === Number.MAX_SAFE_INTEGER)
+						stats.nack = 0;
 					stats.nack++;
 					setStatus();
 				});
@@ -50,76 +52,72 @@
 			$.destroy();
 		};
 
-		function setStatus() {
-			instance.status(`${state} | Ack:${stats.ack} | Nack:${stats.nack}`);
+		function setStatus(str, timeout) {
+			instance.status({
+				state: str || ManagerState.title,
+				stats
+			});
 		};
 
-		instance.configure = function configure(o, oldopts) {
+		instance.configure = function(state, statetitle) {
+			setStatus('Reconfiguring..');
+			statetitle && instance.status(statetitle, 1000);
 
-			instance.status('Reconfiguring..');
+			if (state === 'disconnected') {
+				channel && channel.close && channel.close();
+				setStatus('Disconnected', 1000);
+				return;
+			}
 
-			if (!config.hostname || !config.queuename) // queue name is optional in some cases, not supported here
-				return instance.status('Not configured', 'red');
+			Manager = getManager();
+			if (!Manager) {
+				setStatus('No connection', 1000);
+				return;
+			}
 
-			config.port = config.port || 5672;
-			config.vhost = config.vhost || '/';
-			if (config.vhost[0] !== '/')
-				config.vhost = '/' + config.vhost;
+			setStatus(ManagerState.title, 1000);
 
-			var credentials = '';
-			if (config.username)
-				credentials += config.username;
-			if (config.password)
-				credentials += ':' + config.password;
-			if (credentials)
-				credentials += '@';
+			// no state or state === 'connect'
+			channel = createChannel();
+		};
 
-			var conString = `${config.protocol}://${credentials}${config.hostname}:${config.port}${config.vhost}`;
-
-			// Create a new connection manager
-			Manager = amqp.connect([conString]);
-			Manager.on('connect', function(){
-				state = 'Connected';
-				setStatus();
-				console.log('Rabbit Connected');
-			});
-			Manager.on('disconnect', function(e){
-				state = 'Disconnected';
-				setStatus();
-				console.log('Rabbit Disconnected', e);
-			});
-			Manager.on('error', function(e){
-				state = 'Error';
-				setStatus();
-				console.log('Rabbit Error', e);
-			});
-
+		var createChannel = () => {
 			// Ask the connection manager for a ChannelWrapper.  Specify a setup function to
 			// run every time we reconnect to the broker.
-			channelWrapper = Manager.createChannel({
-				setup: function (channel) {
+			return Manager.createChannel({
+				setup: function (chan) {
 					// `channel` here is a regular amqplib `ConfirmChannel`.
-					// Note that `this` here is the channelWrapper instance.
-					return channel.assertQueue(config.queuename, { durable: true });
+					// Note that `this` here is the channel wrapper instance.
+					setTimeout(_ => { stack && stack.next(); }, 1000);
+					return chan.assertQueue(config.queuename, { durable: true });
 				},
 			});
-
 		};
 
 		instance.close = function(){
 			stack.destroy();
 			stack = null;
-			Manager.close();
+			channel && channel.close && channel.close();
 		};
+
+		var getManager = () => {
+			var man = instance.main.find(config.manager);
+			if (man && man.Manager) {
+				ManagerState = man.state;
+				return man.Manager;
+			}
+		};
+
+		instance.configure();
 
 		function Stack(id, callback) {
 			var self = this;
 			self.dbname = 'amqp_stack_' + id;
-			self.index = 1;
+			self.index = 0;
 			self.callback = callback;
 			self.busy = false;
 			self.db = NOSQL(self.dbname);
-			NOSQLMEMORY(self.dbname);
+			//NOSQLMEMORY(self.dbname);
 		};
 
 		Stack.prototype.destroy = function() {
@@ -138,10 +136,10 @@
 				clearTimeout(self.timeout);
 				self.timeout = null;
 			}
-			self.db.top(1).callback(function(err, data){
-				if (data && data.length) {
-					var id = data[0].id;
-					var data = data[0].data;
+			self.db.find().first().callback(function(err, data){
+				if (data) {
+					var id = data.id;
+					var data = data.data;
 					self.callback(data, function(ok){
 						if (ok) {
 							self.db.remove().where('id', id).callback(function(){
@@ -161,50 +159,39 @@
 		};
 
 		Stack.prototype.push = function(data) {
-			this.db.insert({ id: this.index++, data: data });
-			this.next();
+			this.db.insert({ id: this.index++, data: data }).callback(this.next);
 		};
+	};
+
+	exports.call = function(data, answer) {
+		var arr = [];
+
+		var instances = this.instances();
+
+		instances = instances.filter(i => i.module.flags && i.module.flags.includes('rabbitmq'));
+		for (let com of instances)
+			arr.push({ id: com.id, name: `${com.config.username ? com.config.username + '@' : ''}${com.config.hostname}:${com.config.port}${com.config.vhost}` });
+
+		answer(arr);
 	};
 
 </script>
 
 <readme>
-Markdown readme
-
-```js
-var total = 'Hello world!';
-```
+Uses [amqp-connection-manager](https://github.com/jwalton/node-amqp-connection-manager)
 </readme>
 
 <settings>
 	<div class="padding">
 		<div class="row">
 			<div class="col-md-6">
-				<div data-jc="input__?.hostname__placeholder:localhost;required:1" class="m">@(Hostname or IP address)</div>
-			</div>
-			<div class="col-md-6">
-				<div data-jc="input__?.port__placeholder:5672" class="m">@(Port) (default: 5672)</div>
+				<div data---="input__?.manager__dirsource:%rabbitmqs;dirraw:1;placeholder:Select RabbitMQ connection;dirempty:No connection;required:1" class="m"><b>RabbitMQ Connetion</b></div>
 			</div>
 		</div>
 		<div class="row">
 			<div class="col-md-6">
-				<div data-jc="dropdown__?.protocol__items:amqp|amqp,amqps|amqps" class="m" data-jc-value="'amqp'">@(Protocol)</div>
-			</div>
-			<div class="col-md-6">
-				<div data-jc="input__?.vhost__placeholder:/" class="m">@(Virtual host)</div>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-md-6">
-				<div data-jc="input__?.queuename__required:1" class="m">@(Queue name)</div>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-md-6">
-				<div data-jc="input__?.username" class="m">@(Username)</div>
-			</div>
-			<div class="col-md-6">
-				<div data-jc="input__?.password__type:password" class="m">@(Password)</div>
+				<div data---="input__?.queuename__required:1" class="m">Queue name</div>
+				<div class="help m">Supports variables: queue-{queueid} , the {queueid} will be overwritten by the value from variables</div>
 			</div>
 		</div>
 	</div>
@@ -212,15 +199,24 @@ var total = 'Hello world!';
 
 <style>
 	.CLASS footer { padding: 10px; font-size: 12px; }
+	.CLASS footer span { float: right; }
 </style>
 
 <script>
-
+	ON('configure_rabbitmqpublish', function(data) {
+		data.call(function(response) {
+			SET('%rabbitmqs', response);
+		}, true);
+	});
 </script>
 
 <body>
 	<header>
 		<i class="ICON"></i>NAME
 	</header>
-	<footer dataa-bind="!STATUS__text"></footer>
+	<footer>
+		<div data-bind="!STATUS.state__text"></div>
+		<div>Ack: <span data-bind="STATUS.stats.ack__text"></span></div>
+		<div>Nack: <span data-bind="STATUS.stats.nack__text"></span></div>
+	</footer>
 </body>
