@@ -9,69 +9,50 @@
 	exports.config = {};
 	exports.inputs = [];
 	exports.outputs = [{ id: 'output', name: 'Output' }];
-
-	exports.npm = ['amqp-connection-manager'];
+	exports.flags = ['rabbitmq-dep'];
 
 	exports.make = function(instance, config) {
 
-		var amqp = require('amqp-connection-manager');
-		var Manager, channelWrapper;
+		var channel, Manager, ManagerState;
 
-		instance.configure = function() {
+		instance.configure = function(state, statetitle) {
 			instance.status('Reconfiguring..');
-			console.log('rabbitconsume--------reconfigure', instance.replace(config.queuename));
+			statetitle && instance.status(statetitle, 1000);
 
-			if (!config.hostname || !config.queuename) // queue name is optional in some cases, not supported here
-				return instance.status('Not configured');
+			if (state === 'disconnected') {
+				channel && channel.close && channel.close();
+				return;
+			}
 
-			config.port = config.port || 5672;
-			config.vhost = config.vhost || '/';
-			if (config.vhost[0] !== '/')
-				config.vhost = '/' + config.vhost;
+			Manager = getManager();
+			if (!Manager) {
+				instance.status('No connection', 1000);
+				return;
+			}
 
-			var credentials = '';
-			if (config.username)
-				credentials += config.username;
-			if (config.password)
-				credentials += ':' + config.password;
-			if (credentials)
-				credentials += '@';
+			instance.status(ManagerState.title, 1000);
 
-			var conString = `${config.protocol}://${credentials}${config.hostname}:${config.port}${config.vhost}`;
+			// no state or state === 'connect'
+			channel = createChannel();
+		};
 
-			// Create a new connection manager
-			Manager = amqp.connect([conString]);
-			Manager.on('connect', function(){
-				instance.status('Connected');
-				console.log('Rabbit Consume Connected');
-			});
-			Manager.on('disconnect', function(e){
-				instance.status('Disconnected');
-				console.log('Rabbit Consume Disconnected', e);
-			});
-			Manager.on('error', function(e){
-				instance.status('Error');
-				console.log('Rabbit Consume Error', e);
-			});
-
-			// Ask the connection manager for a ChannelWrapper. Specify a setup function to
-			// run every time we reconnect to the broker.
-			channelWrapper = Manager.createChannel({
-				setup: function (channel) {
+		var createChannel = () => {
+			return Manager.createChannel({
+				setup: function (chan) {
 					// `channel` here is a regular amqplib `ConfirmChannel`.
-					// Note that `this` here is the channelWrapper instance.
+					// Note that `this` here is the channel instance.
 					var qname = instance.replace(config.queuename);
 					return Promise.all([
-						channel.assertQueue(qname, { consumerTag: 'consumer-' + qname }),
-						channel.consume(qname, function(msg) {
+						chan.assertQueue(qname, { consumerTag: 'consumer-' + qname }),
+						chan.consume(qname, function(msg) {
 							if (msg !== null) {
 								var data = {
 									queuename: qname,
 									payload: msg.content.toString(),
-									msg: msg
+									msg: { fields: msg.fields }
 								};
 								instance.send('output', data);
-								channel.ack(msg);
+								chan.ack(msg);
 							}
 						})
 					]);
@@ -79,49 +60,51 @@
 			});
 		};
 
+		var getManager = () => {
+			var man = instance.main.find(config.manager);
+			console.log(config.manager, man);
+			if (man && man.Manager) {
+				ManagerState = man.state;
+				return man.Manager;
+			}
+		};
+
 		instance.close = function() {
-			Manager.close();
+			channel && channel.close && channel.close();
 		};
 
 		instance.configure();
 	};
 
+	exports.call = function(data, answer) {
+		var arr = [];
+
+		var instances = this.instances();
+
+		instances = instances.filter(i => i.module.flags && i.module.flags.includes('rabbitmq'));
+		for (let com of instances)
+			arr.push({ id: com.id, name: `${com.config.username ? com.config.username + '@' : ''}${com.config.hostname}:${com.config.port}${com.config.vhost}` });
+
+		answer(arr);
+	};
+
 </script>
 
 <readme>
-
+Uses [amqp-connection-manager](https://github.com/jwalton/node-amqp-connection-manager)
 </readme>
 
 <settings>
 	<div class="padding">
 		<div class="row">
 			<div class="col-md-6">
-				<div data---="input__?.hostname__placeholder:localhost;required:1" class="m">@(Hostname or IP address)</div>
-			</div>
-			<div class="col-md-6">
-				<div data---="input__?.port__type:number;placeholder:5672__5672" class="m">@(Port) (default: 5672)</div>
+				<div data---="input__?.manager__dirsource:%rabbitmqs;dirraw:1;placeholder:Select RabbitMQ connection;dirempty:No connection;required:1" class="m"><b>RabbitMQ Connetion</b></div>
 			</div>
 		</div>
 		<div class="row">
 			<div class="col-md-6">
-				<div data---="input__?.protocol__dirsource:amqp|amqp,amqps|amqps__amqp" class="m">@(Protocol)</div>
-			</div>
-			<div class="col-md-6">
-				<div data---="input__?.vhost__placeholder:/" class="m">@(Virtual host)</div>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-md-6">
-				<div data---="input__?.queuename__required:1" class="m">@(Queue name)</div>
-				<div class="help m">@(Supports variables): queue-{queueid} , the {queueid} will be overwritten by the value from variables</div>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-md-6">
-				<div data---="input__?.username" class="m">@(Username)</div>
-			</div>
-			<div class="col-md-6">
-				<div data---="input__?.password__type:password" class="m">@(Password)</div>
+				<div data---="input__?.queuename__required:1" class="m">Queue name</div>
+				<div class="help m">Supports variables: queue-{queueid} , the {queueid} will be overwritten by the value from variables</div>
 			</div>
 		</div>
 	</div>
@@ -132,7 +115,11 @@
 </style>
 
 <script>
-
+	ON('configure_rabbitmqconsume', function(data) {
+		data.call(function(response) {
+			SET('%rabbitmqs', response);
+		}, true);
+	});
 </script>
 
 <body>
