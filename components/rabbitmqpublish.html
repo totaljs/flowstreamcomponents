@@ -8,6 +8,7 @@
 	exports.version = '1';
 	exports.config = {};
 	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.flags = ['rabbitmq-dep'];
 
 	exports.npm = ['amqp-connection-manager'];
 
@@ -77,6 +78,7 @@
 
 			setStatus(ManagerState.title, 1000);
 
+			channel && channel.close && channel.close();
 			// no state or state === 'connect'
 			channel = createChannel();
 		};
@@ -136,6 +138,7 @@
 				clearTimeout(self.timeout);
 				self.timeout = null;
 			}
+
 			self.db.find().first().callback(function(err, data){
 				if (data) {
 					var id = data.id;
@@ -159,7 +162,9 @@
 		};
 
 		Stack.prototype.push = function(data) {
-			this.db.insert({ id: this.index++, data: data }).callback(this.next);
+			this.db.insert({ id: this.index++, data: data }).callback((err, result, meta) => {
+				this.next();
+			});
 		};
 	};
 
