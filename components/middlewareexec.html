@@ -1,0 +1,67 @@
+<script total>
+	exports.id = 'middleware_exec';
+	exports.name = 'Middleware Exec';
+	exports.group = 'Common';
+	exports.version = '1';
+	exports.icon = 'fa fa-code';
+	exports.author = 'Martin Smola';
+	exports.config = { id: '' };
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }, { id: 'error', name: 'Error' }];
+
+	exports.make = function(instance, config) {
+
+		instance.message = function message($) {
+			if (!config.id) {
+				$.end();
+				return;
+			}
+
+			var com = instance.main.instances().findItem('id', config.id);
+
+			if (!com || !com.execute) {
+				$.end();
+				return;
+			}
+
+			com.execute($, function(err, data){
+				if (err)
+					$.send('error', err);
+				else
+					$.send('output', data);
+			});
+		};
+	};
+
+	exports.call = function call(data, callback) {
+		var coms = this.instances().filter(ins => ins.component === 'middleware_function' && ins.config.name).map(ins => ({ id: ins.id, name: ins.config.name }));
+		callback(coms);
+	};
+
+</script>
+
+<readme>
+	This component executes a custom JavaScript code as it is.
+</readme>
+
+<script>
+	TOUCH(function(exports, reinit) {
+		exports.settings = function(meta) {
+			meta.call(function(response) {
+				SET('%functions', response);
+			}, true);
+		};
+	});
+</script>
+
+<settings>
+	<div class="padding">
+		<div data---="input__?.id__dirsource:%functions;dirraw:1;placeholder:Select middleware function;dirempty:No functions;required:1" class="m">Name</div>
+	</div>
+</settings>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+</body>
