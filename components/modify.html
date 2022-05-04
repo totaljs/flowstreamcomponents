@@ -182,10 +182,10 @@
 	The expression: `data.value + variables.offset`
 
 	### Important
-	- `Remove` -> `Message data / Message repo -> <empty path>` will set `Message data / Message repo` to `null`;
-	- `Remove` -> `Local variables / Global variables -> <empty path>` will be ignored but `Remove -> Local variables / Global variables -> myVar` will work.
-	- `Set` -> `Message data -> some.path` to: `Message data -> some.other.path` will add another property to the incoming data and rest of the data will remain untouched
-	- `Set` -> `Message data -> <empty path>` to: `Message data -> some.path` will essentialy overwrite the incomming data, after this there's no longer access to original data(same goes for repo)
+	- `Remove` -> `Message data / Message repo` -> `<empty path>` will set `Message data / Message repo` to `null`;
+	- `Remove` -> `Local variables / Global variables` -> `<empty path>` will be ignored but `Remove` -> `Local variables / Global variables` -> `myVar` will work.
+	- `Set` -> `Message data` -> `some.path` to: `Message data` -> `some.other.path` will add another property to the incoming data and rest of the data will remain untouched
+	- `Set` -> `Message data` -> `<empty path>` to: `Message data` -> `some.path` will essentialy overwrite the incomming data, after this there's no longer access to original data(same goes for repo)
 </readme>
 
 <settings>
