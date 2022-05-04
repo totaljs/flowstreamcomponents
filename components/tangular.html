@@ -1,0 +1,71 @@
+<script total>
+
+	exports.name = 'Tangular';
+	exports.icon = 'fa fa-code';
+	exports.author = 'Total.js';
+	exports.version = '1';
+	exports.group = 'Templates';
+	exports.config = {};
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }];
+
+	exports.make = function(instance, config) {
+		var template;
+
+		instance.message = function($) {
+			var data = $.data;
+			try {
+				$.data = template(data, $);
+			} catch(e) { $.data = ''; }
+			$.send('output');
+		};
+
+		instance.configure = function() {
+			template = Tangular.compile(config.template || '');
+		};
+
+		instance.configure();
+
+	};
+
+</script>
+
+<readme>
+Uses server-side implementation of [Tangular](https://docs.totaljs.com/components/40d06002lm50c/)
+**Example:**
+Incomming data
+```js
+{
+	app_name: 'Total.js Flow'
+}
+```
+Template
+```
+App name: {{ app_name }}
+```
+
+$ --> {MessageInstance} https://docs.totaljs.com/total4/40844001ni51c/
+In the example bellow, the $.refs.controller is only available if the message was created by the Route component
+```
+URL: {{ $.refs.controller.url }}
+```
+</readme>
+
+<settings>
+	<div class="padding">
+		<div class="ui-input-label">Template:</div>
+		<div data---="codemirror__?.template__type:html;minheight:300;parent:auto;margin:60;tabs:true;trim:true" class="m"></div>
+	</div>
+</settings>
+
+<style>
+</style>
+
+<script>
+</script>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+</body>
