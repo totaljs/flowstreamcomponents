@@ -281,15 +281,19 @@
 
 				if (item.array) {
 
-					if (!(val instanceof Array))
-						val = [val];
-
 					obj[item.name] = [];
 
-					for (var i = 0; i < val.length; i++) {
-						var m = val[i];
-						var r = instance.preparedata(item, m, err, plus, partial);
-						obj[item.name].push(r);
+					if (val) {
+
+						if (!(val instanceof Array))
+							val = [val];
+
+						for (var i = 0; i < val.length; i++) {
+							var m = val[i];
+							var r = instance.preparedata(item, m, err, plus, partial);
+							obj[item.name].push(r);
+						}
+
 					}
 
 					if (item.required && !obj[item.name].length)
