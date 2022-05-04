@@ -1,0 +1,69 @@
+<script total>
+	exports.id = 'json_schema_validator';
+	exports.name = 'JSON Schema validator';
+	exports.icon = 'fa fa-code';
+	exports.author = 'Total Avengers';
+	exports.version = '1';
+	exports.config = {};
+	exports.inputs = [{ id: 'input', name: 'Input' }, { id: 'schema', name: 'Schema' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }, { id: 'schema', name: 'Schema' }, { id: 'error', name: 'Error' }];
+
+	exports.make = function(instance, config) {
+
+		var schema;
+
+		instance.message = function($) {
+			if (!schema) {
+				$.send('error', { error: 'Not ready' });
+				return;
+			}
+
+			if ($.input === 'schema') {
+				$.send('schema', { schema });
+				return;
+			}
+
+			var data = $.data;
+			JSONSCHEMA(schema, data, function(error, response){
+				if (error)
+					$.send('error', { msg: 'Invalid data', error });
+				else
+					$.send('output', data);
+			});
+		};
+
+		instance.configure = function() {
+			// "config" is changed
+			schema = config.schema && config.schema.parseJSON();
+		};
+
+		instance.configure();
+	};
+
+</script>
+
+<readme>
+JSON schema [documentation](https://json-schema.org/learn/getting-started-step-by-step.html)
+## Inputs
+	- input -> validate data and send the result to output if no error, otherwise send error to error output
+	- schema -> read the schema and send it to the schema output
+</readme>
+
+<settings>
+	<div class="padding">
+		<div data---="codemirror__?.schema__type:javascript;required:true;height:500">JSON schema</div>
+	</div>
+</settings>
+
+<style>
+</style>
+
+<script>
+
+</script>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+</body>
