@@ -1,0 +1,216 @@
+<script total>
+
+	exports.name = 'Teleport';
+	exports.icon = 'fa fa-magic';
+	exports.author = 'Total.js';
+	exports.version = '1';
+	exports.group = 'Common';
+	exports.config = { type: 'input', target: '', name: '', color: '#B9261A', is: false };
+
+	exports.make = function(instance, config) {
+
+		instance.message = function($) {
+
+			if (config.type === 'output') {
+				$.send('output');
+				return;
+			}
+
+			if (config.target) {
+				var target = instance.main.meta.flow[config.target];
+				if (target) {
+					$.toid = target.id;
+					$.instance = target;
+					target.message($);
+					return;
+				}
+			}
+
+			$.destroy();
+		};
+
+		instance.configure = function() {
+
+			config.is = config.name || config.target ? true : false;
+
+			var inputs = [];
+			var outputs = [];
+			var is = false;
+
+			switch (config.type) {
+				case 'input':
+					var target = config.target ? instance.main.meta.flow[config.target] : null;
+					inputs.push({ id: 'input', name: 'Input' });
+					break;
+				case 'output':
+					outputs.push({ id: 'output', name: config.name });
+					break;
+			}
+
+			var jsoninputs = JSON.stringify(instance.inputs || EMPTYARRAY);
+			var jsonoutputs = JSON.stringify(instance.outputs || EMPTYARRAY);
+
+			if (JSON.stringify(inputs) !== jsoninputs) {
+				is = true;
+				instance.inputs = inputs;
+			}
+
+			if (JSON.stringify(outputs) !== jsonoutputs) {
+				is = true;
+				instance.outputs = outputs;
+			}
+
+			is && instance.save();
+		};
+
+		instance.close = function(destroyed) {
+			if (!destroyed || config.type === 'input')
+				return;
+
+			var meta = instance.main.meta;
+			for (var key in meta.flow) {
+				var tmp = meta.flow[key];
+				if (tmp.component) {
+					var com = meta.components[tmp.component];
+					if (com &&
+						com.name === 'Teleport' && tmp.config.type === 'input' && tmp.config.target === instance.id)
+						tmp.reconfigure({ target: '' });
+				}
+			}
+		};
+
+		instance.configure();
+
+	};
+
+</script>
+
+<readme>
+The component can teleport (input) message to another teleport (output) component.
+</readme>
+
+<style>
+	.CLASS .content { min-height: 10px; min-width: 50px; border-radius: var(--radius) var(--radius) 0 0; }
+	.CLASS .input, .CLASS .output { border-top-color: transparent; }
+	.CLASS .inputs, .CLASS .outputs { text-align: center; }
+	.CLASS .colorbar { height: 10px; }
+	.CLASS span { pointer-events: none; }
+	.CLASS-settings figure { cursor: pointer; }
+	.CLASS-settings .item { line-height: 28px; font-size: 12px; background-color: #F8F8F8; border-radius: var(--radius); margin-bottom: 2px; padding: 0 10px; cursor: pointer; }
+	.CLASS-settings .item.selected { background-color: #E8E8E8; }
+	.ui-dark .CLASS-settings .item { background-color: #333; }
+	.ui-dark .CLASS-settings .item.selected { background-color: #404040; }
+</style>
+
+<settings>
+	<div class="CLASS-settings padding">
+
+		<div data-bind="?.is__hide">
+			<div data---="choose__?.type__selector:div" class="iconmenu m">
+				<div data-id="input">
+					<i class="fa fa-dot-circle"></i>
+					<span>Input</span>
+				</div>
+				<div data-id="output">
+					<i class="fa fa-crosshairs"></i>
+					<span>Output</span>
+				</div>
+			</div>
+		</div>
+
+		<div data-bind="?.type__show:value=='output'" class="hidden">
+			<div class="row">
+				<div class="col-md-9 m">
+					<div data---="input__?.name__required:1">Name</div>
+				</div>
+				<div class="col-md-3 m">
+					<div data---="input__?.color__type:color">Color</div>
+				</div>
+			</div>
+		</div>
+
+		<div data-bind="?.type__show:value=='input'">
+			<div class="caption m">
+				<label>Where to send data?</label>
+			</div>
+			<div data---="choose__?.target__selector:.item">
+				<div data-bind="%teleportinstances__template:.item -> data-id" class="listing">
+					<script type="text/html">
+						{{ foreach m in value }}
+						<div class="item" data-id="{{ m.id }}"><i class="fa fa-crosshairs mr5"></i>{{ m.name }}</div>
+						{{ end }}
+					</script>
+				</div>
+			</div>
+		</div>
+	</div>
+</settings>
+
+<body>
+	<div data---="watcher__CONFIG">
+		<script type="text/js">
+			component.watcherbackup && component.unwatch(component.watcherbackup);
+			var defcolor = '#888';
+			var deftext = 'Not configured';
+			var el = element.closest('.area');
+			if (value.type ==='input') {
+				if (value.target) {
+					var target = 'flow.config.' + value.target;
+					component.watch(target, function(path, config) {
+						var conf = config || EMPTYOBJECT;
+						el.find('.content').css('background', conf.color || defcolor);
+						el.find('.inputs span').text(conf.name || deftext);
+					}, true);
+				} else {
+					el.find('.content').css('background', defcolor);
+					el.find('.inputs span').text(deftext);
+				}
+				component.watcherbackup = target;
+			} else
+				el.find('.content').css('background', value.color || defcolor);
+		</script>
+	</div>
+</body>
+
+<script>
+
+	TOUCH(function(exports, reinit) {
+
+		exports.settings = function(meta) {
+
+			var arr = [];
+
+			for (var key in flow.data) {
+				var tmp = flow.data[key];
+				if (tmp.Component && tmp.Component.name === 'Teleport' && tmp.config.type === 'output' && key !== exports.id)
+					arr.push({ id: key, name: tmp.config.name });
+			}
+
+			SET('%teleportinstances', arr);
+		};
+
+		exports.configure = function() {
+
+			var changes = exports.instance.changes;
+			if (changes && changes.newbie) {
+
+				var config = exports.config;
+				var inputs = [];
+				var outputs = [];
+
+				if (config.type === 'input') {
+					var target = flow.data[config.target];
+					inputs.push({ id: 'input', name: target ? target.config.name : 'Input' });
+				} else
+					outputs.push({ id: 'output', name: config.name });
+
+				exports.instance.outputs = outputs;
+				exports.instance.inputs = inputs;
+				UPD('flow.data');
+			}
+
+		};
+
+	});
+
+</script>
