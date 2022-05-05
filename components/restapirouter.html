@@ -6,7 +6,7 @@
 	exports.version = '1';
 	exports.author = 'Total.js';
 	exports.config = { name: 'API Router', schema: [], color: '', icon: 'fa fa-crosshairs', path: '', rewrite: true };
-	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.inputs = [{ id: 'input', name: 'Payload' }];
 	exports.outputs = [];
 
 	exports.make = function(instance, config) {
@@ -96,7 +96,7 @@
 				outputs.push({ id: item.id, name: item.name });
 			}
 
-			outputs.push({ id: 'error', name: '-- Not found --' });
+			outputs.push({ id: 'error', name: '404' });
 
 			var prev = JSON.stringify(instance.outputs);
 			var curr = JSON.stringify(outputs);
@@ -118,14 +118,14 @@ This component implements the [Total.js API Router](https://docs.totaljs.com/tot
 
 ```js
 {
-	"schema": "schema_name/{dynamic_arg_1}/{dynamic_arg_2}?query=arguments",
+	"schema": "schema_name/{param_1}/{param_2}?query=arguments",
 	"data": {} // optional, request payload
 }
 ```
 
-< __Good to know:__<br>Output data will be same `data`, but extendend by adding new properties declared below.
+< __Good to know:__<br>Output data will be the same `data`, but extendend by adding new properties declared below.
 
-__Output data:__
+__Extended output data:__
 
 - `id {String}` first value from dynamic value
 - `params {Object}` dynamic values
@@ -275,7 +275,7 @@ If the controller is stored in the `message.refs.controller` property, then its 
 				var outputs = [];
 				for (var item of exports.config.schema)
 					outputs.push({ id: item.id, name: item.name });
-				outputs.push({ id: 'error', name: '-- Not found --' });
+				outputs.push({ id: 'error', name: '404' });
 				exports.instance.outputs = outputs;
 				UPD('flow.data');
 			}
