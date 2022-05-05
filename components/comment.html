@@ -4,7 +4,7 @@
 	exports.icon = 'fa fa-code';
 	exports.author = 'Total.js';
 	exports.version = '1';
-	exports.config = {};
+	exports.config = { text: 'Comment' };
 	exports.meta = { settingswidth: 1100 };
 
 	exports.make = function(instance, config) {
@@ -21,12 +21,10 @@
 
 <style>
 	.CLASS { max-width: 500px !important; }
-	.CLASS footer { padding: 10px; font-size: 12px; }
+	.CLASS .content { display: none; min-height: 0; }
+	.CLASS footer { padding: 10px; font-size: 12px; border-top: 0 !important; }
 </style>
 
 <body>
-	<header>
-		<i class="ICON"></i>NAME
-	</header>
 	<footer data-bind="!CONFIG.text__html:value.markdown(el)" class="markdown-small"></footer>
 </body>

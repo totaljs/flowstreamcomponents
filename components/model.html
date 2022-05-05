@@ -4,7 +4,7 @@
 	exports.group = 'Transformations';
 	exports.icon = 'fab fa-wpforms';
 	exports.author = 'Total.js';
-	exports.version = '2';
+	exports.version = '1';
 	exports.config = { name: 'Model', path: '', schema: [], rewrite: true };
 	exports.inputs = [{ id: 'input', name: 'Data' }, { id: 'partial', name: 'Partial data' }];
 	exports.outputs = [{ id: 'output', name: 'Output' }, { id: 'error', name: 'Error' }];
@@ -281,15 +281,19 @@
 
 				if (item.array) {
 
-					if (!(val instanceof Array))
-						val = [val];
-
 					obj[item.name] = [];
 
-					for (var i = 0; i < val.length; i++) {
-						var m = val[i];
-						var r = instance.preparedata(item, m, err, plus, partial);
-						obj[item.name].push(r);
+					if (val) {
+
+						if (!(val instanceof Array))
+							val = [val];
+
+						for (var i = 0; i < val.length; i++) {
+							var m = val[i];
+							var r = instance.preparedata(item, m, err, plus, partial);
+							obj[item.name].push(r);
+						}
+
 					}
 
 					if (item.required && !obj[item.name].length)
@@ -447,8 +451,11 @@ This component prepares incoming data according to the defined schema. Output is
 	.CLASS-settings figure.ismoved { background-color: rgba(92,29,196,0.3) !important; }
 
 	.ui-dark .CLASS-settings .fields { border-color: #404040; }
+	.ui-dark .CLASS-settings figure.isrequired { background-color: rgba(255,254,209,0.1); }
+	.ui-dark .CLASS-settings figure .edit-open { background-color: #363636; }
+	.ui-dark .CLASS-settings figure .default { border-color: #404040; }
 	.ui-dark .CLASS-settings figure { border-top-color: #404040; }
-	.ui-dark .CLASS-settings figure .type { border-left-color: #404040; background-color: rgba(100,100,100,0.04); }
+	.ui-dark .CLASS-settings figure .type { border-left-color: #404040; background-color: rgba(100,100,100,0.1); }
 	.ui-dark .CLASS-settings figure .required { border-left-color: #404040; }
 	.ui-dark .CLASS-settings figure .array { border-left-color: #404040; }
 	.ui-dark .CLASS-settings figure .controls { border-left-color: #404040; }

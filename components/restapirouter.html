@@ -5,7 +5,7 @@
 	exports.icon = 'fa fa-crosshairs';
 	exports.version = '1';
 	exports.author = 'Total.js';
-	exports.config = { name: 'API Router', schema: [], color: '', icon: 'fa fa-crosshairs' };
+	exports.config = { name: 'API Router', schema: [], color: '', icon: 'fa fa-crosshairs', path: '', rewrite: true };
 	exports.inputs = [{ id: 'input', name: 'Input' }];
 	exports.outputs = [];
 
@@ -17,7 +17,9 @@
 
 			var data = $.data;
 
-			if (!data.schema)
+			if (config.path) {
+				data = U.get(data, config.path);
+			} else if (!data.schema)
 				data = data.body;
 
 			if (typeof(data.schema) === 'string') {
@@ -63,6 +65,9 @@
 							data.user = ctrl.user;
 							data.session = ctrl.session;
 						}
+
+						if (config.path && !config.rewrite)
+							$.data = data;
 
 						$.send(meta.id);
 						return;
@@ -118,7 +123,9 @@ This component implements the [Total.js API Router](https://docs.totaljs.com/tot
 }
 ```
 
-__Output data:__ will be same data extendend by adding new properties:
+< __Good to know:__<br>Output data will be same `data`, but extendend by adding new properties declared below.
+
+__Output data:__
 
 - `id {String}` first value from dynamic value
 - `params {Object}` dynamic values
@@ -166,12 +173,20 @@ If the controller is stored in the `message.refs.controller` property, then its 
 		<div class="padding">
 			<div data---="input__?.name__required:1" class="m">Name</div>
 			<div class="row">
+				<div class="col-md-6 m">
+					<div data---="input__?.path">Load data from the specific property/field</div>
+					<div class="help">Optional. The data for the model will be loaded from the specific property/field.</div>
+				</div>
 				<div class="col-md-3 m">
 					<div data---="input__?.color__type:color">Color</div>
 				</div>
 				<div class="col-md-3 m">
 					<div data---="input__?.icon__type:icon">Icon</div>
 				</div>
+			</div>
+			<div data-bind="?.path__show" class="hidden">
+				<hr class="nmt" />
+				<div data---="input__?.rewrite__type:checkbox"><b>Rewrite value only</b> (otherwise, it will replace entire message data)</div>
 			</div>
 			<div class="caption m">
 				<div class="toolbar">
