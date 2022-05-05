@@ -1,11 +1,11 @@
 <script total>
 
 	exports.name = 'API PostgreSQL';
-	exports.icon = 'fa fa-cubes';
+	exports.icon = 'fa fa-database';
 	exports.author = 'Total.js';
 	exports.group = 'REST API';
 	exports.version = '1';
-	exports.config = { name: 'default', url: '', pooling: 2 };
+	exports.config = { id: 'default', name: 'API PostgreSQL', url: '', pooling: 2 };
 	exports.outputs = [{ id: 'error', name: 'Error' }];
 	exports.npm = ['querybuilderpg'];
 
@@ -17,11 +17,11 @@
 
 		instance.configure = function() {
 
-			init && QB.init(conf.name);
+			init && QB.init(conf.id);
 			conf = instance.replace(config);
 
 			if (conf.url) {
-				QB.init(conf.name, conf.url, config.pooling, function(err, data) {
+				QB.init(conf.id, conf.url, conf.pooling, function(err, data) {
 					var msg = instance.newmessage([{ error: err + ' --> ' + data.query }]);
 					msg.send('error');
 				});
@@ -53,9 +53,10 @@ __Usage in API Database__:
 
 <settings>
 	<div class="padding">
+		<div data---="input__?.name__required:1" class="m">Name</div>
 		<div class="row">
 			<div class="col-md-3">
-				<div data---="input__?.name__required:1">Alias</div>
+				<div data---="input__?.id__required:1">Alias</div>
 				<div class="help">The alias separates various DB connections</div>
 			</div>
 			<div class="col-md-6">
@@ -71,14 +72,17 @@ __Usage in API Database__:
 </settings>
 
 <style>
-	.CLASS footer { padding: 10px; font-size: 12px; }
+	.CLASS footer { padding: 0 10px 10px; font-size: 12px; }
 </style>
 
 <body>
 	<header>
-		<i class="ICON"></i>NAME
+		<i class="ICON"></i>PostgreSQL
 	</header>
-	<footer>
-		Alias: <b class="monospace" data-bind="CONFIG.name__text"></b>
+	<footer data-bind="CONFIG__template">
+		<script type="text/html">
+			<div class="help"><i class="fa fa-cut"></i>{{ value.id }}</div>
+			<div class="b">{{ value.name }}</div>
+		</script>
 	</footer>
 </body>
