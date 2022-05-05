@@ -5,8 +5,8 @@
 	exports.icon = 'fa fa-database';
 	exports.version = '1';
 	exports.author = 'Total.js';
-	exports.config = { name: 'API Database', tab: 'list', listtable: '', listfilter: [], listwhere: [], listlimit: 100, listsort: '', listpath: '', createtable: '', createerror: '', readtable: '', readfields: '*', readwhere: [], readpath: '', readsort: '', readerror: '', createtable: '', createpath: '', updatetable: '', updateerror: '', updatepath: '', updatewhere: [], removetable: '', removepath: '', removeerror: '', removewhere: [] };
-	exports.inputs = [{ id: 'list', name: 'List' }, { id: 'create', name: 'Create' }, { id: 'read', name: 'Read' }, { id: 'update', name: 'Update' }, { id: 'remove', name: 'Delete' }];
+	exports.config = { name: 'API Database', items: [] };
+	exports.inputs = [];
 	exports.outputs = [{ id: 'output', name: 'Output' }, { id: 'error', name: 'Error' }];
 
 	exports.make = function(instance, config) {
@@ -15,8 +15,13 @@
 
 		instance.message = function($) {
 
+			var item = cache[$.input];
+			if (!item) {
+				$.destroy();
+				return;
+			}
+
 			var builder = null;
-			var is = false;
 			var data = $.data;
 			var params = data.params || EMPTYOBJECT;
 			var query = data.query || EMPTYOBJECT;
@@ -24,44 +29,43 @@
 
 			data = data.data || data.body;
 
-			switch ($.input) {
+			switch (item.command) {
 				case 'create':
-					if (config.createtable)
-						builder = DB().insert(config.createtable, data);
+					builder = DB().insert(item.table, data);
 					break;
 				case 'update':
-
-					if (config.updatetable) {
-						builder = DB().update(config.updatetable, data);
-						cache.update && cache.update(params, data, query, user, $.refs, $, builder);
-						config.updateerror && builder.error(config.updateerror);
-					}
-
+					builder = DB().update(item.table, data);
+					item.where && item.where(params, data, query, user, $.refs, $, builder);
+					item.error && builder.error(item.error);
 					break;
 				case 'remove':
-					if (config.removetable) {
-						builder = DB().remove(config.removetable);
-						cache.remove && cache.remove(params, data, query, user, $.refs, $, builder);
-						config.removeerror && builder.error(config.removeerror);
-					}
+					builder = DB().remove(item.table);
+					item.where && item.where(params, data, query, user, $.refs, $, builder);
+					item.error && builder.error(item.error);
 					break;
 				case 'read':
-					if (config.readtable) {
-						builder = DB().read(config.readtable);
-						cache.read && cache.read(params, data, query, user, $.refs, $, builder);
-						config.readerror && builder.error(config.readerror);
-						if (cache.readsort) {
-							for (var m of cache.readsort)
-								builder.sort(m[0], m[1]);
-						}
+					builder = DB().read(item.table);
+					item.where && item.where(params, data, query, user, $.refs, $, builder);
+					item.error && builder.error(item.error);
+					if (item.sort) {
+						for (var m of item.sort)
+							builder.sort(m[0], m[1]);
+					}
+					break;
+				case 'query':
+					builder = DB().read(item.table);
+					item.where && item.where(params, data, query, user, $.refs, $, builder);
+					item.error && builder.error(item.error);
+					item.limit && builder.take(item.limit);
+					if (item.sort) {
+						for (var m of item.sort)
+							builder.sort(m[0], m[1]);
 					}
 					break;
 				case 'list':
-					if (config.listtable) {
-						builder = DB().list(config.listtable);
-						builder.autoquery(query, cache.listfields, cache.listsort ? (cache.listsort[0] + '_' + cache.listsort[1]) : null, config.listlimit || 100);
-						cache.list && cache.list(params, data, query, user, $.refs, $, builder);
-					}
+					builder = DB().list(item.table);
+					builder.autoquery(query, item.allowed, item.sort ? (item.sort[0] + '_' + item.sort[1]) : null, item.limit || 100);
+					item.where && item.where(params, data, query, user, $.refs, $, builder);
 					break;
 			}
 
@@ -70,7 +74,7 @@
 					if (err) {
 						$.send('error', [{ error: err + '' }]);
 					} else {
-						var path = config[$.input + 'path'];
+						var path = item.path;
 						if (path) {
 							U.set($.data, path, response);
 							$.send('output');
@@ -84,80 +88,94 @@
 
 		instance.configure = function() {
 
-			config.tab = 'list';
-
-			var types = ['list', 'update', 'read', 'remove'];
+			var inputs = [];
 			var builder;
 			var tmp;
 
-			for (var key of types) {
+			for (var item of config.items) {
+
+				var obj = {};
+
+				obj.command = item.command;
+				obj.table = item.table;
+				obj.path = item.path;
 
 				builder = [];
 
-				for (var item of config[key + 'where']) {
+				for (var m of item.where) {
 					var val = 'null';
-					switch (item.type) {
+					switch (m.type) {
 						case '1':
-							val = item.value;
+							val = m.value;
 							break;
 						case '2':
-							val = '\'' + item.value.replace(/'/g, '\\\'') + '\'';
+							val = '\'' + m.value.replace(/'/g, '\\\'') + '\'';
 							break;
 						case '3':
-							val = item.value.parseFloat();
+							val = m.value.parseFloat();
 							break;
 						case '4':
-							val = item.value.toLowerCase();
-							val = val === '1' || item.value === 'true' || val === 'on';
+							val = m.value.toLowerCase();
+							val = val === '1' || m.value === 'true' || val === 'on';
 							break;
 						case '5':
-							val = item.value.toLowerCase();
-							val = val === 'now' ? 'new Date()' : item.value.parseDate('yyyy-MM-dd HH:mm:ss');
+							val = m.value.toLowerCase();
+							val = val === 'now' ? 'new Date()' : m.value.parseDate('yyyy-MM-dd HH:mm:ss');
 							break;
 						case '6':
 							val = 'null';
 							break;
 					}
 
-					builder.push('where(\'{0}\', \'{1}\', {2})'.format(item.name, item.comparer, val));
+					builder.push('where(\'{0}\', \'{1}\', {2})'.format(m.name, m.comparer, val));
 				}
 
-				cache[key] = builder.length ? new Function('params', 'data', 'query', 'user', 'refs', '$', 'builder', 'builder.' + builder.join('.')) : null;
-			}
+				obj.where = builder.length ? new Function('params', 'data', 'query', 'user', 'refs', '$', 'builder', 'builder.' + builder.join('.')) : null;
 
-			types = ['list', 'read'];
-
-			for (var key of types) {
-				var k = key + 'sort';
-				if (config[k]) {
-					cache[k] = [];
-					tmp = config[k].split(/,|;/);
+				tmp = obj.sort;
+				if (tmp) {
+					obj.sort = [];
+					tmp = tmp.split(/,|;/);
 					for (var m of tmp) {
 						m = m.trim().split(' ');
 						m[1] = (m[1] || '').toLowerCase() === 'asc';
-						cache[k].push(m);
+						obj.sort.push(m);
 					}
-				} else
-					cache[k] = null;
-			}
-
-			cache.listfields = '';
-
-			for (var item of config.listfilter) {
-				tmp = 'string';
-				switch (item.type) {
-					case '3':
-						tmp = 'number';
-						break;
-					case '4':
-						tmp = 'boolean';
-						break;
-					case '5':
-						tmp = 'date';
-						break;
 				}
-				cache.listfields += (cache.listfields ? ',' : '') + item.name + ':' + tmp;
+
+				obj.fields = item.fields === '*' ? '' : item.fields;
+
+				if (item.filter && item.filter.length) {
+					obj.allowed = '';
+					for (var m of item.filter) {
+						tmp = 'string';
+						switch (m.type) {
+							case '3':
+								tmp = 'number';
+								break;
+							case '4':
+								tmp = 'boolean';
+								break;
+							case '5':
+								tmp = 'date';
+								break;
+						}
+						obj.allowed += (obj.allowed ? ',' : '') + m.name + ':' + tmp;
+					}
+				}
+
+				cache[item.id] = obj;
+				inputs.push({ id: item.id, name: item.name });
 			}
+
+			var prev = JSON.stringify(instance.inputs);
+			var curr = JSON.stringify(inputs);
+
+			if (curr !== prev) {
+				instance.inputs = inputs;
+				instance.save();
+			}
+
 		};
 
 		instance.configure();
@@ -214,7 +232,13 @@ __Good to know__: If the `data` (payload) can contain special key names in the f
 
 <style>
 	.CLASS-settings .fields { border: 1px solid #E0E0E0; border-radius: var(--radius); }
-	.CLASS-settings .item { padding: 7px 10px; }
+	.CLASS-settings .ui-listform-item .item { padding: 7px 10px; }
+	.CLASS-settings .listing .item { line-height: 28px; font-size: 12px; background-color: #F8F8F8; border-radius: var(--radius); margin-bottom: 2px; padding: 0 10px; cursor: pointer; }
+	.CLASS-settings .listing .item span { float: right; color: #777; }
+	.CLASS-settings .listing .item:hover { background-color: #E8E8E8; }
+	.ui-dark .CLASS-settings .listing .item { background-color: #333; }
+	.ui-dark .CLASS-settings .listing .item.selected { background-color: #404040; }
+	.ui-dark .CLASS-settings .listing .item span { color: #999; }
 	.CLASS footer { padding: 10px; font-size: 12px; }
 </style>
 
@@ -226,241 +250,158 @@ __Good to know__: If the `data` (payload) can contain special key names in the f
 
 <settings>
 
-	<script type="text/html" class="apidatabasestaticfilter">
-		<div data---="listform__?.TYPEwhere__autofocus:1;empty:You do not have defined any rules">
-			<SCR type="text/html">
-				<div class="item monospace"><div class="controls nmr"><button name="up"><i class="fa fa-long-arrow-alt-up"></i></button><button name="down"><i class="fa fa-long-arrow-alt-down"></i></button><button name="remove" class="red"><i class="far fa-trash-alt"></i></button></div><i class="fa fa-filter mr5"></i>{{ name }} {{ comparer }} <b>{{ if type == '6' }}null{{ else }}{{ value }}{{ fi }}</b></div>
-			</SCR>
-			<SCR type="text/html">
-				<div class="padding">
-					<div class="row">
-						<div class="col-sm-3 m">
-							<div data---="input__?.name__required:1;align:1;monospace:1__'id'">Name</div>
-						</div>
-						<div class="col-sm-3 m">
-							<div data---="input__?.comparer__required:1;align:1;dirsource:tmpapidatabase.comparers__'='">Comparer</div>
-						</div>
-						<div class="col-sm-3 m">
-							<div data---="input__?.type__required:1;align:1;dirsource:tmpapidatabase.types__'1'">Type</div>
-						</div>
-						<div class="col-sm-3 m">
-							<div data---="input__?.value__monospace:1;align:1__''" data-bind="?.type__enable:value!=='6'">Value</div>
-						</div>
-					</div>
-					<div class="help"><b>Expression</b> supports these commands <code>params {Object}</code>, <code>query {Object}</code>, <code>data {Object}</code>, <code>user {Object}</code>. A value for date field can contain <code>now</code> with the current date/time.</div>
-					<br />
-					<div data---="validate__?__validonly:true" class="toolbar">
-						<button name="submit"><i class="fa fa-floppy-o"></i>Save</button>
-						<button name="remove">Remove</button>
-						<button name="cancel">Cancel</button>
-					</div>
-				</div>
-			</SCR>
-			<SCR type="text/html">
-				<div style="margin-top:15px"><button class="button button-inline" name="create"><i class="fa fa-plus-circle green"></i>Create</button></div>
-			</SCR>
-		</div>
-	</script>
+	<div data---="box__common.form2__if:apidatabasefieldform;title:Database operation;zindex:30;width:800;submit:tmpapidatabase.save" data-scope="apidatabasefieldform__isolated:1">
+		<div class="padding CLASS-settings">
 
-	<div class="CLASS-settings">
-
-		<div class="padding bg-smoke">
-
-			<div data---="input__?.name__required:1" class="m">Name</div>
-
-			<ul class="tabmenu" data---="tabmenu__?.tab__null__'list'">
+			<ul class="tabmenu" data---="tabmenu__?.command__null__'list'">
 				<li data-value="list">List</li>
+				<li data-value="query">Query</li>
 				<li data-value="read">Read</li>
 				<li data-value="create">Create</li>
 				<li data-value="update">Update</li>
 				<li data-value="remove">Delete</li>
 			</ul>
-			<div class="clearfix"></div>
-		</div>
-		<div class="padding npt">
+			<div class="clearfix">&nbsp;</div>
 
-			<div data-bind="?.tab__show:value==='list'" class="hidden">
-
-				<div class="caption m">
-					<label><i class="fa fa-list"></i>List input</label>
+			<div class="row">
+				<div class="col-md-4 m">
+					<div data---="input__?.name__required:1">Name</div>
+					<div class="help">An input name</div>
 				</div>
-
-				<div class="row">
-					<div class="col-md-3 m">
-						<div data---="input__?.listtable__required:1;monospace:1;align:1">Table</div>
-						<div class="help">Table or Connection/Table</div>
-					</div>
-					<div class="col-md-3 m">
-						<div data---="input__?.listlimit__type:number;required:1;monospace:1">Max. limit</div>
-						<div class="help">Max. records to output</div>
-					</div>
-					<div class="col-md-3 m">
-						<div data---="input__?.listsort__monospace:1;align:1;placeholder:column asc">Default sort</div>
-						<div class="help"><code>column asc</code> or <code>column desc</code></div>
-					</div>
-					<div class="col-md-3 m">
-						<div data---="input__?.listpath__monospace:1">Save to path</div>
-						<div class="help">Response to <code>message.data</code></div>
-					</div>
+				<div class="col-md-4 m">
+					<div data---="input__?.table__required:1;monospace:1;align:1">Table</div>
+					<div class="help">Table or Connection/Table</div>
 				</div>
-
-				<div class="panel m">
-					<label class="bg-smoke">Static filter</label>
-					<div class="padding" data---="loadcontent__null__selector:.apidatabasestaticfilter;replace:TYPE=list"></div>
+				<div class="col-md-4 m">
+					<div data---="input__?.path__monospace:1">Save to path</div>
+					<div class="help">Response to <code>message.data</code></div>
 				</div>
+			</div>
 
-				<div class="panel">
-					<label class="bg-smoke">Dynamic filter</label>
-					<div class="padding">
-						<div data---="listform__?.listfilter__autofocus:1;empty:You do not have defined any rules">
+			<hr />
 
-							<script type="text/html">
-								<div class="item monospace"><div class="controls nmr"><button name="up"><i class="fa fa-long-arrow-alt-up"></i></button><button name="down"><i class="fa fa-long-arrow-alt-down"></i></button><button name="remove" class="red"><i class="far fa-trash-alt"></i></button></div><i class="fa fa-filter mr5"></i>{{ name }} <b>{{ type | tmpapidatabasetype }}</b></div>
-							</script>
+			<div class="row" data-bind="?.command__show:value==='list'||value==='query'||value==='read'">
+				<div class="col-md-4 m">
+					<div data---="input__?.limit__type:number;required:1;monospace:1">Max. limit</div>
+					<div class="help">Max. records to output</div>
+				</div>
+				<div class="col-md-4 m">
+					<div data---="input__?.sort__monospace:1;align:1;placeholder:column asc">Default sort</div>
+					<div class="help"><code>column asc</code> or <code>column desc</code></div>
+				</div>
+				<div class="col-md-4 m">
+					<div data---="input__?.fields__monospace:1;placeholder:column1, column2, column3" data-bind="?.command__disable:value==='list'">Fields</div>
+					<div class="help">Return fields</div>
+				</div>
+			</div>
 
-							<script type="text/html">
-								<div class="padding">
-									<div class="row">
-										<div class="col-sm-3 m">
-											<div data---="input__?.name__required:1;align:1;monospace:1__'name'">Name</div>
-										</div>
-										<div class="col-sm-3 m">
-											<div data---="input__?.type__required:1;align:1;dirsource:tmpapidatabase.types2__'2'">Type</div>
-										</div>
+			<div data-bind="?.command__show:value!=='list'">
+				<div data---="input__?.error">Error message</div>
+				<div class="help">An error message will be returned when the database returns nothing</div>
+			</div>
+
+			<br />
+
+			<div class="panel m">
+				<label class="bg-smoke">Condition</label>
+				<div class="padding">
+				<div data---="listform__?.where__autofocus:1;empty:You do not have defined any rules">
+					<script type="text/html">
+						<div class="item monospace"><div class="controls nmr"><button name="up"><i class="fa fa-long-arrow-alt-up"></i></button><button name="down"><i class="fa fa-long-arrow-alt-down"></i></button><button name="remove" class="red"><i class="far fa-trash-alt"></i></button></div><i class="fa fa-filter mr5"></i>{{ name }} {{ comparer }} <b>{{ if type == '6' }}null{{ else }}{{ value }}{{ fi }}</b></div>
+					</script>
+					<script type="text/html">
+						<div class="padding">
+							<div class="row">
+								<div class="col-sm-3 m">
+									<div data---="input__?.name__required:1;align:1;monospace:1__'id'">Name</div>
+								</div>
+								<div class="col-sm-3 m">
+									<div data---="input__?.comparer__required:1;align:1;dirsource:tmpapidatabase.comparers__'='">Comparer</div>
+								</div>
+								<div class="col-sm-3 m">
+									<div data---="input__?.type__required:1;align:1;dirsource:tmpapidatabase.types__'1'">Type</div>
+								</div>
+								<div class="col-sm-3 m">
+									<div data---="input__?.value__monospace:1;align:1__''" data-bind="?.type__enable:value!=='6'">Value</div>
+								</div>
+							</div>
+							<div class="help"><b>Expression</b> supports these commands <code>params {Object}</code>, <code>query {Object}</code>, <code>data {Object}</code>, <code>user {Object}</code>. A value for date field can contain <code>now</code> with the current date/time.</div>
+							<br />
+							<div data---="validate__?__validonly:true" class="toolbar">
+								<button name="submit"><i class="fa fa-floppy-o"></i>Save</button>
+								<button name="remove">Remove</button>
+								<button name="cancel">Cancel</button>
+							</div>
+						</div>
+					</script>
+					<script type="text/html">
+						<div style="margin-top:15px"><button class="button button-inline" name="create"><i class="fa fa-plus-circle green"></i>Create</button></div>
+					</script>
+				</div>
+				</div>
+			</div>
+
+			<div class="panel hidden" data-bind="?.command__show:value==='list'">
+				<label class="bg-smoke">Dynamic filter</label>
+				<div class="padding">
+					<div data---="listform__?.filter__autofocus:1;empty:You do not have defined any rules">
+
+						<script type="text/html">
+							<div class="item monospace"><div class="controls nmr"><button name="up"><i class="fa fa-long-arrow-alt-up"></i></button><button name="down"><i class="fa fa-long-arrow-alt-down"></i></button><button name="remove" class="red"><i class="far fa-trash-alt"></i></button></div><i class="fa fa-filter mr5"></i>{{ name }} <b>{{ type | tmpapidatabasetype }}</b></div>
+						</script>
+
+						<script type="text/html">
+							<div class="padding">
+								<div class="row">
+									<div class="col-sm-3 m">
+										<div data---="input__?.name__required:1;align:1;monospace:1__'name'">Name</div>
 									</div>
-									<div data---="validate__?__validonly:true" class="toolbar">
-										<button name="submit"><i class="fa fa-floppy-o"></i>Save</button>
-										<button name="remove">Remove</button>
-										<button name="cancel">Cancel</button>
+									<div class="col-sm-3 m">
+										<div data---="input__?.type__required:1;align:1;dirsource:tmpapidatabase.types2__'2'">Type</div>
 									</div>
 								</div>
-							</script>
+								<div data---="validate__?__validonly:true" class="toolbar">
+									<button name="submit"><i class="fa fa-floppy-o"></i>Save</button>
+									<button name="remove">Remove</button>
+									<button name="cancel">Cancel</button>
+								</div>
+							</div>
+						</script>
 
-							<script type="text/html">
-								<div style="margin-top:15px"><button class="button button-inline" name="create"><i class="fa fa-plus-circle green"></i>Create</button></div>
-							</script>
+						<script type="text/html">
+							<div style="margin-top:15px"><button class="button button-inline" name="create"><i class="fa fa-plus-circle green"></i>Create</button></div>
+						</script>
 
-						</div>
 					</div>
-				</div>
-
-			</div>
-
-			<div data-bind="?.tab__show:value==='read'" class="hidden">
-
-				<div class="caption m">
-					<label><i class="fa fa-glasses"></i>Read input</label>
-				</div>
-
-				<div class="row">
-					<div class="col-md-3 m">
-						<div data---="input__?.readtable__required:1;monospace:1;align:1">Table</div>
-						<div class="help">Table or Connection/Table</div>
-					</div>
-					<div class="col-md-3 m">
-						<div data---="input__?.readsort__monospace:1;align:1;placeholder:column asc">Default sort</div>
-						<div class="help"><code>column asc</code> or <code>column desc</code></div>
-					</div>
-					<div class="col-md-3 m">
-						<div data---="input__?.readpath__monospace:1">Save to path</div>
-						<div class="help">Response to <code>message.data</code></div>
-					</div>
-				</div>
-
-				<hr />
-
-				<div class="row">
-					<div class="col-md-6 m">
-						<div data---="input__?.readfields__monospace:1"><b>Read fields</b></div>
-						<div class="help">Seperate them by the comma. Empty value or <code>*</code> returns all fields (columns).</div>
-					</div>
-					<div class="col-md-6 m">
-						<div data---="input__?.readerror__monospace:1">Error message</div>
-						<div class="help">An error message will be returned when the database returns nothing</div>
-					</div>
-				</div>
-
-				<div class="panel m">
-					<label class="bg-smoke">Static filter</label>
-					<div class="padding" data---="loadcontent__null__selector:.apidatabasestaticfilter;replace:TYPE=read"></div>
 				</div>
 			</div>
+		</div>
+		<nav data---="validate__?">
+			<button name="submit" disabled>APPLY</button>
+			<button name="cancel">Cancel</button>
+		</nav>
+	</div>
 
-			<div data-bind="?.tab__show:value==='create'" class="hidden">
+	<div class="CLASS-settings">
+		<div class="padding bg-smoke">
+			<div data---="input__?.name__required:1" class="m">Name</div>
+		</div>
+		<div class="padding">
 
-				<div class="caption m">
-					<label><i class="fa fa-plus-circle"></i>Create input</label>
+			<div class="caption m">
+				<div class="toolbar">
+					<button class="exec" data-exec="tmpapidatabase.add"><i class="fa fa-plus-circle green"></i>Add</button>
 				</div>
-
-				<div class="row">
-					<div class="col-md-3 m">
-						<div data---="input__?.createtable__required:1;monospace:1;align:1">Table</div>
-						<div class="help">Table or Connection/Table</div>
-					</div>
-					<div class="col-md-3 m">
-						<div data---="input__?.createpath__monospace:1">Save to path</div>
-						<div class="help">Response to <code>message.data</code></div>
-					</div>
-				</div>
-
+				<label>Inputs</label>
 			</div>
 
-			<div data-bind="?.tab__show:value==='update'" class="hidden">
-
-				<div class="caption m">
-					<label><i class="fa fa-pencil"></i>Update input</label>
-				</div>
-
-				<div class="row">
-					<div class="col-md-3 m">
-						<div data---="input__?.updatetable__required:1;monospace:1;align:1">Table</div>
-						<div class="help">Table or Connection/Table</div>
-					</div>
-					<div class="col-md-3 m">
-						<div data---="input__?.updatepath__monospace:1">Save to path</div>
-						<div class="help">Response to <code>message.data</code></div>
-					</div>
-					<div class="col-md-6 m">
-						<div data---="input__?.updateerror__monospace:1">Error message</div>
-						<div class="help">An error message will be returned when the database returns nothing</div>
-					</div>
-				</div>
-
-				<div class="panel m">
-					<label class="bg-smoke">Static filter</label>
-					<div class="padding" data---="loadcontent__null__selector:.apidatabasestaticfilter;replace:TYPE=update"></div>
-				</div>
-
+			<div data-bind="?.items__template:.item -> data-id" class="listing">
+				<script type="text/html">
+					{{ foreach m in value }}
+					<div class="item exec" data-id="{{ m.id }}" data-exec="tmpapidatabase.upd"><span>{{ m.command | tmpapidatabasecommand }}</span><i class="fa fa-crosshairs mr5"></i>{{ m.name }}</div>
+					{{ end }}
+				</script>
 			</div>
-
-			<div data-bind="?.tab__show:value==='remove'" class="hidden">
-
-				<div class="caption m">
-					<label><i class="fa fa-trash-alt"></i>Delete input</label>
-				</div>
-
-				<div class="row">
-					<div class="col-md-3 m">
-						<div data---="input__?.removetable__required:1;monospace:1;align:1">Table</div>
-						<div class="help">Table or Connection/Table</div>
-					</div>
-					<div class="col-md-3 m">
-						<div data---="input__?.removepath__monospace:1">Save to path</div>
-						<div class="help">Response to <code>message.data</code></div>
-					</div>
-					<div class="col-md-6 m">
-						<div data---="input__?.removeerror__monospace:1">Error message</div>
-						<div class="help">An error message will be returned when the database returns nothing</div>
-					</div>
-				</div>
-
-				<div class="panel m">
-					<label class="bg-smoke">Static filter</label>
-					<div class="padding" data---="loadcontent__null__selector:.apidatabasestaticfilter;replace:TYPE=remove"></div>
-				</div>
-
-			</div>
-
 		</div>
 	</div>
 </settings>
@@ -477,10 +418,11 @@ __Good to know__: If the `data` (payload) can contain special key names in the f
 				tmp = {};
 				tmp.commands = [];
 				tmp.commands.push({ id: 'list', name: 'List' });
+				tmp.commands.push({ id: 'query', name: 'Query' });
 				tmp.commands.push({ id: 'read', name: 'Read' });
 				tmp.commands.push({ id: 'insert', name: 'Insert' });
 				tmp.commands.push({ id: 'update', name: 'Update' });
-				tmp.commands.push({ id: 'delete', name: 'Delete' });
+				tmp.commands.push({ id: 'remove', name: 'Delete' });
 				tmp.comparers = [];
 				tmp.comparers.push({ id: '=', name: '=' });
 				tmp.comparers.push({ id: '>', name: '>' });
@@ -507,7 +449,55 @@ __Good to know__: If the `data` (payload) can contain special key names in the f
 					return tmp.types2.findValue('id', val, 'name', DEF.empty);
 				};
 
+				Thelpers.tmpapidatabasecommand = function(val) {
+					return tmp.commands.findValue('id', val, 'name', DEF.empty);
+				};
+
+				tmp.add = function() {
+					SET('apidatabasefieldform @reset @showloading', { id: Date.now().toString('36'), name: 'Input', where: [], filter: [], command: 'list', limit: 100 });
+					SET('common.form2 @hideloading', 'apidatabasefieldform');
+				};
+
+				tmp.upd = function(el) {
+					var id = ATTRD(el);
+					var model = GET(tmp.path);
+					var item = model.items.findItem('id', id);
+					if (item) {
+						SET('apidatabasefieldform @reset @showloading', CLONE(item));
+						SET('common.form2 @hideloading', 'apidatabasefieldform');
+					}
+				};
+
+				tmp.save = function(hide) {
+					var item = CLONE(apidatabasefieldform);
+					var model = GET(tmp.path);
+					var index = model.items.findIndex('id', item.id);
+
+					if (item.command !== 'list')
+						item.filter = [];
+
+					if (index === -1)
+						model.items.push(item);
+					else
+						model.items[index] = item;
+					UPD(tmp.path + ' @change');
+					hide();
+				};
+
 				W.tmpapidatabase = tmp;
+			}
+
+			tmp.path = meta.path;
+		};
+
+		exports.configure = function() {
+			var changes = exports.instance.changes;
+			if (changes && changes.newbie) {
+				var inputs = [];
+				for (var item of exports.config.items)
+					inputs.push({ id: item.id, name: item.name });
+				exports.instance.inputs = inputs;
+				UPD('flow.data');
 			}
 		};
 
