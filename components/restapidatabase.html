@@ -33,7 +33,7 @@
 
 					if (config.updatetable) {
 						builder = DB().update(config.updatetable, data);
-						cache.update && cache.update(data.params, data.data, data.query, data.user, $.refs, $, builder);
+						cache.update && cache.update(params, data, query, user, $.refs, $, builder);
 						config.updateerror && builder.error(config.updateerror);
 					}
 
@@ -41,14 +41,14 @@
 				case 'remove':
 					if (config.removetable) {
 						builder = DB().remove(config.removetable);
-						cache.remove && cache.remove(data.params, data.data, data.query, data.user, $.refs, $, builder);
+						cache.remove && cache.remove(params, data, query, user, $.refs, $, builder);
 						config.removeerror && builder.error(config.removeerror);
 					}
 					break;
 				case 'read':
 					if (config.readtable) {
 						builder = DB().read(config.readtable);
-						cache.read && cache.read(data.params, data.data, data.query, data.user, $.refs, $, builder);
+						cache.read && cache.read(params, data, query, user, $.refs, $, builder);
 						config.readerror && builder.error(config.readerror);
 						if (cache.readsort) {
 							for (var m of cache.readsort)
@@ -60,7 +60,7 @@
 					if (config.listtable) {
 						builder = DB().list(config.listtable);
 						builder.autoquery(query, cache.listfields, cache.listsort ? (cache.listsort[0] + '_' + cache.listsort[1]) : null, config.listlimit || 100);
-						cache.list && cache.list(data.params, data.data, data.query, data.user, $.refs, $, builder);
+						cache.list && cache.list(params, data, query, user, $.refs, $, builder);
 					}
 					break;
 			}
