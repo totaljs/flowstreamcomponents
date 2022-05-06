@@ -53,7 +53,7 @@
 					}
 					break;
 				case 'query':
-					builder = DB().read(item.table);
+					builder = DB().find(item.table);
 					item.where && item.where(params, data, query, user, $.refs, $, builder);
 					item.error && builder.error(item.error);
 					item.limit && builder.take(item.limit);
@@ -99,6 +99,7 @@
 				obj.command = item.command;
 				obj.table = item.table;
 				obj.path = item.path;
+				obj.limit = item.limit;
 
 				builder = [];
 
