@@ -234,12 +234,10 @@ __Good to know__: If the `data` (payload) can contain special key names in the f
 <style>
 	.CLASS-settings .fields { border: 1px solid #E0E0E0; border-radius: var(--radius); }
 	.CLASS-settings .ui-listform-item .item { padding: 7px 10px; }
-	.CLASS-settings .listing .item { line-height: 28px; font-size: 12px; background-color: #F8F8F8; border-radius: var(--radius); margin-bottom: 2px; padding: 0 10px; cursor: pointer; }
-	.CLASS-settings .listing .item span { float: right; color: #777; }
+	.CLASS-settings .listing .item { line-height: 34px; font-size: 12px; background-color: #F8F8F8; border-radius: var(--radius); margin-bottom: 2px; padding: 0 10px; cursor: pointer; }
 	.CLASS-settings .listing .item:hover { background-color: #E8E8E8; }
 	.ui-dark .CLASS-settings .listing .item { background-color: #333; }
 	.ui-dark .CLASS-settings .listing .item.selected { background-color: #404040; }
-	.ui-dark .CLASS-settings .listing .item span { color: #999; }
 	.CLASS footer { padding: 10px; font-size: 12px; }
 </style>
 
@@ -399,7 +397,7 @@ __Good to know__: If the `data` (payload) can contain special key names in the f
 			<div data-bind="?.items__template:.item" class="listing">
 				<script type="text/html">
 					{{ foreach m in value }}
-					<div class="item exec" data-id="{{ m.id }}" data-exec="tmpapidatabase.upd"><span>{{ m.command | tmpapidatabasecommand }}</span><i class="fa fa-crosshairs mr5"></i>{{ m.name }}</div>
+					<div class="item exec" data-id="{{ m.id }}" data-exec="tmpapidatabase.upd"><span class="controls nmr"><button class="exec red" data-prevent="true" data-exec="tmpapidatabase.rem"><i class="far fa-trash-alt"></i></button></span><i class="fa fa-crosshairs mr5"></i>{{ m.name }} ({{ m.command | tmpapidatabasecommand }})</div>
 					{{ end }}
 				</script>
 			</div>
@@ -457,6 +455,16 @@ __Good to know__: If the `data` (payload) can contain special key names in the f
 				tmp.add = function() {
 					SET('apidatabasefieldform @reset @showloading', { id: Date.now().toString('36'), name: 'Input', where: [], filter: [], command: 'list', limit: 100 });
 					SET('common.form2 @hideloading', 'apidatabasefieldform');
+				};
+
+				tmp.rem = function(el) {
+					var id = ATTRD(el);
+					var model = GET(tmp.path);
+					var index = model.items.findIndex('id', id);
+					if (index !== -1) {
+						model.items.splice(index, 1);
+						UPD(tmp.path + ' @change');
+					}
 				};
 
 				tmp.upd = function(el) {
