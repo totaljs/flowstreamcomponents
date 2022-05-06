@@ -395,7 +395,7 @@ __Good to know__: If the `data` (payload) can contain special key names in the f
 				<label>Inputs</label>
 			</div>
 
-			<div data-bind="?.items__template:.item -> data-id" class="listing">
+			<div data-bind="?.items__template:.item" class="listing">
 				<script type="text/html">
 					{{ foreach m in value }}
 					<div class="item exec" data-id="{{ m.id }}" data-exec="tmpapidatabase.upd"><span>{{ m.command | tmpapidatabasecommand }}</span><i class="fa fa-crosshairs mr5"></i>{{ m.name }}</div>
