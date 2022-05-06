@@ -174,7 +174,7 @@ This component reads specific values according to the configured map.
 
 		exports.settings = function(meta) {
 
-			var defitem = { pathfrom: 'Temperature', pathto: 'temperature' };
+			var defitem = { pathfrom: 'Temperature', pathto: 'temperature', convert: 'empty' };
 
 			if (!meta.config.schema.length) {
 				var obj = CLONE(defitem);
