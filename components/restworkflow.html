@@ -23,7 +23,8 @@
 					$.destroy();
 					$.throw(e);
 				}
-			}
+			} else
+				$.send('error', 'Not configured');
 		};
 
 		instance.configure = function() {
@@ -48,6 +49,9 @@
 					if (code.indexOf('success') !== -1)
 						builder.push('success=(data)=>$.send(\'output\',{success:true,value:data})');
 
+					if (code.indexOf('done') !== -1)
+						builder.push('done=function(is){return function(err,response){if(err){$.send(\'error\',[{error:err.toString()}])}else{$.send(\'output\',{success:true,value:is==true?response:is})}}}');
+
 					if (code.indexOf('invalid') !== -1)
 						builder.push('invalid=(err)=>$.send(\'error\',[{error:err.toString()}])');
 
@@ -61,7 +65,7 @@
 						builder.push('model=$.data');
 
 					var AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
-					var body = builder.join(',') + ';try{' + code + '}catch(e){$.instance.status({error:e.message});$.destroy();}';
+					var body = builder.join(',') + ';try{\n' + code + '\n}catch(e){$.instance.status({error:e.message});$.destroy();}';
 
 					fn = code.indexOf('await ') === -1 ? new Function('$', 'repo', body) : new AsyncFunction('$', 'repo', body);
 
@@ -112,6 +116,9 @@ __Functions__:
 - `respond(data {Object})` Responds with data
 - `success(data {Object} optional)` Response with success object
 - `invalid(error {String})` Error handling`
+- `done(respond_value {Boolean/Object} optional)` return `function(err, response)` for handling callbacks
+	- when it `fails` it calls `invalid()`
+	- when it `done` it calls `success()`
 </readme>
 
 <settings>
