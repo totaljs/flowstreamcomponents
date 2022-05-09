@@ -20,6 +20,12 @@
 					case 'success':
 						ctrl.success();
 						break;
+					case 'html':
+						ctrl.content($.data);
+						break;
+					case 'plain':
+						ctrl.plain($.data);
+						break;
 					case 'empty':
 					default:
 						ctrl.empty();
@@ -40,7 +46,7 @@ This component can respond on the REST Route component.
 	<div class="padding">
 		<div class="row">
 			<div class="col-md-3 m">
-				<div data---="input__?.type__required:1;dirsource:json|JSON,success|Success,empty|Empty response">Type</div>
+				<div data---="input__?.type__required:1;dirsource:json|JSON,success|Success,empty|Empty response,plain|Plain text,html|HTML">Type</div>
 			</div>
 			<div class="col-md-3 m">
 				<div data---="input__?.code__required:1;type:number">Status code</div>
