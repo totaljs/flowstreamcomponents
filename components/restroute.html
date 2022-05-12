@@ -47,7 +47,7 @@
 							data = ctrl.headers;
 							break;
 						default:
-							data = { payload: ctrl.body, query: ctrl.query, files: ctrl.files, user: ctrl.user, url: ctrl.url, headers: ctrl.headers, params: ctrl.params, ip: ctrl.ip };
+							data = { body: ctrl.body, query: ctrl.query, files: ctrl.files, user: ctrl.user, url: ctrl.url, headers: ctrl.headers, params: ctrl.params, ip: ctrl.ip };
 							break;
 					}
 
@@ -66,6 +66,7 @@
 This component registers an HTTP Route and sends request data next. It stores `controller` instance in the `message.refs.controller` property. You must respond to the REST response component.
 
 < __IMPORTANT__:<br>The component works only with a defined Proxy endpoint in the Flow settings.
+< __URL__:<br>The URL must be relative to the defined Proxy endpoint. So if the endpoint is `/users/` and the desired address is `http://example.com/users/find` then the value must be `/find`
 
 __Output data__:
 
@@ -85,13 +86,18 @@ __Output data__:
 
 <settings>
 	<div class="padding">
+		<div class="row" data-bind="flow.head.worker__hide:!value || flow.head.origin.length < flow.head.proxyurl.length">
+			<div class="col-md-12 m">
+				<div class="message message-error"><b><i class="fa fa-warning"></i>No proxy endpoint defined.</b><br>This component will not work until then. Please go to main screen, open settings of this FlowStream instance and set the Endpoint.</div>
+			</div>
+		</div>
 		<div class="row">
 			<div class="col-md-3 m">
 				<div data---="input__?.method__required:1;dirsource:GET|GET,POST|POST,PUT|PUT,PATCH|PATCH,DELETE|DELETE">Method</div>
 			</div>
 			<div class="col-md-9 m">
 				<div data---="input__?.url__required:1">Relative URL address</div>
-				<div class="help">Relative path to: <span data-bind="flow.head.proxyurl__text"></span></div>
+				<div class="help">Relative path to: <span data-bind="flow.head.proxyurl__text:value?value:window.location.origin"></span></div>
 			</div>
 		</div>
 		<div class="row">
@@ -119,6 +125,6 @@ __Output data__:
 		<i class="ICON"></i>NAME
 	</header>
 	<footer data-bind="CONFIG.method__show" class="hidden">
-		<div><span data-bind="CONFIG.method__text" class="method"></span> <a data-bind="CONFIG.url__text__href:flow.head.proxyurl + value.substring(1)" target="_blank"></a></div>
+		<div><span data-bind="CONFIG.method__text" class="method"></span> <a data-bind="CONFIG.url__text__href:flow.head.proxyurl + (value[0] === '/' ? value.substring(1) : value)" target="_blank"></a></div>
 	</footer>
 </body>
