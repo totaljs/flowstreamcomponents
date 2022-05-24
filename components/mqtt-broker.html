@@ -6,7 +6,7 @@
 	exports.config = { host: 'localhost', port: 1883, secure: false };
 	exports.outputs = [{ id: 'output', name: 'Messages' }];
 	exports.author = 'Martin Smola';
-	exports.version = '2';
+	exports.version = '3';
 	exports.npm = ['mqtt'];
 	exports.flags = ['mqttbroker'];
 
@@ -64,8 +64,9 @@
 
 			var broker = config.secure ? 'mqtts://' : 'mqtt://' + config.host + ':' + config.port;
 			config.name = '[MQTT] ' + config.host + ':' + config.port;
-
-			client = mqtt.connect(broker, config);
+			var opt = CLONE(config);
+			delete opt.auth;
+			client = mqtt.connect(broker, opt);
 
 			client.on('connect', function() {
 				state();
