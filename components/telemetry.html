@@ -2,10 +2,10 @@
 
 	exports.name = 'Telemetry';
 	exports.group = 'Common';
-	exports.version = '3';
+	exports.version = '4';
 	exports.icon = 'fa fa-rss-square';
 	exports.author = 'Martin Smola';
-	exports.config = { paths: {}, interval: null }; // { name, path }
+	exports.config = { paths: {}, interval: null, format: 'dd.MM.yyyy HH:mm:ss' }; // { name, path }
 	exports.inputs = [{ id: 'input', name: 'Input' }];
 
 	exports.make = function(instance, config) {
@@ -13,13 +13,39 @@
 		var interval;
 
 		const get = (obj, path) => path.split(".").reduce((r, k) => r?.[k], obj);
+		const format = (val, type) => {
+			switch(type) {
+				case 'string':
+					return '' + val;
+					break;
+				case 'boolean':
+					return U.parseBolean(val);
+					break;
+				case 'number':
+					return Number(val);
+					break;
+				case 'date':
+					var dt = NOW;
+					try {
+						dt = new Date(val).format(config.format || 'dd.MM.yyyy HH:mm:ss');
+					} catch(e) {};
+					return dt;
+					break;
+				default:
+					return val;
+			}
+		};
 
 		instance.message = function($) {
 			const data = { items: [] };
-			const paths = config.paths;
 
-			for (const path in paths)
-				data.items.push({ key: path, value: get($.data, paths[path]) || '' });
+			const props = Object.keys(config.paths).map(path => {
+				var split = config.paths[path].split('|').trim();
+				return { name: path, path: split[0], type: split[1] || 'string' }
+			});
+
+			for (const prop of props)
+				data.items.push({ key: prop.name, value: format(get($.data, prop.path) || '', prop.type) });
 
 			if (!interval)
 				instance.status(data);
@@ -86,7 +112,9 @@ array.0.value // -> 3
 		<div data---="input__?.interval__type:number__500">Update interval (in ms)</div>
 		<div class="help m">Leave empty to update immediately when new data comes in.</div>
 		<div data---="keyvalue__?.paths__placeholderkey:Type a property name;placeholdervalue:Type a path and press enter">Properties to show in the template</div>
-		<div class="help">Path supports js dot notation like `data.arr.0.value`, following is not supported `data.arr[0].value`</div>
+		<div class="help">Path supports js dot notation like `data.arr.0.value`, following is not supported `data.arr[0].value`<br>Supports datatypes in the `path` column: `some.path | date`</div>
+		<div data---="input__?.format">Date format</div>
+		<div class="help">default `dd.MM.yyyy HH:mm:ss`</div>
 	</div>
 </settings>
 
