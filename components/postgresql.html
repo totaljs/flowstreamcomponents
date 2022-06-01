@@ -4,7 +4,7 @@
 	exports.group = 'Databases';
 	exports.icon = 'fa fa-database';
 	exports.author = 'Total.js';
-	exports.version = '1';
+	exports.version = '2';
 	exports.config = {};
 	exports.inputs = [{ id: 'input', name: 'Input' }];
 	exports.outputs = [{ id: 'output', name: 'Output' }];
@@ -25,7 +25,9 @@
 			PG.pool.query(data.query, (err, response) => {
 				if (err)
 					return $.send('output', { error: err.message });
-				$.send('output', { rows: response && response.rows });
+					
+				var { command, rows, rowCount } = response;
+				$.send('output', { command, rows, rowCount });
 			});
 		};
 
@@ -87,6 +89,14 @@ Expected data:
 ```javascript
 {
 	query: 'SELECT * FROM tblname;'
+}
+```
+Output:
+```javascript
+{
+	command: 'INSERT', // SELECT, etc.
+	rows: [], // 
+	rowCount: 1
 }
 ```
 </readme>
