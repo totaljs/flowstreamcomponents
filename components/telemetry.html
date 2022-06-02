@@ -9,7 +9,7 @@
 	exports.inputs = [{ id: 'input', name: 'Input' }];
 
 	exports.make = function(instance, config) {
-		var last = { items: [] };
+		var last = { items: [], format: config.format || 'dd.MM.yyyy HH:mm:ss' };
 		var interval;
 
 		const get = (obj, path) => path.split(".").reduce((r, k) => r?.[k], obj);
@@ -37,15 +37,28 @@
 		};
 
 		instance.message = function($) {
-			const data = { items: [] };
+			const data = config.extend ? last : { items: [], format: config.format || 'dd.MM.yyyy HH:mm:ss' };
 
 			const props = Object.keys(config.paths).map(path => {
 				var split = config.paths[path].split('|').trim();
 				return { name: path, path: split[0], type: split[1] || 'string' }
 			});
 
-			for (const prop of props)
-				data.items.push({ key: prop.name, value: format(get($.data, prop.path) || '', prop.type) });
+			for (const prop of props) {
+				var val = get($.data, prop.path);
+				if (val == undefined)
+					continue;
+				if (config.extend) {
+					var item = data.items.findItem('key', prop.name);
+					if (item) {
+						item.value = format(val, prop.type);
+						item.ts = NOW;
+						continue;
+					}
+				}
+
+				data.items.push({ key: prop.name, value: format(val, prop.type), ts: NOW });
+			}
 
 			if (!interval)
 				instance.status(data);
@@ -91,6 +104,7 @@
 
 <readme>
 The component shows data in a template.
+Hovering over the value shows the last update time.
 Assuming this incomming data:
 ```javascript
 {
@@ -112,9 +126,11 @@ array.0.value // -> 3
 		<div data---="input__?.interval__type:number__500">Update interval (in ms)</div>
 		<div class="help m">Leave empty to update immediately when new data comes in.</div>
 		<div data---="keyvalue__?.paths__placeholderkey:Type a property name;placeholdervalue:Type a path and press enter">Properties to show in the template</div>
-		<div class="help">Path supports js dot notation like `data.arr.0.value`, following is not supported `data.arr[0].value`<br>Supports datatypes in the `path` column: `some.path | date`</div>
+		<div class="help m">Path supports js dot notation like `data.arr.0.value`, following is not supported `data.arr[0].value`<br>Supports datatypes in the `path` column: `some.path | date`</div>
 		<div data---="input__?.format">Date format</div>
-		<div class="help">default `dd.MM.yyyy HH:mm:ss`</div>
+		<div class="help m">default `dd.MM.yyyy HH:mm:ss`</div>
+		<div data---="input__?.extend__type:checkbox">Extend previous data?</div>
+		<div class="help">if checked the previous data will be extend instead of overwriten, useful when not all data comes in a single message</div>
 	</div>
 </settings>
 
@@ -124,10 +140,10 @@ array.0.value // -> 3
 		<i class="ICON"></i>NAME
 	</header>
 	<footer>
-		<div data-bind="!STATUS__template" class="">
+		<div data-bind="STATUS__template" class="">
 			<script type="text/html">
 				{{foreach item in value.items}}
-					<div class="telemetry-item"><b class="mr5">{{item.key}}:</b><span>{{item.value}}</span></div>
+					<div class="telemetry-item"><b class="mr5">{{item.key}}:</b><span title="{{item.ts | format(value.format)}}">{{item.value}}</span></div>
 				{{end}}
 			</script>
 		</div>
