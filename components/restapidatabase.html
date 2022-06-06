@@ -146,9 +146,9 @@
 				}
 
 				obj.fields = item.fields === '*' ? '' : item.fields;
+				obj.allowed = '';
 
 				if (item.filter && item.filter.length) {
-					obj.allowed = '';
 					for (var m of item.filter) {
 						tmp = 'string';
 						switch (m.type) {
