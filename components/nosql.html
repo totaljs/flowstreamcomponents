@@ -103,10 +103,10 @@
 ```javascript
 {
 	collection: 'users', // optional, will override settings value
-	method: 'find', // optional, will override settings value
-	// for Insert, Update
+	method: 'query', // insert|read|query|update|remove - optional, will override settings value
+	// for insert, update
 	data: { ... },
-	// for Query, Read, Update, Remove
+	// for query, read, update, remove
 	filter: [
 		['where', 'sensor', 'temp'], // builder.where('sensor', 'temp');
 		['limit', 2]                 // builder.limit(2);
