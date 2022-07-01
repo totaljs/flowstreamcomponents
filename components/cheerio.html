@@ -6,7 +6,7 @@
 	exports.icon = 'fa fa-code';
 	exports.author = 'Total.js';
 	exports.version = '1';
-	exports.config = { fn: '// $: cheerio instance\n// html: html string\nvar body = $(\'body\').html();\nreturn body;', path: '' };
+	exports.config = { fn: '// instance : Component instance\n// $: cheerio instance\n// html: html string\nvar body = $(\'body\').html();\nreturn body;', path: '' };
 	exports.inputs = [{ id: 'input', name: 'Input' }];
 	exports.outputs = [{ id: 'output', name: 'Output' }];
 
@@ -41,7 +41,7 @@
 			}
 
 			const $$ = cheerio.load(html);
-			var result = fn($$, html);
+			var result = fn($.instance,$$, html);
 
 			$.data = { result, input };
 			$.send('output');
@@ -54,7 +54,7 @@
 
 			if (config.fn) {
 				try {
-					fn = new Function('$', 'html', config.fn);
+					fn = new Function('instance','$', 'html', config.fn);
 					instance.status('');
 				} catch(e){
 					instance.throw(e.stack);
@@ -88,6 +88,7 @@
 
 ## Example code
 ```js
+	// instance : component instance
 	// $: cheerio instance
 	// html: html string
 
