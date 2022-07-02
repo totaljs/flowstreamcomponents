@@ -2,7 +2,7 @@
 
 	exports.name = 'Workflow';
 	exports.group = 'REST API';
-	exports.version = '1';
+	exports.version = '2';
 	exports.icon = 'fa fa-code';
 	exports.author = 'Total.js';
 	exports.config = { name: 'Name', code: 'success();', clear: false };
@@ -52,8 +52,7 @@
 					if (code.indexOf('done') !== -1)
 						builder.push('done=function(is){return function(err,response){if(err){$.send(\'error\',[{error:err.toString()}])}else{$.send(\'output\',{success:true,value:is==true?response:is})}}}');
 
-					if (code.indexOf('invalid') !== -1)
-						builder.push('invalid=(err)=>$.send(\'error\',[{error:err.toString()}])');
+					builder.push('invalid=$.invalid=(err)=>$.send(\'error\',[{error:err.toString()}])');
 
 					if (code.indexOf('user') !== -1)
 						builder.push('user=controller.user');
@@ -105,6 +104,7 @@ __Properties__:
 - `params {Object}` A dynamic URL params
 - `ip {String}` IP address
 - __`repo {Object}`__ a custom persistent repository object
+- __`model {Object}`__ an alias to `$.data`
 
 __Model/Data__:
 
