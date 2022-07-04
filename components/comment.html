@@ -1,9 +1,9 @@
 <script total>
 	exports.id = 'comment';
 	exports.name = 'Comment';
-	exports.icon = 'fa fa-code';
+	exports.icon = 'fa fa-comment-alt';
 	exports.author = 'Total.js';
-	exports.version = '1';
+	exports.version = '2';
 	exports.config = { text: 'Comment' };
 	exports.meta = { settingswidth: 1100 };
 
@@ -21,10 +21,26 @@
 
 <style>
 	.CLASS { max-width: 500px !important; }
-	.CLASS .content { display: none; min-height: 0; }
-	.CLASS footer { padding: 10px; font-size: 12px; border-top: 0 !important; }
+	.CLASS footer .markdown { padding: 10px; font-size: 12px; border-top: 0 !important; color: #000; }
+	.ui-dark .CLASS footer .markdown { color: #F0F0F0; }
 </style>
 
 <body>
-	<footer data-bind="!CONFIG.text__html:value.markdown(el)" class="markdown-small"></footer>
+	<header>
+		<button class="button">Open in window</button>
+		<i class="ICON"></i>NAME
+	</header>
+	<footer data-bind="!CONFIG.text__html:value.markdown(el)" class="markdown-small selectable"></footer>
 </body>
+
+<script>
+
+	TOUCH(function(exports, reinit) {
+		if (!reinit) {
+			exports.element.on('click', 'button', function() {
+				FUNC.readme('Comment', exports.config.text || '');
+			});
+		}
+	});
+
+</script>
