@@ -2,7 +2,7 @@
 
 	exports.name = 'Trigger';
 	exports.group = 'Triggers';
-	exports.version = '2';
+	exports.version = '3';
 	exports.icon = 'fa fa-bullhorn';
 	exports.author = 'Total.js';
 	exports.config = { random: true, type: 'string', data: '', restart: false };
@@ -70,7 +70,7 @@
 		</div>
 		<div data-bind="?.random__hide" class="hidden">
 			<hr />
-			<div data---="input__?.data__required:1">Data</div>
+			<div data---="input__?.data__required:1;height:250;type:multiline;maxlength:100000;monospace:1">Data</div>
 		</div>
 	</div>
 </settings>
