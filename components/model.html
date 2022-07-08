@@ -119,8 +119,11 @@
 						switch (typeof(val)) {
 							case 'string':
 							case 'number':
-								return val.parseDate();
+								val = val.parseDate();
+								break;
 						}
+						if (!(val instanceof Date) || isNaN(val))
+							val = null;
 					} else
 						val = defvalues[item.name] ? (defvalues[item.name] == NOOP ? new Date() : defvalues[item.name]) : null;
 
