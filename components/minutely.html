@@ -18,10 +18,10 @@
 
 			switch (config.type) {
 				case 'now':
-					instance.send('output', NOW);
+					val = NOW;
 					break;
 				case 'counter':
-					instance.send('output', counter);
+					val = counter;
 					break;
 				case 'number':
 					val = config.random ? U.random() : config.data.parseFloat();
