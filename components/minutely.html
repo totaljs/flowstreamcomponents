@@ -1,0 +1,108 @@
+<script total>
+
+	exports.name = 'Minutely';
+	exports.group = 'Triggers';
+	exports.version = '1';
+	exports.icon = 'far fa-clock-o';
+	exports.author = 'Total.js';
+	exports.config = { random: true, type: 'now', data: '' };
+	exports.outputs = [{ id: 'output', name: 'Output' }];
+
+	exports.make = function(instance, config) {
+
+		var counter;
+
+		instance.trigger = function() {
+
+			var val;
+
+			switch (config.type) {
+				case 'now':
+					instance.send('output', NOW);
+					break;
+				case 'counter':
+					instance.send('output', counter);
+					break;
+				case 'number':
+					val = config.random ? U.random() : config.data.parseFloat();
+					break;
+				case 'buffer':
+					try {
+						val = config.random ? Buffer.from(U.random_string()) : Buffer.from(config.data, 'base64');
+					} catch (e) {
+						instance.throw(e);
+					}
+					break;
+				case 'date':
+					val = config.random ? NOW.add('-' + U.random(500, 10)) : config.data.parseDate();
+					break;
+				case 'object':
+					try {
+						val = config.random ? {} : (new Function('return ' + config.data))();
+					} catch (e) {
+						instance.throw(e);
+					}
+					break;
+				case 'boolean':
+					val = config.random ? U.random() % 2 === 0 : config.data === 'true' || config.data === 'on' || config.data === '1';
+					break;
+				default:
+					val = config.random ? U.random_string(20) : config.data;
+					break;
+			}
+
+			instance.send('output', val);
+		};
+
+		instance.service = function(count) {
+			counter = count;
+			instance.trigger();
+		};
+
+	};
+
+</script>
+
+<script>
+	FUNC.ftimer_exec = function(el) {
+		SETTER('websocket/send', { TYPE: 'trigger', id: el.attrd2('id') });
+	};
+</script>
+
+<style>
+	.CLASS .padding { padding: 0 10px 10px; }
+	.CLASS button { width: 100%; height: 24px; border: 1px solid #E0E0E0; border-radius: var(--radius); color: #000; background-color: #F0F0F0; margin: 0; }
+	.CLASS button:hover { background-color: #F8F8F8; }
+	.CLASS button:active { background-color: #E0E0E0; }
+	.ui-dark .CLASS button { border-color: #404040; color: #FFF; background-color: #222; }
+	.ui-dark .CLASS button:hover { background-color: #303030; }
+	.ui-dark .CLASS button:active { background-color: #404040; }
+</style>
+
+<settings>
+	<div class="padding">
+		<div data---="input__?.type__dirsource:now|Current date/time,counter|Counter,string|String,number|Number,boolean|Boolean,date|Date,object|Object,buffer|Buffer as Base64;required:1;innerlabel:1">Type</div>
+		<div data-bind="?.type__show:value!=='counter'&&value!=='now'" class="hidden">
+			<div class="m">
+				<div data---="input__?.random__type:checkbox">Random data</div>
+			</div>
+			<div data-bind="?.random__hide" class="hidden">
+				<hr />
+				<div data---="input__?.data__required:1">Data</div>
+			</div>
+		</div>
+	</div>
+</settings>
+
+<readme>
+The component triggers data into the Flow in every minute.
+</readme>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+	<div class="padding">
+		<button class="exec" data-exec="FUNC.ftimer_exec">Run</button>
+	</div>
+</body>
