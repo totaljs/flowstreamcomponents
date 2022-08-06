@@ -1,5 +1,49 @@
 [
 	{
+		"id": "restapidatabase",
+		"group": "REST API",
+		"name": "API Database",
+		"url": "https://cdn.totaljs.com/flowstream/components/restapidatabase.html",
+		"author": "Total.js",
+		"icon": "fa fa-database",
+		"color": "",
+		"version": "2",
+		"readme": "This component can perform some operations on a database with the help of Total.js QueryBuilder. First, you must initialize the connection string for the database via QueryBuilder initialization.\n\n__Input data__:\n\n- `data {Object}` or `body {Object}` optional - payload\n- `query {Object}` optional - query data, key/value must be string\n- `params {Object}` optional - dynamic values, key/value must be string\n- `user {Object}` optional - a user instance\n\n__Output__:\n\n- `insert` returns Number\n- `update` returns Number\n- `remove` returns Number\n- `query` returns Array of Objects\n- `read` returns Object\n- `list` returns:\n\n```json\n{\n\titems: Array,\n\tpage: Number,\n\tpages: Number,\n\tcount: Number\n}\n```\n\nQuery parameters for the `List` operation can contain the below fields which can affect filtering according to the values defined in the dynamic filter.\n\n- `sort {String}` can contain field name with `_asc` or `_desc` value\n- `fields {String}` can return only specified fields separated by comma\n- `page {Number}` page number\n- `limit {Number}` max. items per page (default: max. limit)\n- `column_name=VALUE` enables dynamic filtering\n\n---\n\n__Good to know__: If the `data` (payload) can contain special key names in the form:\n\n- `+key` increments a value\n- `-key` decrements a value\n- `!key` performs toggle for boolean values\n- `>key` stores only greater value\n- `<key` stores only lower value"
+	},
+	{
+		"id": "restapipostgresql",
+		"group": "REST API",
+		"name": "API PostgreSQL",
+		"url": "https://cdn.totaljs.com/flowstream/components/restapipostgresql.html",
+		"author": "Total.js",
+		"icon": "fa fa-database",
+		"color": "",
+		"version": "1",
+		"readme": "The component initializes QueryBuilder for PostgreSQL database. So you will able to use `API Database` component. Every connection must be separated by the alias.\n\n__Usage in API Database__:\n\n- `tbl_user` is targeted to the `default/tbl_user` alias connection\n- `anotherserver/tbl_user` will use `anotherserver` alias connection"
+	},
+	{
+		"id": "restapirouter",
+		"group": "REST API",
+		"name": "API Router",
+		"url": "https://cdn.totaljs.com/flowstream/components/restapirouter.html",
+		"author": "Total.js",
+		"icon": "fa fa-crosshairs",
+		"color": "",
+		"version": "1",
+		"readme": "This component implements the [Total.js API Router](https://docs.totaljs.com/total4/cc674001rr51c/#total-js-routing) that allows you to provide only one endpoint (route) by adding multiple endpoints divided by keys. The component expects REST Route message or data in the form:\n\n```js\n{\n\t\"schema\": \"schema_name/{param_1}/{param_2}?query=arguments\",\n\t\"data\": {} // optional, request payload\n}\n```\n\n< __Good to know:__<br>Output data will be the same `data`, but extendend by adding new properties declared below.\n\n__Extended output data:__\n\n- `id {String}` first value from dynamic value\n- `params {Object}` dynamic values\n- `query {Object}` query arguments\n- `user {Object}` optional, inherited from the controller\n- `session {Object}` optional, inherited from the controller\n- `ip {String}` optional, inherited from the controller\n\nIf the controller is stored in the `message.refs.controller` property, then its properties like `controller.id`, `controller.params` and `controller.query` will be extendend by values from parsed schema."
+	},
+	{
+		"id": "cheerio",
+		"group": "HTML",
+		"name": "Cheerio",
+		"url": "https://cdn.totaljs.com/flowstream/components/cheerio.html",
+		"author": "Total.js",
+		"icon": "fa fa-code",
+		"color": "",
+		"version": "1",
+		"readme": "Uses [Cheerio](https://cheerio.js.org/index.html)\nPlease refer to the [documentation](https://cheerio.js.org/classes/Cheerio.html) for available functions.\n## Input\n```js\n<any>\n```\n\n## Output\n```js\n{\n\tresult: <the data returned from the code>,\n\tinput: <incomming data>\n}\n```\n\n## Example code\n```js\n// instance : component instance\n// $: cheerio instance\n// html: html string\n\nvar txt = [];\n$('ul > li').each(function (i, elem) {\n\ttxt.push($(this).text());\n});\nreturn txt;\n```"
+	},
+	{
 		"id": "code",
 		"group": "Common",
 		"name": "Code",
@@ -16,7 +60,7 @@
 		"name": "Comment",
 		"url": "https://cdn.totaljs.com/flowstream/components/comment.html",
 		"author": "Total.js",
-		"icon": "fa fa-code",
+		"icon": "fa fa-comment-alt",
 		"color": "",
 		"version": "1"
 	},
@@ -87,6 +131,17 @@
 		"readme": "The component stores data as CSV Dataset for e.g. Dashboard application. Dataset is stored in `/private/` path that is available with the help of the Flow access token.\n\nCSV file contains only processed values, which aren't closed and stored in the `.meta` file.\n\n```js\n{\n\tkey: String,    // optional, e.g. device_id | device_name\n\tvalue: Number   // measured value\n}\n```"
 	},
 	{
+		"id": "dataparser",
+		"group": "Transformations",
+		"name": "Data parser",
+		"url": "https://cdn.totaljs.com/flowstream/components/dataparser.html",
+		"author": "Total.js",
+		"icon": "fa fa-compress-arrows-alt",
+		"color": "",
+		"version": "1",
+		"readme": "The component can parse newline data or begin/end phrases in the buffer or string. In addition, it can help with parsing XML or CSV files."
+	},
+	{
 		"id": "datasorter",
 		"group": "Common",
 		"name": "Data sorter",
@@ -94,7 +149,7 @@
 		"author": "Total.js",
 		"icon": "fa fa-random",
 		"color": "",
-		"version": "1",
+		"version": "2",
 		"readme": "The component sort data according to the custom defined conditions. You can define unlimited count of outputs with various conditions."
 	},
 	{
@@ -175,6 +230,17 @@
 		"readme": "The component is extraordinary because it must be executed directly from the source code via the `flowstream.exec()` method. The component triggers received data into the Flow.\n\n```js\nvar opt = {};\nopt.id = 'ID_OF_EXEC_INSTANCE';\nopt.data = { custom: 'data' };\nopt.callback = function(err, msg) {\n\t// msg.uid;\n\t// msg.ref;\n\t// msg.repo {Object}\n\t// msg.data {Object}\n\t// msg.cloned {Number} how many times was the message cloned?\n\t// msg.duration {Number} in milliseconds\n};\n\n// optional:\n// opt.vars = {};    --> custom variables\n// opt.repo = {};    --> custom repository data and this data will be returned in the callback\n// opt.uid;          --> for storing some unique ID\n// opt.ref;          --> for storing some reference ID\nflowinstance.exec(opt);\n```"
 	},
 	{
+		"id": "feedtodelay",
+		"group": "Common",
+		"name": "Feed to delay",
+		"url": "https://cdn.totaljs.com/flowstream/components/feedtodelay.html",
+		"author": "Total.js",
+		"icon": "fa fa-clock-o",
+		"color": "",
+		"version": "1",
+		"readme": "The incomming message will only be forwarded after the timeout. Only the last message is forwarded, so any previously received messages are lost.\nIf messages are comming in within the given timeout period this component will never forward any message.\nThe timeout is activated by the first message.\nThe maximum timeout is 2147483 seconds, which is about 24.8 days.\nExample usage:\n\t- A sensor is supposed to send data every minute, use this component to notify you that there is a problem with receiving message.\n\t- HTTP request comes in and it takes too much time to respond? Use this component to notify you about it."
+	},
+	{
 		"id": "filewatcher",
 		"group": "Files",
 		"name": "File Watcher",
@@ -201,7 +267,7 @@
 		"group": "Common",
 		"name": "Flashback",
 		"url": "https://cdn.totaljs.com/flowstream/components/flashback.html",
-		"author": "Total.js",
+		"author": "Peter Širka & Jakub Urban",
 		"icon": "fa fa-history",
 		"color": "",
 		"version": "2",
@@ -263,6 +329,17 @@
 		"readme": "The component receives data from a `Publish` component from another FlowStream instance."
 	},
 	{
+		"id": "jsonschemavalidator",
+		"group": "",
+		"name": "JSON Schema validator",
+		"url": "https://cdn.totaljs.com/flowstream/components/jsonschemavalidator.html",
+		"author": "Total Avengers",
+		"icon": "fa fa-code",
+		"color": "",
+		"version": "1",
+		"readme": "JSON schema [documentation](https://json-schema.org/learn/getting-started-step-by-step.html)\n## Inputs\n\t- input -> validate data and send the result to output if no error, otherwise send error to error output\n\t- schema -> read the schema and send it to the schema output"
+	},
+	{
 		"id": "kill",
 		"group": "",
 		"name": "Kill",
@@ -283,6 +360,17 @@
 		"color": "",
 		"version": "1",
 		"readme": "The component logs incoming messages into the Total.js Cloud Logger."
+	},
+	{
+		"id": "macro",
+		"group": "",
+		"name": "Macro",
+		"url": "https://cdn.totaljs.com/flowstream/components/macro.html",
+		"author": "Total.js",
+		"icon": "fa fa-scroll",
+		"color": "",
+		"version": "1",
+		"readme": "The macro component uses Total.js Macro language that allows you to write much simple code like in JavaScript. Macros are targeted for small data transformation.\n\n- you don't need to solve Upper/Lower case\n- `return EXPRESSION` will return data and send them next\n- `data` keyword contains a message data\n- `temp` keyword can contain a persistent temporary data\n\n__Example__:\n\n```text\nIF DATA>20 AND DATA<35\n\tRETURN DATA * 5\nFI\n```"
 	},
 	{
 		"id": "map-array",
@@ -307,6 +395,39 @@
 		"readme": "This component monitors a memory consumption (in MB) in the Linux systems. It uses `free` command.\n\n__Data Example__:\n\n```js\n{\n\tfree: 0,\n\ttotal: 0,\n\tused: 0\n}\n```"
 	},
 	{
+		"id": "middlewareexec",
+		"group": "Common",
+		"name": "Middleware Exec",
+		"url": "https://cdn.totaljs.com/flowstream/components/middlewareexec.html",
+		"author": "Martin Smola",
+		"icon": "fa fa-code",
+		"color": "",
+		"version": "1",
+		"readme": "This component executes a custom JavaScript code as it is."
+	},
+	{
+		"id": "middlewarefunction",
+		"group": "Common",
+		"name": "Middleware Function",
+		"url": "https://cdn.totaljs.com/flowstream/components/middlewarefunction.html",
+		"author": "Martin Smola",
+		"icon": "fa fa-code",
+		"color": "",
+		"version": "1",
+		"readme": "The code defined in this component can be executed by multiple `Middleware Exec`.\n**Example:**\n```js\n// available arguments\n// instance {FlowStreamComponent}\n// $        {FlowStreamMessage}\n// data     reference to $.data\n// repo     reference to $.repo\n// vars     reference to instance.main.variables\n\nif (data.headers['x-token'] === instance.main.variables.token)\n\t// data will be send to `Output` output of `Middleware Exec` component\n\tcallback(null, data);\nelse\n\t// data will be send to `Error` output of `Middleware Exec` component\n\tcallback('an error occured');\n```"
+	},
+	{
+		"id": "minutely",
+		"group": "Triggers",
+		"name": "Minutely",
+		"url": "https://cdn.totaljs.com/flowstream/components/minutely.html",
+		"author": "Total.js",
+		"icon": "far fa-clock-o",
+		"color": "",
+		"version": "1",
+		"readme": "The component triggers data into the Flow in every minute."
+	},
+	{
 		"id": "model",
 		"group": "Transformations",
 		"name": "Model",
@@ -314,7 +435,7 @@
 		"author": "Total.js",
 		"icon": "fab fa-wpforms",
 		"color": "",
-		"version": "1",
+		"version": "2",
 		"readme": "This component prepares incoming data according to the defined schema. Output is prepared model or Error."
 	},
 	{
@@ -337,7 +458,7 @@
 		"icon": "fa fa-random",
 		"color": "",
 		"version": "3",
-		"readme": "This component allows you to set/modify/move/remove properties of the incomming data.\nFor eaxample, to set the message data to a string `Hello world` select *Message data* in the rule dropdown and leave the text field empty.\nThen in the bellow dropdown select `string` and enter the desired string in the text field.\nResult:\n- before: $.data -> 'Hello world'\n- after:  $.data -> 'New string'\n\n## Expression\nAvailable params are: `data`, `repo`, `variables` ,`variables2`\nWhere data is message.data, repo is message.repo --> [Documentation](https://docs.totaljs.com/total4/40844001ni51c)\nAnd variables are local variables which can be set in the Variables dialog accessible on the main toolbar(the button between Plus icon and Bug icon)\nFor example, we want message data to be the value of (data.value + variables.offset)\nResult:\n- before: $.data --> `{ value: 100 }` / variables --> `{ offset: 20, ... many other properties }`\n- after:  $.data -> `{ value: 120 }`\nThe expression: `data.value + variables.offset`\n\n### Important\n- `Remove` -> `Message data / Message repo -> <empty path>` will set `Message data / Message repo` to `null`;\n- `Remove` -> `Local variables / Global variables -> <empty path>` will be ignored but `Remove -> Local variables / Global variables -> myVar` will work.\n- `Set` -> `Message data -> some.path` to: `Message data -> some.other.path` will add another property to the incoming data and rest of the data will remain untouched\n- `Set` -> `Message data -> <empty path>` to: `Message data -> some.path` will essentialy overwrite the incomming data, after this there's no longer access to original data(same goes for repo)"
+		"readme": "This component allows you to set/modify/move/remove properties of the incomming data.\nFor eaxample, to set the message data to a string `Hello world` select *Message data* in the rule dropdown and leave the text field empty.\nThen in the bellow dropdown select `string` and enter the desired string in the text field.\nResult:\n- before: $.data -> 'Hello world'\n- after:  $.data -> 'New string'\n\n## Expression\nAvailable params are: `data`, `repo`, `variables` ,`variables2`\nWhere data is message.data, repo is message.repo --> [Documentation](https://docs.totaljs.com/total4/40844001ni51c)\nAnd variables are local variables which can be set in the Variables dialog accessible on the main toolbar(the button between Plus icon and Bug icon)\nFor example, we want message data to be the value of (data.value + variables.offset)\nResult:\n- before: $.data --> `{ value: 100 }` / variables --> `{ offset: 20, ... many other properties }`\n- after:  $.data -> `{ value: 120 }`\nThe expression: `data.value + variables.offset`\n\n### Important\n- `Remove` -> `Message data / Message repo` -> `<empty path>` will set `Message data / Message repo` to `null`;\n- `Remove` -> `Local variables / Global variables` -> `<empty path>` will be ignored but `Remove` -> `Local variables / Global variables` -> `myVar` will work.\n- `Set` -> `Message data` -> `some.path` to: `Message data` -> `some.other.path` will add another property to the incoming data and rest of the data will remain untouched\n- `Set` -> `Message data` -> `<empty path>` to: `Message data` -> `some.path` will essentialy overwrite the incomming data, after this there's no longer access to original data(same goes for repo)"
 	},
 	{
 		"id": "mongodb-insert",
@@ -369,7 +490,7 @@
 		"author": "Martin Smola",
 		"icon": "fa fa-exchange-alt",
 		"color": "",
-		"version": "2",
+		"version": "3",
 		"readme": ""
 	},
 	{
@@ -391,7 +512,7 @@
 		"author": "Martin Smola",
 		"icon": "fa fa-sign-in",
 		"color": "",
-		"version": "2",
+		"version": "3",
 		"readme": "MQTT Subscribe"
 	},
 	{
@@ -414,7 +535,7 @@
 		"icon": "fa fa-database",
 		"color": "",
 		"version": "1",
-		"readme": "## Outputs\n- response from nosql engine\n## Settings\n- collection: (optional) if not set, incomming data object must have a 'collection' property set\n- method: (optional) if not set, incomming data object must have a 'method' property set\n## Input\n```javascript\n{\n\tcollection: 'users', // optional, will override settings value\n\tmethod: 'find', // optional, will override settings value\n\t// for Insert, Update\n\tdata: { ... },\n\t// for Query, Read, Update, Remove\n\tfilter: [\n\t\t['where', 'sensor', 'temp'], // builder.where('sensor', 'temp');\n\t\t['limit', 2]                 // builder.limit(2);\n\t],\n\tupsert: true // only for update, if set then document will be inserted if it doesn't exist\n\taddid: true  // only for insert and update, if set then id prop will be automaticaly generated (for update only when upsert is also set)\n}\n```\n## Insert\n- inserts recieved data\n- expects data to be an Object\n- returns error, success, id\n## Read\n- returns first document found\n- requires `filter`\n- returns error, response\n## Update\n- updates document(s)\n- expects data to be an Object with all the props to be updated\n- requires `filter`\n- returns error, response\n- if response is 0 then update failed\n## Remove\n- removes document\n- requires `filter`\n- returns error, response\n- if response is 0 then remove failed\n## Query\n- returns all documents found\n- requires `filter`\n- returns error, response"
+		"readme": "## Outputs\n- response from nosql engine\n## Settings\n- collection: (optional) if not set, incomming data object must have a 'collection' property set\n- method: (optional) if not set, incomming data object must have a 'method' property set\n## Input\n```javascript\n{\n\tcollection: 'users', // optional, will override settings value\n\tmethod: 'query', // insert|read|query|update|remove - optional, will override settings value\n\t// for insert, update\n\tdata: { ... },\n\t// for query, read, update, remove\n\tfilter: [\n\t\t['where', 'sensor', 'temp'], // builder.where('sensor', 'temp');\n\t\t['limit', 2]                 // builder.limit(2);\n\t],\n\tupsert: true // only for update, if set then document will be inserted if it doesn't exist\n\taddid: true  // only for insert and update, if set then id prop will be automaticaly generated (for update only when upsert is also set)\n}\n```\n## Insert\n- inserts recieved data\n- expects data to be an Object\n- returns error, success, id\n## Read\n- returns first document found\n- requires `filter`\n- returns error, response\n## Update\n- updates document(s)\n- expects data to be an Object with all the props to be updated\n- requires `filter`\n- returns error, response\n- if response is 0 then update failed\n## Remove\n- removes document\n- requires `filter`\n- returns error, response\n- if response is 0 then remove failed\n## Query\n- returns all documents found\n- requires `filter`\n- returns error, response"
 	},
 	{
 		"id": "rpi-ds18b20",
@@ -457,8 +578,8 @@
 		"author": "Total.js",
 		"icon": "fa fa-database",
 		"color": "",
-		"version": "1",
-		"readme": "PostgreSQL\n\n## Input\nExpected data:\n```javascript\n{\n\tquery: 'SELECT * FROM tblname;'\n}\n```"
+		"version": "2",
+		"readme": "PostgreSQL\n\n## Input\nExpected data:\n```javascript\n{\n\tquery: 'SELECT * FROM tblname;'\n}\n```\nOutput:\n```javascript\n{\n\tcommand: 'INSERT', // SELECT, etc.\n\trows: [], // \n\trowCount: 1\n}\n```"
 	},
 	{
 		"id": "print",
@@ -505,6 +626,17 @@
 		"readme": "The component publish the data to the specific `Input` component."
 	},
 	{
+		"id": "qrgenerator",
+		"group": "",
+		"name": "QR generator",
+		"url": "https://cdn.totaljs.com/flowstream/components/qrgenerator.html",
+		"author": "Total Avengers",
+		"icon": "fa fa-qrcode",
+		"color": "",
+		"version": "1",
+		"readme": "## Input\n```js\n{\n\ttext: 'text to write to qr code',\n\tfilename: '/public/img/', // optionaly writes the file to filesystem\n\t...\n}\n```\n## Output\n```js\n{\n\ttext: 'text to write to qr code',\n\t...\n\t_qrcode: 'base64 encoded buffer'\n}\n```"
+	},
+	{
 		"id": "queue",
 		"group": "Common",
 		"name": "Queue",
@@ -516,6 +648,50 @@
 		"readme": "A simple persistent queue for the incomming messages."
 	},
 	{
+		"id": "rabbitmqconnection",
+		"group": "RabbitMQ",
+		"name": "RabbitMQ Connection",
+		"url": "https://cdn.totaljs.com/flowstream/components/rabbitmqconnection.html",
+		"author": "Total.js",
+		"icon": "fa fa-envelope-o",
+		"color": "",
+		"version": "1",
+		"readme": ""
+	},
+	{
+		"id": "rabbitmqconsume",
+		"group": "RabbitMQ",
+		"name": "RabbitMQ Consume",
+		"url": "https://cdn.totaljs.com/flowstream/components/rabbitmqconsume.html",
+		"author": "Total Avengers",
+		"icon": "fa fa-envelope-o",
+		"color": "",
+		"version": "1",
+		"readme": "Uses [amqp-connection-manager](https://github.com/jwalton/node-amqp-connection-manager)"
+	},
+	{
+		"id": "rabbitmqpublish",
+		"group": "RabbitMQ",
+		"name": "RabbitMQ Publish",
+		"url": "https://cdn.totaljs.com/flowstream/components/rabbitmqpublish.html",
+		"author": "Total Avengers",
+		"icon": "fa fa-envelope-o",
+		"color": "",
+		"version": "1",
+		"readme": "Uses [amqp-connection-manager](https://github.com/jwalton/node-amqp-connection-manager)"
+	},
+	{
+		"id": "range",
+		"group": "",
+		"name": "Range",
+		"url": "https://cdn.totaljs.com/flowstream/components/range.html",
+		"author": "Total.js",
+		"icon": "fa fa-arrows-h",
+		"color": "",
+		"version": "1",
+		"readme": ""
+	},
+	{
 		"id": "read",
 		"group": "Common",
 		"name": "Read",
@@ -525,6 +701,17 @@
 		"color": "",
 		"version": "2",
 		"readme": "This component reads specific values according to the configured map."
+	},
+	{
+		"id": "restredirect",
+		"group": "REST API",
+		"name": "Redirect",
+		"url": "https://cdn.totaljs.com/flowstream/components/restredirect.html",
+		"author": "Total.js",
+		"icon": "fa fa-share",
+		"color": "",
+		"version": "1",
+		"readme": "## Input\nIncomming data have higher priority than the values set in the Configuration form.\nBoth the `url` and `permanent` are optional.\n```js\n{\n\tredirect: 'https://example.com',\n\tpermanent: true|false\n}\n```"
 	},
 	{
 		"id": "restremember",
@@ -556,7 +743,7 @@
 		"author": "Total.js",
 		"icon": "fa fa-retweet",
 		"color": "",
-		"version": "1",
+		"version": "2",
 		"readme": "This component can respond on the REST Route component."
 	},
 	{
@@ -568,7 +755,7 @@
 		"icon": "fa fa-road",
 		"color": "",
 		"version": "1",
-		"readme": "This component registers an HTTP Route and sends request data next. It stores `controller` instance in the `message.refs.controller` property. You must respond to the REST response component.\n\n< __IMPORTANT__:<br>The component works only with a defined Proxy endpoint in the Flow settings.\n\n__Output data__:\n\n```js\n{\n\t\"route\": String,\n\t\"params\": Object,\n\t\"query\": Object,\n\t\"body\": Object,\n\t\"files\": Array,\n\t\"headers\": Object,\n\t\"url\": String,\n\t\"ip\": String\n}\n```"
+		"readme": "This component registers an HTTP Route and sends request data next. It stores `controller` instance in the `message.refs.controller` property. You must respond to the REST response component.\n\n< __IMPORTANT__:<br>The component works only with a defined Proxy endpoint in the Flow settings.\n< __URL__:<br>The URL must be relative to the defined Proxy endpoint. So if the endpoint is `/users/` and the desired address is `http://example.com/users/find` then the value must be `/find`\n\n__Output data__:\n\n```js\n{\n\t\"route\": String,\n\t\"params\": Object,\n\t\"query\": Object,\n\t\"body\": Object,\n\t\"files\": Array,\n\t\"headers\": Object,\n\t\"url\": String,\n\t\"ip\": String\n}\n```"
 	},
 	{
 		"id": "rpi-gpio",
@@ -725,6 +912,17 @@
 		"readme": "This component monitors last line in some text file with the help of `tail` command in the Linux systems.\n\n__Data Example__:\n\n```js\n{\n\tvalue: 'Some meessage'\n\tdate: Date\n}\n```"
 	},
 	{
+		"id": "tangular",
+		"group": "Templates",
+		"name": "Tangular",
+		"url": "https://cdn.totaljs.com/flowstream/components/tangular.html",
+		"author": "Total.js",
+		"icon": "fa fa-code",
+		"color": "",
+		"version": "1",
+		"readme": "Uses server-side implementation of [Tangular](https://docs.totaljs.com/components/40d06002lm50c/)\n**Example:**\nIncomming data\n```js\n{\n\tapp_name: 'Total.js Flow'\n}\n```\nTemplate\n```\nApp name: {{ app_name }}\n```\n\n$ --> {MessageInstance} https://docs.totaljs.com/total4/40844001ni51c/\nIn the example bellow, the $.refs.controller is only available if the message was created by the Route component\n```\nURL: {{ $.refs.controller.url }}\n```"
+	},
+	{
 		"id": "telemetry",
 		"group": "Common",
 		"name": "Telemetry",
@@ -732,8 +930,19 @@
 		"author": "Martin Smola",
 		"icon": "fa fa-rss-square",
 		"color": "",
-		"version": "3",
-		"readme": "The component shows data in a template.\nAssuming this incomming data:\n```javascript\n{\n\tspeed: 1,\n\tnested: { value: 2 },\n\tarray: [{ value: 3 }]\n}\n```\nThe paths bust be defined as:\n```\nspeed         // -> 1\nnested.value  // -> 2\narray.0.value // -> 3\n```"
+		"version": "4",
+		"readme": "The component shows data in a template.\nHovering over the value shows the last update time.\nAssuming this incomming data:\n```javascript\n{\n\tspeed: 1,\n\tnested: { value: 2 },\n\tarray: [{ value: 3 }]\n}\n```\nThe paths bust be defined as:\n```\nspeed         // -> 1\nnested.value  // -> 2\narray.0.value // -> 3\n```"
+	},
+	{
+		"id": "teleport",
+		"group": "Common",
+		"name": "Teleport",
+		"url": "https://cdn.totaljs.com/flowstream/components/teleport.html",
+		"author": "Total.js",
+		"icon": "fa fa-magic",
+		"color": "",
+		"version": "1",
+		"readme": "The component can teleport (input) message to another teleport (output) component."
 	},
 	{
 		"id": "test",
@@ -787,7 +996,7 @@
 		"author": "Total.js",
 		"icon": "fa fa-bullhorn",
 		"color": "",
-		"version": "2",
+		"version": "3",
 		"readme": "The component triggers data into the Flow."
 	},
 	{
@@ -798,7 +1007,7 @@
 		"author": "Total.js",
 		"icon": "fa fa-code",
 		"color": "",
-		"version": "1",
-		"readme": "The component simulates Total.js Schema Workflow operation. It can process data and store/read them into the database."
+		"version": "2",
+		"readme": "The component simulates Total.js Schema Workflow operation. It can process data and store/read them into the database.\n\n__Properties__:\n- `$ {Message}`\n- `controller {Object}` A controller instance\n- `user {Object}` A user instance if exists\n- `headers {Object}` Request headers\n- `query {Object}` URL query arguments\n- `params {Object}` A dynamic URL params\n- `ip {String}` IP address\n- __`repo {Object}`__ a custom persistent repository object\n- __`model {Object}`__ an alias to `$.data`\n\n__Model/Data__:\n\n- `$.data {Object}` a message data\n- `$.repo {Object}` a message repository\n- `$.refs {Object}` a message references\n\n__Functions__:\n- `respond(data {Object})` Responds with data\n- `success(data {Object} optional)` Response with success object\n- `invalid(error {String})` Error handling`\n- `done(respond_value {Boolean/Object} optional)` return `function(err, response)` for handling callbacks\n\t- when it `fails` it calls `invalid()`\n\t- when it `done` it calls `success()`"
 	}
 ]
