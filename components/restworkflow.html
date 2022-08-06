@@ -43,13 +43,19 @@
 					if (code.indexOf('query') !== -1)
 						builder.push('query=controller.query||EMPTYOBJECT');
 
-					if (code.indexOf('respond') !== -1)
+					if (code.indexOf('respond(') !== -1)
 						builder.push('respond=(data)=>$.send(\'output\',data)');
 
-					if (code.indexOf('success') !== -1)
+					if (code.indexOf('success(') !== -1)
 						builder.push('success=(data)=>$.send(\'output\',{success:true,value:data})');
 
-					if (code.indexOf('done') !== -1)
+					if (code.indexOf('cancel(') !== -1)
+						builder.push('cancel=()=>$.end()');
+
+					if (code.indexOf('send(') !== -1)
+						builder.push('send=(data)=>$.instance.send(\'output\', data)');
+
+					if (code.indexOf('done(') !== -1)
 						builder.push('done=function(is){return function(err,response){if(err){$.send(\'error\',[{error:err.toString()}])}else{$.send(\'output\',{success:true,value:is==true?response:is})}}}');
 
 					builder.push('invalid=$.invalid=(err)=>$.send(\'error\',[{error:err.toString()}])');
@@ -113,6 +119,7 @@ __Model/Data__:
 - `$.refs {Object}` a message references
 
 __Functions__:
+- `cancel()` Cancels the processing without error and sending data next
 - `respond(data {Object})` Responds with data
 - `success(data {Object} optional)` Response with success object
 - `invalid(error {String})` Error handling`
