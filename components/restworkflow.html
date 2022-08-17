@@ -43,8 +43,8 @@
 					if (code.indexOf('query') !== -1)
 						builder.push('query=controller.query||EMPTYOBJECT');
 
-+					if (code.indexOf('variable(') !== -1)
-+						builder.push('variable=key=>$.main.variables[key]||$.main.variables2[key]');
+					if (code.indexOf('variable(') !== -1)
+						builder.push('variable=key=>$.main.variables[key]||$.main.variables2[key]');
 
 					if (code.indexOf('respond(') !== -1)
 						builder.push('respond=(data)=>$.send(\'output\',data)');
