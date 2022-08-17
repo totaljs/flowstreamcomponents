@@ -2,7 +2,7 @@
 
 	exports.name = 'Workflow';
 	exports.group = 'REST API';
-	exports.version = '2';
+	exports.version = '3';
 	exports.icon = 'fa fa-code';
 	exports.author = 'Total.js';
 	exports.config = { name: 'Name', code: 'success();', clear: false };
@@ -42,6 +42,9 @@
 
 					if (code.indexOf('query') !== -1)
 						builder.push('query=controller.query||EMPTYOBJECT');
+
++					if (code.indexOf('variable(') !== -1)
++						builder.push('variable=key=>$.main.variables[key]||$.main.variables2[key]');
 
 					if (code.indexOf('respond(') !== -1)
 						builder.push('respond=(data)=>$.send(\'output\',data)');
@@ -119,6 +122,7 @@ __Model/Data__:
 - `$.refs {Object}` a message references
 
 __Functions__:
+- `variable(key {String}) returns {String}` for reading variables
 - `cancel()` Cancels the processing without error and sending data next
 - `respond(data {Object})` Responds with data
 - `success(data {Object} optional)` Response with success object
