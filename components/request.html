@@ -2,7 +2,7 @@
 
 	exports.name = 'Request';
 	exports.group = 'Common';
-	exports.version = '3';
+	exports.version = '4';
 	exports.icon = 'fas fa-cloud-download';
 	exports.author = 'Total.js';
 	exports.config = { url: '', method: 'GET', dnscache: true, insecure: false, nocookies: true, xhr: false, parse: true, timeout: 10000, limit: 1024 * 500, responsebody: true, headers: {}, cookies: {}, serialize: null, send: 'all' };
@@ -36,7 +36,7 @@
 				opt.cookies[$.variables(key, true)] = $.variables(config.cookies[key], true);
 			}
 
-			opt.method = config.method;
+			opt.method = $.variables(config.method, true);
 			opt.url = $.variables(config.url, true);
 			opt.cook = true;
 
@@ -190,14 +190,17 @@ __Response__:
 </body>
 
 <settings>
+	<div class="padding">
+		<div class="message message-alert">Method, URL address, headers and Cookies support dynamic variables in the form <code>{key}</code>. Variables are read from global Variables and from the message data.</div>
+	</div>
 	<div class="padding bg-smoke npb">
+
 		<div class="row">
 			<div class="col-md-3 m">
 				<div data---="input__?.method__dirsource:GET|GET,POST|POST,PUT|PUT,DELETE|DELETE,PATCH|PATCH,API|API;required:1">Method</div>
 			</div>
 			<div class="col-md-9 m">
 				<div data---="input__?.url__required:1"><b>URL address</b></div>
-				<div class="help">URL address supports dynamic variables in the form <code>{key}</code></div>
 			</div>
 		</div>
 	</div>
