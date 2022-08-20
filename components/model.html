@@ -4,7 +4,7 @@
 	exports.group = 'Transformations';
 	exports.icon = 'fab fa-wpforms';
 	exports.author = 'Total.js';
-	exports.version = '2';
+	exports.version = '3';
 	exports.config = { name: 'Model', path: '', schema: [], rewrite: true };
 	exports.inputs = [{ id: 'input', name: 'Data' }, { id: 'partial', name: 'Partial data' }];
 	exports.outputs = [{ id: 'output', name: 'Output' }, { id: 'error', name: 'Error' }];
@@ -419,7 +419,7 @@ This component prepares incoming data according to the defined schema. Output is
 							<div class="help nmt">Default value</div>
 						</div>
 						<div class="name">
-							<div class="monospace edit hellip" data-edit="exec:tmprestmodel.name;required:1">{{ m.name }}</div>
+							<div class="hellip"><span class="edit label" data-edit="exec:tmprestmodel.label;required:1">{{ m.label }}</span><span class="monospace edit key" data-edit="exec:tmprestmodel.name;required:1">{{ m.name }}</span></div>
 							<div class="error">Error message: <span class="edit hellip" data-edit="exec:tmprestmodel.error;required:1">{{ m.error | empty('Invalid value') }}</span></div>
 						</div>
 					</figure>
@@ -439,7 +439,9 @@ This component prepares incoming data according to the defined schema. Output is
 	.CLASS-settings figure:first-child { border-top: 0; line-height: 40px; }
 	.CLASS-settings figure .edit-open { background-color: #F0F0F0; }
 	.CLASS-settings figure .name { margin-right: 350px; padding: 6px 8px 0; line-height: 14px; }
-	.CLASS-settings figure .name > div:first-child { font-weight: bold; outline: 0; }
+	.CLASS-settings figure .name .label { background-color: #000; outline: 0; padding: 2px 3px; color: #FFF; }
+	.CLASS-settings figure .name .key { font-weight: bold; margin-left: 5px; outline: 0; }
+	.CLASS-settings figure .name > div:first-child { outline: 0; }
 	.CLASS-settings figure .error { font-size: 11px; color: #888; }
 	.CLASS-settings figure .error span { color: #B9261A; outline: 0; min-width: 150px; }
 	.CLASS-settings figure .default { float: right; width: 180px; border-left: 1px solid #E0E0E0; padding: 0 8px; cursor: pointer; line-height: 16px; padding-top: 4px; height: 40px; }
@@ -463,6 +465,7 @@ This component prepares incoming data according to the defined schema. Output is
 	.ui-dark .CLASS-settings figure .required { border-left-color: #404040; }
 	.ui-dark .CLASS-settings figure .array { border-left-color: #404040; }
 	.ui-dark .CLASS-settings figure .controls { border-left-color: #404040; }
+	.ui-dark .CLASS-settings figure .name .label { background-color: #FFF; color: #000; }
 </style>
 
 <body>
@@ -487,7 +490,7 @@ This component prepares incoming data according to the defined schema. Output is
 				tmp = {};
 				tmp.add = function(el) {
 					var scope = el.scope();
-					scope.push('schema', { id: Math.random().toString(36).substring(4), name: 'name', type: 'string', required: true, array: false });
+					scope.push('schema', { id: Math.random().toString(36).substring(4), label: 'Name', name: 'propname', type: 'string', required: true, array: false });
 					scope.change('*');
 				};
 
@@ -526,6 +529,19 @@ This component prepares incoming data according to the defined schema. Output is
 						var id = ATTRD(opt.element);
 						var item = scope.get().schema.findItem('id', id);
 						item.name = opt.value;
+						scope.change('*');
+						next(true);
+					} else
+						next(opt.html);
+				};
+
+				tmp.label = function(opt, next) {
+					opt.value = opt.value.trim();
+					if (opt.value) {
+						var scope = opt.element.scope();
+						var id = ATTRD(opt.element);
+						var item = scope.get().schema.findItem('id', id);
+						item.label = opt.value;
 						scope.change('*');
 						next(true);
 					} else
@@ -667,7 +683,7 @@ This component prepares incoming data according to the defined schema. Output is
 					else
 						continue;
 				}
-				builder.push('- `{0} {{1}}`'.format(m.name, type) + (m.array ? ' array' : '') + (m.required ? ' __required__' : ''));
+				builder.push('- {0} `{1} {{2}}`'.format(m.label, m.name, type) + (m.array ? ' array' : '') + (m.required ? ' __required__' : ''));
 			}
 
 			SETTER('clipboard/copy', builder.join('\n'));
