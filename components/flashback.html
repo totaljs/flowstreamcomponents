@@ -2,7 +2,7 @@
 
 	exports.name = 'Flashback';
 	exports.group = 'Common';
-	exports.version = '2';
+	exports.version = '3';
 	exports.icon = 'fa fa-history';
 	exports.author = 'Peter Širka & Jakub Urban';
 	exports.inputs = [{ id: 'input', name: 'Input' }];
@@ -61,15 +61,10 @@ The component remembers the data for repeating the action.
 	.CLASS .padding { padding: 0 10px 10px; }
 	.CLASS pre { font-size: 10px; margin: 0; padding: 5px; background-color: #F0F0F0; border-radius: var(--radius); }
 	.CLASS footer > div { margin: 10px; }
+	.CLASS .readme { position: absolute; position: absolute; font-size: 11px; right: 5px; margin-top: -5px; cursor: pointer; }
 	.CLASS .noscrollbar { max-height: 250px; }
 	.ui-dark .CLASS pre { background-color: #404040; tab-size: 2; }
 </style>
-
-<script>
-	FUNC.fflashback_clear = function(el) {
-		SETTER('websocket/send', { TYPE: 'trigger', id: el.attrd2('id'), type: 'clear' });
-	};
-</script>
 
 <body>
 	<header>
@@ -81,9 +76,35 @@ The component remembers the data for repeating the action.
 	</div>
 	<footer>
 		<div data-bind="!STATUS__html pre:Thelpers.jsonformat(JSON.stringify(value.data, null, '\t'))__hide:value.empty" class="hidden selectable">
+			<span class="readme" title="Open in new window"><i class="far fa-window-restore"></i></span>
 			<div class="noscrollbar">
 				<pre class="json"></pre>
 			</div>
 		</div>
 	</footer>
 </body>
+
+<script>
+
+	FUNC.fflashback_clear = function(el) {
+		SETTER('websocket/send', { TYPE: 'trigger', id: el.attrd2('id'), type: 'clear' });
+	};
+
+	TOUCH(function(exports, reinit) {
+
+		if (reinit)
+			return;
+
+		var laststatus;
+
+		exports.status = function(status, isinit) {
+			laststatus = status;
+		};
+
+		exports.element.on('click', '.readme', function() {
+			console.log('SO MTU');
+			FUNC.readme('Flashback', '```json\n' + JSON.stringify(laststatus, null, '  ') + '\n```');
+		});
+
+	});
+</script>

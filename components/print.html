@@ -2,7 +2,7 @@
 
 	exports.name = 'Print';
 	exports.group = 'Common';
-	exports.version = '3';
+	exports.version = '4';
 	exports.icon = 'fa fa-print';
 	exports.author = 'Total.js';
 	exports.config = { repo: false, data: true };
@@ -57,6 +57,7 @@
 	.CLASS footer > div { margin: 10px; }
 	.CLASS pre { font-size: 10px; margin: 0; padding: 5px; background-color: #F0F0F0; border-radius: var(--radius); }
 	.CLASS .noscrollbar { max-height: 250px; }
+	.CLASS .readme { position: absolute; position: absolute; font-size: 11px; right: 5px; margin-top: -5px; cursor: pointer; }
 	.ui-dark .CLASS pre { background-color: #404040; tab-size: 2; }
 </style>
 
@@ -78,9 +79,29 @@ The component prints incoming data in a JSON format.
 	</header>
 	<footer>
 		<div data-bind="!STATUS__html pre:Thelpers.jsonformat(JSON.stringify(value, null, '\t'))__show" class="hidden selectable">
-			<div class="noscrollbar">
+			<span class="readme" title="Open in new window"><i class="far fa-window-restore"></i></span>
+			<div class="noscrollbar mt5">
 				<pre class="json"></pre>
 			</div>
 		</div>
 	</footer>
 </body>
+
+<script>
+	TOUCH(function(exports, reinit) {
+
+		if (reinit)
+			return;
+
+		var laststatus;
+
+		exports.status = function(status, isinit) {
+			laststatus = status;
+		};
+
+		exports.element.on('click', '.readme', function() {
+			FUNC.readme('Debug', '```json\n' + JSON.stringify(laststatus, null, '  ') + '\n```');
+		});
+
+	});
+</script>
