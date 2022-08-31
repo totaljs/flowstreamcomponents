@@ -3,7 +3,7 @@
 	exports.name = 'API Router';
 	exports.group = 'REST API';
 	exports.icon = 'fa fa-crosshairs';
-	exports.version = '1';
+	exports.version = '2';
 	exports.author = 'Total.js';
 	exports.config = { name: 'API Router', schema: [], color: '', icon: 'fa fa-crosshairs', path: '', rewrite: true };
 	exports.inputs = [{ id: 'input', name: 'Payload' }];
@@ -81,10 +81,14 @@
 
 		instance.configure = function() {
 
-			compiled = {};
 			var outputs = [];
 
+			compiled = {};
+
 			for (var item of config.schema) {
+
+				if (!item)
+					continue;
 
 				var params = item.name.split('/').trim();
 				var name = params.shift();
@@ -143,11 +147,12 @@ If the controller is stored in the `message.refs.controller` property, then its 
 	.CLASS-settings figure .edit-open { background-color: #F0F0F0; }
 	.CLASS-settings figure .name { line-height: 14px; margin-right: 30px; }
 	.CLASS-settings figure .name div { outline: 0; line-height: 23px; padding: 0 5px; min-height: 25px; font-weight: bold; }
-	.CLASS-settings figure .controls { float: right; width: 30px; padding: 0; margin: 0; border-left: 1px solid #E0E0E0; text-align: center; }
+	.CLASS-settings figure .controls { float: right; width: 90px; padding: 0; margin: 0; border-left: 1px solid #E0E0E0; text-align: center; }
 	.CLASS-settings figure .controls span { cursor: pointer; margin-left: 5px; }
 	.CLASS-settings figure .controls span:first-child { margin-left: 0; }
 	.CLASS-settings figure:first-child { border-top: 0; line-height: 26px; }
 	.CLASS-settings figure:first-child div { line-height: 26px; }
+	.CLASS-settings figure.ismoved { background-color: rgba(92,29,196,0.3) !important; }
 	.CLASS footer { height: 40px; line-height: 40px; padding: 0 10px; font-size: 12px; }
 	.CLASS header div { border-radius: var(--radius); padding: 3px; background-color: #777; color: #FFF; }
 	.CLASS header div i { background-color: rgba(0,0,0,0.2); }
@@ -202,6 +207,8 @@ If the controller is stored in the `message.refs.controller` property, then its 
 					{{ foreach m in value }}
 					<figure data-id="{{ m.id }}">
 						<div class="controls">
+							<span class="exec" data-exec="tmpapirouter.move" title="Up" data-type="up"><i class="fa fa-arrow-up"></i></span>
+							<span class="exec" data-exec="tmpapirouter.move" title="Down" data-type="down"><i class="fa fa-arrow-down"></i></span>
 							<span class="exec" data-exec="tmpapirouter.rem" title="Remove"><i class="far fa-trash-alt red"></i></span>
 						</div>
 						<div class="name">
@@ -251,6 +258,39 @@ If the controller is stored in the `message.refs.controller` property, then its 
 					model.schema.splice(index, 1);
 					scope.update('schema');
 					scope.change('*');
+				};
+
+				tmp.move = function(el) {
+
+					var scope = el.scope();
+					var id = ATTRD(el);
+					var container = el.closest('figure');
+					var schema = scope.get().schema;
+					var index = schema.findIndex('id', id);
+					var is = false;
+					var isup = el.attrd('type') === 'up';
+
+					if (isup) {
+						if (index > 0) {
+							var a = schema[index];
+							schema[index] = schema[index - 1];
+							schema[index - 1] = a;
+							is = true;
+						}
+					} else {
+						if (index <= schema.length - 2) {
+							var a = schema[index];
+							schema[index] = schema[index + 1];
+							schema[index + 1] = a;
+							is = true;
+						}
+					}
+
+					if (is) {
+						NODEMOVE(container, isup);
+						scope.change('*');
+						container.aclass('ismoved').rclass('ismoved', 500);
+					}
 				};
 
 				tmp.name = function(opt, next) {
