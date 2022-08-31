@@ -1,0 +1,29 @@
+<script total>
+
+	exports.name = 'Forward';
+	exports.icon = 'fa fa-arrow-right';
+	exports.author = 'Total.js';
+	exports.version = '1';
+	exports.group = 'Common';
+	exports.config = {};
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }];
+
+	exports.make = function(instance, config) {
+		instance.message = function($) {
+			var data = $.data;
+			$.send('output', data);
+		};
+	};
+
+</script>
+
+<readme>
+The component send message next only. It's targeted for colorized connections to targeted to the same input.
+</readme>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+</body>
