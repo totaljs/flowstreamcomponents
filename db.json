@@ -1,27 +1,5 @@
 [
 	{
-		"id": "restapidatabase",
-		"group": "REST API",
-		"name": "API Database",
-		"url": "https://cdn.totaljs.com/flowstream/components/restapidatabase.html",
-		"author": "Total.js",
-		"icon": "fa fa-database",
-		"color": "",
-		"version": "2",
-		"readme": "This component can perform some operations on a database with the help of Total.js QueryBuilder. First, you must initialize the connection string for the database via QueryBuilder initialization.\n\n__Input data__:\n\n- `data {Object}` or `body {Object}` optional - payload\n- `query {Object}` optional - query data, key/value must be string\n- `params {Object}` optional - dynamic values, key/value must be string\n- `user {Object}` optional - a user instance\n\n__Output__:\n\n- `insert` returns Number\n- `update` returns Number\n- `remove` returns Number\n- `query` returns Array of Objects\n- `read` returns Object\n- `list` returns:\n\n```json\n{\n\titems: Array,\n\tpage: Number,\n\tpages: Number,\n\tcount: Number\n}\n```\n\nQuery parameters for the `List` operation can contain the below fields which can affect filtering according to the values defined in the dynamic filter.\n\n- `sort {String}` can contain field name with `_asc` or `_desc` value\n- `fields {String}` can return only specified fields separated by comma\n- `page {Number}` page number\n- `limit {Number}` max. items per page (default: max. limit)\n- `column_name=VALUE` enables dynamic filtering\n\n---\n\n__Good to know__: If the `data` (payload) can contain special key names in the form:\n\n- `+key` increments a value\n- `-key` decrements a value\n- `!key` performs toggle for boolean values\n- `>key` stores only greater value\n- `<key` stores only lower value"
-	},
-	{
-		"id": "restapipostgresql",
-		"group": "REST API",
-		"name": "API PostgreSQL",
-		"url": "https://cdn.totaljs.com/flowstream/components/restapipostgresql.html",
-		"author": "Total.js",
-		"icon": "fa fa-database",
-		"color": "",
-		"version": "1",
-		"readme": "The component initializes QueryBuilder for PostgreSQL database. So you will able to use `API Database` component. Every connection must be separated by the alias.\n\n__Usage in API Database__:\n\n- `tbl_user` is targeted to the `default/tbl_user` alias connection\n- `anotherserver/tbl_user` will use `anotherserver` alias connection"
-	},
-	{
 		"id": "restapirouter",
 		"group": "REST API",
 		"name": "API Router",
@@ -153,6 +131,17 @@
 		"readme": "The component sort data according to the custom defined conditions. You can define unlimited count of outputs with various conditions."
 	},
 	{
+		"id": "restdatabase",
+		"group": "REST API",
+		"name": "Database",
+		"url": "https://cdn.totaljs.com/flowstream/components/restdatabase.html",
+		"author": "Total.js",
+		"icon": "fa fa-database",
+		"color": "",
+		"version": "2",
+		"readme": "This component can perform some operations on a database with the help of Total.js QueryBuilder. First, you must initialize the connection string for the database via QueryBuilder initialization.\n\n__Input data__:\n\n- `data {Object}` or `body {Object}` optional - payload\n- `query {Object}` optional - query data, key/value must be string\n- `params {Object}` optional - dynamic values, key/value must be string\n- `user {Object}` optional - a user instance\n\n__Output__:\n\n- `insert` returns Number\n- `update` returns Number\n- `remove` returns Number\n- `query` returns Array of Objects\n- `read` returns Object\n- `list` returns:\n\n```json\n{\n\titems: Array,\n\tpage: Number,\n\tpages: Number,\n\tcount: Number\n}\n```\n\nQuery parameters for the `List` operation can contain the below fields which can affect filtering according to the values defined in the dynamic filter.\n\n- `sort {String}` can contain field name with `_asc` or `_desc` value\n- `fields {String}` can return only specified fields separated by comma\n- `page {Number}` page number\n- `limit {Number}` max. items per page (default: max. limit)\n- `column_name=VALUE` enables dynamic filtering\n\n---\n\n__Good to know__: If the `data` (payload) can contain special key names in the form:\n\n- `+key` increments a value\n- `-key` decrements a value\n- `!key` performs toggle for boolean values\n- `>key` stores only greater value\n- `<key` stores only lower value"
+	},
+	{
 		"id": "date",
 		"group": "Common",
 		"name": "Date",
@@ -270,7 +259,7 @@
 		"author": "Peter Širka & Jakub Urban",
 		"icon": "fa fa-history",
 		"color": "",
-		"version": "2",
+		"version": "3",
 		"readme": "The component remembers the data for repeating the action."
 	},
 	{
@@ -435,7 +424,7 @@
 		"author": "Total.js",
 		"icon": "fab fa-wpforms",
 		"color": "",
-		"version": "2",
+		"version": "3",
 		"readme": "This component prepares incoming data according to the defined schema. Output is prepared model or Error."
 	},
 	{
@@ -582,6 +571,17 @@
 		"readme": "PostgreSQL\n\n## Input\nExpected data:\n```javascript\n{\n\tquery: 'SELECT * FROM tblname;'\n}\n```\nOutput:\n```javascript\n{\n\tcommand: 'INSERT', // SELECT, etc.\n\trows: [], // \n\trowCount: 1\n}\n```"
 	},
 	{
+		"id": "restpostgresql",
+		"group": "REST API",
+		"name": "PostgreSQL",
+		"url": "https://cdn.totaljs.com/flowstream/components/restpostgresql.html",
+		"author": "Total.js",
+		"icon": "fa fa-database",
+		"color": "",
+		"version": "1",
+		"readme": "The component initializes QueryBuilder for PostgreSQL database. So you will able to use `API Database` component. Every connection must be separated by the alias.\n\n__Usage in API Database__:\n\n- `tbl_user` is targeted to the `default/tbl_user` alias connection\n- `anotherserver/tbl_user` will use `anotherserver` alias connection"
+	},
+	{
 		"id": "print",
 		"group": "Common",
 		"name": "Print",
@@ -589,7 +589,7 @@
 		"author": "Total.js",
 		"icon": "fa fa-print",
 		"color": "",
-		"version": "3",
+		"version": "4",
 		"readme": "The component prints incoming data in a JSON format."
 	},
 	{
@@ -855,6 +855,17 @@
 		"color": "",
 		"version": "1",
 		"readme": "The component splits a message with an array of objects on the input into separate messages with individual objects on the output.\n\n__Input example__:\n\n```js\n[\n\t{\n\t\t\"email\": \"michal@totaljs.com\",\n\t\t\"date\": 20220202,\n\t\t\"meno\": \"Michal Klacan\"\n\t},\n\t{\n\t\t\"email\": \"martin@totaljs.com\",\n\t\t\"date\": 20220204,\n\t\t\"meno\": \"Martin Smola\"\n\t},\n\t{\n\t\t\"email\": \"peter@totaljs.com\",\n\t\t\"datum\": 20220210,\n\t\t\"meno\": \"Peter Sirka\"\n\t}\n]\n```\n\n__Output example__:\n\n```js\n{\n\t\"email\": \"michal@totaljs.com\",\n\t\"date\": 20220202,\n\t\"meno\": \"Michal Klacan\"\n}\n```\n\n```js\n{\n\t\"email\": \"martin@totaljs.com\",\n\t\"date\": 20220204,\n\t\"meno\": \"Martin Smola\"\n}\n```\n\n```js\n{\n\t\"email\": \"peter@totaljs.com\",\n\t\"datum\": 20220210,\n\t\"meno\": \"Peter Sirka\"\n}\n```"
+	},
+	{
+		"id": "restsql",
+		"group": "REST API",
+		"name": "SQL Query",
+		"url": "https://cdn.totaljs.com/flowstream/components/restsql.html",
+		"author": "Total.js",
+		"icon": "fa fa-database",
+		"color": "",
+		"version": "1",
+		"readme": "The component executes SQL command on the specifi connection. This component depends on the `API PostgreSQL` component."
 	},
 	{
 		"id": "sqlite3",
