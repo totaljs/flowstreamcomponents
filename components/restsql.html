@@ -1,11 +1,11 @@
 <script total>
 
-	exports.name = 'SQL Query';
+	exports.name = 'SQL query';
 	exports.icon = 'fa fa-database';
 	exports.author = 'Total.js';
 	exports.group = 'REST API';
 	exports.version = '1';
-	exports.config = { id: 'default', sql: 'SELECT 1', first: false };
+	exports.config = { id: 'default', sql: 'SELECT 1', first: false, path: '' };
 	exports.inputs = [{ id: 'input', name: 'Payload' }];
 	exports.outputs = [{ id: 'output', name: 'Output' }, { id: 'error', name: 'Error' }];
 
@@ -16,10 +16,20 @@
 			var sql = $.variables(config.sql, true, val => typeof(val) === 'string' && val[0] === '!' ? val.substring(1) : PG_ESCAPE(val));
 
 			DB().query(id, sql).callback(function(err, response) {
-				if (err)
+				if (err) {
 					$.send('error', err);
-				else
-					$.send('output', config.first ? response[0] : response);
+				} else {
+
+					if (config.first)
+						response = response[0];
+
+					if (config.path) {
+						U.set($.data, config.path, response);
+						response = $.data;
+					}
+
+					$.send('output', response);
+				}
 			});
 
 		};
