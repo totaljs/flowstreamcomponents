@@ -1,0 +1,217 @@
+<script total>
+
+	exports.name = 'Merge';
+	exports.icon = 'fa fa-filter';
+	exports.author = 'Total.js';
+	exports.version = '1';
+	exports.group = 'Common';
+	exports.config = { inputs: [] };
+	exports.inputs = [];
+	exports.outputs = [{ id: 'output', name: 'Output' }];
+
+	exports.make = function(instance, config) {
+
+		var compiled = null;
+		var checktimeout;
+		var values = {};
+		var value = {};
+
+		var checkforce = function() {
+
+			checktimeout = null;
+
+			var skip = false;
+
+			for (var input of config.inputs) {
+
+				var val = values[input.id];
+				if (val === undefined) {
+					if (input.required) {
+						skip = true;
+						break;
+					}
+				}
+
+				if (input.assign)
+					U.set(value, input.assign, val);
+				else
+					U.extend(value, val);
+
+			}
+
+			if (skip)
+				return;
+
+			for (var input of config.inputs) {
+				if (input.clear)
+					delete values[input.id];
+			}
+
+			instance.newmessage(value).send('output');
+		};
+
+		var check = function() {
+			checktimeout && clearTimeout(checktimeout);
+			checktimeout = setTimeout(checkforce, 100);
+		};
+
+		instance.message = function($) {
+			var data = $.data;
+			var input = compiled[$.input];
+			if (input) {
+				values[$.input] = input.path ? U.get(data, input.path) : data;
+				check();
+			}
+			$.destroy();
+		};
+
+		instance.configure = function() {
+
+			var inputs = [];
+
+			if (config.clear) {
+				values = {};
+				delete config.clear;
+			}
+
+			compiled = {};
+
+			for (var item of config.inputs) {
+				if (item) {
+					compiled[item.id] = item;
+					inputs.push({ id: item.id, name: item.name });
+				}
+			}
+
+			for (var key in values) {
+				if (!compiled[key])
+					delete values[key];
+			}
+
+			var prev = JSON.stringify(instance.inputs);
+			var curr = JSON.stringify(inputs);
+
+			if (prev !== curr) {
+				instance.inputs = inputs;
+				instance.save();
+			}
+
+		};
+
+		instance.configure();
+
+	};
+
+</script>
+
+<readme>
+This component merges multiple inputs into one object.
+</readme>
+
+<settings>
+	<div class="CLASS-settings">
+		<div class="padding">
+			<div data---="input__?.clear__type:checkbox" class="m">Clear cache</div>
+			<div data---="listform__?.inputs__autofocus:1;empty:You do not have defined any inputs;create:tmpmerge.add">
+
+				<script type="text/html">
+					<div class="item"><i class="fa fa-arrow-right"></i>{{ if required }}<b>{{fi}}{{ name }}{{ if required }}</b>{{fi}}{{ if assign }}<span class="fs11 gray ml5">{{ assign }}</span>{{ fi }}</div>
+				</script>
+
+				<script type="text/html">
+					<div class="padding">
+						<div data---="input__?.name__required:1;innerlabel:1;placeholder:Enter a name__''" class="m">Name</div>
+						<div class="grid-2">
+							<div class="m">
+								<div data---="input__?.path__innerlabel:1;placeholder:path.to.property__''">Path</div>
+								<div class="help">A value will be read according to this path</div>
+							</div>
+							<div class="m">
+								<div data---="input__?.assign__innerlabel:1;placeholder:path.to.property__''">Assign to the path</div>
+								<div class="help">A value will be assigned according to this path. Otherwise, the message extends cached data.</div>
+							</div>
+						</div>
+						<hr class="nmt" />
+						<div data---="input__?.required__type:checkbox__false"><b>Required</b></div>
+						<div data---="input__?.clear__type:checkbox__false" class="m">Clear value after use</div>
+						<div data---="validate__?" class="toolbar">
+							<button name="submit"><i class="fa fa-floppy-o"></i>Save</button>
+							<button name="remove">Remove</button>
+							<button name="cancel">Cancel</button>
+						</div>
+					</div>
+				</script>
+
+				<script type="text/html">
+					<div style="margin-top:10px"><button class="button button-inline" name="create"><i class="fa fa-plus-circle green"></i>Add input</button></div>
+				</script>
+
+			</div>
+		</div>
+	</div>
+</settings>
+
+<style>
+	.CLASS-settings .item { padding: 8px 10px; font-size: 12px; }
+	.CLASS-settings .item i { margin-right: 5px; }
+	.CLASS footer { height: 40px; line-height: 40px; padding: 0 10px; font-size: 12px; }
+	.CLASS header div { border-radius: var(--radius); padding: 3px; background-color: #777; color: #FFF; }
+	.CLASS header div i { background-color: rgba(0,0,0,0.2); }
+
+	.ui-dark .CLASS header div i { background-color: rgba(255,255,255,0.2); }
+</style>
+
+<script>
+	TOUCH(function(exports, reinit) {
+
+		exports.settings = function(meta) {
+
+			if (!meta.config.inputs.length) {
+				var obj = {};
+				obj.id = 'i' + Math.random().toString(36).substring(6);
+				obj.name = 'Name';
+				obj.path = '';
+				obj.clear = false;
+				obj.required = false;
+				meta.config.inputs.push(obj);
+			}
+
+			var tmp = W.tmpmerge;
+
+			if (!tmp) {
+
+				tmp = {};
+				tmp.add = function(callback) {
+					var obj = {};
+					obj.id = 'i' + Math.random().toString(36).substring(6);
+					obj.name = 'Name';
+					obj.path = '';
+					obj.clear = false;
+					obj.required = false;
+					callback(obj);
+				};
+
+				W.tmpmerge = tmp;
+			}
+		};
+
+		exports.configure = function() {
+			var changes = exports.instance.changes;
+			if (changes && changes.newbie) {
+				var inputs = [];
+				for (var item of exports.config.inputs)
+					inputs.push({ id: item.id, name: item.name });
+				exports.instance.inputs = inputs;
+				UPD('flow.data');
+			}
+
+		};
+
+	});
+</script>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+</body>
