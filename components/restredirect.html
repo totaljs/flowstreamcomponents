@@ -4,20 +4,24 @@
 	exports.icon = 'fa fa-share';
 	exports.group = 'REST API';
 	exports.author = 'Total.js';
-	exports.version = '1';
-	exports.config = {};
+	exports.version = '2';
+	exports.config = { url: '', permanent: false };
 	exports.inputs = [{ id: 'input', name: 'Input' }];
 
 	exports.make = function(instance, config) {
 
 		instance.message = function($) {
-			var data = $.data;
-			var url = data.redirect || config.redirect;
+			var data = $.data || EMPTYOBJECT;
+
+			if (typeof(data) !== 'object')
+				data = EMPTYOBJECT;
+
+			var url = $.variables(data.url || config.url, true);
+
 			if (url && $.refs.controller)
-				$.refs.controller.redirect(url, data.permanent === true || (!data.permanent === false && config.permanent === true) ? true : false);
+				$.refs.controller.redirect(url, data.permanent === true || config.permanent === true);
 
 			$.destroy();
-			!url && instance.throw('No Redirect URL specified.');
 		};
 
 	};
@@ -26,11 +30,12 @@
 
 <readme>
 ## Input
-Incomming data have higher priority than the values set in the Configuration form.
-Both the `url` and `permanent` are optional.
+
+Incomming data have higher priority than the values set in the Configuration form. Both the `url` and `permanent` are optional.
+
 ```js
 {
-	redirect: 'https://example.com',
+	url: 'https://example.com',
 	permanent: true|false
 }
 ```
@@ -38,19 +43,21 @@ Both the `url` and `permanent` are optional.
 
 <settings>
 	<div class="padding">
-		<div data---="input__?.redirect" class="m">Redirect URL</div>
-		<div data---="input__?.permanent">Permanent redirect</div>
+		<div class="message message-alert">Redirect URL address supports dynamic variables in the form <code class="b">{key}</code> or <code class="b">{data.key}</code>. Variables are read from global variables <code class="b">{key}</code> and from the message data <code class="b">{data.key}</code>.</div>
+		<div data---="input__?.url__innerlabel:1;required:1;placeholder:Enter absolute URL address" class="m">Redirect URL</div>
+		<div data---="input__?.permanent__type:checkbox">Permanent redirect</div>
 	</div>
 </settings>
 
 <style>
+	.CLASS footer { padding: 10px; font-size: 11px; }
 </style>
-
-<script>
-</script>
 
 <body>
 	<header>
 		<i class="ICON"></i>NAME
 	</header>
+	<footer>
+		<i class="fa fa-globe mr5"></i><span data-bind="CONFIG.url__text__empty"></span>
+	</footer>
 </body>
