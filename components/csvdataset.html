@@ -2,10 +2,10 @@
 
 	exports.id = 'dataset';
 	exports.name = 'CSV Dataset';
-	exports.group = 'Stats';
-	exports.version = '1';
+	exports.group = 'Dashboard';
+	exports.version = '2';
 	exports.icon = 'fa fa-database';
-	exports.author = 'Total.js';
+	exports.author = 'Peter Širka';
 	exports.config = { name: '', unit: '', icon: '', color: '', decimals: 2, type: 'daily', sum: 0 };
 	exports.inputs = [{ id: 'input', name: 'Value' }];
 
@@ -273,7 +273,7 @@
 <readme>
 The component stores data as CSV Dataset for e.g. Dashboard application. Dataset is stored in `/private/` path that is available with the help of the Flow access token.
 
-CSV file contains only processed values, which aren't closed and stored in the `.meta` file.
+CSV file contains only processed values (according to the period) and the `.meta` file contains meta data + last value.
 
 ```js
 {
@@ -281,6 +281,20 @@ CSV file contains only processed values, which aren't closed and stored in the `
 	value: Number   // measured value
 }
 ```
+
+### CSV columns
+
+1. `key {String}`
+1. `value {Number}`
+1. `min {Number}`
+1. `max {Number}`
+1. `sum {Number}`
+1. `count {Number}`
+1. `tshour {Number}`in the form `yyyyMMddhh`
+1. `tsday {Number}` in the form `yyyyMMdd`
+1. `tsweek {Number}` in the form `yyyyww`
+1. `tsmonth {Number}` in the form `yyyyMM`
+1. `tsyear {Number}` in the form `yyyy`
 </readme>
 
 <script>
@@ -344,14 +358,13 @@ CSV file contains only processed values, which aren't closed and stored in the `
 			</div>
 			<div data-bind="STATUS__template__show" class="keys hidden">
 				<script type="text/html">
-
 					<div class="selectable">
 						<div class="meta mt5">
-							<span>Meta:</span><div>dataset_{{ value.id }}.meta</div>
+							<span>Meta:</span><div><a href="/private/?filename=dataset_{{ value.id }}.meta&token=" target="_blank">dataset_{{ value.id }}.meta</a></div>
 						</div>
 						{{ if value.type !== 'lastvalue' }}
 						<div class="meta">
-							<span>Data:</span><div>dataset_{{ value.id }}.csv</div>
+							<span>Data:</span><div><a href="/private/?filename=dataset_{{ value.id }}.csv&token=" target="_blank">dataset_{{ value.id }}.csv</a></div>
 						</div>
 						{{ fi }}
 					</div>
