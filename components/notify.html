@@ -1,0 +1,88 @@
+<script total>
+
+	exports.name = 'Notify';
+	exports.group = 'Triggers';
+	exports.icon = 'fa fa-route';
+	exports.author = 'Total.js';
+	exports.version = '1';
+	exports.config = { method: 'all', send: 'all' };
+	exports.outputs = [{ id: 'output', name: 'Output' }];
+
+	exports.make = function(instance, config) {
+		instance.notify = function(data) {
+			if (config.method === 'all' || config.method === data.method) {
+
+
+				var cookie = data.headers.cookie;
+				if (!cookie)
+					return '';
+
+				data.cookies = {};
+
+				var arr = cookie.split(';');
+
+				for (var i = 0; i < arr.length; i++) {
+					var line = arr[i].trim();
+					var index = line.indexOf('=');
+					if (index !== -1)
+						data.cookies[line.substring(0, index)] = decodeURIComponent(line.substring(index + 1));
+				}
+
+				if (config.send !== 'all')
+					data = data[config.send];
+
+				instance.send('output', data);
+			}
+		};
+	};
+
+</script>
+
+<readme>
+This component captures data on the `/notify/` endpoint.
+
+__Output data__:
+
+```js
+{
+	"method": String,
+	"query": Object,
+	"body": Object,
+	"headers": Object,
+	"cookies": Object,
+	"url": String,
+	"ip": String
+}
+```
+</readme>
+
+<style>
+	.CLASS footer { padding: 5px 8px; font-size: 11px; color: #777; }
+</style>
+
+<settings>
+	<div class="padding">
+		<div class="grid-2">
+			<div class="m">
+				<div data---="input__?.method__dirsource:all|All supported HTTP methods,GET|GET,POST|POST" class="m">HTTP Method</div>
+			</div>
+			<div class="m">
+				<div data---="input__?.send__dirsource:all|Everything,query|Query arguments,body|Payload,headers|Headers,cookies|Cookies">Send to output</div>
+			</div>
+		</div>
+	</div>
+</settings>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+	<footer>
+		<div>Endpoint:</div>
+		<div data-bind="flow.head__template">
+			<script type="text/html">
+				<a href="{{ value.proxyendpoint }}/notify/{{ value.id }}-UID/" target="_blank">/notify/{{ value.id }}-UID/</a>
+			</script>
+		</div>
+	</footer>
+</body>
