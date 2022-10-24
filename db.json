@@ -560,6 +560,17 @@
 		"readme": "This component captures data on the `/notify/` endpoint.\n\n__Output data__:\n\n```js\n{\n\t\"method\": String,\n\t\"query\": Object,\n\t\"body\": Object,\n\t\"headers\": Object,\n\t\"cookies\": Object,\n\t\"url\": String,\n\t\"ip\": String\n}\n```"
 	},
 	{
+		"id": "oauth2",
+		"group": "API",
+		"name": "OAuth 2.0",
+		"url": "https://cdn.totaljs.com/flowstream/components/oauth2.html",
+		"author": "Total.js",
+		"icon": "fa fa-key",
+		"color": "",
+		"version": "1",
+		"readme": "This component can obtain OAuth 2.0 access token from 3rd party service."
+	},
+	{
 		"id": "rpi-ds18b20",
 		"group": "Raspberry Pi",
 		"name": "OneWire",
