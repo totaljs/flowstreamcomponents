@@ -99,14 +99,14 @@
 	},
 	{
 		"id": "csvdataset",
-		"group": "Stats",
+		"group": "Dashboard",
 		"name": "CSV Dataset",
 		"url": "https://cdn.totaljs.com/flowstream/components/csvdataset.html",
-		"author": "Total.js",
+		"author": "Peter Širka",
 		"icon": "fa fa-database",
 		"color": "",
-		"version": "1",
-		"readme": "The component stores data as CSV Dataset for e.g. Dashboard application. Dataset is stored in `/private/` path that is available with the help of the Flow access token.\n\nCSV file contains only processed values, which aren't closed and stored in the `.meta` file.\n\n```js\n{\n\tkey: String,    // optional, e.g. device_id | device_name\n\tvalue: Number   // measured value\n}\n```"
+		"version": "2",
+		"readme": "The component stores data as CSV Dataset for e.g. Dashboard application. Dataset is stored in `/private/` path that is available with the help of the Flow access token.\n\nCSV file contains only processed values (according to the period) and the `.meta` file contains meta data + last value.\n\n```js\n{\n\tkey: String,    // optional, e.g. device_id | device_name\n\tvalue: Number   // measured value\n}\n```\n\n### CSV columns\n\n1. `key {String}`\n1. `value {Number}`\n1. `min {Number}`\n1. `max {Number}`\n1. `sum {Number}`\n1. `count {Number}`\n1. `tshour {Number}`in the form `yyyyMMddhh`\n1. `tsday {Number}` in the form `yyyyMMdd`\n1. `tsweek {Number}` in the form `yyyyww`\n1. `tsmonth {Number}` in the form `yyyyMM`\n1. `tsyear {Number}` in the form `yyyy`"
 	},
 	{
 		"id": "dataparser",
@@ -549,6 +549,17 @@
 		"readme": "## Outputs\n- response from nosql engine\n## Settings\n- collection: (optional) if not set, incomming data object must have a 'collection' property set\n- method: (optional) if not set, incomming data object must have a 'method' property set\n## Input\n```javascript\n{\n\tcollection: 'users', // optional, will override settings value\n\tmethod: 'query', // insert|read|query|update|remove - optional, will override settings value\n\t// for insert, update\n\tdata: { ... },\n\t// for query, read, update, remove\n\tfilter: [\n\t\t['where', 'sensor', 'temp'], // builder.where('sensor', 'temp');\n\t\t['limit', 2]                 // builder.limit(2);\n\t],\n\tupsert: true // only for update, if set then document will be inserted if it doesn't exist\n\taddid: true  // only for insert and update, if set then id prop will be automaticaly generated (for update only when upsert is also set)\n}\n```\n## Insert\n- inserts recieved data\n- expects data to be an Object\n- returns error, success, id\n## Read\n- returns first document found\n- requires `filter`\n- returns error, response\n## Update\n- updates document(s)\n- expects data to be an Object with all the props to be updated\n- requires `filter`\n- returns error, response\n- if response is 0 then update failed\n## Remove\n- removes document\n- requires `filter`\n- returns error, response\n- if response is 0 then remove failed\n## Query\n- returns all documents found\n- requires `filter`\n- returns error, response"
 	},
 	{
+		"id": "notify",
+		"group": "Triggers",
+		"name": "Notify",
+		"url": "https://cdn.totaljs.com/flowstream/components/notify.html",
+		"author": "Total.js",
+		"icon": "fa fa-route",
+		"color": "",
+		"version": "1",
+		"readme": "This component captures data on the `/notify/` endpoint.\n\n__Output data__:\n\n```js\n{\n\t\"method\": String,\n\t\"query\": Object,\n\t\"body\": Object,\n\t\"headers\": Object,\n\t\"cookies\": Object,\n\t\"url\": String,\n\t\"ip\": String\n}\n```"
+	},
+	{
 		"id": "rpi-ds18b20",
 		"group": "Raspberry Pi",
 		"name": "OneWire",
@@ -732,8 +743,8 @@
 		"author": "Total.js",
 		"icon": "fa fa-share",
 		"color": "",
-		"version": "1",
-		"readme": "## Input\nIncomming data have higher priority than the values set in the Configuration form.\nBoth the `url` and `permanent` are optional.\n```js\n{\n\tredirect: 'https://example.com',\n\tpermanent: true|false\n}\n```"
+		"version": "2",
+		"readme": "## Input\n\nIncomming data have higher priority than the values set in the Configuration form. Both the `url` and `permanent` are optional.\n\n```js\n{\n\turl: 'https://example.com',\n\tpermanent: true|false\n}\n```"
 	},
 	{
 		"id": "restremember",
