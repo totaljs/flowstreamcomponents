@@ -10,16 +10,12 @@
 
 	exports.make = function(instance, config) {
 		instance.notify = function(data) {
-			if (config.method === 'all' || config.method === data.method) {
+			if (config.method === 'all' || config.method === data.method && instance.id === data.id) {
 
-
-				var cookie = data.headers.cookie;
-				if (!cookie)
-					return '';
+				var cookie = data.headers.cookie || '';
+				var arr = cookie.split(';');
 
 				data.cookies = {};
-
-				var arr = cookie.split(';');
 
 				for (var i = 0; i < arr.length; i++) {
 					var line = arr[i].trim();
