@@ -74,11 +74,19 @@ __Output data__:
 		<i class="ICON"></i>NAME
 	</header>
 	<footer>
-		<div>Endpoint:</div>
+		<div><span class="exec mr5 pointer" data-exec="tmpnotifycopy"><i class="far fa-copy"></i></span>Endpoint:</div>
 		<div data-bind="flow.head__template">
 			<script type="text/html">
-				<a href="{{ value.proxyendpoint }}/notify/{{ value.id }}-UID/" target="_blank">/notify/{{ value.id }}-UID/</a>
+				<a href="{{ value.proxyurl }}/notify/{{ value.id }}-UID/" target="_blank">/notify/{{ value.id }}-UID/</a>
 			</script>
 		</div>
 	</footer>
 </body>
+
+<script>
+	W.tmpnotifycopy = function(el) {
+		var url = el.closest('footer').find('a').attr('href');
+		SETTER('clipboard/copy', url);
+		SETTER('notifybar/success', 'Copied');
+	};
+</script>
