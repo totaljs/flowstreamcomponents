@@ -1,0 +1,233 @@
+<script total>
+
+	exports.name = 'Confirmation code';
+	exports.icon = 'fa fa-barcode';
+	exports.author = 'Total.js';
+	exports.version = '1';
+	exports.group = 'Security';
+	exports.config = { count: 3, type: 'pin', length: 4, expire: '5 minutes', lock: '' };
+	exports.inputs = [{ id: 'create', name: 'Create' }, { id: 'verify', name: 'Verify' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }];
+
+	exports.make = function(instance, config) {
+
+		var codes = {};
+		var timeout = null;
+
+		var refreshforce = function() {
+			timeout = null;
+			instance.status({ count: Object.keys(codes).length });
+		};
+
+		var refresh = function() {
+			timeout && clearTimeout(timeout);
+			timeout = setTimeout(refreshforce, 500);
+		};
+
+		instance.message_create = function($) {
+
+			var data = $.data;
+			var val = null;
+
+			switch (config.type) {
+				case 'pin':
+					val = U.random_number(config.length);
+					break;
+				case 'token':
+					val = GUID(config.length);
+					break;
+				case 'number':
+					val = U.random_number(config.length);
+					break;
+				case 'string':
+					val = U.random_string(config.length);
+					break;
+				case 'guid':
+					val = GUID();
+					break;
+			}
+
+			var id = typeof(data) === 'string' ? data : data.id;
+			var tmp = codes[id];
+			var msg = {};
+
+			if (tmp && tmp.locked && tmp.locked > NOW) {
+				msg.success = tmp.count > 0;
+				msg.slots = tmp.count;
+				msg.error = 'locked';
+				$.send('output', msg);
+				return;
+			}
+
+			msg.success = true;
+			msg.value = val;
+
+			var now = new Date();
+			codes[id] = { value: val, expire: now.add(config.expire), count: config.count, locked: config.lock ? now.add(config.lock) : null };
+			$.send('output', msg);
+			refresh();
+		};
+
+		instance.message_verify = function($) {
+
+			var data = $.data;
+			var id = data.id;
+			var value = data.value || data.token || data.code || data.pin;
+			var tmp = codes[id];
+			var output = {};
+
+			output.success = false;
+			output.slots = 0;
+
+			if (tmp) {
+
+				if (tmp.value === value) {
+					delete codes[id];
+					output.success = true;
+					output.slots = tmp.count;
+					$.send('output', output);
+					refresh();
+					return;
+				}
+
+				tmp.count--;
+
+				output.slots = tmp.count;
+				output.error = 'invalid';
+
+				if (!tmp.count) {
+					delete codes[id];
+					refresh();
+				}
+
+				$.send('output', output);
+			} else {
+				output.error = '404';
+				$.send('output', output);
+			}
+		};
+
+		instance.destroy = function() {
+			timeout && clearTimeout(timeout);
+			timeout = null;
+		};
+
+		instance.service = function() {
+			var is = false;
+			for (var key in codes) {
+				var item = codes[key];
+				if (item.expire < NOW) {
+					delete codes[key];
+					is = true;
+				}
+			}
+			is && refresh();
+		};
+
+		instance.configure = function() {
+
+			var locked = config.lock ? NOW.add(lock) : null;
+
+			for (var key in codes) {
+				var item = codes[key];
+				item.locked = locked;
+			}
+
+		};
+	};
+
+</script>
+
+<readme>
+This component can help you with generating confirmation codes. Keep data structure for inputs according to the documentation below.
+
+### `create` input/output
+
+__Create input__:
+
+- `id {String}` identifier (email, phone number, identifier, etc.)
+
+__Create output__:
+
+- `success {Boolean}` determines if the code is verified or not accroding to its identifier
+- `value {String}` a pin/code/token
+- `error {String}` (optional) a simple error identifier, it can contain:
+	- `locked` the identifier is locked by the previous call
+
+### `verify` input/output
+
+__Verify input__:
+
+- `id {String}` identifier (email, phone number, identifier, etc.)
+- `value {String}` a pin/code/token
+
+__Verify output__:
+
+- `success {Boolean}` determines if the code is verified or not accroding to its identifier
+- `slots {Number}` free slots/attempts
+- `error {String}` (optional) a simple error identifier, it can contain:
+	- `invalid` the code is invalid
+	- `404` identifier not found
+
+---
+
+### Settings
+
+- __Lock__ prevents overwriting of the code according to the identifier
+
+</readme>
+
+<settings>
+	<div class="padding">
+		<div class="grid-2">
+			<div class="m">
+				<div data---="input__?.type__dirsource:#confirmcodetypes;required:1">Type</div>
+			</div>
+			<div>
+				<div class="grid-2">
+					<div class="m">
+						<div data---="input__?.length__type:number;min:1;max:500">Length</div>
+					</div>
+					<div class="m">
+						<div data---="input__?.count__type:number">Count of attempts</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<hr />
+		<div class="grid-4">
+			<div class="m">
+				<div data---="input__?.expire__align:1;placeholder:5 minutes;required:1">Expiration</div>
+			</div>
+			<div class="m">
+				<div data---="input__?.lock__align:1;placeholder:5 minutes">Lock</div>
+			</div>
+		</div>
+	</div>
+</settings>
+
+<style>
+	.CLASS footer { padding: 10px 8px; font-size: 12px; }
+	.CLASS footer > div:first-child { margin-bottom: 3px; }
+</style>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+	<footer>
+		<div>Pending: <b data-bind="STATUS.count__text__empty"></b></div>
+		<div data-bind="CONFIG__template">
+			<script type="text/html">
+				<div class="keyvalue small"><span>Type</span><div class="right b">{{ value.type | cl('confirmcodetypes') }}</div></div>
+				<div class="keyvalue small"><span>Length</span><div class="right">{{ value.length }}</div></div>
+				<div class="keyvalue small"><span>Expiration</span><div class="right">{{ value.expire }}</div></div>
+				<div class="keyvalue small"><span>Lock</span><div class="right">{{ value.lock | empty }}</div></div>
+			</script>
+		</div>
+	</footer>
+</body>
+
+<script>
+	DEF.cl.confirmcodetypes = [{ id: 'pin', name: 'PIN' }, { id: 'guid', name: 'Guid' }, { id: 'token', name: 'Token' }, { id: 'number', name: 'Number' }, { id: 'string', name: 'String' }];
+</script>

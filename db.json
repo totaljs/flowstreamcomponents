@@ -43,6 +43,17 @@
 		"version": "1"
 	},
 	{
+		"id": "confirmation-code",
+		"group": "Security",
+		"name": "Confirmation code",
+		"url": "https://cdn.totaljs.com/flowstream/components/confirmation-code.html",
+		"author": "Total.js",
+		"icon": "fa fa-barcode",
+		"color": "",
+		"version": "1",
+		"readme": "This component can help you with generating confirmation codes. Keep data structure for inputs according to the documentation below.\n\n### `create` input/output\n\n__Create input__:\n\n- `id {String}` identifier (email, phone number, identifier, etc.)\n\n__Create output__:\n\n- `success {Boolean}` determines if the code is verified or not accroding to its identifier\n- `value {String}` a pin/code/token\n- `error {String}` (optional) a simple error identifier, it can contain:\n\t- `locked` the identifier is locked by the previous call\n\n### `verify` input/output\n\n__Verify input__:\n\n- `id {String}` identifier (email, phone number, identifier, etc.)\n- `value {String}` a pin/code/token\n\n__Verify output__:\n\n- `success {Boolean}` determines if the code is verified or not accroding to its identifier\n- `slots {Number}` free slots/attempts\n- `error {String}` (optional) a simple error identifier, it can contain:\n\t- `invalid` the code is invalid\n\t- `404` identifier not found\n\n---\n\n### Settings\n\n- __Lock__ prevents overwriting of the code according to the identifier"
+	},
+	{
 		"id": "connections",
 		"group": "Linux Monitoring",
 		"name": "Connections",
