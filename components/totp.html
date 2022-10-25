@@ -1,0 +1,273 @@
+<script total>
+
+	exports.name = 'TOTP';
+	exports.icon = 'fa fa-lock';
+	exports.author = 'Total.js';
+	exports.version = '1';
+	exports.group = 'Security';
+	exports.config = { issuer: 'Total.js', type: 'totp', time: 30 };
+	exports.inputs = [{ id: 'generate', name: 'Generate' }, { id: 'verify', name: 'Verify' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }];
+
+	exports.make = function(instance, config) {
+
+		// Base32 methods are updated code from "Base32.js" library
+		// Source: https://github.com/mikepb/base32.js
+		function charmap(alphabet) {
+			var mappings = {};
+			var chars = alphabet.split('');
+			for (var i = 0; i < chars.length; i++) {
+				var c = chars[i];
+				if (!(c in mappings))
+					mappings[c] = i;
+			}
+			return mappings;
+		}
+
+		var CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+		var CHARMAP = charmap(CHARS);
+
+		CHARMAP[0] = 14;
+		CHARMAP[1] = 8;
+
+		function base32encode(arr) {
+			var buf = [];
+			var shift = 3;
+			var carry = 0;
+
+			for (var i = 0; i < arr.length; i++) {
+
+				var byte = arr[i];
+				var symbol = carry | (byte >> shift);
+				buf.push(CHARS[symbol & 0x1f]);
+				if (shift > 5) {
+					shift -= 5;
+					symbol = byte >> shift;
+					buf.push(CHARS[symbol & 0x1f]);
+				}
+				shift = 5 - shift;
+				carry = byte << shift;
+				shift = 8 - shift;
+			}
+
+			if (shift !== 3) {
+				buf.push(CHARS[carry & 0x1f]);
+				shift = 3;
+				carry = 0;
+			}
+
+			return buf.join('');
+		}
+
+		function base32decode(val) {
+
+			var buf = [];
+			var arr = val.toUpperCase().split('');
+			var shift = 8;
+			var carry = 0;
+
+			for (var i = 0; i < arr.length; i++) {
+				var c = arr[i];
+				if (c === '=')
+					continue;
+
+				var symbol = CHARMAP[c] & 0xff;
+				shift -= 5;
+
+				if (shift > 0) {
+					carry |= symbol << shift;
+				} else if (shift < 0) {
+					buf.push(carry | (symbol >> -shift));
+					shift += 8;
+					carry = (symbol << shift) & 0xff;
+				} else {
+					buf.push(carry | symbol);
+					shift = 8;
+					carry = 0;
+				}
+			}
+
+			if (shift !== 8 && carry !== 0) {
+				buf.push(carry);
+				shift = 8;
+				carry = 0;
+			}
+
+			return Buffer.from(buf);
+		}
+
+		// Inspired from "Speakeasy" library
+		// Source: https://github.com/speakeasyjs/speakeasy
+		function hotp(key, counter) {
+
+			var buffer = Buffer.from(base32decode(key), 'base32');
+			var buffersize = 20;
+			var digits = 6;
+
+			key = Buffer.from(Array(Math.ceil(buffersize / buffer.length) + 1).join(buffer.toString('hex')), 'hex').slice(0, buffersize);
+
+			var buf = Buffer.alloc(8);
+			var tmp = counter || 0;
+
+			for (var i = 0; i < 8; i++) {
+				// mask 0xff over number to get last 8
+				buf[7 - i] = tmp & 0xff;
+				// shift 8 and get ready to loop over the next batch of 8
+				tmp = tmp >> 8;
+			}
+
+			var hmac = F.Crypto.createHmac('sha1', key);
+			hmac.update(buf);
+			var digest = hmac.digest();
+
+			// compute HOTP offset
+			var offset = digest[digest.length - 1] & 0xf;
+
+			// calculate binary code (RFC4226 5.4)
+			var code = (digest[offset] & 0x7f) << 24 |
+			(digest[offset + 1] & 0xff) << 16 |
+			(digest[offset + 2] & 0xff) << 8 |
+			(digest[offset + 3] & 0xff);
+
+			// left-pad code
+			code = new Array(digits + 1).join('0') + code.toString(10);
+
+			// return length number off digits
+			return code.substr(-digits);
+		}
+
+		function hotpverify(key, token, counter, win, totp) {
+
+			if (!win)
+				win = 5;
+
+			if (!counter)
+				counter = 0;
+
+			token += '';
+
+			var loopstart = totp ? counter - win : counter;
+			var inc = 0;
+
+			// Now loop through from C (C - W in case of TOTP)
+			// to C + W to determine if there is a correct code
+			for (var i = loopstart; i <= counter + win; ++i) {
+				inc = i;
+				if (hotp(key, inc) === token) {
+					// We have found a matching code, trigger callback
+					// and pass offset
+					return { delta: i - counter };
+				}
+			}
+
+			// If we get to here then no codes have matched, return null
+			return null;
+		}
+
+		instance.message_generate = function($) {
+
+			var bytes = F.Crypto.randomBytes(20);
+			var set = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz';
+			var builder = [];
+
+			for (var i = 0; i < bytes.length; i++)
+				builder.push(set[Math.floor(bytes[i] / 255.0 * (set.length - 1))]);
+
+			var secret = base32encode(Buffer.from(builder.join('').toUpperCase())).toString().replace(/=/g, '');
+			var user = (typeof($.data) === 'string' ? $.data : $.data.user) || 'Account';
+			var data = {};
+			data.secret = secret;
+			data.url = 'otpauth://' + config.type + '/' + user +'?secret=' + data.secret + '&issuer=' + encodeURIComponent(config.issuer || '');
+			data.qrcode = 'https://api.qrserver.com/v1/create-qr-code/?color=000000&bgcolor=FFFFFF&data=' + encodeURIComponent(data.url) + '&qzone=0&margin=0&size=200x200&ecc=L';
+			$.send('output', data);
+		};
+
+		instance.message_verify = function($) {
+			var data = $.data;
+			var now = Date.now();
+			var counter = Math.floor((now / 1000) / config.time);
+			var secret = data.secret || data.key;
+			var token = (data.token || data.code || data.pin || '0').replace(/\s/g, '');
+			var tmp = secret ? hotpverify(secret, token, counter, 1, true) : null;
+			var output = {};
+			output.success = tmp != null && tmp.delta >= 0;
+			$.send('output', output);
+		};
+
+	};
+
+</script>
+
+<readme>
+## Time-Based One-Time Password Algorithm
+
+This component can generate a secret and verifies the code (generated via Authenticator app) as a one-time password for 2FA authorization.
+
+- recommended mobile apps: __Google Authenticator__ or __Microsoft Authenticator__
+
+---
+
+__How does it work?__
+
+First, a user must generate a secret via`generate` input in the authenticator app. Then, for verification of the one-time generated password, you need to use the second input `verify,` which needs user secrets.
+
+### `generate` input/output
+
+__Input data__:
+
+- `user {String}` email or user/account name without special characters
+
+__Output data `object` with__:
+
+- `secret {String}` a generated secret which you must store for the specific user
+- `url {String}` an optimized url address for tokenization
+- `qrcode {String}` a link to the picture with QR code
+
+### `verify` input/outputs
+
+__Input data `object` with__:
+
+- `secret {String}`
+
+__Output data `object` with__:
+
+- `success {Boolean}` determines if the password is valid or not
+
+</readme>
+
+<style>
+	.CLASS footer { padding: 10px 8px; }
+</style>
+
+<settings>
+	<div class="padding">
+		<div class="grid-2">
+			<div class="m">
+				<div data---="input__?.issuer__required:1;innerlabel:1;placeholder:Enter a value">Issuer</div>
+				<div class="help">Your project or organization name</div>
+			</div>
+			<div>
+				<div class="grid-2">
+					<div class="m">
+						<div data---="input__?.time__required:1;type:number;innerlabel:1;placeholder:Enter a value">Time</div>
+						<div class="help">Code validity in seconds</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</settings>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+	<footer data-bind="CONFIG__template">
+		<script type="text/html">
+			<div class="keyvalue small">
+				<span>Issuer</span>
+				<div>{{ value.issuer }}</div>
+			</div>
+		</script>
+	</footer>
+</body>
