@@ -1,0 +1,50 @@
+<script total>
+
+	exports.name = 'Transform';
+	exports.icon = 'fa fa-radiation';
+	exports.author = 'Total.js';
+	exports.version = '1';
+	exports.group = 'Common';
+	exports.config = { path: '' };
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'transform', name: 'Transform', type: 'transform' }, { id: 'output', name: 'Output' }];
+
+	exports.make = function(instance, config) {
+		instance.message = function($) {
+			var data = $.data;
+			var value = config.path ? U.get(data, config.path) : data;
+			instance.transform('transform', value, function(response) {
+				if (config.path)
+					U.set(data, config.path, response.data);
+				else
+					data = response.data;
+				$.send('output', data);
+			});
+		};
+	};
+
+</script>
+
+<readme>
+This component can transform (a specific) message data.
+</readme>
+
+<settings>
+	<div class="padding">
+		<div data---="input__?.path__placeholder:path.to.the.property">Transform value according to this path</div>
+		<div class="help">Only the value according to the path will be transformed</div>
+	</div>
+</settings>
+
+<style>
+	.CLASS footer { padding: 10px 8px; font-size: 11px; }
+</style>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+	<footer>
+		Path: <b data-bind="CONFIG.path__text__empty"></b>
+	</footer>
+</body>

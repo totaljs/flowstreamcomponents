@@ -1055,6 +1055,17 @@
 		"readme": "## Time-Based One-Time Password Algorithm\n\nThis component can generate a secret and verifies the code (generated via Authenticator app) as a one-time password for 2FA authorization.\n\n- recommended mobile apps: __Google Authenticator__ or __Microsoft Authenticator__\n\n---\n\n__How does it work?__\n\nFirst, a user must generate a secret via`generate` input in the authenticator app. Then, for verification of the one-time generated password, you need to use the second input `verify,` which needs user secrets.\n\n### `generate` input/output\n\n__Input data__:\n\n- `user {String}` email or user/account name without special characters\n\n__Output data `object` with__:\n\n- `secret {String}` a generated secret which you must store for the specific user\n- `url {String}` an optimized url address for tokenization\n- `qrcode {String}` a link to the picture with QR code\n\n### `verify` input/outputs\n\n__Input data `object` with__:\n\n- `secret {String}`\n\n__Output data `object` with__:\n\n- `success {Boolean}` determines if the password is valid or not"
 	},
 	{
+		"id": "transform",
+		"group": "Common",
+		"name": "Transform",
+		"url": "https://cdn.totaljs.com/flowstream/components/transform.html",
+		"author": "Total.js",
+		"icon": "fa fa-radiation",
+		"color": "",
+		"version": "1",
+		"readme": "This component can transform (a specific) message data."
+	},
+	{
 		"id": "trigger",
 		"group": "Triggers",
 		"name": "Trigger",
