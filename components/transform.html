@@ -5,7 +5,7 @@
 	exports.author = 'Total.js';
 	exports.version = '1';
 	exports.group = 'Common';
-	exports.config = { path: '' };
+	exports.config = { path: '', assign: '' };
 	exports.inputs = [{ id: 'input', name: 'Input' }];
 	exports.outputs = [{ id: 'transform', name: 'Transform', type: 'transform' }, { id: 'output', name: 'Output' }];
 
@@ -14,10 +14,14 @@
 			var data = $.data;
 			var value = config.path ? U.get(data, config.path) : data;
 			instance.transform('transform', value, function(response) {
-				if (config.path)
+
+				if (config.assign)
+					U.set(data, config.assign, response.data);
+				else if (config.path)
 					U.set(data, config.path, response.data);
 				else
 					data = response.data;
+
 				$.send('output', data);
 			});
 		};
@@ -26,13 +30,21 @@
 </script>
 
 <readme>
-This component can transform (a specific) message data.
+This component can transform message data.
 </readme>
 
 <settings>
 	<div class="padding">
-		<div data---="input__?.path__placeholder:path.to.the.property">Transform value according to this path</div>
-		<div class="help">Only the value according to the path will be transformed</div>
+		<div class="grid-2">
+			<div class="m">
+				<div data---="input__?.path__placeholder:path.to.the.property">Transform value according to this path</div>
+				<div class="help">Only the value according to the path will be transformed</div>
+			</div>
+			<div class="m">
+				<div data---="input__?.assign__placeholder:path.to.the.property">Assign response to the path</div>
+				<div class="help">Empty path will replace transformed property</div>
+			</div>
+		</div>
 	</div>
 </settings>
 
