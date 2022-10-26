@@ -1,0 +1,51 @@
+<script total>
+
+	exports.name = 'Error';
+	exports.icon = 'fa fa-bug';
+	exports.author = 'Total.js';
+	exports.version = '1';
+	exports.group = 'REST API';
+	exports.config = {};
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }];
+
+	exports.make = function(instance, config) {
+
+		instance.message = function($) {
+
+			var data = $.data;
+			var output = [];
+
+			if (!(data instanceof Array))
+				data = [data];
+
+			for (var m of data) {
+				var err = null;
+				if (m instanceof Error)
+					err = m.message;
+				else if (typeof(m) === 'string')
+					err = m;
+				else if (m)
+					err = m.error || m.err  || m.e || m.message;
+				err && output.push({ name: $.from.module.name, error: err });
+			}
+
+			if (output.length)
+				$.send('output', output);
+			else
+				$.destroy();
+		};
+
+	};
+
+</script>
+
+<readme>
+This component transforms incoming data to the Total.js Error structure.
+</readme>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+</body>

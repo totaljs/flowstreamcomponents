@@ -219,6 +219,17 @@
 		"readme": "The component destroys the incoming message."
 	},
 	{
+		"id": "error",
+		"group": "REST API",
+		"name": "Error",
+		"url": "https://cdn.totaljs.com/flowstream/components/error.html",
+		"author": "Total.js",
+		"icon": "fa fa-bug",
+		"color": "",
+		"version": "1",
+		"readme": "This component transforms incoming data to the Total.js Error structure."
+	},
+	{
 		"id": "exec",
 		"group": "Triggers",
 		"name": "Exec",
