@@ -5,7 +5,7 @@
 	exports.author = 'Total.js';
 	exports.version = '1';
 	exports.group = 'Security';
-	exports.config = { count: 3, type: 'pin', length: 4, expire: '5 minutes', lock: '' };
+	exports.config = { count: 3, type: 'pin', length: 4, expire: '5 minutes', lock: '', limit: 1 };
 	exports.inputs = [{ id: 'create', name: 'Create' }, { id: 'verify', name: 'Verify' }];
 	exports.outputs = [{ id: 'output', name: 'Output' }];
 
@@ -52,18 +52,30 @@
 			var msg = {};
 
 			if (tmp && tmp.locked && tmp.locked > NOW) {
-				msg.success = tmp.count > 0;
-				msg.slots = tmp.count;
-				msg.error = 'locked';
+				if (tmp.limit <= 0) {
+					msg.success = tmp.count > 0;
+					msg.slots = tmp.count;
+					msg.error = 'locked';
+					msg.limit = tmp.limit;
+				} else {
+					tmp.limit--;
+					msg.value = val;
+					msg.success = tmp.count > 0;
+					msg.slots = tmp.count;
+					msg.expire = now.add(config.expire);
+					msg.limit = tmp.limit;
+				}
 				$.send('output', msg);
 				return;
 			}
 
 			msg.success = true;
 			msg.value = val;
+			msg.slots = config.count;
+			msg.limit = config.limit;
 
 			var now = new Date();
-			codes[id] = { value: val, expire: now.add(config.expire), count: config.count, locked: config.lock ? now.add(config.lock) : null };
+			codes[id] = { value: val, expire: now.add(config.expire), count: config.count, locked: config.lock ? now.add(config.lock) : null, limit: config.limit };
 			$.send('output', msg);
 			refresh();
 		};
@@ -201,6 +213,9 @@ __Verify output__:
 			</div>
 			<div class="m">
 				<div data---="input__?.lock__align:1;placeholder:5 minutes">Lock</div>
+			</div>
+			<div class="m">
+				<div data---="input__?.limit__type:number">Max. calls per lock</div>
 			</div>
 		</div>
 	</div>
