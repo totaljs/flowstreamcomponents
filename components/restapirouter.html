@@ -3,9 +3,9 @@
 	exports.name = 'API Router';
 	exports.group = 'REST API';
 	exports.icon = 'fa fa-crosshairs';
-	exports.version = '2';
+	exports.version = '3';
 	exports.author = 'Total.js';
-	exports.config = { name: 'API Router', schema: [], color: '', icon: 'fa fa-crosshairs', path: '', rewrite: true };
+	exports.config = { name: 'API Router', schema: [], color: '', icon: 'fa fa-crosshairs', path: '', rewrite: true, send: 'all' };
 	exports.inputs = [{ id: 'input', name: 'Payload' }];
 	exports.outputs = [];
 
@@ -66,7 +66,9 @@
 							data.session = ctrl.session;
 						}
 
-						if (config.path && !config.rewrite)
+						if (config.send && config.send !== 'all')
+							$.data = data[config.send];
+						else if (config.path && !config.rewrite)
 							$.data = data;
 
 						$.send(meta.id);
@@ -176,7 +178,14 @@ If the controller is stored in the `message.refs.controller` property, then its 
 <settings>
 	<div class="CLASS-settings">
 		<div class="padding">
-			<div data---="input__?.name__required:1" class="m">Name</div>
+			<div class="row">
+				<div class="col-md-9 m">
+					<div data---="input__?.name__required:1">Name</div>
+				</div>
+				<div class="col-md-3 m">
+					<div data---="input__?.send__dirsource:all|Everything,params|Params,query|Query arguments,data|Payload">Send next</div>
+				</div>
+			</div>
 			<div class="row">
 				<div class="col-md-6 m">
 					<div data---="input__?.path">Load data from the specific property/field</div>

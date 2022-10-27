@@ -50,6 +50,9 @@
 			var id = typeof(data) === 'string' ? data : data.id;
 			var tmp = codes[id];
 			var msg = {};
+			var now = NOW = new Date();
+
+			msg.success = true;
 
 			if (tmp && tmp.locked && tmp.locked > NOW) {
 				if (tmp.limit <= 0) {
@@ -60,22 +63,20 @@
 				} else {
 					tmp.limit--;
 					msg.value = val;
-					msg.success = tmp.count > 0;
-					msg.slots = tmp.count;
-					msg.expire = now.add(config.expire);
+					tmp.slots = msg.slots = tmp.count;
+					tmp.expire = now.add(config.expire);
 					msg.limit = tmp.limit;
+					tmp.param = data.param;
 				}
 				$.send('output', msg);
 				return;
 			}
 
-			msg.success = true;
 			msg.value = val;
 			msg.slots = config.count;
 			msg.limit = config.limit;
 
-			var now = new Date();
-			codes[id] = { value: val, expire: now.add(config.expire), count: config.count, locked: config.lock ? now.add(config.lock) : null, limit: config.limit };
+			codes[id] = { value: val, expire: now.add(config.expire), count: config.count, locked: config.lock ? now.add(config.lock) : null, limit: config.limit, param: data.param };
 			$.send('output', msg);
 			refresh();
 		};
@@ -91,12 +92,15 @@
 			output.success = false;
 			output.slots = 0;
 
+			console.log(id, value, codes);
+
 			if (tmp) {
 
 				if (tmp.value === value) {
 					delete codes[id];
 					output.success = true;
 					output.slots = tmp.count;
+					output.param = tmp.param;
 					$.send('output', output);
 					refresh();
 					return;
@@ -158,11 +162,13 @@ This component can help you with generating confirmation codes. Keep data struct
 __Create input__:
 
 - `id {String}` identifier (email, phone number, identifier, etc.)
+- `param {String}` a custom parameter
 
 __Create output__:
 
 - `success {Boolean}` determines if the code is verified or not accroding to its identifier
 - `value {String}` a pin/code/token
+- `param {String}` a custom parameter (it sends only if the value is true)
 - `error {String}` (optional) a simple error identifier, it can contain:
 	- `locked` the identifier is locked by the previous call
 
