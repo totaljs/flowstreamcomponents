@@ -3,7 +3,7 @@
 	exports.name = 'Modified';
 	exports.group = 'Common';
 	exports.version = '1';
-	exports.icon = 'fas fa-drafting-compass';
+	exports.icon = 'ti ti-map';
 	exports.author = 'Total.js';
 	exports.config = {};
 	exports.inputs = [{ id: 'input', name: 'Input' }];
@@ -105,8 +105,8 @@ The component compares incoming data with previous data.
 	<footer>
 		<div data-bind="STATUS__template" class="status">
 			<script type="text/html">
-				<div><i class="fa fa-check-circle green"></i>Modified: {{ value.modified | empty }}</div>
-				<div><i class="fa fa-times-circle red"></i>Not modified: {{ value.notmodified | empty }}</div>
+				<div><i class="ti ti-check-circle green"></i>Modified: {{ value.modified | empty }}</div>
+				<div><i class="ti ti-times-circle red"></i>Not modified: {{ value.notmodified | empty }}</div>
 				<div class="help">Refresh interval: <b>1 minute</b></div>
 			</script>
 		</div>

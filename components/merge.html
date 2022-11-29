@@ -1,7 +1,7 @@
 <script total>
 
 	exports.name = 'Merge';
-	exports.icon = 'fa fa-filter';
+	exports.icon = 'ti ti-filter';
 	exports.author = 'Total.js';
 	exports.version = '1';
 	exports.group = 'Common';
@@ -115,7 +115,7 @@ This component merges multiple inputs into one object.
 			<div data---="listform__?.inputs__autofocus:1;empty:You do not have defined any inputs;create:tmpmerge.add">
 
 				<script type="text/html">
-					<div class="item"><i class="fa fa-arrow-right"></i>{{ if required }}<b>{{fi}}{{ name }}{{ if required }}</b>{{fi}}{{ if assign }}<span class="fs11 gray ml5">{{ assign }}</span>{{ fi }}</div>
+					<div class="item"><i class="ti ti-arrow-right"></i>{{ if required }}<b>{{fi}}{{ name }}{{ if required }}</b>{{fi}}{{ if assign }}<span class="fs11 gray ml5">{{ assign }}</span>{{ fi }}</div>
 				</script>
 
 				<script type="text/html">
@@ -135,7 +135,7 @@ This component merges multiple inputs into one object.
 						<div data---="input__?.required__type:checkbox__false"><b>Required</b></div>
 						<div data---="input__?.clear__type:checkbox__false" class="m">Clear value after use</div>
 						<div data---="validate__?" class="toolbar">
-							<button name="submit"><i class="fa fa-floppy-o"></i>Save</button>
+							<button name="submit"><i class="ti ti-file-code"></i>Save</button>
 							<button name="remove">Remove</button>
 							<button name="cancel">Cancel</button>
 						</div>
@@ -143,7 +143,7 @@ This component merges multiple inputs into one object.
 				</script>
 
 				<script type="text/html">
-					<div style="margin-top:10px"><button class="button button-inline" name="create"><i class="fa fa-plus-circle green"></i>Add input</button></div>
+					<div style="margin-top:10px"><button class="button button-inline" name="create"><i class="ti ti-plus-circle green"></i>Add input</button></div>
 				</script>
 
 			</div>
