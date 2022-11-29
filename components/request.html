@@ -208,11 +208,11 @@ __Response__:
 		<div class="row">
 			<div class="col-md-3 m">
 				<div data---="input__?.timeout__type:number">Timeout</div>
-				<div class="help"><i class="far fa-clock-o"></i><span data-bind="?.timeout__text:((value||0)/1000).floor(2)+' sec.'"></span><br />Timeout <b>in milliseconds</b></div>
+				<div class="help"><i class="ti ti-clock"></i><span data-bind="?.timeout__text:((value||0)/1000).floor(2)+' sec.'"></span><br />Timeout <b>in milliseconds</b></div>
 			</div>
 			<div class="col-md-3 m">
 				<div data---="input__?.limit__type:number">Max. size</div>
-				<div class="help"><i class="fas fa-calculator"></i><span data-bind="?.limit__text:(value||0).filesize()"></span><br />Response max. size <b>in bytes</b></div>
+				<div class="help"><i class="ti ti-calculator"></i><span data-bind="?.limit__text:(value||0).filesize()"></span><br />Response max. size <b>in bytes</b></div>
 			</div>
 			<div class="col-md-6 m">
 				<div data---="input__?.send__required:1;dirsource:all|Everything,response|Response body,chunks|Chunks of buffer,headers|Headers only,status|Status code">Send to output</div>
