@@ -1,7 +1,7 @@
 <script total>
 
 	exports.name = 'Map array';
-	exports.icon = 'fa fa-random';
+	exports.icon = 'ti ti-table';
 	exports.author = 'Total.js';
 	exports.version = '1';
 	exports.config = { rules: [] };
@@ -200,7 +200,7 @@ each of the Map properties will be pushed to a new array, see example bellow
 								<div data---="input__?.map[{{ $index }}].target"></div>
 							</div>
 							<div class="col-md-1">
-								<i class="fa fa-trash red exec" data-exec="FUNC.maparray_remove_item" data-index="{{ $index }}"></i>
+								<i class="ti ti-trash red exec" data-exec="FUNC.maparray_remove_item" data-index="{{ $index }}"></i>
 							</div>
 						</div>
 					</div>
@@ -210,7 +210,7 @@ each of the Map properties will be pushed to a new array, see example bellow
 			<div class="help m" data-bind="?.array__hide">You can use 3 dots(...) in the right field to keep the same path.</div>
 			<button class="button-add exec" data-exec="FUNC.maparray_add_item">ADD</button>
 		</section>
-		<button class="button exec" style="width: 200px;" data-exec="FUNC.maparray_readme"><i class="fa fa-info-circle blue"></i>Show configuration info</button>
+		<button class="button exec" style="width: 200px;" data-exec="FUNC.maparray_readme"><i class="ti ti-info-circle blue"></i>Show configuration info</button>
 	</div>
 </settings>
 

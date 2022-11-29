@@ -3,7 +3,7 @@
 	exports.name = 'Print JSON';
 	exports.group = 'Common';
 	exports.version = '1';
-	exports.icon = 'fa fa-print';
+	exports.icon = 'ti ti-print';
 	exports.author = 'Martin Smola';
 	exports.config = { repo: false, data: true };
 	exports.inputs = [{ id: 'input', name: 'Input' }];
@@ -83,12 +83,12 @@ The component prints incoming data in a JSON format.
 		navigator.clipboard.writeText(type === 'path' ? data : STRINGIFY(data)).catch(e => console.error(e));
 	};
 
-	$('body').on('click', '.ui-objecttree .fa-copy, .ui-objecttree .fa-link', function(){
+	$('body').on('click', '.ui-objecttree .ti-copy, .ui-objecttree .ti-link', function(){
 		var el = $(this);
-		var iscopy = el.hclass('fa-copy');
-		el.tclass(iscopy ? 'fa-copy' : 'fa-link').tclass('fa-check');
+		var iscopy = el.hclass('ti-copy');
+		el.tclass(iscopy ? 'ti-copy' : 'ti-link').tclass('ti-check');
 		setTimeout(function(){
-			el.tclass('fa-check').tclass(iscopy ? 'fa-copy' : 'fa-link');
+			el.tclass('ti-check').tclass(iscopy ? 'ti-copy' : 'ti-link');
 		}, 2000);
 	});
 </script>

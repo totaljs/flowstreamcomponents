@@ -4,7 +4,7 @@
 	exports.name = 'CSV Dataset';
 	exports.group = 'Dashboard';
 	exports.version = '2';
-	exports.icon = 'fa fa-database';
+	exports.icon = 'ti ti-database';
 	exports.author = 'Peter Širka';
 	exports.config = { name: '', unit: '', icon: '', color: '', decimals: 2, type: 'daily', sum: 0 };
 	exports.inputs = [{ id: 'input', name: 'Value' }];
@@ -326,7 +326,7 @@ CSV file contains only processed values (according to the period) and the `.meta
 			if (id !== value) {
 				next(false);
 				// Due to "enter" key
-				setTimeout(ASETTER('approve/show', 'Are you sure you want to rename "{0}" to <b>"{1}"</b>?'.format(id, value), '"fa fa-trash-alt" Remove', function() {
+				setTimeout(ASETTER('approve/show', 'Are you sure you want to rename "{0}" to <b>"{1}"</b>?'.format(id, value), '"ti ti-trash" Remove', function() {
 					exports.trigger({ type: 'rename', key: id, name: value });
 					next(value);
 				}), 200);
@@ -337,7 +337,7 @@ CSV file contains only processed values (according to the period) and the `.meta
 
 		exports.click = function(el) {
 			var id = ATTRD(el);
-			SETTER('approve/show', 'Are you sure you want to remove selected key <b>"{0}"</b>?'.format(id.encode()), '"fa fa-trash-alt" Remove', function() {
+			SETTER('approve/show', 'Are you sure you want to remove selected key <b>"{0}"</b>?'.format(id.encode()), '"ti ti-trash" Remove', function() {
 				exports.trigger({ type: 'remove', key: id });
 			});
 		};
@@ -372,7 +372,7 @@ CSV file contains only processed values (according to the period) and the `.meta
 					<div class="selectable">
 					{{ foreach m in value.keys }}
 						<div class="keyvalue small" data-id="{{ m.key }}">
-							<span><i class="fa fa-trash-alt red clickable"></i><b class="edit" data-edit="required:1;offsetWidth:150;exec:TOUCH.rename" data-id="{{ m.key }}">{{ m.key }}</b></span>
+							<span><i class="ti ti-trash red clickable"></i><b class="edit" data-edit="required:1;offsetWidth:150;exec:TOUCH.rename" data-id="{{ m.key }}">{{ m.key }}</b></span>
 							<div class="right">{{ m.value.value }} {{ m.value.unit }}</div>
 						</div>
 					{{ end }}
