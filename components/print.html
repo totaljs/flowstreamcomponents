@@ -3,7 +3,7 @@
 	exports.name = 'Print';
 	exports.group = 'Common';
 	exports.version = '4';
-	exports.icon = 'fa fa-print';
+	exports.icon = 'ti ti-print';
 	exports.author = 'Total.js';
 	exports.config = { repo: false, data: true };
 	exports.inputs = [{ id: 'input', name: 'Input' }];
@@ -54,7 +54,7 @@
 </script>
 
 <style>
-	.CLASS footer > div { margin: 10px; }
+	.CLASS footer > ui-bind { margin: 10px; }
 	.CLASS pre { font-size: 10px; margin: 0; padding: 5px; background-color: #F0F0F0; border-radius: var(--radius); }
 	.CLASS .noscrollbar { max-height: 250px; }
 	.CLASS .readme { position: absolute; position: absolute; font-size: 11px; right: 5px; margin-top: -5px; cursor: pointer; }
@@ -67,8 +67,8 @@ The component prints incoming data in a JSON format.
 
 <settings>
 	<div class="padding">
-		<div data---="input__?.repo__type:checkbox">Shows repository</div>
-		<div data---="input__?.data__type:checkbox">Shows data</div>
+		<ui-component name="input" path="?.repo" config="type:checkbox">Shows repository</div>
+		<ui-component name="input" path="?.data" config="type:checkbox">Shows data</div>
 	</div>
 </settings>
 
@@ -78,12 +78,12 @@ The component prints incoming data in a JSON format.
 		<i class="ICON"></i>NAME
 	</header>
 	<footer>
-		<div data-bind="!STATUS__html pre:Thelpers.jsonformat(JSON.stringify(value, null, '\t'))__show" class="hidden selectable">
-			<span class="readme" title="Open in new window"><i class="far fa-window-restore"></i></span>
+		<ui-bind path="!STATUS" config="html pre:Thelpers.jsonformat(JSON.stringify(value, null, '\t'));show" class="hidden selectable block">
+			<span class="readme" title="Open in new window"><i class="ti ti-window"></i></span>
 			<div class="noscrollbar mt5">
 				<pre class="json"></pre>
 			</div>
-		</div>
+		</ui-bind>
 	</footer>
 </body>
 
