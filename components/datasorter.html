@@ -65,7 +65,7 @@ The component sort data according to the custom defined conditions. You can defi
 </readme>
 
 <style>
-	.CLASS footer > div { padding: 10px; font-size: 12px; }
+	.CLASS footer > ui-bind { padding: 10px; font-size: 12px; }
 	.CLASS.isnewbie footer .newbie { display: block; font-size: 12px; color: red; }
 	.CLASSsettings .item { padding: 8px 10px; font-size: 12px; }
 	.CLASSsettings .item i { margin-right: 5px; }
@@ -73,7 +73,7 @@ The component sort data according to the custom defined conditions. You can defi
 
 <settings>
 	<div class="padding CLASSsettings">
-		<div data---="listform__?.conditions__autofocus:1;empty:You do not have defined any rules">
+		<ui-component name="listform" path="?.conditions" config="autofocus:1;empty:You do not have defined any rules">
 
 			<script type="text/html">
 				<div class="item"><i class="ti ti-arrow-right"></i>{{ name }}</div>
@@ -81,14 +81,14 @@ The component sort data according to the custom defined conditions. You can defi
 
 			<script type="text/html">
 				<div class="padding">
-					<div data---="input__?.name__required:1;innerlabel:1__''" class="m">Name</div>
-					<div data---="input__?.if__required:1;innerlabel:1;monospace:1__'value != null'">Condition</div>
+					<ui-component name="input" path="?.name" config="required:1;innerlabel:1__''" class="m">Name</ui-component>
+					<ui-component name="input" path="?.if" config="required:1;innerlabel:1;monospace:1" default="'value != null'">Condition</ui-component>
 					<div class="help m"><i class="ti ti-exclamation-triangle"></i><code>value</code> represents a message data. Example: <code>value.age > 18</code></div>
-					<div data---="validate__?" class="toolbar">
+					<ui-component name="validate" path="?" class="toolbar">
 						<button name="submit"><i class="ti ti-file-code"></i>Save</button>
 						<button name="remove">Remove</button>
 						<button name="cancel">Cancel</button>
-					</div>
+					</ui-component>
 				</div>
 			</script>
 
@@ -96,7 +96,7 @@ The component sort data according to the custom defined conditions. You can defi
 				<div style="margin-top:10px"><button class="button button-inline" name="create"><i class="ti ti-plus-circle green"></i>Create rule</button></div>
 			</script>
 
-		</div>
+		</ui-component>
 	</div>
 </settings>
 
@@ -105,7 +105,7 @@ The component sort data according to the custom defined conditions. You can defi
 		<i class="ICON"></i>NAME
 	</header>
 	<footer>
-		<div data-bind="STATUS__text__show" class="red"></div>
+		<ui-bind path="STATUS" config="text;show" class="red"></ui-bind>
 	</footer>
 </body>
 

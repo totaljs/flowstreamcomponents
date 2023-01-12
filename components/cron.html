@@ -107,7 +107,7 @@ or
 
 <settings>
 	<div class="padding">
-		<div data---="textboxlist__?.jobs__maxlength:50;placeholder:enter value like '* 1 * * * * | day' and hit enter" class="m">Cron jobs</div>
+		<ui-component name="textboxlist" path="?.jobs" config="maxlength:50;placeholder:enter value like '* 1 * * * * | day' and hit enter" class="m">Cron jobs</ui-component>
 		<button class="button exec" style="width: 200px;" data-exec="FUNC.cron_readme"><i class="ti ti-info-circle blue"></i>Show configuration info</button>
 	</div>
 </settings>
@@ -129,5 +129,5 @@ or
 	<header>
 		<i class="ICON"></i>NAME
 	</header>
-	<footer><span data-bind="!STATUS__text"></span>Number of jobs:</footer>
+	<footer><span><ui-bind path="!STATUS" config="text"></ui-bind></span>Number of jobs:</footer>
 </body>
