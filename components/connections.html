@@ -68,7 +68,7 @@ __Data Example__:
 
 <style>
 	.CLASS footer { padding: 10px; font-size: 11px; }
-	.CLASS footer > div > div { height: 16px; }
+	.CLASS footer > ui-bind > div { height: 16px; }
 	.CLASS footer b { float: right; }
 </style>
 
@@ -76,10 +76,10 @@ __Data Example__:
 	<div class="padding">
 		<div class="row">
 			<div class="col-md-4">
-				<div data---="input__?.port__type:number;required:1">Port number</div>
+				<ui-component name="input" path="?.port" config="type:number;required:1">Port number</ui-component>
 			</div>
 			<div class="col-md-4">
-				<div data---="input__?.interval__type:number;required:1">Interval</div>
+				<ui-component name="input" path="?.interval" config="type:number;required:1">Interval</ui-component>
 				<div class="help">In seconds</div>
 			</div>
 		</div>
@@ -91,11 +91,11 @@ __Data Example__:
 		<i class="ICON"></i>NAME
 	</header>
 	<footer>
-		<div data-bind="!STATUS__template__show">
+		<ui-bind name="!STATUS" config="template;show">
 			<script type="text/html">
 				<div><b>{{ value.port }}</b>Port</div>
 				<div><b>{{ value.connections }}x</b>Connections</div>
 			</script>
-		</div>
+		</ui-bind>
 	</footer>
 </body>

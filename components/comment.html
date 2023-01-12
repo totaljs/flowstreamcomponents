@@ -14,7 +14,7 @@
 
 <settings>
 	<div class="padding">
-		<div data---="codemirror__?.text__type:markdown;parent:auto;minheight:300;margin:65"></div>
+		<ui-component name="codemirror" path="?.text" config="type:markdown;parent:auto;minheight:300;margin:65"></ui-component>
 		<div class="help">Supports Markdown</div>
 	</div>
 </settings>
@@ -31,7 +31,7 @@
 		<button class="button">Open in window</button>
 		<i class="ICON"></i>NAME
 	</header>
-	<footer data-bind="!CONFIG.text__html div:value.markdown(value, { element: el })" class="markdown-small selectable"><div class="markdown"></div></footer>
+	<footer><ui-bind path="!CONFIG.text" config="html div:value.markdown(value, { element: el })" class="markdown-small selectable"><div class="markdown"></div></ui-bind></footer>
 </body>
 
 <script>
