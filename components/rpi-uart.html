@@ -2,7 +2,7 @@
 	exports.name = 'RPIuart';
 	exports.author = 'Thecoolpeople';
 	exports.group = 'Raspberry';
-	exports.icon = 'fab fa-raspberry-pi';
+	exports.icon = 'ti ti-table-alt';
 	exports.version = '1';
 	exports.config = { port:'/dev/ttyUSB0' };
 	exports.inputs = [{ id: 'input', name: 'Input' }];
@@ -91,9 +91,9 @@
 	<footer>
 		<div data-bind="!STATUS__template__show" class="status hidden">
 			{{ if value.open }}
-				<i class="fa fa-circle mr5 green"></i>Open
+				<i class="ti ti-circle mr5 green"></i>Open
 			{{ else }}
-				<i class="fa fa-circle mr5 red"></i>Closed
+				<i class="ti ti-circle mr5 red"></i>Closed
 			{{ fi }}
 		</div>
 	</footer>

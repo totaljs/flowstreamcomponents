@@ -2,7 +2,7 @@
 
 	exports.name = 'Database';
 	exports.group = 'REST API';
-	exports.icon = 'fa fa-database';
+	exports.icon = 'ti ti-database';
 	exports.version = '2';
 	exports.author = 'Total.js';
 	exports.config = { name: 'API Database', items: [] };
@@ -307,7 +307,7 @@ __Good to know__: If the `data` (payload) can contain special key names in the f
 				<div class="padding">
 				<div data---="listform__?.where__autofocus:1;empty:You do not have defined any rules">
 					<script type="text/html">
-						<div class="item monospace"><div class="controls nmr"><button name="up"><i class="fa fa-long-arrow-alt-up"></i></button><button name="down"><i class="fa fa-long-arrow-alt-down"></i></button><button name="remove" class="red"><i class="far fa-trash-alt"></i></button></div><i class="fa fa-filter mr5"></i>{{ name }} {{ comparer }} <b>{{ if type == '6' }}null{{ else }}{{ value }}{{ fi }}</b></div>
+						<div class="item monospace"><div class="controls nmr"><button name="up"><i class="ti ti-long-arrow-up"></i></button><button name="down"><i class="ti ti-long-arrow-alt-down"></i></button><button name="remove" class="red"><i class="ti ti-trash"></i></button></div><i class="ti ti-filter mr5"></i>{{ name }} {{ comparer }} <b>{{ if type == '6' }}null{{ else }}{{ value }}{{ fi }}</b></div>
 					</script>
 					<script type="text/html">
 						<div class="padding">
@@ -328,14 +328,14 @@ __Good to know__: If the `data` (payload) can contain special key names in the f
 							<div class="help"><b>Expression</b> supports these commands <code>params {Object}</code>, <code>query {Object}</code>, <code>data {Object}</code>, <code>user {Object}</code>. A value for date field can contain <code>now</code> with the current date/time.</div>
 							<br />
 							<div data---="validate__?__validonly:true" class="toolbar">
-								<button name="submit"><i class="fa fa-floppy-o"></i>Save</button>
+								<button name="submit"><i class="ti ti-file-code"></i>Save</button>
 								<button name="remove">Remove</button>
 								<button name="cancel">Cancel</button>
 							</div>
 						</div>
 					</script>
 					<script type="text/html">
-						<div style="margin-top:15px"><button class="button button-inline" name="create"><i class="fa fa-plus-circle green"></i>Create</button></div>
+						<div style="margin-top:15px"><button class="button button-inline" name="create"><i class="ti ti-plus-circle green"></i>Create</button></div>
 					</script>
 				</div>
 				</div>
@@ -347,7 +347,7 @@ __Good to know__: If the `data` (payload) can contain special key names in the f
 					<div data---="listform__?.filter__autofocus:1;empty:You do not have defined any rules">
 
 						<script type="text/html">
-							<div class="item monospace"><div class="controls nmr"><button name="up"><i class="fa fa-long-arrow-alt-up"></i></button><button name="down"><i class="fa fa-long-arrow-alt-down"></i></button><button name="remove" class="red"><i class="far fa-trash-alt"></i></button></div><i class="fa fa-filter mr5"></i>{{ name }} <b>{{ type | tmpapidatabasetype }}</b></div>
+							<div class="item monospace"><div class="controls nmr"><button name="up"><i class="ti ti-long-arrow-up"></i></button><button name="down"><i class="ti ti-long-arrow-down"></i></button><button name="remove" class="red"><i class="ti ti-trash"></i></button></div><i class="ti ti-filter mr5"></i>{{ name }} <b>{{ type | tmpapidatabasetype }}</b></div>
 						</script>
 
 						<script type="text/html">
@@ -361,7 +361,7 @@ __Good to know__: If the `data` (payload) can contain special key names in the f
 									</div>
 								</div>
 								<div data---="validate__?__validonly:true" class="toolbar">
-									<button name="submit"><i class="fa fa-floppy-o"></i>Save</button>
+									<button name="submit"><i class="ti ti-check-circle"></i>Save</button>
 									<button name="remove">Remove</button>
 									<button name="cancel">Cancel</button>
 								</div>
@@ -369,7 +369,7 @@ __Good to know__: If the `data` (payload) can contain special key names in the f
 						</script>
 
 						<script type="text/html">
-							<div style="margin-top:15px"><button class="button button-inline" name="create"><i class="fa fa-plus-circle green"></i>Create</button></div>
+							<div style="margin-top:15px"><button class="button button-inline" name="create"><i class="ti ti-plus-circle green"></i>Create</button></div>
 						</script>
 
 					</div>
@@ -390,7 +390,7 @@ __Good to know__: If the `data` (payload) can contain special key names in the f
 
 			<div class="caption m">
 				<div class="toolbar">
-					<button class="exec" data-exec="tmpapidatabase.add"><i class="fa fa-plus-circle green"></i>Add</button>
+					<button class="exec" data-exec="tmpapidatabase.add"><i class="ti ti-plus-circle green"></i>Add</button>
 				</div>
 				<label>Inputs</label>
 			</div>
@@ -398,7 +398,7 @@ __Good to know__: If the `data` (payload) can contain special key names in the f
 			<div data-bind="?.items__template:.item" class="listing">
 				<script type="text/html">
 					{{ foreach m in value }}
-					<div class="item exec" data-id="{{ m.id }}" data-exec="tmpapidatabase.upd"><span class="controls nmr"><button class="exec red" data-prevent="true" data-exec="tmpapidatabase.rem"><i class="far fa-trash-alt"></i></button></span><i class="fa fa-crosshairs mr5"></i>{{ m.name }} ({{ m.command | tmpapidatabasecommand }})</div>
+					<div class="item exec" data-id="{{ m.id }}" data-exec="tmpapidatabase.upd"><span class="controls nmr"><button class="exec red" data-prevent="true" data-exec="tmpapidatabase.rem"><i class="ti ti-trash-alt"></i></button></span><i class="ti ti-crosshairs mr5"></i>{{ m.name }} ({{ m.command | tmpapidatabasecommand }})</div>
 					{{ end }}
 				</script>
 			</div>

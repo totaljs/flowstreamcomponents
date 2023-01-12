@@ -2,10 +2,10 @@
 
 	exports.name = 'API Router';
 	exports.group = 'REST API';
-	exports.icon = 'fa fa-crosshairs';
+	exports.icon = 'ti ti-crosshairs';
 	exports.version = '3';
 	exports.author = 'Total.js';
-	exports.config = { name: 'API Router', schema: [], color: '', icon: 'fa fa-crosshairs', path: '', rewrite: true, send: 'all' };
+	exports.config = { name: 'API Router', schema: [], color: '', icon: 'ti ti-crosshairs', path: '', rewrite: true, send: 'all' };
 	exports.inputs = [{ id: 'input', name: 'Payload' }];
 	exports.outputs = [];
 
@@ -205,20 +205,20 @@ If the controller is stored in the `message.refs.controller` property, then its 
 			<div class="caption m">
 				<div class="toolbar">
 					<nav>
-						<button class="exec" data-exec="tmpapirouter.add"><i class="fa fa-plus-circle"></i>Add</button>
+						<button class="exec" data-exec="tmpapirouter.add"><i class="ti ti-plus-circle"></i>Add</button>
 					</nav>
 				</div>
 				<label>Schema</label>
 			</div>
-			<div class="message message-alert"><i class="fa fa-exclamation-triangle"></i>Every name of identifier must be unique per Flow. You can use dynamic arguments in the form <code>{argument_name}</code></div>
+			<div class="message message-alert"><i class="ti ti-exclamation-triangle"></i>Every name of identifier must be unique per Flow. You can use dynamic arguments in the form <code>{argument_name}</code></div>
 			<div data-bind="?.schema__template:figure --> data-id__show:value && value.length" class="fields m">
 				<script type="text/html">
 					{{ foreach m in value }}
 					<figure data-id="{{ m.id }}">
 						<div class="controls">
-							<span class="exec" data-exec="tmpapirouter.move" title="Up" data-type="up"><i class="fa fa-arrow-up"></i></span>
-							<span class="exec" data-exec="tmpapirouter.move" title="Down" data-type="down"><i class="fa fa-arrow-down"></i></span>
-							<span class="exec" data-exec="tmpapirouter.rem" title="Remove"><i class="far fa-trash-alt red"></i></span>
+							<span class="exec" data-exec="tmpapirouter.move" title="Up" data-type="up"><i class="ti ti-arrow-up"></i></span>
+							<span class="exec" data-exec="tmpapirouter.move" title="Down" data-type="down"><i class="ti ti-arrow-down"></i></span>
+							<span class="exec" data-exec="tmpapirouter.rem" title="Remove"><i class="ti ti-trash red"></i></span>
 						</div>
 						<div class="name">
 							<div class="monospace edit hellip" data-type="from" data-edit="exec:tmpapirouter.name;required:1">{{ m.name }}</div>

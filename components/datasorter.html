@@ -2,7 +2,7 @@
 
 	exports.name = 'Data sorter';
 	exports.group = 'Common';
-	exports.icon = 'fa fa-random';
+	exports.icon = 'ti ti-vector';
 	exports.author = 'Total.js';
 	exports.version = '2';
 	exports.config = { conditions: [] };
@@ -76,16 +76,16 @@ The component sort data according to the custom defined conditions. You can defi
 		<div data---="listform__?.conditions__autofocus:1;empty:You do not have defined any rules">
 
 			<script type="text/html">
-				<div class="item"><i class="fa fa-arrow-right"></i>{{ name }}</div>
+				<div class="item"><i class="ti ti-arrow-right"></i>{{ name }}</div>
 			</script>
 
 			<script type="text/html">
 				<div class="padding">
 					<div data---="input__?.name__required:1;innerlabel:1__''" class="m">Name</div>
 					<div data---="input__?.if__required:1;innerlabel:1;monospace:1__'value != null'">Condition</div>
-					<div class="help m"><i class="fa fa-exclamation-triangle"></i><code>value</code> represents a message data. Example: <code>value.age > 18</code></div>
+					<div class="help m"><i class="ti ti-exclamation-triangle"></i><code>value</code> represents a message data. Example: <code>value.age > 18</code></div>
 					<div data---="validate__?" class="toolbar">
-						<button name="submit"><i class="fa fa-floppy-o"></i>Save</button>
+						<button name="submit"><i class="ti ti-file-code"></i>Save</button>
 						<button name="remove">Remove</button>
 						<button name="cancel">Cancel</button>
 					</div>
@@ -93,7 +93,7 @@ The component sort data according to the custom defined conditions. You can defi
 			</script>
 
 			<script type="text/html">
-				<div style="margin-top:10px"><button class="button button-inline" name="create"><i class="fa fa-plus-circle green"></i>Create rule</button></div>
+				<div style="margin-top:10px"><button class="button button-inline" name="create"><i class="ti ti-plus-circle green"></i>Create rule</button></div>
 			</script>
 
 		</div>

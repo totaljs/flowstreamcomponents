@@ -3,7 +3,7 @@
 	exports.name = 'File Writer';
 	exports.group = 'Files';
 	exports.version = '1';
-	exports.icon = 'fa fa-pencil';
+	exports.icon = 'ti ti-pencil';
 	exports.author = 'Total.js';
 	exports.config = { path: '', serializer: 'json', rewrite: true, divider: '\\n' };
 	exports.inputs = [{ id: 'input', name: 'Input' }];
@@ -104,8 +104,8 @@ The component writes incoming data into the file.
 		<i class="ICON"></i>NAME
 	</header>
 	<footer>
-		<div><i class="far fa-calendar mr5"></i><span data-bind="STATUS.used__text__format:yyyy-MM-dd HH:mm:ss__empty"></span></div>
-		<div><i class="fa fa-calculator mr5"></i><span data-bind="STATUS.size__text__helper:filesize__empty"></span></div>
+		<div><i class="ti ti-calendar mr5"></i><span data-bind="STATUS.used__text__format:yyyy-MM-dd HH:mm:ss__empty"></span></div>
+		<div><i class="ti ti-calculator mr5"></i><span data-bind="STATUS.size__text__helper:filesize__empty"></span></div>
 		<hr />
 		<div data-bind="CONFIG.path__text__empty"></div>
 	</footer>

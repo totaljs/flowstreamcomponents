@@ -1,7 +1,7 @@
 <script total>
 
 	exports.name = 'OAuth 2.0';
-	exports.icon = 'fa fa-key';
+	exports.icon = 'ti ti-key';
 	exports.author = 'Total.js';
 	exports.version = '1';
 	exports.group = 'API';
@@ -54,7 +54,7 @@
 			</div>
 		</div>
 		<hr class="nmt" />
-		<div class="fs12 m"><i class="fa fa-globe mr5"></i>Your redirect URL: <b data-bind="flow.head.notify__text__empty" class="red"></b></div>
+		<div class="fs12 m"><i class="ti ti-globe mr5"></i>Your redirect URL: <b data-bind="flow.head.notify__text__empty" class="red"></b></div>
 		<div class="grid-3">
 			<div class="m">
 				<div data---="input__?.clientid__required:1;camouflage:1;innerlabel:1;placeholder:Enter client id">Client ID</div>
@@ -73,7 +73,7 @@
 		<div class="m center">
 			<p>To obtain of OAuth 2.0 access token, you must click on the button below.</p>
 			<div style="width:150px;margin:0 auto">
-				<button class="button exec b" data-exec="tmpoauth2.authorize" data-bind="?__enabled:value.urlauthorize && value.urltoken && value.clientid && value.clientsecret" disabled><i class="fa fa-key"></i>Authorize</button>
+				<button class="button exec b" data-exec="tmpoauth2.authorize" data-bind="?__enabled:value.urlauthorize && value.urltoken && value.clientid && value.clientsecret" disabled><i class="ti ti-key"></i>Authorize</button>
 			</div>
 			<br />
 		</div>
@@ -93,7 +93,7 @@
 			<div class="padding">
 				<div class="fs12">Response:</div>
 				<pre style="font-size:12px;tab-size:4;margin:0;padding:5px 0"></pre>
-				<div class="help red"><i class="fa fa-exclamation-triangle"></i>Don't forget to save settings if you change something</div>
+				<div class="help red"><i class="ti ti-exclamation-triangle"></i>Don't forget to save settings if you change something</div>
 			</div>
 		</div>
 	</div>
@@ -109,7 +109,7 @@
 		<i class="ICON"></i>NAME
 	</header>
 	<footer data-bind="CONFIG.accesstoken__show">
-		<div><span class="exec link" data-exec="tmpoauth2.copy"><i class="far fa-copy mr5"></i>Copy access token</span></div>
+		<div><span class="exec link" data-exec="tmpoauth2.copy"><i class="ti ti-copy mr5"></i>Copy access token</span></div>
 	</footer>
 </body>
 

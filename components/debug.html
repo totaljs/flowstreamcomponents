@@ -3,7 +3,7 @@
 	exports.name = 'Debug';
 	exports.group = 'Common';
 	exports.version = '1';
-	exports.icon = 'fa fa-print';
+	exports.icon = 'ti ti-print';
 	exports.author = 'Total.js';
 	exports.config = { repo: false, data: true, name: 'Debug' };
 	exports.inputs = [{ id: 'input', name: 'Log window' }];
@@ -90,7 +90,7 @@ The component prints incoming data into the JSON format.
 		<i class="ICON"></i>NAME
 	</header>
 	<footer>
-		<div><button class="button" name="toggle"><i class="far fa-eye"></i>Toggle</button></div>
+		<div><button class="button" name="toggle"><i class="ti ti-eye"></i>Toggle</button></div>
 	</footer>
 </body>
 
@@ -115,7 +115,7 @@ The component prints incoming data into the JSON format.
 					}
 				};
 
-				$(document.body).append('<div data---="box__common.$debug__if:debugform;align:right;width:420;background:false;transparent:true;title:Debug panel;icon:fa fa-bug;zindex:5"><nav><button class="exec" data-exec="debugwindowclear"><i class="fa fa-trash-alt"></i>Clear</button></nav><div class="padding debugform" id="debugformbody"></div></div>');
+				$(document.body).append('<div data---="box__common.$debug__if:debugform;align:right;width:420;background:false;transparent:true;title:Debug panel;icon:ti ti-bug;zindex:5"><nav><button class="exec" data-exec="debugwindowclear"><i class="ti ti-trash"></i>Clear</button></nav><div class="padding debugform" id="debugformbody"></div></div>');
 
 				exports.element.on('click', 'button', function() {
 					SET('common.$debug', common.$debug ? '' : 'debugform');
@@ -130,7 +130,7 @@ The component prints incoming data into the JSON format.
 
 		exports.status = function(data) {
 			if (data && data.date)
-				$('#debugformbody').prepend('<div class="m"><div class="name">{0}</div><div class="date"><i class="fa fa-calendar mr5"></i>{1}</div><pre class="json">{2}</pre></div>'.format(data.name, data.date.format('[ts]'), Thelpers.jsonformat(JSON.stringify(data.data, '\t'))));
+				$('#debugformbody').prepend('<div class="m"><div class="name">{0}</div><div class="date"><i class="ti ti-calendar mr5"></i>{1}</div><pre class="json">{2}</pre></div>'.format(data.name, data.date.format('[ts]'), Thelpers.jsonformat(JSON.stringify(data.data, '\t'))));
 		};
 
 	});

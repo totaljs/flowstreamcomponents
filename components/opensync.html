@@ -3,7 +3,7 @@
 	exports.name = 'OpenSync';
 	exports.group = 'External';
 	exports.author = 'Total.js';
-	exports.icon = 'fa fa-sync';
+	exports.icon = 'ti ti-sync';
 	exports.version = '2';
 	exports.config = {};
 	exports.outputs = [{ id: 'output', name: 'Output' }];
@@ -91,8 +91,8 @@ This component receives a data from the [OpenSync](https://docs.totaljs.com/open
 	<footer>
 		<div data-bind="!STATUS__template">
 			<script type="text/html">
-				<div class="b"><i class="fa fa-globe"></i>{{ if value.meta }}{{value.meta.name }}{{ else }}---{{ fi }}</div>
-				<div><i class="fa fa-circle {{ if value.connected }}green{{ else }}red{{ fi }}"></i>{{ if value.connected }}Connected{{ else }}Disconnected{{ fi }}</div>
+				<div class="b"><i class="ti ti-globe"></i>{{ if value.meta }}{{value.meta.name }}{{ else }}---{{ fi }}</div>
+				<div><i class="ti ti-circle {{ if value.connected }}green{{ else }}red{{ fi }}"></i>{{ if value.connected }}Connected{{ else }}Disconnected{{ fi }}</div>
 			</script>
 		</div>
 	</footer>

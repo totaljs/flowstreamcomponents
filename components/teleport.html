@@ -1,7 +1,7 @@
 <script total>
 
 	exports.name = 'Teleport';
-	exports.icon = 'fa fa-magic';
+	exports.icon = 'ti ti-globe';
 	exports.author = 'Total.js';
 	exports.version = '1';
 	exports.group = 'Common';
@@ -108,11 +108,11 @@ The component can teleport (input) message to another teleport (output) componen
 		<div data-bind="?.is__hide">
 			<div data---="choose__?.type__selector:div" class="iconmenu m">
 				<div data-id="input">
-					<i class="fa fa-dot-circle"></i>
+					<i class="ti ti-dot-circle"></i>
 					<span>Input</span>
 				</div>
 				<div data-id="output">
-					<i class="fa fa-crosshairs"></i>
+					<i class="ti ti-crosshairs"></i>
 					<span>Output</span>
 				</div>
 			</div>
@@ -137,7 +137,7 @@ The component can teleport (input) message to another teleport (output) componen
 				<div data-bind="%teleportinstances__template:.item -> data-id" class="listing">
 					<script type="text/html">
 						{{ foreach m in value }}
-						<div class="item" data-id="{{ m.id }}"><i class="fa fa-crosshairs mr5"></i>{{ m.name }}</div>
+						<div class="item" data-id="{{ m.id }}"><i class="ti ti-crosshairs mr5"></i>{{ m.name }}</div>
 						{{ end }}
 					</script>
 				</div>

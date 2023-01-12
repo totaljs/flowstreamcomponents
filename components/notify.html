@@ -2,7 +2,7 @@
 
 	exports.name = 'Notify';
 	exports.group = 'Triggers';
-	exports.icon = 'fa fa-route';
+	exports.icon = 'ti ti-map-pin';
 	exports.author = 'Total.js';
 	exports.version = '1';
 	exports.config = { method: 'all', send: 'all' };
@@ -74,7 +74,7 @@ __Output data__:
 		<i class="ICON"></i>NAME
 	</header>
 	<footer>
-		<div><span class="exec mr5 pointer" data-exec="tmpnotifycopy"><i class="far fa-copy"></i></span>Endpoint:</div>
+		<div><span class="exec mr5 pointer" data-exec="tmpnotifycopy"><i class="ti ti-copy"></i></span>Endpoint:</div>
 		<div data-bind="flow.head__template">
 			<script type="text/html">
 				<a href="{{ value.proxyurl }}/notify/{{ value.id }}-UID/" target="_blank">/notify/{{ value.id }}-UID/</a>
