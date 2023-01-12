@@ -2,7 +2,7 @@
 
 	exports.name = 'Model';
 	exports.group = 'Transformations';
-	exports.icon = 'fab fa-wpforms';
+	exports.icon = 'ti ti-file';
 	exports.author = 'Total.js';
 	exports.version = '3';
 	exports.config = { name: 'Model', path: '', schema: [], rewrite: true };
@@ -397,7 +397,7 @@ This component prepares incoming data according to the defined schema. Output is
 			<div class="caption m">
 				<div class="toolbar">
 					<nav>
-						<button class="exec" data-exec="tmprestmodel.add"><i class="fa fa-plus-circle"></i>Add</button>
+						<button class="exec" data-exec="tmprestmodel.add"><i class="ti ti-plus-circle"></i>Add</button>
 					</nav>
 				</div>
 				<label>Fields</label>
@@ -407,9 +407,9 @@ This component prepares incoming data according to the defined schema. Output is
 					{{ foreach m in value }}
 					<figure data-id="{{ m.id }}"{{ if m.required }} class="isrequired"{{ fi }}>
 						<div class="controls">
-							<span class="exec" data-exec="tmprestmodel.move" data-type="up" title="Move up"><i class="far fa fa-arrow-up"></i></span>
-							<span class="exec" data-exec="tmprestmodel.move" data-type="down" title="Move down"><i class="far fa fa-arrow-down"></i></span>
-							<span class="exec" data-exec="tmprestmodel.rem" title="Remove"><i class="far fa-trash-alt red"></i></span>
+							<span class="exec" data-exec="tmprestmodel.move" data-type="up" title="Move up"><i class="ti ti-arrow-up"></i></span>
+							<span class="exec" data-exec="tmprestmodel.move" data-type="down" title="Move down"><i class="ti ti-arrow-down"></i></span>
+							<span class="exec" data-exec="tmprestmodel.rem" title="Remove"><i class="ti ti-trash red"></i></span>
 						</div>
 						<div class="required exec{{ if m.required }} is{{ fi }}" data-exec="tmprestmodel.required">required</div>
 						<div class="array exec{{ if m.array }} is{{ fi }}" data-exec="tmprestmodel.array">Array</div>
@@ -473,7 +473,7 @@ This component prepares incoming data according to the defined schema. Output is
 		<i class="ICON"></i><b>Model:</b> <span data-bind="CONFIG.name__text"></span>
 	</header>
 	<footer>
-		<span class="exec link" data-exec="/copy"><i class="far fa-copy mr5"></i>Copy fields as Markdown</span>
+		<span class="exec link" data-exec="/copy"><i class="ti ti-copy mr5"></i>Copy fields as Markdown</span>
 	</footer>
 </body>
 

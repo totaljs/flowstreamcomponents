@@ -1,7 +1,7 @@
 <script total>
 
 	exports.name = 'Switch';
-	exports.icon = 'fa fa-sitemap fa-rotate-270';
+	exports.icon = 'ti ti-sitemap ti-redo';
 	exports.author = 'Total.js';
 	exports.version = '3';
 	exports.config = { conditions: [{ operator: 'eq', value: 'Hello world', type: 'string' }] };
@@ -346,7 +346,7 @@ data.value - variables.offset
 								<div data---="input__?.conditions[{{ $index }}].name"></div>
 							</div>
 							<div class="col-md-1">
-								<i class="fa fa-trash red exec" data-exec="FUNC.switch_remove_condition"></i>
+								<i class="ti ti-trash red exec" data-exec="FUNC.switch_remove_condition"></i>
 							</div>
 						</div>
 					</div>
@@ -356,7 +356,7 @@ data.value - variables.offset
 			<div class="help m">Each condition corresponds to an output index. First condition --> First output, etc.</div>
 			<button class="button-add exec" data-exec="FUNC.switch_add_condition">ADD</button>
 		</section>
-		<button class="button exec" style="width: 200px;" data-exec="FUNC.switch_readme"><i class="fa fa-info-circle blue"></i>Show configuration info</button>
+		<button class="button exec" style="width: 200px;" data-exec="FUNC.switch_readme"><i class="ti ti-info-circle blue"></i>Show configuration info</button>
 	</div>
 </settings>
 

@@ -3,7 +3,7 @@
 	exports.name = 'File Watcher';
 	exports.group = 'Files';
 	exports.version = '1';
-	exports.icon = 'fa fa-recycle';
+	exports.icon = 'ti ti-recycle';
 	exports.author = 'Total.js';
 	exports.config = { path: '', parser: 'json', interval: 1000 };
 	exports.outputs = [{ id: 'output', name: 'Output' }];
@@ -100,8 +100,8 @@ The component watches the existence of the file, then reads the content and send
 		<i class="icon"></i>NAME
 	</header>
 	<footer>
-		<div><i class="far fa-calendar mr5"></i><span data-bind="STATUS.used__text__format:yyyy-MM-dd HH:mm:ss__empty"></span></div>
-		<div><i class="fa fa-calculator mr5"></i><span data-bind="STATUS.size__text__helper:filesize__empty"></span></div>
+		<div><i class="ti ti-calendar mr5"></i><span data-bind="STATUS.used__text__format:yyyy-MM-dd HH:mm:ss__empty"></span></div>
+		<div><i class="ti ti-calculator mr5"></i><span data-bind="STATUS.size__text__helper:filesize__empty"></span></div>
 		<hr />
 		<div data-bind="CONFIG.path__text__empty"></div>
 	</footer>

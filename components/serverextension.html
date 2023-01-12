@@ -3,7 +3,7 @@
 	exports.name = 'Server extension';
 	exports.group = 'Common';
 	exports.version = '1';
-	exports.icon = 'fa fa-flag-checkered';
+	exports.icon = 'ti ti-check-square';
 	exports.author = 'Total.js';
 	exports.config = { name: 'My extension', install: '', uninstall: '', icon: exports.icon };
 
@@ -74,7 +74,7 @@ The component installs Total.js server-side extension. In other words: it can ev
 <body>
 	<div class="padding center" data-bind="CONFIG__template">
 		<script type="text/html">
-			<i class="fa-2x {{ value.icon }}"></i>
+			<i class="ti-2x {{ value.icon }}"></i>
 			<div class="mt10 fs12">{{ value.name }}</div>
 			<div class="help npt nmt">Server extension</div>
 		</script>

@@ -3,7 +3,7 @@
 	exports.name = 'Read';
 	exports.group = 'Common';
 	exports.version = '2';
-	exports.icon = 'fa fa-filter';
+	exports.icon = 'ti ti-filter';
 	exports.author = 'Total.js';
 	exports.config = { path: '', schema: [] };
 	exports.inputs = [{ id: 'input', name: 'Input' }];
@@ -139,7 +139,7 @@ This component reads specific values according to the configured map.
 			<div class="caption m">
 				<div class="toolbar">
 					<nav>
-						<button class="exec" data-exec="tmpread.add"><i class="fa fa-plus-circle"></i>Add</button>
+						<button class="exec" data-exec="tmpread.add"><i class="ti ti-plus-circle"></i>Add</button>
 					</nav>
 				</div>
 				<label>Paths</label>
@@ -149,7 +149,7 @@ This component reads specific values according to the configured map.
 					{{ foreach m in value }}
 					<figure data-id="{{ m.id }}">
 						<div class="controls">
-							<span class="exec" data-exec="tmpread.rem" title="Remove"><i class="far fa-trash-alt red"></i></span>
+							<span class="exec" data-exec="tmpread.rem" title="Remove"><i class="ti ti-trash red"></i></span>
 						</div>
 						<div class="path from">
 							<span>From</span><div class="monospace edit hellip" data-type="from" data-edit="exec:tmpread.path;required:1">{{ m.pathfrom }}</div>
