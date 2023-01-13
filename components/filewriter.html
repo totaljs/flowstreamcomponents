@@ -75,18 +75,18 @@
 
 <settings>
 	<div class="padding">
-		<div data---="input__?.path__required:1;placeholder:/www/flowstream/data.json"><b>Path</b></div>
+		<ui-component name="input" path="?.path" config="required:1;placeholder:/www/flowstream/data.json"><b>Path</b></ui-component>
 		<div class="help m">Absolute path to the file. The path starts with the <code>~</code> char will use a filename in the project's root directory.</div>
-		<div data---="input__?.serializer__dirsource:json|JSON,text|Text,buffer|Buffer;required:1__'json'" class="m">Serializer</div>
-		<div data---="input__?.rewrite__type:checkbox__true">Rewrite content</div>
-		<div data-bind="?.rewrite__hide" class="hidden">
+		<ui-component name="input" path="?.serializer" config="dirsource:json|JSON,text|Text,buffer|Buffer;required:1" default="'json'" class="m">Serializer</ui-component>
+		<ui-component name="input" path="?.rewrite" config="type:checkbox" default="true">Rewrite content</ui-component>
+		<ui-bind path="?.rewrite" config="hide" class="hidden">
 			<hr />
 			<div class="row">
 				<div class="col-md-4 m">
-					<div data---="input__?.divider">Divider</div>
+					<ui-component name="input" path="?.divider">Divider</ui-component>
 				</div>
 			</div>
-		</div>
+		</ui-bind>
 	</div>
 </settings>
 
@@ -104,9 +104,9 @@ The component writes incoming data into the file.
 		<i class="ICON"></i>NAME
 	</header>
 	<footer>
-		<div><i class="ti ti-calendar mr5"></i><span data-bind="STATUS.used__text__format:yyyy-MM-dd HH:mm:ss__empty"></span></div>
-		<div><i class="ti ti-calculator mr5"></i><span data-bind="STATUS.size__text__helper:filesize__empty"></span></div>
+		<div><i class="ti ti-calendar mr5"></i><ui-bind path="STATUS.used" config="text;format:yyyy-MM-dd HH:mm:ss;empty"></span></ui-bind>
+		<div><i class="ti ti-calculator mr5"></i><ui-bind path="STATUS.size" config="text;helper:filesize;empty"></span></ui-bind>
 		<hr />
-		<div data-bind="CONFIG.path__text__empty"></div>
+		<ui-bind path="CONFIG.path" config="text;empty"></ui-bind>
 	</footer>
 </body>

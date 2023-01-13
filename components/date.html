@@ -36,7 +36,7 @@
 
 <settings>
 	<div class="padding">
-		<div data---="input__?.format__placeholder:yyyy-MM-dd HH\:mm\:ss">Date format</div>
+		<ui-component name="input" path="?.format" config="placeholder:yyyy-MM-dd HH\:mm\:ss">Date format</ui-component>
 		<p>
 			d - day e.g. 1<br>
 			dd - day e.g. 01<br>
@@ -80,5 +80,5 @@
 	<div class="padding">
 		<button class="exec" data-exec="FUNC.trigger">Run</button>
 	</div>
-	<footer data-bind="!STATUS__text"></footer>
+	<footer><ui-bind name="!STATUS" config="text"></ui-bind></footer>
 </body>

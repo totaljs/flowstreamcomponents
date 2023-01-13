@@ -79,9 +79,9 @@ The component prints incoming data into the JSON format.
 
 <settings>
 	<div class="padding">
-		<div data---="input__?.name" class="m">Name</div>
-		<div data---="input__?.repo__type:checkbox">Shows repository</div>
-		<div data---="input__?.data__type:checkbox">Shows data</div>
+		<ui-component name="input" path="?.name" class="m">Name</ui-component>
+		<ui-component name="input" path="?.repo" config="type:checkbox">Shows repository</ui-component>
+		<ui-component name="input" path="?.data" config="type:checkbox">Shows data</ui-component>
 	</div>
 </settings>
 
