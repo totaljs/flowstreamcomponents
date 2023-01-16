@@ -120,7 +120,7 @@ This component reads specific values according to the configured map.
 	<header>
 		<i class="ICON"></i>NAME
 	</header>
-	<footer data-bind="CONFIG.path__show__text span">
+	<footer> <ui-bind path="CONFIG.path" config="show;text span"></ui-bind>
 		Path: <span class="b"></span>
 	</footer>
 </body>
@@ -128,12 +128,12 @@ This component reads specific values according to the configured map.
 <settings>
 	<div class="CLASS-settings">
 		<div class="padding bg-smoke">
-			<div data---="input__?.path__placeholder:path.to.property;monospace:1">Load data from the specific property/field</div>
+			<ui-component name="input" path="?.path" config="placeholder:path.to.property;monospace:1">Load data from the specific property/field</ui-component>
 			<div class="help">Optional. The data for the model will be loaded from the specific property/field.</div>
-			<div data-bind="?.path__show" class="hidden">
+			<ui-bind path="?.path" config="show" class="hidden block">
 				<hr />
-				<div data---="input__?.rewrite__type:checkbox"><b>Rewrite value only</b> (otherwise, it will replace entire message data)</div>
-			</div>
+				<ui-component name="input" path="?.rewrite" config="type:checkbox"><b>Rewrite value only</b> (otherwise, it will replace entire message data)</ui-component>
+			</ui-bind>
 		</div>
 		<div class="padding">
 			<div class="caption m">
@@ -144,7 +144,7 @@ This component reads specific values according to the configured map.
 				</div>
 				<label>Paths</label>
 			</div>
-			<div data-bind="?.schema__template:figure --> data-id__show:value && value.length" class="fields m">
+			<ui-bind path="?.schema" config="template:figure --> data-id;show:value && value.length" class="fields m block">
 				<script type="text/html">
 					{{ foreach m in value }}
 					<figure data-id="{{ m.id }}">
@@ -163,7 +163,7 @@ This component reads specific values according to the configured map.
 					</figure>
 					{{ end }}
 				</script>
-			</div>
+			</ui-bind>
 		</div>
 	</div>
 </settings>

@@ -168,7 +168,7 @@ If the controller is stored in the `message.refs.controller` property, then its 
 <body>
 	<header data-bind="CONFIG__template">
 		<script type="text/html">
-			<div{{ if value.color }} style="background:{{ value.color }}"{{ fi }}>
+			<div {{ if value.color }} style="background:{{ value.color }}"{{ fi }}>
 				<i class="{{ value.icon }}"></i><span>{{ value.name }}</span>
 			</div>
 		</script>
@@ -180,27 +180,27 @@ If the controller is stored in the `message.refs.controller` property, then its 
 		<div class="padding">
 			<div class="row">
 				<div class="col-md-9 m">
-					<div data---="input__?.name__required:1">Name</div>
+					<ui-component name="input" path="?.name" config="required:1">Name</ui-component>
 				</div>
 				<div class="col-md-3 m">
-					<div data---="input__?.send__dirsource:all|Everything,params|Params,query|Query arguments,data|Payload">Send next</div>
+					<ui-component name="input" path="?.send" config="dirsource:all|Everything,params|Params,query|Query arguments,data|Payload">Send next</ui-component>
 				</div>
 			</div>
 			<div class="row">
 				<div class="col-md-6 m">
-					<div data---="input__?.path">Load data from the specific property/field</div>
+					<ui-component name="input" path="?.path">Load data from the specific property/field</ui-component>
 					<div class="help">Optional. The data for the model will be loaded from the specific property/field.</div>
 				</div>
 				<div class="col-md-3 m">
-					<div data---="input__?.color__type:color">Color</div>
+					<ui-component name="input" path="?.color" config="type:color">Color</ui-component>
 				</div>
 				<div class="col-md-3 m">
-					<div data---="input__?.icon__type:icon">Icon</div>
+					<ui-component name="input" path="?.icon" config="type:icon">Icon</ui-component>
 				</div>
 			</div>
 			<div data-bind="?.path__show" class="hidden">
 				<hr class="nmt" />
-				<div data---="input__?.rewrite__type:checkbox"><b>Rewrite value only</b> (otherwise, it will replace entire message data)</div>
+				<ui-component name="input" path="?.rewrite" config="type:checkbox"><b>Rewrite value only</b> (otherwise, it will replace entire message data)</ui-component>
 			</div>
 			<div class="caption m">
 				<div class="toolbar">
@@ -211,7 +211,7 @@ If the controller is stored in the `message.refs.controller` property, then its 
 				<label>Schema</label>
 			</div>
 			<div class="message message-alert"><i class="ti ti-exclamation-triangle"></i>Every name of identifier must be unique per Flow. You can use dynamic arguments in the form <code>{argument_name}</code></div>
-			<div data-bind="?.schema__template:figure --> data-id__show:value && value.length" class="fields m">
+			<ui-bind path="?.schema" config="template:figure --> data-id;show:value && value.length" class="fields m">
 				<script type="text/html">
 					{{ foreach m in value }}
 					<figure data-id="{{ m.id }}">
@@ -226,7 +226,7 @@ If the controller is stored in the `message.refs.controller` property, then its 
 					</figure>
 					{{ end }}
 				</script>
-			</div>
+			</ui-bind>
 			<div class="help">Use names in lower-case. We recommend to keep e.g. <code>users_read/{id}</code> or <code>products_read/{id}</code></div>
 		</div>
 	</div>
