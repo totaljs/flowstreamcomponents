@@ -61,9 +61,9 @@ else
 
 <settings>
 	<div class="padding">
-		<div data---="input__?.name__required:1" class="m">Name</div>
+		<ui-component name="input" path="?.name" config="required:1" class="m">Name</ui-component>
 		<div class="ui-input-label">Code</div>
-		<div data---="codemirror__?.code__required:1;type:javascript;minheight:300;parent:auto;margin:60;tabs:true;trim:true"></div>
+		<ui-component name="codemirror" path="?.code" config="required:1;type:javascript;minheight:300;parent:auto;margin:60;tabs:true;trim:true"></ui-component>
 	</div>
 </settings>
 
@@ -75,5 +75,5 @@ else
 	<header>
 		<i class="ICON"></i>NAME
 	</header>
-	<footer data-bind="!STATUS__text"></footer>
+	<footer><ui-bind path="!STATUS" config="text"></ui-bind></footer>
 </body>

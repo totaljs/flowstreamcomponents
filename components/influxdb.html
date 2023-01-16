@@ -154,17 +154,17 @@ Expected data for "Execute a Flux query":
 	<div class="padding">
 		<div class="row m">
 			<div class="col-md-12">
-				<div data---="input__?.url__placeholder:https\://example.com;required:1" class="m">Server url</div>
-				<div data---="input__?.token__required:1" class="m">Token</div>
-				<div data---="input__?.org__required:1" class="m">Organization</div>
-				<div data---="input__?.bucket__required:1" class="m">Bucket</div>
+				<ui-component name="input" path="?.url" config="placeholder:https\://example.com;required:1" class="m">Server url</ui-component>
+				<ui-component name="input" path="?.token" config="required:1" class="m">Token</ui-component>
+				<ui-component name="input" path="?.org" config="required:1" class="m">Organization</ui-component>
+				<ui-component name="input" path="?.bucket" config="required:1" class="m">Bucket</ui-component>
                 <hr>
-				<div data---="input__?.api__dirsource:write|Write data,query|Execute a Flux query__write"class="m">Action</div>
-				<div data-bind="?.api__show:value==='write'">
-					<div data---="keyvalue__?.fields__placeholderkey:Enter property name;placeholdervalue:Enter the property type and hit enter">Fields</div>
+				<ui-component name="input" path="?.api" config="dirsource:write|Write data,query|Execute a Flux query" default="'write'" class="m">Action</ui-component>
+				<ui-bind path="?.api" config="show:value==='write'">
+					<ui-component name="keyvalue" path="?.fields" config="placeholderkey:Enter property name;placeholdervalue:Enter the property type and hit enter">Fields</ui-component>
 					<div class="help m">List of supported types: boolean, int, float and string</div>
-					<div data---="textboxlist__?.tags__placeholderkey:Enter tag name">Tags</div>
-				</div>
+					<ui-component name="textboxlist" path="?.tags" config="placeholderkey:Enter tag name">Tags</ui-component>
+				</ui-bind>
 			</div>
 		</div>
 	</div>
@@ -183,6 +183,6 @@ Expected data for "Execute a Flux query":
 		<i class="ICON"></i>NAME
 	</header>
 	<footer>
-		<span class="red" data-bind="STATUS.error__text"></span>
+		<ui-bind path="STATUS.error" config="text" class="red"></ui-bind>
 	</footer>
 </body>

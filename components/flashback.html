@@ -60,7 +60,7 @@ The component remembers the data for repeating the action.
 	.CLASS { max-width: 250px; min-width: 150px; }
 	.CLASS .padding { padding: 0 10px 10px; }
 	.CLASS pre { font-size: 10px; margin: 0; padding: 5px; background-color: #F0F0F0; border-radius: var(--radius); }
-	.CLASS footer > div { margin: 10px; }
+	.CLASS footer > ui-bind { margin: 10px; }
 	.CLASS .readme { position: absolute; position: absolute; font-size: 11px; right: 5px; margin-top: -5px; cursor: pointer; }
 	.CLASS .noscrollbar { max-height: 250px; }
 	.ui-dark .CLASS pre { background-color: #404040; tab-size: 2; }
@@ -69,18 +69,18 @@ The component remembers the data for repeating the action.
 <body>
 	<header>
 		<i class="ICON"></i>NAME
-		<button class="exec button hidden" data-exec="FUNC.fflashback_clear" data-bind="STATUS.empty__hide">Clear</button>
+		<button class="exec button hidden" data-exec="FUNC.fflashback_clear"><ui-bind path="STATUS.empty" config="hide"></ui-bind>Clear</button>
 	</header>
 	<div class="padding">
-		<button class="exec button" data-exec="FUNC.trigger" data-bind="STATUS.empty__disabled" disabled>Repeat</button>
+		<button class="exec button" data-exec="FUNC.trigger"><ui-bind path="STATUS.empty" config="disabled" disabled></ui-bind>Repeat</button>
 	</div>
 	<footer>
-		<div data-bind="!STATUS__html pre:Thelpers.jsonformat(JSON.stringify(value.data, null, '\t'))__hide:value.empty" class="hidden selectable">
+		<ui-bind path="!STATUS" config="html pre:Thelpers.jsonformat(JSON.stringify(value.data, null, '\t'));hide:value.empty" class="hidden selectable">
 			<span class="readme" title="Open in new window"><i class="ti ti-retweet"></i></span>
 			<div class="noscrollbar">
 				<pre class="json"></pre>
 			</div>
-		</div>
+		</ui-bind>
 	</footer>
 </body>
 

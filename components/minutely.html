@@ -81,16 +81,16 @@
 
 <settings>
 	<div class="padding">
-		<div data---="input__?.type__dirsource:now|Current date,counter|Counter,string|String,number|Number,boolean|Boolean,date|Date,object|Object,buffer|Buffer as Base64;required:1;innerlabel:1">Type</div>
-		<div data-bind="?.type__show:value!=='counter'&&value!=='now'" class="hidden">
+		<ui-component name="input" path="?.type" config="dirsource:now|Current date,counter|Counter,string|String,number|Number,boolean|Boolean,date|Date,object|Object,buffer|Buffer as Base64;required:1;innerlabel:1">Type</ui-component>
+		<ui-bind path="?.type" config="show:value!=='counter'&&value!=='now'" class="hidden">
 			<div class="m">
-				<div data---="input__?.random__type:checkbox">Random data</div>
+				<ui-component name="input" path="?.random" config="type:checkbox">Random data</ui-component>
 			</div>
-			<div data-bind="?.random__hide" class="hidden">
+			<ui-bind path="?.random" config="hide" class="hidden">
 				<hr />
-				<div data---="input__?.data__required:1">Data</div>
-			</div>
-		</div>
+				<ui-component name="input" path="?.data" config="required:1">Data</ui-component>
+			</ui-bind>
+		</ui-bind>
 	</div>
 </settings>
 

@@ -180,24 +180,24 @@ each of the Map properties will be pushed to a new array, see example bellow
 
 <settings>
 	<div class="padding">
-		<div data---="input__?.array__type:checkbox" class="m">Return an Array of Arrays (Default: Array of Objects)</div>
+		<ui-component name="input" path="?.array" config="type:checkbox" class="m">Return an Array of Arrays (Default: Array of Objects)</ui-component>
 		<section class="maparray-section m">
 			<label>Map</label>
-			<!--<div data---="keyvalue___?.map__placeholderkey:Type a path to property;placeholdervalue:Type a new path to a property" class="maparray-keyvalue"></div>-->
+			<!--<ui-component name="keyvalue" path="?.map" config="placeholderkey:Type a path to property;placeholdervalue:Type a new path to a property" class="maparray-keyvalue"></ui-component>-->
 
 			<div data-bind="?.map__template:.maparray-item -> data-index">
 				<script type="text/html">
 					{{ foreach item in value }}
 					<div class="maparray-item" data-index="{{ $index }}">
 						<div class="row">
-							<div class="" data-bind="?.array__.col-md-11:value__.col-md-5:!value">
-								<div data---="input__?.map[{{ $index }}].source" class="m"></div>
-							</div>
+							<ui-bind path="?.array" config=".col-md-11:value__.col-md-5:!value" class="block">
+								<ui-component name="input" path="?.map[{{ $index }}].source" class="m"></ui-component>
+							</ui-bind>
 							<div class="col-md-1" data-bind="?.array__hide">
 								<div class="m" style="line-height: 35px;">--&gt;</div>
 							</div>
 							<div class="col-md-5" data-bind="?.array__hide">
-								<div data---="input__?.map[{{ $index }}].target"></div>
+								<ui-component name="input" path="?.map[{{ $index }}].target"></ui-component>
 							</div>
 							<div class="col-md-1">
 								<i class="ti ti-trash red exec" data-exec="FUNC.maparray_remove_item" data-index="{{ $index }}"></i>
@@ -207,7 +207,7 @@ each of the Map properties will be pushed to a new array, see example bellow
 					{{ end }}
 				</script>
 			</div>
-			<div class="help m" data-bind="?.array__hide">You can use 3 dots(...) in the right field to keep the same path.</div>
+			<ui-bind path="?.array" config="hide" class="help block m">You can use 3 dots(...) in the right field to keep the same path.</ui-bind>
 			<button class="button-add exec" data-exec="FUNC.maparray_add_item">ADD</button>
 		</section>
 		<button class="button exec" style="width: 200px;" data-exec="FUNC.maparray_readme"><i class="ti ti-info-circle blue"></i>Show configuration info</button>
