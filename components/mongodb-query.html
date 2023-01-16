@@ -181,19 +181,19 @@ Valid inclusion: `.select('name email')` or `.select('email lastname')` etc.
 		<div class="row m">
 			<div class="col-md-12">
 				<div class="m"><b>Select Connection</b></div>
-				<div data---="input__?.string__dirsource:%connections;dirraw:1;placeholder:Select connection;dirempty:No connection" class="m"></div>
+				<ui-component name="input" path="?.string" config="dirsource:%connections;dirraw:1;placeholder:Select connection;dirempty:No connection" class="m"></ui-component>
 				<hr />
-				<div data-bind="?.string__config [data---]:'required:' + (!value)__hide">
+				<ui-bind path="?.string" config="config [data---]:'required:' + (!value);hide">
 					<div class="m"><b>or create new one</b></div>
-					<div data---="input__?.name__required:1" class="m">Connection name</div>
-					<div data---="input__?.connection__required:1">Connection string (without the database name)</div>
+					<ui-component name="input" path="?.name" config="required:1" class="m">Connection name</ui-component>
+					<ui-component name="input" path="?.connection" config="required:1">Connection string (without the database name)</ui-component>
 					<div class="help m">e.g.: mongodb+srv://user:pswd@xyz.mongodb.net/?retryWrites=true&w=majority</div>
-				</div>
+				</ui-bind>
 			</div>
 		</div>
 		<div class="row m">
 			<div class="col-md-12">
-				<div data---="codemirror__?.fn__type:javascript;required:true;height:300" class="m">Query editor</div>
+				<ui-component name="codemirror" path="?.fn" config="type:javascript;required:true;height:300" class="m">Query editor</ui-component>
 				<a href="https://www.npmjs.com/package/mquery" target="_blank"><i class="ti ti-info-circle mr5"></i>mquery documentation</a>
 			</div>
 		</div>
@@ -213,6 +213,6 @@ Valid inclusion: `.select('name email')` or `.select('email lastname')` etc.
 		<i class="ICON"></i>NAME
 	</header>
 	<footer>
-		<span data-bind="STATUS.state__text"></span>
+		<ui-bind path="STATUS.state" config="text"></ui-bind>
 	</footer>
 </body>
