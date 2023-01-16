@@ -103,26 +103,26 @@
 	<div class="padding">
 		<div class="row">
 			<div class="col-md-6">
-				<div data---="input__?.hostname__placeholder:localhost;required:1" class="m">Hostname or IP address</div>
+				<ui-component name="input" path="?.hostname" config="placeholder:localhost;required:1" class="m">Hostname or IP address</ui-component>
 			</div>
 			<div class="col-md-6">
-				<div data---="input__?.port__type:number;placeholder:5672__5672" class="m">Port (default: 5672)</div>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-md-6">
-				<div data---="input__?.protocol__dirsource:amqp|amqp,amqps|amqps__'amqp'" class="m">Protocol</div>
-			</div>
-			<div class="col-md-6">
-				<div data---="input__?.vhost__placeholder:/" class="m">Virtual host</div>
+				<ui-component name="input" path="?.port" config="type:number;placeholder:5672" default="5672" class="m">Port (default: 5672)</ui-component>
 			</div>
 		</div>
 		<div class="row">
 			<div class="col-md-6">
-				<div data---="input__?.username" class="m">Username</div>
+				<ui-component name="input" path="?.protocol" config="dirsource:amqp|amqp,amqps|amqps" default="'amqp'" class="m">Protocol</ui-component>
 			</div>
 			<div class="col-md-6">
-				<div data---="input__?.password__type:password" class="m">Password</div>
+				<ui-component name="input" path="?.vhost" config="placeholder:/" class="m">Virtual host</ui-component>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-6">
+				<ui-component name="input" path="?.username" class="m">Username</ui-component>
+			</div>
+			<div class="col-md-6">
+				<ui-component name="input" path="?.password" config="type:password" class="m">Password</ui-component>
 			</div>
 		</div>
 	</div>
@@ -140,5 +140,5 @@
 	<header>
 		<i class="ICON"></i>NAME
 	</header>
-	<footer data-bind="!STATUS__show__text"></footer>
+	<footer><ui-bind path="!STATUS" config="show;text"></ui-bind></footer>
 </body>

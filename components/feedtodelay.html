@@ -91,7 +91,7 @@ Example usage:
 			<div class="col-md-4 m">
 				<ui-component name="input" path="?.timeout" config="type:number;maxvalue:2147483" default="60">Timeout in seconds</ui-component>
 				<div class="help m">Maximum timeout is 2147483 seconds(24.8 days)</div>
-				<div>Current value: <b data-bind="?.timeout__text__helper:feedtodelay_format"></b></div>
+				<div>Current value: <b><ui-bind path="?.timeout" config="text;helper:feedtodelay_format"></ui-bind></b></div>
 			 </div>
 		</div>
 		<div class="row">

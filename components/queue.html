@@ -115,6 +115,6 @@ A simple persistent queue for the incomming messages.
 		<i class="ICON"></i>NAME
 	</header>
 	<footer>
-		<div class="status">Delayed messages: <b data-bind="STATUS.pending__text:value?value.format(0):'0'"></b></div>
+		<div class="status">Delayed messages: <b><ui-bind path="STATUS.pending" config="text:value?value.format(0):'0'"></ui-bind></b></div>
 	</footer>
 </body>

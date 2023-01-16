@@ -77,7 +77,7 @@
 
 <settings>
 	<div class="padding">
-		<div data---="input__?.id__dirsource:%inputs;dirraw:1;placeholder:Choose a specific input;dirempty:No input" class="m"><b>Input</b></div>
+		<ui-component name="input" path="?.id" config="dirsource:%inputs;dirraw:1;placeholder:Choose a specific input;dirempty:No input" class="m"><b>Input</b></ui-component>
 	</div>
 </settings>
 
@@ -87,6 +87,6 @@ The component publish the data to the specific `Input` component.
 
 <body>
 	<header>
-		<i class="ICON"></i>NAME: <b class="monospace" data-bind="STATUS.name__text__empty"></b>
+		<i class="ICON"></i>NAME: <b class="monospace"><ui-bind path="STATUS.name" config="text;empty"></ui-bind></b>
 	</header>
 </body>

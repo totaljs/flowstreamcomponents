@@ -105,7 +105,7 @@ Output:
 	<div class="padding">
 		<div class="row m">
 			<div class="col-md-12">
-				<div data---="input__?.connection__;required:1">Connection string</div>
+				<ui-component name="input" path="?.connection" config="required:1">Connection string</ui-component>
 				<div class="help">e.g.: postgresql://user:password@localhost:5432/dbname</div>
 			</div>
 		</div>
@@ -125,6 +125,6 @@ Output:
 		<i class="ICON"></i>NAME
 	</header>
 	<footer>
-		<span class="red" data-bind="STATUS.error__text"></span>
+		<ui-bind path="STATUS.error" config="text" class="red"></ui-bind>
 	</footer>
 </body>
