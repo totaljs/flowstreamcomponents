@@ -142,15 +142,15 @@
 
 <settings>
 	<div class="padding">
-		<div data---="textbox__?.collection" class="m">DB collection(table) name</div>
-		<div data---="input__?.method__dirsource:insert|Insert,update|Update,read|Read,query|Query,remove|Remove" class="m">Method</div>
-		<div data-bind="?.method__show:value === 'insert'">
-			<div data---="checkbox__?.addid">Add unique ID to `id` property of data before insert</div>
-		</div>
-		<div data-bind="?.method__show:value === 'update'">
-			<div data---="checkbox__?.upsert">Insert document if it doesn't exist</div>
-			<div data---="checkbox__?.upsertid">Add unique ID to `id` property of data before insert (only if it doesn't exist)</div>
-		</div>
+		<ui-component name="textbox" path="?.collection" class="m">DB collection(table) name</ui-component>
+		<ui-component name="input" path="?.method" config="dirsource:insert|Insert,update|Update,read|Read,query|Query,remove|Remove" class="m">Method</ui-component>
+		<ui-bind path="?.method" path="show:value === 'insert'" class="block">
+			<ui-component name="checkbox" path="?.addid">Add unique ID to `id` property of data before insert</ui-component>
+		</ui-bind>
+		<ui-bind path="?.method" config="show:value === 'update'" class="block">
+			<ui-component name="checkbox" path="?.upsert">Insert document if it doesn't exist</ui-component>
+			<ui-component name="checkbox" path="?.upsertid">Add unique ID to `id` property of data before insert (only if it doesn't exist)</ui-component>
+		</ui-bind>
 	</div>
 </settings>
 

@@ -60,10 +60,10 @@ __Output data__:
 	<div class="padding">
 		<div class="grid-2">
 			<div class="m">
-				<div data---="input__?.method__dirsource:all|All supported HTTP methods,GET|GET,POST|POST" class="m">HTTP Method</div>
+				<ui-component name="input" path="?.method" config="dirsource:all|All supported HTTP methods,GET|GET,POST|POST" class="m">HTTP Method</ui-component>
 			</div>
 			<div class="m">
-				<div data---="input__?.send__dirsource:all|Everything,query|Query arguments,body|Payload,headers|Headers,cookies|Cookies">Send to output</div>
+				<ui-component name="input" path="?.send" config="dirsource:all|Everything,query|Query arguments,body|Payload,headers|Headers,cookies|Cookies">Send to output</ui-component>
 			</div>
 		</div>
 	</div>
@@ -75,11 +75,11 @@ __Output data__:
 	</header>
 	<footer>
 		<div><span class="exec mr5 pointer" data-exec="tmpnotifycopy"><i class="ti ti-copy"></i></span>Endpoint:</div>
-		<div data-bind="flow.head__template">
+		<ui-bind path="flow.head" config="template">
 			<script type="text/html">
 				<a href="{{ value.proxyurl }}/notify/{{ value.id }}-UID/" target="_blank">/notify/{{ value.id }}-UID/</a>
 			</script>
-		</div>
+		</ui-bind>
 	</footer>
 </body>
 
