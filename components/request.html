@@ -182,13 +182,13 @@ __Response__:
 	</header>
 	<footer class="hidden">
 		<ui-bind path="CONFIG.url" config="show">
-			<ui-bnind path="CONFIG" config="template">
+			<ui-bind path="CONFIG" config="template">
 				<div class="status">
 					<script type="text/html">
 						<div class="monospace"><span style="background:{{ value.method | color }}">{{ value.method }}</span> {{ value.url }}</div>
 					</script>
 				</div>
-			</ui-bnind>
+			</ui-bind>
 		</ui-bind>
 	</footer>
 </body>
