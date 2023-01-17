@@ -37,11 +37,11 @@ This component can transform message data.
 	<div class="padding">
 		<div class="grid-2">
 			<div class="m">
-				<div data---="input__?.path__placeholder:path.to.the.property">Transform value according to this path</div>
+				<ui-component name="input" path="?.path" config="placeholder:path.to.the.property">Transform value according to this path</ui-component>
 				<div class="help">Only the value according to the path will be transformed</div>
 			</div>
 			<div class="m">
-				<div data---="input__?.assign__placeholder:path.to.the.property">Assign response to the path</div>
+				<ui-component name="input" path="?.assign" config="placeholder:path.to.the.property">Assign response to the path</ui-component>
 				<div class="help">Empty path will replace transformed property</div>
 			</div>
 		</div>
@@ -57,6 +57,6 @@ This component can transform message data.
 		<i class="ICON"></i>NAME
 	</header>
 	<footer>
-		Path: <b data-bind="CONFIG.path__text__empty"></b>
+		Path: <b><ui-bind path="CONFIG.path" config="text;empty"></ui-bind></b>
 	</footer>
 </body>

@@ -54,29 +54,29 @@ The component installs Total.js server-side extension. In other words: it can ev
 	<div class="padding bg-smoke">
 		<div class="row">
 			<div class="col-md-9 m">
-				<div data---="input__?.name__required:1;placeholder:e.g. Database">Name</div>
+				<ui-component name="input" path="?.name" config="required:1;placeholder:e.g. Database">Name</ui-component>
 			</div>
 			<div class="col-md-3 m">
-				<div data---="input__?.icon__type:icon">Icon</div>
+				<ui-component name="input" path="?.icon" config="type:icon">Icon</ui-component>
 			</div>
 		</div>
 	</div>
 	<div class="padding">
 		<div class="ui-input-label">Installation code:</div>
-		<div data---="codemirror__?.install__type:javascript;height:300;tabs:true;trim:true"></div>
+		<ui-component name="codemirror" path="?.install" config="type:javascript;height:300;tabs:true;trim:true"></ui-component>
 		<div class="help m">The code will be executed when the configuration is changed or the component instance is initialized.</div>
 		<div class="ui-input-label">Uninstallation code:</div>
-		<div data---="codemirror__?.uninstall__type:javascript;height:300;tabs:true;trim:true"></div>
+		<ui-component name="codemirror" path="?.uninstall" config="type:javascript;height:300;tabs:true;trim:true"></ui-component>
 		<div class="help">The code above will be executed when the configuration is changed or the component instance is removed.</div>
 	</div>
 </settings>
 
 <body>
-	<div class="padding center" data-bind="CONFIG__template">
+	<ui-bind path="CONFIG" config="template" class="padding center block">
 		<script type="text/html">
 			<i class="ti-2x {{ value.icon }}"></i>
 			<div class="mt10 fs12">{{ value.name }}</div>
 			<div class="help npt nmt">Server extension</div>
 		</script>
-	</div>
+	</ui-bind>
 </body>

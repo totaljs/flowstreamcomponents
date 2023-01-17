@@ -59,18 +59,18 @@ This component must be used only with REST Route component. It reads a token fro
 
 <settings>
 	<div class="padding">
-		<div data---="input__?.token__required:1;camouflage:1">Token</div>
+		<ui-component name="input" path="?.token" config="required:1;camouflage:1">Token</ui-component>
 		<div class="help"><span class="link exec" data-exec="tmptokenauthgenerate">Generate token</span>. It can contain a global variable in the form <code>{variable}</code>.</div>
 		<hr />
 		<div class="row">
 			<div class="col-md-3 m">
-				<div data---="input__?.code__required:1;type:number">Status code</div>
+				<ui-component name="input" path="?.code" config="required:1;type:number">Status code</ui-component>
 			</div>
 			<div class="col-md-3 m">
-				<div data---="input__?.header__required:1;type:lower">Header</div>
+				<ui-component name="input" path="?.header" config="required:1;type:lower">Header</ui-component>
 			</div>
 			<div class="col-md-6 m">
-				<div data---="input__?.error__required:1">Error message</div>
+				<ui-component name="input" path="?.error" config="required:1">Error message</ui-component>
 			</div>
 		</div>
 		<hr />
@@ -78,7 +78,7 @@ This component must be used only with REST Route component. It reads a token fro
 			<div class="col-md-6 m">
 				<div class="row">
 					<div class="col-md-6">
-						<div data---="input__?.ddos__required:1;type:number">DDOS protection</div>
+						<ui-component name="input" path="?.ddos" config="required:1;type:number">DDOS protection</ui-component>
 					</div>
 				</div>
 				<div class="help">How many times can the client requested your API with a bad key? The internal IP database is cleared every 10 minutes. <code>0</code> disables DDOS protection.</div>
@@ -89,7 +89,7 @@ This component must be used only with REST Route component. It reads a token fro
 
 <style>
 	.CLASS footer { padding: 10px; }
-	.CLASS footer span { font-family: var(--monospace); }
+	.CLASS footer ui-bind { font-family: var(--monospace); }
 	.CLASS footer .code { background-color: var(--color); color: #FFF; padding: 2px 3px; border-radius: var(--radius); }
 </style>
 
@@ -98,7 +98,7 @@ This component must be used only with REST Route component. It reads a token fro
 		<i class="ICON"></i>NAME
 	</header>
 	<footer>
-		<div><span data-bind="CONFIG.code__text" class="code"></span> <span data-bind="CONFIG.header__text"></span></div>
+		<div><ui-bind path="CONFIG.code" config="text" class="code"></ui-bind><ui-bind path="CONFIG.header" config="text"></ui-bind></div>
 	</footer>
 </body>
 

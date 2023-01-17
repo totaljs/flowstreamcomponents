@@ -46,10 +46,10 @@ This component can respond on the REST Route component.
 	<div class="padding">
 		<div class="row">
 			<div class="col-md-3 m">
-				<div data---="input__?.type__required:1;dirsource:json|JSON,success|Success,empty|Empty response,plain|Plain text,html|HTML">Type</div>
+				<ui-component name="input" path="?.type" config="required:1;dirsource:json|JSON,success|Success,empty|Empty response,plain|Plain text,html|HTML">Type</ui-component>
 			</div>
 			<div class="col-md-3 m">
-				<div data---="input__?.code__required:1;type:number">Status code</div>
+				<ui-component name="input" path="?.code" config="required:1;type:number">Status code</ui-component>
 			</div>
 		</div>
 	</div>
@@ -63,6 +63,6 @@ This component can respond on the REST Route component.
 
 <body>
 	<header>
-		<i class="ICON"></i>NAME<span data-bind="CONFIG.code__text__exec:el.css('background-color', value >= 400 ? '#E73323' : '#4285F4')"></span> <span data-bind="CONFIG.type__text"></span>
+		<i class="ICON"></i>NAME<ui-bind path="CONFIG.code" config="text;exec:el.css('background-color', value >= 400 ? '#E73323' : '#4285F4')"></ui-bind> <ui-bind path="CONFIG.type" config="text"></ui-bind>
 	</header>
 </body>

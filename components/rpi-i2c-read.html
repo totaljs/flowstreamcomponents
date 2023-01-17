@@ -63,17 +63,17 @@ Parameters, can be transmitted to the component, or directly set as setting.
 <settings>
 	<div class="padding">
 		<div class="mt10 m">
-			<div data---="input__?.presensor__type:checkbox">Predefined Sensor</div>
+			<ui-component name="input" path="?.presensor" config="type:checkbox">Predefined Sensor</ui-component>
 		</div>
 		<hr />
-		<div data-bind="?.presensor__show" class="show">
-			<div data---="input__?.sensor__dirsource:DS1307|DS1307,none|none;required:1">Sensor</div>
-		</div>
-		<div data-bind="?.presensor__hide" class="hidden">
-			<div data---="input__?.address__required:0">Address</div>
-			<div data---="input__?.register__required:0">Register</div>
-			<div data---="input__?.readLength__required:0">readLength</div>
-		</div>
+		<ui-bind path="?.presensor" config="show" class="show block">
+			<ui-component name="input" path="?.sensor" config="dirsource:DS1307|DS1307,none|none;required:1">Sensor</ui-component>
+		</ui-bind>
+		<ui-bind path="?.presensor" config="hide" class="hidden block">
+			<ui-component name="input" path="?.address" config="required:0">Address</ui-component>
+			<ui-component name="input" path="?.register" config="required:0">Register</ui-component>
+			<ui-component name="input" path="?.readLength" config="required:0">readLength</ui-component>
+		</ui-bind>
 	</div>
 </settings>
 

@@ -311,8 +311,8 @@ data.value - variables.offset
 	<div class="padding">
 			<label class="ui-input-label">Source + Path to the value</label>
 		<div class="switch-input-group wide m">
-			<div data---="input__?.source__dirsource:REPO.switch_datasources__'data'"></div>
-			<div data---="input__?.path"></div>
+			<ui-component name="input" path="?.source" config="dirsource:REPO.switch_datasources" default="'data'"></ui-component>
+			<ui-component name="input" path="?.path"></ui-component>
 		</div>
 		<section class="switch-conditions m">
 			<label class="ui-input-label">Switch conditions</label>
@@ -325,34 +325,38 @@ data.value - variables.offset
 					<div class="col-md-1">Action</div>
 				</div>
 			</div>
-			<div data-bind="?.conditions__template:.switch-condition -> data-index" data---="movable__?.conditions__selector:.dragme;exec:FUNC.switch_condition_dragged">
-				<script type="text/html">
-					{{ foreach con in value }}
-					<div class="switch-condition dragme" data-index="{{ $index }}" draggable="true">
-						<div class="row">
-							<div class="col-md-1">
-								{{ ($index + 1) }}.
-							</div>
-							<div class="col-md-2">
-								<div data---="input__?.conditions[{{ $index }}].operator__dirsource:REPO.switch_operators"></div>
-							</div>
-							<div class="col-md-6">
-								<div data-bind="?.conditions[{{ $index }}].operator__hide:value == 'true' || value == 'false' || value == 'isnull' || value == 'isempty'__.switch-input-group:value!=='expression'">
-									<div data---="input__?.conditions[{{ $index }}].type__dirsource:REPO.switch_valuetypes" data-bind="?.conditions[{{ $index }}].operator__hide:value==='expression'"></div>
-									<div data---="input__?.conditions[{{ $index }}].value__placeholder:value"></div>
+			<ui-bind path="?.conditions" config="template:.switch-condition -> data-index" clas="block">
+				<ui-component name="movable" path="?.conditions" config="selector:.dragme;exec:FUNC.switch_condition_dragged">
+					<script type="text/html">
+						{{ foreach con in value }}
+						<div class="switch-condition dragme" data-index="{{ $index }}" draggable="true">
+							<div class="row">
+								<div class="col-md-1">
+									{{ ($index + 1) }}.
+								</div>
+								<div class="col-md-2">
+									<ui-component name="input" path="?.conditions[{{ $index }}].operator" config="dirsource:REPO.switch_operators"></ui-component>
+								</div>
+								<div class="col-md-6">
+									<ui-bind path="?.conditions[{{ $index }}].operator" config="hide:value == 'true' || value == 'false' || value == 'isnull' || value == 'isempty';.switch-input-group:value!=='expression'" class="block">
+										<ui-bind path="?.conditions[{{ $index }}].operator" config="hide:value==='expression'">
+											<ui-component name="input" path="?.conditions[{{ $index }}].type" config="dirsource:REPO.switch_valuetypes"></ui-component>
+										</ui-bind>
+										<ui-component name="input" path="?.conditions[{{ $index }}].value" config="placeholder:value"></ui-component>
+									</ui-bind>
+								</div>
+								<div class="col-md-2">
+									<ui-component name="input" path="?.conditions[{{ $index }}].name"></ui-component>
+								</div>
+								<div class="col-md-1">
+									<i class="ti ti-trash red exec" data-exec="FUNC.switch_remove_condition"></i>
 								</div>
 							</div>
-							<div class="col-md-2">
-								<div data---="input__?.conditions[{{ $index }}].name"></div>
-							</div>
-							<div class="col-md-1">
-								<i class="ti ti-trash red exec" data-exec="FUNC.switch_remove_condition"></i>
-							</div>
 						</div>
-					</div>
-					{{ end }}
-				</script>
-			</div>
+						{{ end }}
+					</script>
+				</ui-component>
+			</ui-bind>
 			<div class="help m">Each condition corresponds to an output index. First condition --> First output, etc.</div>
 			<button class="button-add exec" data-exec="FUNC.switch_add_condition">ADD</button>
 		</section>
@@ -418,10 +422,10 @@ data.value - variables.offset
 	.ui-dark .button-add:active { background-color: #404040; }
 
 	.switch-input-group { clear: both; height: 36px; }
-	.switch-input-group > div:first-child .ui-input-control { border-right: none; border-bottom-right-radius: 0; border-top-right-radius: 0; width: 120px; float: left; background-color: #f0f0f0; }
-	.switch-input-group > div:last-child .ui-input-control { border-bottom-left-radius: 0; border-top-left-radius: 0; float: left; width: calc(100% - 120px); }
-	.switch-input-group.wide > div:first-child .ui-input-control { width: 200px; }
-	.switch-input-group.wide > div:last-child .ui-input-control { width: calc(100% - 200px); }
+	.switch-input-group > ui-component:first-child .ui-input-control { border-right: none; border-bottom-right-radius: 0; border-top-right-radius: 0; width: 120px; float: left; background-color: #f0f0f0; }
+	.switch-input-group > ui-component:last-child .ui-input-control { border-bottom-left-radius: 0; border-top-left-radius: 0; float: left; width: calc(100% - 120px); }
+	.switch-input-group.wide > ui-component:first-child .ui-input-control { width: 200px; }
+	.switch-input-group.wide > ui-component:last-child .ui-input-control { width: calc(100% - 200px); }
 	.switch-conditions { border: 1px solid #e0e0e0; padding: 8px; border-radius: 3px; }
 	.switch-condition { border: 1px solid #e0e0e0; border-radius: 3px; padding: 8px; margin-bottom:4px; }
 	.switch-condition > .row > .col-md-1 { height: 36px; line-height: 36px; }
