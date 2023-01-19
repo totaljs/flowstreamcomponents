@@ -79,7 +79,7 @@ This component receives a data from the [OpenSync](https://docs.totaljs.com/open
 
 <settings>
 	<div class="padding">
-		<div data---="input__?.url__required:1;camouflage:1">URL address + token</div>
+		<ui-component name="input" path="?.url" config="required:1;camouflage:1">URL address + token</ui-component>
 		<div class="help">Enter URL address + token to the OpenSync server. This component will connect to the OpenSync via WebSocket.</div>
 	</div>
 </settings>
@@ -89,11 +89,11 @@ This component receives a data from the [OpenSync](https://docs.totaljs.com/open
 		<i class="ICON"></i>NAME
 	</header>
 	<footer>
-		<div data-bind="!STATUS__template">
+		<ui-bind path="!STATUS" config="template">
 			<script type="text/html">
 				<div class="b"><i class="ti ti-globe"></i>{{ if value.meta }}{{value.meta.name }}{{ else }}---{{ fi }}</div>
 				<div><i class="ti ti-circle {{ if value.connected }}green{{ else }}red{{ fi }}"></i>{{ if value.connected }}Connected{{ else }}Disconnected{{ fi }}</div>
 			</script>
-		</div>
+		</ui-bind>
 	</footer>
 </body>

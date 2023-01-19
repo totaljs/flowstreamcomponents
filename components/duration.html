@@ -76,7 +76,7 @@ __Output__:
 	</header>
 	<footer style="padding:10px;width:180px">
 		<button class="exec button" data-exec="FUNC.trigger">Reset</button>
-		<div data-bind="STATUS__template__.keyvalue" class="mt10">
+		<ui-bind path="STATUS" config="template;.keyvalue" class="mt10">
 			<script type="text/html">
 				<div class="keyvalue small">
 					<span>Min</span>
@@ -99,6 +99,6 @@ __Output__:
 					<div class="right b">{{ value.count | format(0) | empty }}</div>
 				</div>
 			</script>
-		</div>
+		</ui-bind>
 	</footer>
 </body>

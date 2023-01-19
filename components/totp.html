@@ -243,13 +243,13 @@ __Output data `object` with__:
 	<div class="padding">
 		<div class="grid-2">
 			<div class="m">
-				<div data---="input__?.issuer__required:1;innerlabel:1;placeholder:Enter a value">Issuer</div>
+				<ui-component name="input" path="?.issuer" config="required:1;innerlabel:1;placeholder:Enter a value">Issuer</ui-component>
 				<div class="help">Your project or organization name</div>
 			</div>
 			<div>
 				<div class="grid-2">
 					<div class="m">
-						<div data---="input__?.time__required:1;type:number;innerlabel:1;placeholder:Enter a value">Time</div>
+						<ui-component name="input" path="?.time" config="required:1;type:number;innerlabel:1;placeholder:Enter a value">Time</ui-component>
 						<div class="help">Code validity in seconds</div>
 					</div>
 				</div>
@@ -262,12 +262,14 @@ __Output data `object` with__:
 	<header>
 		<i class="ICON"></i>NAME
 	</header>
-	<footer data-bind="CONFIG__template">
-		<script type="text/html">
-			<div class="keyvalue small">
-				<span>Issuer</span>
-				<div>{{ value.issuer }}</div>
-			</div>
-		</script>
+	<footer>
+		<ui-bind path="CONFIG" config="template">
+			<script type="text/html">
+				<div class="keyvalue small">
+					<span>Issuer</span>
+					<div>{{ value.issuer }}</div>
+				</div>
+			</script>
+		</ui-bind>
 	</footer>
 </body>

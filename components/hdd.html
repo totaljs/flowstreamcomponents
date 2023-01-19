@@ -71,7 +71,7 @@ __Data Example__:
 
 <style>
 	.CLASS footer { padding: 10px; font-size: 11px; }
-	.CLASS footer > div > div { height: 16px; }
+	.CLASS footer > ui-bind > div { height: 16px; }
 	.CLASS footer b { float: right; }
 </style>
 
@@ -79,11 +79,11 @@ __Data Example__:
 	<div class="padding">
 		<div class="row">
 			<div class="col-md-4">
-				<div data---="input__?.interval__type:number;required:1">Interval</div>
+				<ui-component name="input" path="?.interval" config="type:number;required:1">Interval</ui-component>
 				<div class="help">In seconds</div>
 			</div>
 			<div class="col-md-4">
-				<div data---="input__?.path__required:1">Path</div>
+				<ui-component name="input" path="?.path" config="required:1">Path</ui-component>
 			</div>
 		</div>
 	</div>
@@ -94,12 +94,12 @@ __Data Example__:
 		<i class="ICON"></i>NAME
 	</header>
 	<footer>
-		<div data-bind="!STATUS__template__show">
+		<ui-bind path="!STATUS" config="template;show">
 			<script type="text/html">
 				<div><b>{{ value.free | filesize }}</b>Free</div>
 				<div><b>{{ value.used | filesize }}</b>Used</div>
 				<div><b>{{ value.total | filesize }}</b>Total</div>
 			</script>
-		</div>
+		</ui-bind>
 	</footer>
 </body>

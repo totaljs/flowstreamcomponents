@@ -70,22 +70,22 @@ __Output data__:
 	<div class="padding">
 		<div class="row">
 			<div class="col-md-3 m">
-				<div data---="input__?.method__required:1;dirsource:GET|GET,POST|POST,PUT|PUT,PATCH|PATCH,DELETE|DELETE">Method</div>
+				<ui-component name="input" path="?.method" config="required:1;dirsource:GET|GET,POST|POST,PUT|PUT,PATCH|PATCH,DELETE|DELETE">Method</ui-component>
 			</div>
 			<div class="col-md-9 m">
-				<div data---="input__?.url__required:1">Relative URL address</div>
-				<div class="help">Relative path to: <span data-bind="window.location.origin__text"></span></div>
+				<ui-component name="input" path="?.url" config="required:1">Relative URL address</ui-component>
+				<div class="help">Relative path to: <ui-bind path="window.location.origin" config="text"></ui-bind></div>
 			</div>
 		</div>
 		<div class="row">
 			<div class="col-md-3 m">
-				<div data---="input__?.timeout__required:1;type:number">Timeout</div>
+				<ui-component name="input" path="?.timeout" config="required:1;type:number">Timeout</ui-component>
 			</div>
 			<div class="col-md-3 m">
-				<div data---="input__?.limit__required:1;type:number;ricon:!kB;align:1">Request limit</div>
+				<ui-component name="input" path="?.limit" config="required:1;type:number;ricon:!kB;align:1">Request limit</ui-component>
 			</div>
 			<div class="col-md-6 m">
-				<div data---="input__?.response__required:1;dirsource:empty|Empty response,json|JSON,text|Text,html|HTML,xml|XML,custom|Custom">Response</div>
+				<ui-component name="input" path="?.response" config="required:1;dirsource:empty|Empty response,json|JSON,text|Text,html|HTML,xml|XML,custom|Custom">Response</ui-component>
 			</div>
 		</div>
 	</div>
@@ -93,7 +93,7 @@ __Output data__:
 
 <style>
 	.CLASS footer { padding: 10px; }
-	.CLASS footer span { font-family: var(--monospace); }
+	.CLASS footer ui-bind > ui-bind { font-family: var(--monospace); }
 	.CLASS footer .method { background-color: var(--color); color: #FFF; padding: 2px 3px; border-radius: var(--radius); }
 </style>
 
@@ -102,6 +102,6 @@ __Output data__:
 		<i class="ICON"></i>NAME
 	</header>
 	<footer>
-		<div data-bind="CONFIG.method__show" class="hidden"><span data-bind="CONFIG.method__text" class="method"></span> <a data-bind="CONFIG.url__text__href:window.location.origin + value" target="_blank"></a></div>
+		<ui-bind path="CONFIG.method" config="show" class="hidden"><ui-bind path="CONFIG.method" config="text" class="method"></ui-bind><a is="is-a" path="CONFIG.url" config="text;href:window.location.origin + value" target="_blank"></a></ui-bind>
 	</footer>
 </body>

@@ -81,10 +81,10 @@
 	<div class="padding">
 		<div class="row">
 			<div class="col-md-8 m">
-				<div data---="input__?.name__required:1">Name</div>
+				<ui-component name="input" path="?.name" config="required:1">Name</ui-component>
 			</div>
 			<div class="col-md-4 m">
-				<div data---="input__?.delay__type:number;required:1;align:1;ricon:!ms">Idle time delay</div>
+				<ui-component name="input" path="?.delay" config="type:number;required:1;align:1;ricon:!ms">Idle time delay</ui-component>
 			</div>
 		</div>
 	</div>
@@ -96,11 +96,11 @@ The component runs a simple stopwatch for incomming messages.
 
 <body>
 	<header>
-		<i class="ICON"></i><span data-bind="CONFIG.name__text"></span>
+		<i class="ICON"></i><ui-bind path="CONFIG.name" config="text"></ui-bind>
 	</header>
 	<footer>
 		<div><button class="exec button" data-exec="FUNC.trigger">Reset</button></div>
-		<div data-bind="STATUS__template__show:value && value.length" class="mt10">
+		<ui-bind path="STATUS" config="template;show:value && value.length" class="mt10 block">
 			<script type="text/html">
 				{{ foreach m in value }}
 				<div class="result">
@@ -109,6 +109,6 @@ The component runs a simple stopwatch for incomming messages.
 				</div>
 				{{ end }}
 			</script>
-		</div>
+		</ui-bind>
 	</footer>
 </body>

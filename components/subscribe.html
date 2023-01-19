@@ -76,7 +76,7 @@
 
 <settings>
 	<div class="padding">
-		<div data---="input__?.id__dirsource:%outputs;dirraw:1;placeholder:Choose a specific input;dirempty:No output" class="m"><b>Output</b></div>
+		<ui-component name="input" path="?.id" config="dirsource:%outputs;dirraw:1;placeholder:Choose a specific input;dirempty:No output" class="m"><b>Output</b></ui-component>
 	</div>
 </settings>
 
@@ -86,6 +86,6 @@ The component subscribes to the specific `Output` component.
 
 <body>
 	<header>
-		<i class="ICON"></i>NAME: <b class="monospace" data-bind="STATUS.name__text__empty"></b>
+		<i class="ICON"></i>NAME: <b class="monospace"><ui-bind path="STATUS.name" config="text;empty"></ui-bind></b>
 	</header>
 </body>

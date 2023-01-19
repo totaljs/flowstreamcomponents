@@ -68,10 +68,10 @@ The component sends only limited count of messages.
 	<div class="padding">
 		<div class="row">
 			<div class="col-md-3 m">
-				<div data---="input__?.limit__required:1;type:number">Limit</div>
+				<ui-component name="input" path="?.limit" config="required:1;type:number">Limit</ui-component>
 			</div>
 			<div class="col-md-3 m">
-				<div data---="input__?.delay__required:0;align:1;type:number;ricon:!ms">Delay</div>
+				<ui-component name="input" path="?.delay" config="required:0;align:1;type:number;ricon:!ms">Delay</ui-component>
 			</div>
 		</div>
 	</div>
@@ -86,5 +86,5 @@ The component sends only limited count of messages.
 		<button class="button exec" data-exec="FUNC.trigger">Send</button>
 		<i class="ICON"></i>NAME
 	</header>
-	<footer data-bind="STATUS__text:(value || 0).format(0)" class="status"></footer>
+	<footer><ui-bind path="STATUS" config="text:(value || 0).format(0)" class="status block"></ui-bind></footer>
 </body>

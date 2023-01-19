@@ -83,14 +83,16 @@ __Output example__:
 	<header>
 		<i class="ICON"></i>NAME
 	</header>
-	<footer data-bind="CONFIG.path__show__text span">
-		Path: <span class="b"></span>
+	<footer> 
+		<ui-bind path="CONFIG.path" config="show;text span" class="block">
+			Path: <span class="b"></span>
+		</ui-bind>
 	</footer>
 </body>
 
 <settings>
 	<div class="padding">
-		<div data---="input__?.path__placeholder:path.to.property;monospace:1">Load data from the specific property/field</div>
+		<ui-component name="input" path="?.path" config="placeholder:path.to.property;monospace:1">Load data from the specific property/field</ui-component>
 		<div class="help">Optional. The data for the splitting will be loaded from the specific property/field.</div>
 	</div>
 </settings>

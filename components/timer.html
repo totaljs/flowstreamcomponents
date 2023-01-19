@@ -85,21 +85,21 @@
 	<div class="padding">
 		<div class="row">
 			<div class="col-md-3 m">
-				<div data---="input__?.interval__type:number;required:1">Interval</div>
+				<ui-component name="input" path="?.interval" config="type:number;required:1">Interval</ui-component>
 				<div class="help">In milliseconds</div>
 			</div>
 			<div class="col-md-9 m">
-				<div data---="input__?.type__dirsource:string|String,number|Number,boolean|Boolean,date|Date,object|Object,buffer|Buffer as Base64;required:1">Type</div>
+				<ui-component name="input" path="?.type" config="dirsource:string|String,number|Number,boolean|Boolean,date|Date,object|Object,buffer|Buffer as Base64;required:1">Type</ui-component>
 			</div>
 		</div>
 		<hr />
 		<div class="m">
-			<div data---="input__?.random__type:checkbox">Random data</div>
+			<ui-component name="input" path="?.random" config="type:checkbox">Random data</ui-component>
 		</div>
-		<div data-bind="?.random__hide" class="hidden">
+		<ui-bind path="?.random" config="hide" class="hidden block">
 			<hr />
-			<div data---="input__?.data__required:1">Data</div>
-		</div>
+			<ui-component name="input" path="?.data" config="required:1">Data</ui-component>
+		</ui-bind>
 	</div>
 </settings>
 
@@ -113,6 +113,6 @@ The component triggers data into the Flow in the specified interval.
 	</header>
 	<div class="padding">
 		<button class="exec" data-exec="FUNC.ftimer_exec">Run</button>
-		<div class="help">Interval: <span data-bind="CONFIG.interval__text__empty"></span> ms</div>
+		<div class="help">Interval: <ui-bind path="CONFIG.interval" config="text;empty"></ui-bind> ms</div>
 	</div>
 </body>

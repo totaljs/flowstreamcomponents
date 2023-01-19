@@ -76,11 +76,11 @@
 
 <settings>
 	<div class="padding">
-		<div data---="input__?.port__required:1">PORT</div>
-		<div data---="input__?.baudrate__dirsource:110|110,300|300,600|600,1200|1200,2400|2400,4800|4800,9600|9600,14400|14400,19200|19200,38400|38400,57600|57600,115200|115200,128000|128000;required:1">Baudrate</div>
-		<div data---="input__?.databits__dirsource:5|5,6|6,7|7,8|8;required:1">Databits</div>
-		<div data---="input__?.parity__dirsource:none|none,even|even,mark|mark,odd|odd,space|space;required:1">Parity</div>
-		<div data---="input__?.stopbits__dirsource:1|1,2|2;required:1">Stop Bits</div>
+		<ui-component name="input" path="?.port" config="required:1">PORT</ui-component>
+		<ui-component name="input" path="?.baudrate" config="dirsource:110|110,300|300,600|600,1200|1200,2400|2400,4800|4800,9600|9600,14400|14400,19200|19200,38400|38400,57600|57600,115200|115200,128000|128000;required:1">Baudrate</ui-component>
+		<ui-component name="input" path="?.databits" config="dirsource:5|5,6|6,7|7,8|8;required:1">Databits</ui-component>
+		<ui-component name="input" path="?.parity" config="dirsource:none|none,even|even,mark|mark,odd|odd,space|space;required:1">Parity</ui-component>
+		<ui-component name="input" path="?.stopbits" config="dirsource:1|1,2|2;required:1">Stop Bits</ui-component>
 	</div>
 </settings>
 
@@ -89,12 +89,12 @@
 		<i class="ICON"></i>Raspberry UART
 	</header>
 	<footer>
-		<div data-bind="!STATUS__template__show" class="status hidden">
+		<ui-bind path="!STATUS" config="template;show" class="status hidden block">
 			{{ if value.open }}
 				<i class="ti ti-circle mr5 green"></i>Open
 			{{ else }}
 				<i class="ti ti-circle mr5 red"></i>Closed
 			{{ fi }}
-		</div>
+		</ui-bind>
 	</footer>
 </body>

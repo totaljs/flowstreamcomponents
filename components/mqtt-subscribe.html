@@ -63,7 +63,7 @@ MQTT Subscribe
 
 <style>
 	.CLASS footer { padding: 10px; font-size: 11px; }
-	.CLASS footer > div > div { height: 16px; }
+	.CLASS footer > ui-bind > div { height: 16px; }
 	.CLASS footer b { float: right; margin-left: 12px; }
 </style>
 
@@ -79,12 +79,12 @@ MQTT Subscribe
 	<div class="padding">
 		<div class="row">
 			<div class="col-md-6">
-				<div data---="input__?.broker__dirsource:%brokers;dirraw:1;placeholder:Select broker;dirempty:No broker;required:1" class="m"><b>Broker</b></div>
+				<ui-component name="input" path="?.broker" config="dirsource:%brokers;dirraw:1;placeholder:Select broker;dirempty:No broker;required:1" class="m"><b>Broker</b></ui-component>
 			</div>
 		</div>
 		<div class="row">
 			<div class="col-md-6">
-				<div data---="input__?.topic__placeholder:devices/status;required:1" class="m"><b>Topic</b></div>
+				<ui-component name="input" path="?.topic" config="placeholder:devices/status;required:1" class="m"><b>Topic</b></ui-component>
 			</div>
 		</div>
 		<div class="row">
@@ -104,11 +104,11 @@ MQTT Subscribe
 		<i class="ICON"></i>NAME
 	</header>
 	<footer>
-		<div data-bind="!STATUS__template__show">
+		<ui-bind path="!STATUS" config="template;show">
 			<script type="text/html">
 				<div><b>{{ value.status }}</b>Status</div>
 				<div><b>{{ value.topic }}</b>Topic</div>
 			</script>
-		</div>
+		</ui-bind>
 	</footer>
 </body>

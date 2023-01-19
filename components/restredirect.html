@@ -1,5 +1,5 @@
 <script total>
-
+///
 	exports.name = 'Redirect';
 	exports.icon = 'ti ti-share';
 	exports.group = 'REST API';
@@ -44,8 +44,8 @@ Incomming data have higher priority than the values set in the Configuration for
 <settings>
 	<div class="padding">
 		<div class="message message-alert">Redirect URL address supports dynamic variables in the form <code class="b">{key}</code> or <code class="b">{data.key}</code>. Variables are read from global variables <code class="b">{key}</code> and from the message data <code class="b">{data.key}</code>.</div>
-		<div data---="input__?.url__innerlabel:1;required:1;placeholder:Enter absolute URL address" class="m">Redirect URL</div>
-		<div data---="input__?.permanent__type:checkbox">Permanent redirect</div>
+		<ui-component name="input" path="?.url" config="innerlabel:1;required:1;placeholder:Enter absolute URL address" class="m">Redirect URL</ui-component>
+		<ui-component name="input" path="?.permanent" config="type:checkbox">Permanent redirect</ui-component>
 	</div>
 </settings>
 
@@ -58,6 +58,6 @@ Incomming data have higher priority than the values set in the Configuration for
 		<i class="ICON"></i>NAME
 	</header>
 	<footer>
-		<i class="ti ti-globe mr5"></i><span data-bind="CONFIG.url__text__empty"></span>
+		<i class="ti ti-globe mr5"></i><ui-bind path="CONFIG.url" config="text;empty"></ui-bind>
 	</footer>
 </body>

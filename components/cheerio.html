@@ -102,10 +102,10 @@
 
 <settings>
 	<div class="padding">
-		<div data---="input__?.path">Path to html</div>
+		<ui-component name="input" path="?.path">Path to html</ui-component>
 		<div class="help m">Leave empty if the 'data' itself is the html string, otherwise use dot notation. E.g.: { request: { body: '&lt;html&gt;...&lt;/html&gt;' }} -> `request.body` </div>
 		<div class="ui-input-label">Code:</div>
-		<div data---="codemirror__?.fn__type:javascript;minheight:300;parent:.ui-largeform-body;margin:60;tabs:true;trim:true"></div>
+		<ui-component name="codemirror" path="?.fn" config="type:javascript;minheight:300;parent:.ui-largeform-body;margin:60;tabs:true;trim:true"></ui-component>
 		<div class="help">Available variables: '&dollar;' -> cheerio instance, 'html' -> html string. Use 'return somedata;' to return whatever you want. Output data -> { result: somedata, input: inputdata }</div>
 	</div>
 </settings>
@@ -122,5 +122,5 @@
 	<header>
 		<i class="ICON"></i>NAME
 	</header>
-	<footer data-bind="!STATUS__text__show"></footer>
+	<footer><ui-bind path="!STATUS" config="text;show"></ui-bind></footer>
 </body>

@@ -46,10 +46,10 @@ This component can respond on the REST Route component.
 	<div class="padding">
 		<div class="row">
 			<div class="col-md-3 m">
-				<div data---="input__?.type__required:1;dirsource:json|JSON,success|Success,empty|Empty response,plain|Plain text,html|HTML">Type</div>
+				<ui-component name="input" path="?.type" config="required:1;dirsource:json|JSON,success|Success,empty|Empty response,plain|Plain text,html|HTML">Type</ui-component>
 			</div>
 			<div class="col-md-3 m">
-				<div data---="input__?.code__required:1;type:number">Status code</div>
+				<ui-component name="input" path="?.code" config="required:1;type:number">Status code</ui-component>
 			</div>
 		</div>
 	</div>
@@ -57,12 +57,14 @@ This component can respond on the REST Route component.
 
 <style>
 	.CLASS header { padding: 6px !important; }
-	.CLASS header span { font-family: var(--monospace); color: #FFF; margin-left: 4px; padding: 2px 3px; border-radius: var(--radius); }
-	.CLASS header span:last-child { background-color: grey; }
+	.CLASS header ui-bind { font-family: var(--monospace); color: #FFF; margin-left: 4px; padding: 2px 3px; border-radius: var(--radius); }
+	.CLASS header ui-bind:last-child { background-color: grey; }
 </style>
 
 <body>
 	<header>
-		<i class="ICON"></i>NAME<span data-bind="CONFIG.code__text__exec:el.css('background-color', value >= 400 ? '#E73323' : '#4285F4')"></span> <span data-bind="CONFIG.type__text"></span>
+		<i class="ICON"></i>NAME
+		<ui-bind path="CONFIG.code" config="text;exec:el.css('background-color', value >= 400 ? '#E73323' : '#4285F4')"></ui-bind> 
+		<ui-bind path="CONFIG.type" config="text"></ui-bind>
 	</header>
 </body>

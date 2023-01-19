@@ -64,7 +64,7 @@ The component can parse newline data or begin/end phrases in the buffer or strin
 
 <settings>
 	<div class="padding">
-		<div data---="choose__?.type__selector:div" class="iconmenu m">
+		<ui-component name="choose" path="?.type__selector:div" class="iconmenu m">
 			<div data-id="1">
 				<i class="ti ti-arrow-down ti-sync"></i>
 				<span>CSV</span>
@@ -73,37 +73,39 @@ The component can parse newline data or begin/end phrases in the buffer or strin
 				<i class="ti ti-code"></i>
 				<span>XML</span>
 			</div>
-		</div>
-		<div data---="input__?.convert__type:checkbox">Convert parsed value to the object</div>
+		</ui-component>
+		<ui-component name="input" path="?.convert" config="type:checkbox">Convert parsed value to the object</ui-component>
 	</div>
 	<hr class="nmt nmb" />
-	<div data-bind="?.type__show:value==='2'" class="padding hidden">
+	<ui-bind path="?.type" config="show:value==='2'" class="padding hidden block">
 		<div class="caption m">
 			<label><i class="ti ti-cog"></i>Advanced settings</label>
 		</div>
 		<div class="row">
 			<div class="col-md-6 m">
-				<div data---="input__?.beg__required:1;placeholder:&lt;PRODUCT&gt;">Begin phrase</div>
+				<ui-component name="input" path="?.beg" config="required:1;placeholder:&lt;PRODUCT&gt;">Begin phrase</ui-component>
 			</div>
 			<div class="col-md-6 m">
-				<div data---="input__?.end__required:1;placeholder:&lt;/PRODUCT&gt;">End phrase</div>
+				<ui-component name="input" path="?.end" config="required:1;placeholder:&lt;/PRODUCT&gt;">End phrase</ui-component>
 			</div>
 		</div>
-	</div>
+	</ui-bind>
 </settings>
 
 <style>
 	.CLASS footer { padding: 10px; font-size: 12px; text-align: center; }
-	.CLASS footer span { font-family: var(--monospace); }
+	.CLASS footer ui-bind { font-family: var(--monospace); }
 </style>
 
 <body>
 	<header>
 		<i class="ICON"></i>NAME
 	</header>
-	<footer data-bind="CONFIG__template">
-		<script type="text/html">
-			<div>{{ if value.type === '1' }}New line{{ else }}<span>{{ value.beg }}</span> - <span>{{ value.end }}</span>{{ fi }}</div>
-		</script>
+	<footer>
+		<ui-bind path="CONFIG" config="template">
+			<script type="text/html">
+				<div>{{ if value.type === '1' }}New line{{ else }}<span>{{ value.beg }}</span> - <span>{{ value.end }}</span>{{ fi }}</div>
+			</script>
+		</ui-bind>
 	</footer>
 </body>

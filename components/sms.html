@@ -35,29 +35,29 @@ The component sends a SMS message.
 
 <settings>
 	<div class="padding bg-smoke">
-		<div data---="input__?.token__required:1;camouflage:*">Total API token</div>
+		<ui-component name="input" path="?.token" config="required:1;camouflage:*">Total API token</ui-component>
 		<div class="help">Supports dynamic variables in the form <code>{key}</code>. Generate your token on <a href="https://platform.totaljs.com/?open=api" target="_blank">https://platform.totaljs.com</a> - Total.js API Services.</div>
 	</div>
 	<div class="padding">
 		<div class="row">
 			<div class="col-md-4 m">
-				<div data---="input__?.from">From</div>
+				<ui-component name="input" path="?.from">From</ui-component>
 				<div class="help"><b>International format</b>. Supports dynamic variables in the form <code>{key}</code></div>
 			</div>
 			<div class="col-md-4 m">
-				<div data---="input__?.to">To</div>
+				<ui-component name="input" path="?.to">To</ui-component>
 				<div class="help"><b>International format</b>. Supports dynamic variables in the form <code>{key}</code></div>
 			</div>
 		</div>
 	</div>
 	<hr class="nmt nmb" />
 	<div class="padding">
-		<div data---="input__?.isdata__type:checkbox" class="b mt5">Send incoming message data only</div>
+		<ui-component name="input" path="?.isdata" config="type:checkbox" class="b mt5">Send incoming message data only</ui-component>
 	</div>
 	<div data-bind="?.isdata__hide" class="hidden">
 		<hr class="nmt nmb" />
 		<div class="padding">
-			<div data---="input__?.body__maxlength:500;required:1">Message</div>
+			<ui-component name="input" path="?.body" config="maxlength:500;required:1">Message</ui-component>
 			<div class="help m">Supports dynamic variables in the form <code>{key}</code>. The component reads data from the message data and then from all defined variables.</div>
 		</div>
 	</div>
@@ -68,6 +68,6 @@ The component sends a SMS message.
 		<i class="ICON"></i>NAME
 	</header>
 	<footer>
-		<div data-bind="!STATUS.response__text__show" class="error hidden"></div>
+		<ui-bind path="!STATUS.response" config="text;show" class="error hidden block"></ui-bind>
 	</footer>
 </body>

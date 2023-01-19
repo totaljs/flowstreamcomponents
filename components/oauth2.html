@@ -1,5 +1,4 @@
 <script total>
-
 	exports.name = 'OAuth 2.0';
 	exports.icon = 'ti ti-key';
 	exports.author = 'Total.js';
@@ -47,25 +46,25 @@
 		<p>To obtain an OAuth 2.0 access token, you must follow the OAuth 2.0 specification on the service you want to use.</p>
 		<div class="grid-2">
 			<div class="m">
-				<div data---="input__?.urlauthorize__required:1;type:url;innerlabel:1;placeholder:Enter a value">Authorize URL</div>
+				<ui-component name="input" path="?.urlauthorize" config="required:1;type:url;innerlabel:1;placeholder:Enter a value">Authorize URL</ui-component>
 			</div>
 			<div class="m">
-				<div data---="input__?.urltoken__required:1;type:url;innerlabel:1;placeholder:Enter a value">Token URL</div>
+				<ui-component name="input" path="?.urltoken" config="required:1;type:url;innerlabel:1;placeholder:Enter a value">Token URL</ui-component>
 			</div>
 		</div>
 		<hr class="nmt" />
-		<div class="fs12 m"><i class="ti ti-globe mr5"></i>Your redirect URL: <b data-bind="flow.head.notify__text__empty" class="red"></b></div>
+		<div class="fs12 m"><i class="ti ti-globe mr5"></i>Your redirect URL: <b><ui-bind path="flow.head.notify" config="text;empty" class="red"></ui-bind></b></div>
 		<div class="grid-3">
 			<div class="m">
-				<div data---="input__?.clientid__required:1;camouflage:1;innerlabel:1;placeholder:Enter client id">Client ID</div>
+				<ui-component name="input" path="?.clientid" config="required:1;camouflage:1;innerlabel:1;placeholder:Enter client id">Client ID</ui-component>
 				<div class="help">Required</div>
 			</div>
 			<div class="m">
-				<div data---="input__?.clientsecret__required:1;camouflage:1;innerlabel:1;placeholder:Enter client secret">Client secret</div>
+				<ui-component name="input" path="?.clientsecret" config="required:1;camouflage:1;innerlabel:1;placeholder:Enter client secret">Client secret</ui-component>
 				<div class="help">Required</div>
 			</div>
 			<div class="m">
-				<div data---="input__?.scope__required:0;innerlabel:1;placeholder:email,profile">Scope</div>
+				<ui-component name="input" path="?.scope" config="required:0;innerlabel:1;placeholder:email,profile">Scope</ui-component>
 				<div class="help">Optional</div>
 			</div>
 		</div>
@@ -73,29 +72,29 @@
 		<div class="m center">
 			<p>To obtain of OAuth 2.0 access token, you must click on the button below.</p>
 			<div style="width:150px;margin:0 auto">
-				<button class="button exec b" data-exec="tmpoauth2.authorize" data-bind="?__enabled:value.urlauthorize && value.urltoken && value.clientid && value.clientsecret" disabled><i class="ti ti-key"></i>Authorize</button>
+				<button class="button exec b" data-exec="tmpoauth2.authorize"><ui-bind path="?" config="enabled:value.urlauthorize && value.urltoken && value.clientid && value.clientsecret" disabled></ui-bind><i class="ti ti-key"></i>Authorize</button>
 			</div>
 			<br />
 		</div>
-		<div data-bind="?.accesstoken__show" class="hidden">
+		<ui-bind path="?.accesstoken" config="show" class="hidden">
 			<div class="grid-2">
 				<div class="m">
-					<div data---="input__?.accesstoken__required:1;disabled:1;innerlabel:1;placeholder:Will be filled automatically after authorization">Access token</div>
+					<ui-component name="input" path="?.accesstoken" config="required:1;disabled:1;innerlabel:1;placeholder:Will be filled automatically after authorization">Access token</ui-component>
 					<div class="help">OAuth 2.0 access token</div>
 				</div>
 				<div class="m">
-					<div data---="input__?.variable__innerlabel:1;placeholder:Enter a variable key">Assign token to the global variable</div>
+					<ui-component name="input" path="?.variable" config="innerlabel:1;placeholder:Enter a variable key">Assign token to the global variable</ui-component>
 					<div class="help">The access token will be automatically assigned into the global variables</div>
 				</div>
 			</div>
-		</div>
-		<div data-bind="?.response__html pre:value ? Thelpers.jsonformat(value) : ''__show" class="hidden bg-smoke">
+		</ui-bind>
+		<ui-bind path="?.response" config="html pre:value ? Thelpers.jsonformat(value) : ''__show" class="hidden bg-smoke block">
 			<div class="padding">
 				<div class="fs12">Response:</div>
 				<pre style="font-size:12px;tab-size:4;margin:0;padding:5px 0"></pre>
 				<div class="help red"><i class="ti ti-exclamation-triangle"></i>Don't forget to save settings if you change something</div>
 			</div>
-		</div>
+		</ui-bind>
 	</div>
 </settings>
 
@@ -108,8 +107,10 @@
 	<header>
 		<i class="ICON"></i>NAME
 	</header>
-	<footer data-bind="CONFIG.accesstoken__show">
-		<div><span class="exec link" data-exec="tmpoauth2.copy"><i class="ti ti-copy mr5"></i>Copy access token</span></div>
+	<footer>
+		<ui-bind path="CONFIG.accesstoken" config="show">
+			<div><span class="exec link" data-exec="tmpoauth2.copy"><i class="ti ti-copy mr5"></i>Copy access token</span></div>
+		</ui-bind>
 	</footer>
 </body>
 

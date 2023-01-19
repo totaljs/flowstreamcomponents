@@ -75,14 +75,14 @@
 	<div class="padding">
 		<div class="row">
 			<div class="col-md-9 m">
-				<div data---="input__?.path___required:1;placeholder:/www/flowstream/data.json"><b>Path</b></div>
+				<ui-component name="input" path="?.path" config="required:1;placeholder:/www/flowstream/data.json"><b>Path</b></ui-component>
 				<div class="help">Absolute path to the file. The path starts with the <code>~</code> char will watch filename in the project's root directory.</div>
 			</div>
 			<div class="col-md-3 m">
-				<div data---="input__?.interval___required:1;type:number;min:100;align:1;ricon:!ms__1000">Interval</div>
+				<ui-component name="input" path="?.interval" config="required:1;type:number;min:100;align:1;ricon:!ms" default="1000">Interval</ui-component>
 			</div>
 		</div>
-		<div data---="input__?.parser__dirsource:json|JSON,text|Text,buffer|Buffer,number|Number,date|Date;required:1__'json'" class="m">Parser</div>
+		<ui-component name="input" path="?.parser" config="dirsource:json|JSON,text|Text,buffer|Buffer,number|Number,date|Date;required:1" default="'json'" class="m">Parser</ui-component>
 	</div>
 </settings>
 
@@ -100,9 +100,9 @@ The component watches the existence of the file, then reads the content and send
 		<i class="icon"></i>NAME
 	</header>
 	<footer>
-		<div><i class="ti ti-calendar mr5"></i><span data-bind="STATUS.used__text__format:yyyy-MM-dd HH:mm:ss__empty"></span></div>
-		<div><i class="ti ti-calculator mr5"></i><span data-bind="STATUS.size__text__helper:filesize__empty"></span></div>
+		<div><i class="ti ti-calendar mr5"></i><ui-bind path="STATUS.used" config="text;format:yyyy-MM-dd HH:mm:ss;empty"></ui-bind></div>
+		<div><i class="ti ti-calculator mr5"></i><ui-bind path="STATUS.size" config="text;helper:filesize;empty"></ui-bind></div>
 		<hr />
-		<div data-bind="CONFIG.path__text__empty"></div>
+		<ui-bind name="CONFIG.path" config="text;empty"></ui-bind>
 	</footer>
 </body>

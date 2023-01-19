@@ -40,25 +40,25 @@ The component logs incoming messages into the Total.js Cloud Logger.
 
 <settings>
 	<div class="padding bg-smoke">
-		<div data---="input__?.token__required:1;camouflage:*">Total API token</div>
+		<ui-component name="input" path="?.token" config="required:1;camouflage:*">Total API token</ui-component>
 		<div class="help">Supports dynamic arguments in the form <code>{key}</code></div>
 	</div>
 	<div class="padding">
 		<div class="row">
 			<div class="col-md-3 m">
-				<div data---="input__?.type__dirsource:info|Info,error|Error,warning|Warning,success|Success;required:1">Type</div>
+				<ui-component name="input" path="?.type" config="dirsource:info|Info,error|Error,warning|Warning,success|Success;required:1">Type</ui-component>
 			</div>
 			<div class="col-md-3 m">
-				<div data---="input__?.app">App name</div>
+				<ui-component name="input" path="?.app">App name</ui-component>
 			</div>
 			<div class="col-md-3 m">
-				<div data---="input__?.reference">Reference</div>
+				<ui-component name="input" path="?.reference">Reference</ui-component>
 			</div>
 			<div class="col-md-3 m">
-				<div data---="input__?.url">URL address</div>
+				<ui-component name="input" path="?.url">URL address</ui-component>
 			</div>
 		</div>
-		<div data---="input__?.message__required:1;maxlength:200">Message</div>
+		<ui-component name="input" path="?.message" config="required:1;maxlength:200">Message</ui-component>
 		<div class="help">Supports dynamic arguments in the form <code>{key}</code></div>
 	</div>
 </settings>
@@ -68,6 +68,6 @@ The component logs incoming messages into the Total.js Cloud Logger.
 		<i class="ICON"></i>NAME
 	</header>
 	<footer>
-		<div data-bind="!STATUS.response__text__show" class="error hidden"></div>
+		<ui-bind path="!STATUS.response" config="text;show" class="error hidden"></ui-bind>
 	</footer>
 </body>

@@ -265,9 +265,9 @@
 
 <settings>
 	<div class="padding">
-		<div data---="keyvalue__?.map__placeholderkey:Sensor name;placeholdervalue:Type a sensor id and hit enter" class="m">Name/ID map</div>
-		<div data---="input__?.interval__type:number" class="m">Interval in seconds (default 60s, minimum 30s)</div>
-		<div data---="input__?.history__type:checkbox" class="m">Keep history? (last 10 values for each sensor)</div>
+		<ui-component name="keyvalue" path="?.map" config="placeholderkey:Sensor name;placeholdervalue:Type a sensor id and hit enter" class="m">Name/ID map</ui-component>
+		<ui-component name="input" path="?.interval" config="type:number" class="m">Interval in seconds (default 60s, minimum 30s)</ui-component>
+		<ui-component name="input" path="?.history" config="type:checkbox" class="m">Keep history? (last 10 values for each sensor)</ui-component>
 	</div>
 </settings>
 

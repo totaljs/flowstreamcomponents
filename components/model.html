@@ -385,13 +385,13 @@ This component prepares incoming data according to the defined schema. Output is
 <settings>
 	<div class="CLASS-settings">
 		<div class="padding bg-smoke">
-			<div data---="input__?.name__required:1" class="m">Model name</div>
-			<div data---="input__?.path__placeholder:path.to.property;monospace:1">Load data from the specific property/field</div>
+			<ui-component name="input" path="?.name" config="required:1" class="m">Model name</ui-component>
+			<ui-component name="input" path="?.path" config="placeholder:path.to.property;monospace:1">Load data from the specific property/field</ui-component>
 			<div class="help">Optional. The data for the model will be loaded from the specific property/field.</div>
-			<div data-bind="?.path__show" class="hidden">
+			<ui-bind path="?.path" config="show" class="hidden block">
 				<hr />
-				<div data---="input__?.rewrite__type:checkbox"><b>Rewrite value only</b> (otherwise, it will replace entire message data)</div>
-			</div>
+				<ui-component name="input" path="?.rewrite" config="type:checkbox"><b>Rewrite value only</b> (otherwise, it will replace entire message data)</ui-component>
+			</ui-bind>
 		</div>
 		<div class="padding">
 			<div class="caption m">
@@ -402,7 +402,7 @@ This component prepares incoming data according to the defined schema. Output is
 				</div>
 				<label>Fields</label>
 			</div>
-			<div data-bind="?.schema__template:figure --> data-id__show:value && value.length" class="fields m">
+			<ui-bind path="?.schema" config="template:figure --> data-id;show:value && value.length" class="fields m">
 				<script type="text/html">
 					{{ foreach m in value }}
 					<figure data-id="{{ m.id }}"{{ if m.required }} class="isrequired"{{ fi }}>
@@ -425,7 +425,7 @@ This component prepares incoming data according to the defined schema. Output is
 					</figure>
 					{{ end }}
 				</script>
-			</div>
+			</ui-bind>
 			<div class="message message-alert">If you want to declare a nested object, then you can create another model and link it with this model.</div>
 		</div>
 	</div>
@@ -470,7 +470,7 @@ This component prepares incoming data according to the defined schema. Output is
 
 <body>
 	<header>
-		<i class="ICON"></i><b>Model:</b> <span data-bind="CONFIG.name__text"></span>
+		<i class="ICON"></i><b>Model:</b> <ui-bind path="CONFIG.name" config="text"></ui-bind>
 	</header>
 	<footer>
 		<span class="exec link" data-exec="/copy"><i class="ti ti-copy mr5"></i>Copy fields as Markdown</span>

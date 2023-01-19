@@ -243,27 +243,27 @@
 	<div class="padding">
 		<div class="row">
 			<div class="col-md-6 m">
-				<div data---="input__?.name__required:1;placeholder:Dataset name">Name</div>
+				<ui-component name="input" path="?.name" config="required:1;placeholder:Dataset name">Name</ui-component>
 			</div>
 			<div class="col-md-3 m">
-				<div data---="input__?.type__dirsource:lastvalue|Last value only,logger|Logger,hourly|Hourly,daily|Daily,weekly|Weeekly,monthly|Monthly,yearly|Yearly;required:1">Type</div>
+				<ui-component name="input" path="?.type" config="dirsource:lastvalue|Last value only,logger|Logger,hourly|Hourly,daily|Daily,weekly|Weeekly,monthly|Monthly,yearly|Yearly;required:1">Type</ui-component>
 			</div>
 			<div class="col-md-3 m">
-				<div data---="input__?.sum__dirsource:0|Disabled,1|Periodical sum,2|Total sum;type:number">Calculate the sum</div>
+				<ui-component name="input" path="?.sum" config="dirsource:0|Disabled,1|Periodical sum,2|Total sum;type:number">Calculate the sum</ui-component>
 			</div>
 		</div>
 		<div class="row">
 			<div class="col-md-3 m">
-				<div data---="input__?.unit__align:1">Unit</div>
+				<ui-component name="input" path="?.unit" config="align:1">Unit</ui-component>
 			</div>
 			<div class="col-md-3 m">
-				<div data---="input__?.decimals__align:1;type:number__2">Decimals</div>
+				<ui-component name="input" path="?.decimals" config="align:1;type:number" default="2">Decimals</ui-component>
 			</div>
 			<div class="col-md-3 m">
-				<div data---="input__?.icon__type:icon">Icon</div>
+				<ui-component name="input" path="?.icon" config="type:icon">Icon</ui-component>
 			</div>
 			<div class="col-md-3 m">
-				<div data---="input__?.color__type:color">Color</div>
+				<ui-component name="input" path="?.color" config="type:color">Color</ui-component>
 			</div>
 		</div>
 		<hr />
@@ -351,12 +351,12 @@ CSV file contains only processed values (according to the period) and the `.meta
 	</header>
 	<footer>
 		<div class="padding">
-			<div data-bind="CONFIG__template">
+			<ui-bind path="CONFIG" config="template">
 				<script type="text/html">
 					<span class="badge badge-medium badge-color mr5">{{ value.type }}</span> {{ if value.icon }}<i class="{{ value.icon }} mr5"></i>{{ fi }}<b>{{ value.name }}</b>
 				</script>
-			</div>
-			<div data-bind="STATUS__template__show" class="keys hidden">
+			</ui-bind>
+			<ui-bind path="STATUS" config="template;show" class="keys hidden">
 				<script type="text/html">
 					<div class="selectable">
 						<div class="meta mt5">
@@ -378,7 +378,7 @@ CSV file contains only processed values (according to the period) and the `.meta
 					{{ end }}
 					</div>
 				</script>
-			</div>
+			</ui-bind>
 		</div>
 	</footer>
 </body>

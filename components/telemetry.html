@@ -123,13 +123,13 @@ array.0.value // -> 3
 
 <settings>
 	<div class="padding">
-		<div data---="input__?.interval__type:number__500">Update interval (in ms)</div>
+		<ui-component name="input" path="?.interval" config="type:number" default="500">Update interval (in ms)</ui-component>
 		<div class="help m">Leave empty to update immediately when new data comes in.</div>
-		<div data---="keyvalue__?.paths__placeholderkey:Type a property name;placeholdervalue:Type a path and press enter">Properties to show in the template</div>
+		<ui-component name="keyvalue" path="?.paths" config="placeholderkey:Type a property name;placeholdervalue:Type a path and press enter">Properties to show in the template</ui-component>
 		<div class="help m">Path supports js dot notation like `data.arr.0.value`, following is not supported `data.arr[0].value`<br>Supports datatypes in the `path` column: `some.path | date`</div>
-		<div data---="input__?.format">Date format</div>
+		<ui-component name="input" path="?.format">Date format</ui-component>
 		<div class="help m">default `dd.MM.yyyy HH:mm:ss`</div>
-		<div data---="input__?.extend__type:checkbox">Extend previous data?</div>
+		<ui-component name="input" path="?.extend" config="type:checkbox">Extend previous data?</ui-component>
 		<div class="help">if checked the previous data will be extend instead of overwriten, useful when not all data comes in a single message</div>
 	</div>
 </settings>
@@ -140,12 +140,12 @@ array.0.value // -> 3
 		<i class="ICON"></i>NAME
 	</header>
 	<footer>
-		<div data-bind="STATUS__template" class="">
+		<ui-bind path="STATUS" config="template" class="block">
 			<script type="text/html">
 				{{foreach item in value.items}}
 					<div class="telemetry-item"><b class="mr5">{{item.key}}:</b><span title="{{item.ts | format(value.format)}}">{{item.value}}</span></div>
 				{{end}}
 			</script>
-		</div>
+		</ui-bind>
 	</footer>
 </body>

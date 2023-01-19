@@ -87,9 +87,9 @@
 
 <settings>
 	<div class="padding">
-		<div data---="input__?.url__type:url;required:1">URL address</div>
+		<ui-component name="input" path="?.url" config="type:url;required:1">URL address</ui-component>
 		<div class="help m">Example: <code>https://blog.totaljs.com/rss/</code></div>
-		<div data---="input__?.type__dirsource:a|Send all items,b|Send only new items,c|Send every item separately,d|Send only new items separately">Output</div>
+		<ui-component name="input" path="?.type" config="dirsource:a|Send all items,b|Send only new items,c|Send every item separately,d|Send only new items separately">Output</ui-component>
 	</div>
 </settings>
 
@@ -115,5 +115,5 @@ __Example__:
 	<div class="padding">
 		<button class="exec button" data-exec="FUNC.trigger">Download</button>
 	</div>
-	<footer data-bind="CONFIG.url__text__show"></footer>
+	<footer> <ui-bind path="CONFIG.url" config="text;show" class="block"></ui-bind></footer>
 </body>

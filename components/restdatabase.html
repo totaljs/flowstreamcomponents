@@ -250,7 +250,7 @@ __Good to know__: If the `data` (payload) can contain special key names in the f
 
 <settings>
 
-	<div data---="box__common.form2__if:apidatabasefieldform;title:Database operation;zindex:30;width:800;submit:tmpapidatabase.save" data-scope="apidatabasefieldform__isolated:1">
+	<ui-component name="box" path="common.form" config="if:apidatabasefieldform;title:Database operation;zindex:30;width:800;submit:tmpapidatabase.save" plugin="apidatabasefieldform" class="isolated:1">
 		<div class="padding CLASS-settings">
 
 			<ul class="tabmenu" data---="tabmenu__?.command__null__'list'">
@@ -265,47 +265,49 @@ __Good to know__: If the `data` (payload) can contain special key names in the f
 
 			<div class="row">
 				<div class="col-md-4 m">
-					<div data---="input__?.name__required:1">Name</div>
+					<ui-component name="input" path="?.name" config="required:1">Name</ui-component>
 					<div class="help">An input name</div>
 				</div>
 				<div class="col-md-4 m">
-					<div data---="input__?.table__required:1;monospace:1;align:1">Table</div>
+					<ui-component name="input" path="?.table" config="required:1;monospace:1;align:1">Table</ui-component>
 					<div class="help">Table or Connection/Table</div>
 				</div>
 				<div class="col-md-4 m">
-					<div data---="input__?.path__monospace:1">Save to path</div>
+					<ui-component name="input" path="?.path" config="monospace:1">Save to path</ui-component>
 					<div class="help">Response to <code>message.data</code></div>
 				</div>
 			</div>
 
 			<hr />
 
-			<div class="row" data-bind="?.command__show:value==='list'||value==='query'||value==='read'">
+			<ui-bind path="?.command" config="show:value==='list'||value==='query'||value==='read'" class="row block">
 				<div class="col-md-4 m">
-					<div data---="input__?.limit__type:number;required:1;monospace:1">Max. limit</div>
+					<ui-component name="input" path="?.limit" config="type:number;required:1;monospace:1">Max. limit</ui-component>
 					<div class="help">Max. records to output</div>
 				</div>
 				<div class="col-md-4 m">
-					<div data---="input__?.sort__monospace:1;align:1;placeholder:column asc">Default sort</div>
+					<ui-component name="input" path="?.sort" config="monospace:1;align:1;placeholder:column asc">Default sort</ui-component>
 					<div class="help"><code>column asc</code> or <code>column desc</code></div>
 				</div>
 				<div class="col-md-4 m">
-					<div data---="input__?.fields__monospace:1;placeholder:column1, column2, column3" data-bind="?.command__disable:value==='list'">Fields</div>
+					<ui-bind path="?.command" config="disable:value==='list'">
+						<ui-component name="input" path="?.fields" config="monospace:1;placeholder:column1, column2, column3">Fields</ui-component>
+					</ui-bind>
 					<div class="help">Return fields</div>
 				</div>
-			</div>
+			</ui-bind>
 
-			<div data-bind="?.command__show:value!=='list'">
-				<div data---="input__?.error">Error message</div>
+			<ui-bind path="?.command" config="show:value!=='list'" class="block">
+				<ui-component name="input" path="?.error">Error message</ui-component>
 				<div class="help">An error message will be returned when the database returns nothing</div>
-			</div>
+			</ui-bind>
 
 			<br />
 
 			<div class="panel m">
 				<label class="bg-smoke">Condition</label>
 				<div class="padding">
-				<div data---="listform__?.where__autofocus:1;empty:You do not have defined any rules">
+				<ui-component name="listform" path="?.where" config="autofocus:1;empty:You do not have defined any rules">
 					<script type="text/html">
 						<div class="item monospace"><div class="controls nmr"><button name="up"><i class="ti ti-long-arrow-up"></i></button><button name="down"><i class="ti ti-long-arrow-alt-down"></i></button><button name="remove" class="red"><i class="ti ti-trash"></i></button></div><i class="ti ti-filter mr5"></i>{{ name }} {{ comparer }} <b>{{ if type == '6' }}null{{ else }}{{ value }}{{ fi }}</b></div>
 					</script>
@@ -313,38 +315,40 @@ __Good to know__: If the `data` (payload) can contain special key names in the f
 						<div class="padding">
 							<div class="row">
 								<div class="col-sm-3 m">
-									<div data---="input__?.name__required:1;align:1;monospace:1__'id'">Name</div>
+									<ui-component name="input" path="?.name" config="required:1;align:1;monospace:1" default="'id'">Name</ui-component>
 								</div>
 								<div class="col-sm-3 m">
-									<div data---="input__?.comparer__required:1;align:1;dirsource:tmpapidatabase.comparers__'='">Comparer</div>
+									<ui-component name="input" path="?.comparer" config="required:1;align:1;dirsource:tmpapidatabase.comparers" default="'='">Comparer</ui-component>
 								</div>
 								<div class="col-sm-3 m">
-									<div data---="input__?.type__required:1;align:1;dirsource:tmpapidatabase.types__'1'">Type</div>
+									<ui-component name="input" path="?.type" config="required:1;align:1;dirsource:tmpapidatabase.types" default="'1'">Type</ui-component>
 								</div>
 								<div class="col-sm-3 m">
-									<div data---="input__?.value__monospace:1;align:1__''" data-bind="?.type__enable:value!=='6'">Value</div>
+									<ui-bind path="?.type" config="enable:value!=='6'">
+										<ui-component name="input" path="?.value" config="monospace:1;align:1" default="''">Value</ui-component>
+									</ui-bind>
 								</div>
 							</div>
 							<div class="help"><b>Expression</b> supports these commands <code>params {Object}</code>, <code>query {Object}</code>, <code>data {Object}</code>, <code>user {Object}</code>. A value for date field can contain <code>now</code> with the current date/time.</div>
 							<br />
-							<div data---="validate__?__validonly:true" class="toolbar">
+							<ui-component name="validate" path="?" validate="validonly:true" class="toolbar">
 								<button name="submit"><i class="ti ti-file-code"></i>Save</button>
 								<button name="remove">Remove</button>
 								<button name="cancel">Cancel</button>
-							</div>
+							</ui-component>
 						</div>
 					</script>
 					<script type="text/html">
 						<div style="margin-top:15px"><button class="button button-inline" name="create"><i class="ti ti-plus-circle green"></i>Create</button></div>
 					</script>
-				</div>
+				</ui-component>
 				</div>
 			</div>
 
-			<div class="panel hidden" data-bind="?.command__show:value==='list'">
+			<ui-bind path="?.command" config="show:value==='list'" class="panel hidden block">
 				<label class="bg-smoke">Dynamic filter</label>
 				<div class="padding">
-					<div data---="listform__?.filter__autofocus:1;empty:You do not have defined any rules">
+					<ui-component name="listform" path="?.filter" config="autofocus:1;empty:You do not have defined any rules">
 
 						<script type="text/html">
 							<div class="item monospace"><div class="controls nmr"><button name="up"><i class="ti ti-long-arrow-up"></i></button><button name="down"><i class="ti ti-long-arrow-down"></i></button><button name="remove" class="red"><i class="ti ti-trash"></i></button></div><i class="ti ti-filter mr5"></i>{{ name }} <b>{{ type | tmpapidatabasetype }}</b></div>
@@ -354,17 +358,17 @@ __Good to know__: If the `data` (payload) can contain special key names in the f
 							<div class="padding">
 								<div class="row">
 									<div class="col-sm-3 m">
-										<div data---="input__?.name__required:1;align:1;monospace:1__'name'">Name</div>
+										<ui-component name="input" path="?.name" config="required:1;align:1;monospace:1" default="'name'">Name</ui-component>
 									</div>
 									<div class="col-sm-3 m">
-										<div data---="input__?.type__required:1;align:1;dirsource:tmpapidatabase.types2__'2'">Type</div>
+										<ui-component name="input" path="?.type" config="required:1;align:1;dirsource:tmpapidatabase.types2" default="'2'">Type</ui-component>
 									</div>
 								</div>
-								<div data---="validate__?__validonly:true" class="toolbar">
+								<ui-component name="validate" path="?" config="validonly:true" class="toolbar">
 									<button name="submit"><i class="ti ti-check-circle"></i>Save</button>
 									<button name="remove">Remove</button>
 									<button name="cancel">Cancel</button>
-								</div>
+								</ui-component>
 							</div>
 						</script>
 
@@ -372,19 +376,21 @@ __Good to know__: If the `data` (payload) can contain special key names in the f
 							<div style="margin-top:15px"><button class="button button-inline" name="create"><i class="ti ti-plus-circle green"></i>Create</button></div>
 						</script>
 
-					</div>
+					</ui-component>
 				</div>
-			</div>
+			</ui-bind>
 		</div>
-		<nav data---="validate__?">
-			<button name="submit" disabled>APPLY</button>
-			<button name="cancel">Cancel</button>
+		<nav>
+			<ui-component name="validate" path="?">
+				<button name="submit" disabled>APPLY</button>
+				<button name="cancel">Cancel</button>
+			</ui-component>
 		</nav>
-	</div>
+	</ui-component>
 
 	<div class="CLASS-settings">
 		<div class="padding bg-smoke">
-			<div data---="input__?.name__required:1" class="m">Name</div>
+			<ui-component name="input" path="?.name" config="required:1" class="m">Name</ui-component>
 		</div>
 		<div class="padding">
 
@@ -395,13 +401,13 @@ __Good to know__: If the `data` (payload) can contain special key names in the f
 				<label>Inputs</label>
 			</div>
 
-			<div data-bind="?.items__template:.item" class="listing">
+			<ui-bind name="?.items" config="template:.item" class="listing block">
 				<script type="text/html">
 					{{ foreach m in value }}
 					<div class="item exec" data-id="{{ m.id }}" data-exec="tmpapidatabase.upd"><span class="controls nmr"><button class="exec red" data-prevent="true" data-exec="tmpapidatabase.rem"><i class="ti ti-trash-alt"></i></button></span><i class="ti ti-crosshairs mr5"></i>{{ m.name }} ({{ m.command | tmpapidatabasecommand }})</div>
 					{{ end }}
 				</script>
-			</div>
+			</ui-bind>
 		</div>
 	</div>
 </settings>

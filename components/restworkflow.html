@@ -134,16 +134,21 @@ __Functions__:
 
 <settings>
 	<div class="padding">
-		<div data---="input__?.name__required:1" class="m">Workflow name</div>
-		<div data---="input__?.clear__type:checkbox" class="m b">Clear repository object</div>
+		<ui-component name="input" path="?.name" config="required:1" class="m">Workflow name</ui-component>
+		<ui-component name="input" path="?.clear" config="type:checkbox" class="m b">Clear repository object</ui-component>
 		<div class="ui-input-label">Code:</div>
-		<div data---="codemirror__?.code__type:javascript;minheight:300;parent:auto;margin:175;tabs:true;trim:true"></div>
+		<ui-component name="codemirror" path="?.code" config="type:javascript;minheight:300;parent:auto;margin:175;tabs:true;trim:true"></ui-component>
 	</div>
 </settings>
 
 <body>
 	<header>
-		<i class="ICON"></i>NAME: <b data-bind="CONFIG.name__text"></b>
+		<i class="ICON"></i>NAME: 
+		<b><ui-bind path="CONFIG.name" config="text"></ui-bind></b>
 	</header>
-	<footer data-bind="STATUS.error__text span__show" style="padding:10px" class="fs12 red"><i class="ti ti-bug mr5"></i><b>ERROR:</b> <span></span></footer>
+	<footer>
+		<ui-bind path="STATUS.error" config="text span;show" style="padding:10px" class="fs12 red block">
+			<i class="ti ti-bug mr5"></i><b>ERROR:</b> <span></span>
+		</ui-bind>
+	</footer>
 </body>

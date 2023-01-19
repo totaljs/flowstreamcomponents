@@ -1,7 +1,7 @@
 <script total>
 
 	exports.name = 'Macro';
-	exports.icon = 'ti ti-lomg-arrow-down';
+	exports.icon = 'ti ti-long-arrow-down';
 	exports.author = 'Total.js';
 	exports.version = '1';
 	exports.config = { code: 'RETURN DATA' };
@@ -54,8 +54,8 @@ FI
 
 <settings>
 	<div class="padding">
-		<div data---="input__?.clear__type:checkbox" class="m b">Clear temporary data</div>
-		<div data---="codemirror__?.code__type:text;minheight:300;parent:auto;margin:90;tabs:true;trim:true"></div>
+		<ui-component name="input" path="?.clear" config="type:checkbox" class="m b">Clear temporary data</ui-component>
+		<ui-component name="codemirror" path="?.code" config="type:text;minheight:300;parent:auto;margin:90;tabs:true;trim:true"></ui-component>
 		<div class="help"><a href="https://docs.totaljs.com/total4/pahk001pr41d/" target="_blank"><i class="ti ti-book mr5"></i>Documentation</a></div>
 	</div>
 </settings>

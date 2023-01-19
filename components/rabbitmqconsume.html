@@ -98,12 +98,12 @@ Uses [amqp-connection-manager](https://github.com/jwalton/node-amqp-connection-m
 	<div class="padding">
 		<div class="row">
 			<div class="col-md-6">
-				<div data---="input__?.manager__dirsource:%rabbitmqs;dirraw:1;placeholder:Select RabbitMQ connection;dirempty:No connection;required:1" class="m"><b>RabbitMQ Connetion</b></div>
+				<ui-component name="input" path="?.manager" config="dirsource:%rabbitmqs;dirraw:1;placeholder:Select RabbitMQ connection;dirempty:No connection;required:1" class="m"><b>RabbitMQ Connetion</b></ui-component>
 			</div>
 		</div>
 		<div class="row">
 			<div class="col-md-6">
-				<div data---="input__?.queuename__required:1" class="m">Queue name</div>
+				<ui-component name="input" path="?.queuename" config="required:1" class="m">Queue name</ui-component>
 				<div class="help m">Supports variables: queue-{queueid} , the {queueid} will be overwritten by the value from variables</div>
 			</div>
 		</div>
@@ -126,5 +126,5 @@ Uses [amqp-connection-manager](https://github.com/jwalton/node-amqp-connection-m
 	<header>
 		<i class="ICON"></i>NAME
 	</header>
-	<footer data-bind="!STATUS__text"></footer>
+	<footer><ui-bind path="!STATUS" config="text"></ui-bind></footer>
 </body>

@@ -46,18 +46,18 @@ The component executes SQL command on the specifi connection. This component dep
 		<div class="message message-alert">Connection and SQL query support dynamic variables in the form <code class="b">{key}</code> or <code class="b">{data.key}</code>. Variables are read from global Variables <code class="b">{key}</code> and from the message data <code class="b">{data.key}</code>. The component encodes all SQL values with except <code class="b red">{!key}</code>.</div>
 		<div class="grid-2">
 			<div class="m">
-				<div data---="input__?.id__required:1;innerlabel:1">Connection</div>
+				<ui-component name="input" path="?.id" config="required:1;innerlabel:1">Connection</ui-component>
 				<div class="help">A connection name/identifier</div>
 			</div>
 			<div class="m">
-				<div data---="input__?.path__innerlabel:1;placeholder:response">Assign data according to the path</div>
+				<ui-component name="input" path="?.path" config="innerlabel:1;placeholder:response">Assign data according to the path</ui-component>
 				<div class="help">Otherwise, the response will replace the entire message data.</div>
 			</div>
 		</div>
-		<div data---="input__?.first__type:checkbox">Return only the first row</div>
+		<ui-component name="input" path="?.first" config="type:checkbox">Return only the first row</ui-component>
 		<hr />
 		<div class="ui-input-label">SQL query:</div>
-		<div data---="codemirror__?.sql__type:sql;minheight:300;parent:auto;margin:290;tabs:true;trim:true"></div>
+		<ui-component name="codemirror" path="?.sql" config="type:sql;minheight:300;parent:auto;margin:290;tabs:true;trim:true"></ui-component>
 	</div>
 </settings>
 
@@ -69,7 +69,9 @@ The component executes SQL command on the specifi connection. This component dep
 	<header>
 		<i class="ICON"></i>NAME
 	</header>
-	<footer data-bind="CONFIG.id__text span__empty">
-		Database: <span class="b"></span>
+	<footer> 
+		<ui-bind path="CONFIG.id" config="text span;empty">
+			Database: <span class="b"></span>
+		</ui-bind>
 	</footer>
 </body>

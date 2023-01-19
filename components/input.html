@@ -21,8 +21,8 @@
 
 <settings>
 	<div class="padding">
-		<div data---="input__?.name__required:1" class="m"><b>Input name</b></div>
-		<div data---="input__?.readme__monospace:1;type:multiline;height:250">Readme</div>
+		<ui-component name="input" path="?.name" config="required:1" class="m"><b>Input name</b></ui-component>
+		<ui-component name="input" path="?.readme" config="monospace:1;type:multiline;height:250">Readme</ui-component>
 		<div class="help">Supports markdown format</div>
 	</div>
 </settings>
@@ -33,6 +33,6 @@ The component receives data from a `Publish` component from another FlowStream i
 
 <body>
 	<header>
-		<i class="ICON"></i>NAME: <b data-bind="CONFIG.name__text__empty"></b>
+		<i class="ICON"></i>NAME: <b><ui-bind path="CONFIG.name" config="text;empty"></ui-bind></b>
 	</header>
 </body>

@@ -190,12 +190,12 @@ Uses [amqp-connection-manager](https://github.com/jwalton/node-amqp-connection-m
 	<div class="padding">
 		<div class="row">
 			<div class="col-md-6">
-				<div data---="input__?.manager__dirsource:%rabbitmqs;dirraw:1;placeholder:Select RabbitMQ connection;dirempty:No connection;required:1" class="m"><b>RabbitMQ Connetion</b></div>
+				<ui-component name="input" path="?.manager" config="dirsource:%rabbitmqs;dirraw:1;placeholder:Select RabbitMQ connection;dirempty:No connection;required:1" class="m"><b>RabbitMQ Connetion</b></ui-component>
 			</div>
 		</div>
 		<div class="row">
 			<div class="col-md-6">
-				<div data---="input__?.queuename__required:1" class="m">Queue name</div>
+				<ui-component name="input" path="?.queuename" config="required:1" class="m">Queue name</ui-component>
 				<div class="help m">Supports variables: queue-{queueid} , the {queueid} will be overwritten by the value from variables</div>
 			</div>
 		</div>
@@ -204,7 +204,7 @@ Uses [amqp-connection-manager](https://github.com/jwalton/node-amqp-connection-m
 
 <style>
 	.CLASS footer { padding: 10px; font-size: 12px; }
-	.CLASS footer span { float: right; }
+	.CLASS footer ui-bind { float: right; }
 </style>
 
 <script>
@@ -220,8 +220,8 @@ Uses [amqp-connection-manager](https://github.com/jwalton/node-amqp-connection-m
 		<i class="ICON"></i>NAME
 	</header>
 	<footer>
-		<div data-bind="!STATUS.state__text"></div>
-		<div>Ack: <span data-bind="STATUS.stats.ack__text"></span></div>
-		<div>Nack: <span data-bind="STATUS.stats.nack__text"></span></div>
+		<ui-bind path="!STATUS.state" config="text" class="block"></ui-bind>
+		<div>Ack: <ui-bind path="STATUS.stats.ack__text"></ui-bind></div>
+		<div>Nack: <ui-bind path="STATUS.stats.nack__text"></ui-bind></div>
 	</footer>
 </body>

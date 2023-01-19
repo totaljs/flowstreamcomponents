@@ -93,22 +93,22 @@ __Output data__:
 		</div>
 		<div class="row">
 			<div class="col-md-3 m">
-				<div data---="input__?.method__required:1;dirsource:GET|GET,POST|POST,PUT|PUT,PATCH|PATCH,DELETE|DELETE">Method</div>
+				<ui-component name="input" path="?.method" config="required:1;dirsource:GET|GET,POST|POST,PUT|PUT,PATCH|PATCH,DELETE|DELETE">Method</ui-component>
 			</div>
 			<div class="col-md-9 m">
-				<div data---="input__?.url__required:1">Relative URL address</div>
-				<div class="help">Relative path to: <span data-bind="flow.head.proxyurl__text:value?value:window.location.origin"></span></div>
+				<ui-component name="input" path="?.url" config="required:1">Relative URL address</ui-component>
+				<div class="help">Relative path to: <ui-bind path="flow.head.proxyurl" config="text:value?value:window.location.origin"></ui-bind></div>
 			</div>
 		</div>
 		<div class="row">
 			<div class="col-md-3 m">
-				<div data---="input__?.timeout__required:1;type:number">Timeout</div>
+				<ui-component name="input" path="?.timeout" config="required:1;type:number">Timeout</ui-component>
 			</div>
 			<div class="col-md-3 m">
-				<div data---="input__?.limit__required:1;type:number;ricon:!kB;align:1">Request limit</div>
+				<ui-component name="input" path="?.limit" config="required:1;type:number;ricon:!kB;align:1">Request limit</ui-component>
 			</div>
 			<div class="col-md-3 m">
-				<div data---="input__?.send__required:1;dirsource:all|Everything,payload|Payload,query|Query arguments,files|Files,params|Dynamic params,headers|Headers">Send to output</div>
+				<ui-component name="input" path="?.send" config="required:1;dirsource:all|Everything,payload|Payload,query|Query arguments,files|Files,params|Dynamic params,headers|Headers">Send to output</ui-component>
 			</div>
 		</div>
 	</div>
@@ -116,7 +116,7 @@ __Output data__:
 
 <style>
 	.CLASS footer { padding: 10px; }
-	.CLASS footer span { font-family: var(--monospace); }
+	.CLASS footer div ui-bind { font-family: var(--monospace); }
 	.CLASS footer .method { background-color: var(--color); color: #FFF; padding: 2px 3px; border-radius: var(--radius); }
 </style>
 
@@ -124,7 +124,9 @@ __Output data__:
 	<header>
 		<i class="ICON"></i>NAME
 	</header>
-	<footer data-bind="CONFIG.method__show" class="hidden">
-		<div><span data-bind="CONFIG.method__text" class="method"></span> <a data-bind="CONFIG.url__text__href:flow.head.proxyurl + (value[0] === '/' ? value.substring(1) : value)" target="_blank"></a></div>
+	<footer> 
+		<ui-bind path="CONFIG.method" config="show" class="hidden block">
+			<div><ui-bind path="CONFIG.method" config="text" class="method"></ui-bind> <a is="is-a" path="CONFIG.url" config="text;href:flow.head.proxyurl + (value[0] === '/' ? value.substring(1) : value)" target="_blank"></a></div>
+		</ui-bind>
 	</footer>
 </body>

@@ -105,8 +105,8 @@ The component can teleport (input) message to another teleport (output) componen
 <settings>
 	<div class="CLASS-settings padding">
 
-		<div data-bind="?.is__hide">
-			<div data---="choose__?.type__selector:div" class="iconmenu m">
+		<ui-bind path="?.is" config="hide" class="block">
+			<ui-component name="choose" path="?.type" config="selector:div" class="iconmenu m">
 				<div data-id="input">
 					<i class="ti ti-dot-circle"></i>
 					<span>Input</span>
@@ -115,39 +115,39 @@ The component can teleport (input) message to another teleport (output) componen
 					<i class="ti ti-crosshairs"></i>
 					<span>Output</span>
 				</div>
-			</div>
-		</div>
+			</ui-component>
+		</ui-bind>
 
-		<div data-bind="?.type__show:value=='output'" class="hidden">
+		<ui-bind path="?.type" config="show:value=='output'" class="hidden block">
 			<div class="row">
 				<div class="col-md-9 m">
-					<div data---="input__?.name__required:1">Name</div>
+					<ui-component name="input" path="?.name" config="required:1">Name</ui-component>
 				</div>
 				<div class="col-md-3 m">
-					<div data---="input__?.color__type:color">Color</div>
+					<ui-component name="input" path="?.color" config="type:color">Color</ui-component>
 				</div>
 			</div>
-		</div>
+		</ui-bind>
 
-		<div data-bind="?.type__show:value=='input'">
+		<ui-bind path="?.type" config="show:value=='input'" class="block">
 			<div class="caption m">
 				<label>Where to send data?</label>
 			</div>
-			<div data---="choose__?.target__selector:.item">
-				<div data-bind="%teleportinstances__template:.item -> data-id" class="listing">
+			<ui-component name="choose" path="?.target" config="selector:.item">
+				<ui-bind path="%teleportinstances" config="template:.item -> data-id" class="listing block">
 					<script type="text/html">
 						{{ foreach m in value }}
 						<div class="item" data-id="{{ m.id }}"><i class="ti ti-crosshairs mr5"></i>{{ m.name }}</div>
 						{{ end }}
 					</script>
-				</div>
-			</div>
-		</div>
+				</ui-bind>
+			</ui-component>
+		</ui-bind>
 	</div>
 </settings>
 
 <body>
-	<div data---="watcher__CONFIG">
+	<ui-component name="watcher" config="CONFIG">
 		<script type="text/js">
 			component.watcherbackup && component.unwatch(component.watcherbackup);
 			var defcolor = '#888';
@@ -169,7 +169,7 @@ The component can teleport (input) message to another teleport (output) componen
 			} else
 				el.find('.content').css('background', value.color || defcolor);
 		</script>
-	</div>
+	</ui-component>
 </body>
 
 <script>

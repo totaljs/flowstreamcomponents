@@ -111,8 +111,8 @@ This component merges multiple inputs into one object.
 <settings>
 	<div class="CLASS-settings">
 		<div class="padding">
-			<div data---="input__?.clear__type:checkbox" class="m">Clear cache</div>
-			<div data---="listform__?.inputs__autofocus:1;empty:You do not have defined any inputs;create:tmpmerge.add">
+			<ui-component name="input" path="?.clear" config="type:checkbox" class="m">Clear cache</ui-component>
+			<ui-component name="listform" path="?.inputs" config="autofocus:1;empty:You do not have defined any inputs;create:tmpmerge.add">
 
 				<script type="text/html">
 					<div class="item"><i class="ti ti-arrow-right"></i>{{ if required }}<b>{{fi}}{{ name }}{{ if required }}</b>{{fi}}{{ if assign }}<span class="fs11 gray ml5">{{ assign }}</span>{{ fi }}</div>
@@ -120,25 +120,25 @@ This component merges multiple inputs into one object.
 
 				<script type="text/html">
 					<div class="padding">
-						<div data---="input__?.name__required:1;innerlabel:1;placeholder:Enter a name__''" class="m">Name</div>
+						<ui-component name="input" path="?.name" config="required:1;innerlabel:1;placeholder:Enter a name" default="''" class="m">Name</ui-component>
 						<div class="grid-2">
 							<div class="m">
-								<div data---="input__?.path__innerlabel:1;placeholder:path.to.property__''">Path</div>
+								<ui-component name="input" path="?.path" config="innerlabel:1;placeholder:path.to.property" default="''">Path</ui-component>
 								<div class="help">A value will be read according to this path</div>
 							</div>
 							<div class="m">
-								<div data---="input__?.assign__innerlabel:1;placeholder:path.to.property__''">Assign to the path</div>
+								<ui-component name="input" path="?.assign" config="innerlabel:1;placeholder:path.to.property" default="''">Assign to the path</ui-component>
 								<div class="help">A value will be assigned according to this path. Otherwise, the message extends cached data.</div>
 							</div>
 						</div>
 						<hr class="nmt" />
-						<div data---="input__?.required__type:checkbox__false"><b>Required</b></div>
-						<div data---="input__?.clear__type:checkbox__false" class="m">Clear value after use</div>
-						<div data---="validate__?" class="toolbar">
+						<ui-component name="input" path="?.required" config="type:checkbox" default="false"><b>Required</b></ui-component>
+						<ui-component name="input" path="?.clear" config="type:checkbox" default="false" class="m">Clear value after use</ui-component>
+						<ui-component name="validate" path="?" class="toolbar">
 							<button name="submit"><i class="ti ti-file-code"></i>Save</button>
 							<button name="remove">Remove</button>
 							<button name="cancel">Cancel</button>
-						</div>
+						</ui-component>
 					</div>
 				</script>
 
@@ -146,7 +146,7 @@ This component merges multiple inputs into one object.
 					<div style="margin-top:10px"><button class="button button-inline" name="create"><i class="ti ti-plus-circle green"></i>Add input</button></div>
 				</script>
 
-			</div>
+			</ui-component>
 		</div>
 	</div>
 </settings>

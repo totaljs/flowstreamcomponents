@@ -180,12 +180,16 @@ __Response__:
 	<header>
 		<i class="ICON"></i>NAME
 	</header>
-	<footer class="hidden" data-bind="CONFIG.url__show">
-		<div class="status" data-bind="CONFIG__template">
-			<script type="text/html">
-				<div class="monospace"><span style="background:{{ value.method | color }}">{{ value.method }}</span> {{ value.url }}</div>
-			</script>
-		</div>
+	<footer class="hidden">
+		<ui-bind path="CONFIG.url" config="show">
+			<ui-bind path="CONFIG" config="template">
+				<div class="status">
+					<script type="text/html">
+						<div class="monospace"><span style="background:{{ value.method | color }}">{{ value.method }}</span> {{ value.url }}</div>
+					</script>
+				</div>
+			</ui-bind>
+		</ui-bind>
 	</footer>
 </body>
 
@@ -197,39 +201,39 @@ __Response__:
 
 		<div class="row">
 			<div class="col-md-3 m">
-				<div data---="input__?.method__dirsource:GET|GET,POST|POST,PUT|PUT,DELETE|DELETE,PATCH|PATCH,API|API;required:1">Method</div>
+				<ui-component name="input" path="?.method" config="dirsource:GET|GET,POST|POST,PUT|PUT,DELETE|DELETE,PATCH|PATCH,API|API;required:1">Method</ui-component>
 			</div>
 			<div class="col-md-9 m">
-				<div data---="input__?.url__required:1"><b>URL address</b></div>
+				<ui-component name="input" path="?.url" config="required:1"><b>URL address</b></ui-component>
 			</div>
 		</div>
 	</div>
 	<div class="padding">
 		<div class="row">
 			<div class="col-md-3 m">
-				<div data---="input__?.timeout__type:number">Timeout</div>
-				<div class="help"><i class="ti ti-clock"></i><span data-bind="?.timeout__text:((value||0)/1000).floor(2)+' sec.'"></span><br />Timeout <b>in milliseconds</b></div>
+				<ui-component name="input" path="?.timeout" config="type:number">Timeout</ui-component>
+				<div class="help"><i class="ti ti-clock"></i><ui-bind path="?.timeout" config="text:((value||0)/1000).floor(2)+' sec.'"></ui-bind><br />Timeout <b>in milliseconds</b></div>
 			</div>
 			<div class="col-md-3 m">
-				<div data---="input__?.limit__type:number">Max. size</div>
-				<div class="help"><i class="ti ti-calculator"></i><span data-bind="?.limit__text:(value||0).filesize()"></span><br />Response max. size <b>in bytes</b></div>
+				<ui-component name="input" path="?.limit" config="type:number">Max. size</ui-component>
+				<div class="help"><i class="ti ti-calculator"></i><ui-bind path="?.limit" config="text:(value||0).filesize()"></ui-bind><br />Response max. size <b>in bytes</b></div>
 			</div>
 			<div class="col-md-6 m">
-				<div data---="input__?.send__required:1;dirsource:all|Everything,response|Response body,chunks|Chunks of buffer,headers|Headers only,status|Status code">Send to output</div>
+				<ui-component name="input" path="?.send" config="required:1;dirsource:all|Everything,response|Response body,chunks|Chunks of buffer,headers|Headers only,status|Status code">Send to output</ui-component>
 			</div>
 		</div>
 	</div>
 	<hr class="nmt nmb" />
 	<div class="padding">
-		<div data---="input__?.serialize__dirsource:json|JSON,urlencoded|URL encode,buffer|Buffer;dirraw:1;placeholder:Choose serialization;dirempty:None" class="m">Data serialization</div>
-		<div data---="keyvalue__?.headers__placeholderkey:Header name;placeholdervalue:Header value and press enter">Headers</div>
+		<ui-component name="input" path="?.serialize" config="dirsource:json|JSON,urlencoded|URL encode,buffer|Buffer;dirraw:1;placeholder:Choose serialization;dirempty:None" class="m">Data serialization</ui-component>
+		<ui-component name="keyvalue" path="?.headers" config="placeholderkey:Header name;placeholdervalue:Header value and press enter">Headers</ui-component>
 		<div class="help m">Headers support dynamic variables in the form <code>{key}</code></div>
-		<div data---="keyvalue__?.cookies__placeholderkey:Cookie name;placeholdervalue:Cookie value and press enter">Cookies</div>
+		<ui-component name="keyvalue" path="?.cookies" config="placeholderkey:Cookie name;placeholdervalue:Cookie value and press enter">Cookies</ui-component>
 		<div class="help m">Cookies support dynamic variables in the form <code>{key}</code></div>
 		<hr />
-		<div data---="input__?.parse__type:checkbox">Parse Response to Object</div>
-		<div data---="input__?.dnscache__type:checkbox">Enable DNS cache</div>
-		<div data---="input__?.insecure__type:checkbox">Allow insecure connection</div>
-		<div data---="input__?.xhr__type:checkbox">Add XHR header</div>
+		<ui-component name="input" path="?.parse" config="type:checkbox">Parse Response to Object</ui-component>
+		<ui-component name="input" path="?.dnscache" config="type:checkbox">Enable DNS cache</ui-component>
+		<ui-component name="input" path="?.insecure" config="type:checkbox">Allow insecure connection</ui-component>
+		<ui-component name="input" path="?.xhr" config="type:checkbox">Add XHR header</ui-component>
 	</div>
 </settings>

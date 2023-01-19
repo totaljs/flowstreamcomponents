@@ -54,7 +54,7 @@
 </script>
 
 <style>
-	.CLASS footer > div { margin: 10px; }
+	.CLASS footer > ui-component { margin: 10px; }
 	.CLASS pre { font-size: 10px; margin: 0; padding: 5px; background-color: #F0F0F0; border-radius: var(--radius); }
 	.CLASS button { float: right; height: 20px; font-size: 11px; border: 1px solid #E0E0E0; border-radius: var(--radius); color: #000; background-color: transparent; margin: 0; padding: 0 5px; }
 	.CLASS button:hover { background-color: #F8F8F8; }
@@ -73,8 +73,8 @@ The component prints incoming data in a JSON format.
 
 <settings>
 	<div class="padding">
-		<div data---="input__?.repo__type:checkbox">Shows repository</div>
-		<div data---="input__?.data__type:checkbox">Shows data</div>
+		<ui-component name="input" path="?.repo" config="type:checkbox">Shows repository</ui-component>
+		<ui-component name="input" path="?.data" config="type:checkbox">Shows data</ui-component>
 	</div>
 </settings>
 
@@ -99,6 +99,6 @@ The component prints incoming data in a JSON format.
 		<i class="ICON"></i>NAME
 	</header>
 	<footer>
-		<div data---="objecttree__!STATUS__exec:FUNC.printjson_click" class="selectable"></div>
+		<ui-component name="objecttree" path="!STATUS" config="exec:FUNC.printjson_click" class="selectable"></ui-component>
 	</footer>
 </body>

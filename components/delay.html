@@ -71,12 +71,12 @@
 
 <style>
 	.CLASS .status { font-size: 12px; margin: 0; padding: 10px; }
-	.CLASS .status span { color: #A0A0A0; }
+	.CLASS .status ui-bind { color: #A0A0A0; }
 	.CLASS .padding { padding: 0 10px 10px; }
 	.CLASS button { width: 100%; height: 24px; border: 1px solid #E0E0E0; border-radius: var(--radius); color: #000; background-color: #F0F0F0; margin: 0; }
 	.CLASS button:hover { background-color: #F8F8F8; }
 	.CLASS button:active { background-color: #E0E0E0; }
-	.ui-dark .CLASS .status span { color: #777; }
+	.ui-dark .CLASS .status ui-bind { color: #777; }
 	.ui-dark .CLASS button { border-color: #404040; color: #FFF; background-color: #222; }
 	.ui-dark .CLASS button:hover { background-color: #303030; }
 	.ui-dark .CLASS button:active { background-color: #404040; }
@@ -86,7 +86,7 @@
 	<div class="padding">
 		<div class="row">
 			<div class="col-md-4">
-				<div data---="input__?.delay__type:number;required:1">Delay</div>
+				<ui-component name="input" path="?.delay" config="type:number;required:1">Delay</ui-component>
 			</div>
 		</div>
 	</div>
@@ -105,8 +105,8 @@ The component delays processing of a message.
 	</div>
 	<footer>
 		<div class="status">
-			<div>Timeout: <span data-bind="CONFIG.delay__text:(value?value:'0')+'ms'"></span></div>
-			<div>Delayed messages: <b data-bind="STATUS.pending__text:value?value.format(0):'0'"></b></div>
+			<div>Timeout: <ui-bind path="CONFIG.delay" config="text:(value?value:'0')+'ms'"></ui-bind></div>
+			<div>Delayed messages: <b><ui-bind path="STATUS.pending" config="text:value?value.format(0):'0'"></ui-bind></b></div>
 		</div>
 	</footer>
 </body>

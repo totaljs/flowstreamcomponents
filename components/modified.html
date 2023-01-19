@@ -3,7 +3,7 @@
 	exports.name = 'Modified';
 	exports.group = 'Common';
 	exports.version = '1';
-	exports.icon = 'ti ti-map';
+	exports.icon = 'ti ti-map-pin';
 	exports.author = 'Total.js';
 	exports.config = {};
 	exports.inputs = [{ id: 'input', name: 'Input' }];
@@ -103,12 +103,12 @@ The component compares incoming data with previous data.
 		<i class="ICON"></i>NAME
 	</header>
 	<footer>
-		<div data-bind="STATUS__template" class="status">
+		<ui-bind path="STATUS" config="template" class="status block">
 			<script type="text/html">
 				<div><i class="ti ti-check-circle green"></i>Modified: {{ value.modified | empty }}</div>
 				<div><i class="ti ti-times-circle red"></i>Not modified: {{ value.notmodified | empty }}</div>
 				<div class="help">Refresh interval: <b>1 minute</b></div>
 			</script>
-		</div>
+		</ui-bind>
 	</footer>
 </body>

@@ -89,14 +89,14 @@ Example usage:
 	<div class="padding">
 		<div class="row">
 			<div class="col-md-4 m">
-				<div data---="input__?.timeout__type:number;maxvalue:2147483__60">Timeout in seconds</div>
+				<ui-component name="input" path="?.timeout" config="type:number;maxvalue:2147483" default="60">Timeout in seconds</ui-component>
 				<div class="help m">Maximum timeout is 2147483 seconds(24.8 days)</div>
-				<div>Current value: <b data-bind="?.timeout__text__helper:feedtodelay_format"></b></div>
+				<div>Current value: <b><ui-bind path="?.timeout" config="text;helper:feedtodelay_format"></ui-bind></b></div>
 			 </div>
 		</div>
 		<div class="row">
 			<div class="col-md-4">
-				<div data---="input__?.resend__type:checkbox">Keep resending</div>
+				<ui-component name="input" path="?.resend" config="type:checkbox">Keep resending</ui-component>
 				<div class="help">By default it only forwards message once after the timeout even if no more messages is received.</div>
 			 </div>
 		</div>
@@ -111,5 +111,5 @@ Example usage:
 	<header>
 		<i class="ICON"></i>NAME
 	</header>
-	<footer data-bind="!STATUS__show__text__helper:feedtodelay_format"></footer>
+	<footer><ui-bind path="!STATUS" config="show;text;helper:feedtodelay_format"></ui-bind></footer>
 </body>

@@ -197,15 +197,15 @@ __Verify output__:
 	<div class="padding">
 		<div class="grid-2">
 			<div class="m">
-				<div data---="input__?.type__dirsource:#confirmcodetypes;required:1">Type</div>
+				<ui-component name="input" path="?.type" config="dirsource:#confirmcodetypes;required:1">Type</ui-component>
 			</div>
 			<div>
 				<div class="grid-2">
 					<div class="m">
-						<div data---="input__?.length__type:number;min:1;max:500">Length</div>
+						<ui-component name="input" path="?.length" config="type:number;min:1;max:500">Length</ui-component>
 					</div>
 					<div class="m">
-						<div data---="input__?.count__type:number">Count of attempts</div>
+						<ui-component name="input" path="?.count" config="type:number">Count of attempts</ui-component>
 					</div>
 				</div>
 			</div>
@@ -213,13 +213,13 @@ __Verify output__:
 		<hr />
 		<div class="grid-4">
 			<div class="m">
-				<div data---="input__?.expire__align:1;placeholder:5 minutes;required:1">Expiration</div>
+				<ui-component name="input" path="?.expire" config="align:1;placeholder:5 minutes;required:1">Expiration</ui-component>
 			</div>
 			<div class="m">
-				<div data---="input__?.lock__align:1;placeholder:5 minutes">Lock</div>
+				<ui-component name="input" path="?.lock" config="align:1;placeholder:5 minutes">Lock</ui-component>
 			</div>
 			<div class="m">
-				<div data---="input__?.limit__type:number">Max. calls per lock</div>
+				<ui-component name="input" path="?.limit" config="type:number">Max. calls per lock</ui-component>
 			</div>
 		</div>
 	</div>
@@ -235,15 +235,15 @@ __Verify output__:
 		<i class="ICON"></i>NAME
 	</header>
 	<footer>
-		<div>Pending: <b data-bind="STATUS.count__text__empty"></b></div>
-		<div data-bind="CONFIG__template">
+		<div>Pending: <b><ui-bind name="STATUS.count" config="text;empty"></ui-bind></b></div>
+		<ui-bind path="CONFIG" config="template">
 			<script type="text/html">
 				<div class="keyvalue small"><span>Type</span><div class="right b">{{ value.type | cl('confirmcodetypes') }}</div></div>
 				<div class="keyvalue small"><span>Length</span><div class="right">{{ value.length }}</div></div>
 				<div class="keyvalue small"><span>Expiration</span><div class="right">{{ value.expire }}</div></div>
 				<div class="keyvalue small"><span>Lock</span><div class="right">{{ value.lock | empty }}</div></div>
 			</script>
-		</div>
+		</ui-bind>
 	</footer>
 </body>
 

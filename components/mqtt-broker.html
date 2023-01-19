@@ -194,7 +194,7 @@
 
 <style>
 	.CLASS footer { padding: 10px; font-size: 11px; }
-	.CLASS footer > div > div { height: 16px; }
+	.CLASS footer > ui-bind > div { height: 16px; }
 	.CLASS footer b { float: right; }
 </style>
 
@@ -202,47 +202,47 @@
 	<div class="padding">
 		<div class="row m">
 			<div class="col-md-4">
-				<div data---="input__?.host__placeholder:test.mosquitto.org;required:1">Hostname or IP address</div>
+				<ui-component name="input" path="?.host" config="placeholder:test.mosquitto.org;required:1">Hostname or IP address</ui-component>
 			</div>
 			<div class="col-md-4">
-				<div data---="input__?.port__type:number;placeholder:1883;required:1">Port</div>
+				<ui-component name="input" path="?.port" config="type:number;placeholder:1883;required:1">Port</ui-component>
 			</div>
 		</div>
 		<div class="row">
 			<div class="col-md-6">
-				<div data---="input__?.clientid">Client id</div>
+				<ui-component name="input" path="?.clientid">Client id</ui-component>
 				<div class="help m">Supports variables, example: \`client_{device-id}\`</div>
-				<div data---="checkbox__?.secure" class="m">Secure (ssl)</div>
+				<ui-component name="checkbox" path="?.secure" class="m">Secure (ssl)</ui-component>
 			</div>
 		</div>
 		<div class="row">
 			<div class="col-md-6">
-				<div data---="checkbox__?.auth" class="m">Require Authorization</div>
+				<ui-component name="checkbox" path="?.auth" class="m">Require Authorization</ui-component>
 			</div>
 		</div>
-		<div class="row" data-bind="?.auth__show:value">
+		<ui-bind path="?.auth" config="show:value" class="row block">
 			<div class="col-md-6">
-				<div data---="input__?.username" class="m">Username</div>
+				<ui-component name="input" path="?.username" class="m">Username</ui-component>
 			</div>
 			<div class="col-md-6">
-				<div data---="input__?.password" data-jc-config="type:password" class="m">Password</div>
+				<ui-component name="input" path="?.password" data-jc-config="type:password" class="m">Password</ui-component>
 			</div>
-		</div>
+		</ui-bind>
 		<div class="row">
 			<div class="col-md-6">
-				<div data---="checkbox__?.lwt" class="m">LWT</div>
+				<ui-component name="checkbox" path="?.lwt" class="m">LWT</ui-component>
 			</div>
 		</div>
-		<div class="row" data-bind="?.lwt__show:value">
+		<ui-bind path="?.lwt" config="show:value" class="row block">
 			<div class="col-md-6">
-				<div data---="input__?.lwttopic">Last will topic</div>
+				<ui-component name="input" path="?.lwttopic">Last will topic</ui-component>
 				<div class="help m">Supports variables, example: \`lwt/{device-id}\`</div>
 			</div>
 			<div class="col-md-6">
-				<div data---="input__?.lwtmessage">Last will message</div>
+				<ui-component name="input" path="?.lwtmessage">Last will message</ui-component>
 				<div class="help m">Supports variables, example: \`{device-id} is offline\`</div>
 			</div>
-		</div>
+		</ui-bind>
 	</div>
 </settings>
 
@@ -251,11 +251,11 @@
 		<i class="ICON"></i>NAME
 	</header>
 	<footer>
-		<div data-bind="!STATUS__template__show">
+		<ui-bind path="!STATUS" config="template;show" class="block">
 			<script type="text/html">
 				<div><b>{{ value.name }}</b>Name</div>
 				<div><b>{{ value.status }}</b>Status</div>
 			</script>
-		</div>
+		</ui-bind>
 	</footer>
 </body>

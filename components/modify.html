@@ -192,36 +192,38 @@
 	<div class="padding">
 		<section class="modify-rules m">
 			<label>Rules</label>
-			<div data-bind="?.rules__template:.modify-rule -> data-index" data---="movable__?.rules__selector:.dragme;exec:FUNC.modify_rule_dragged">
-				<script type="text/html">
-					{{ foreach rule in value }}
-					<div class="modify-rule dragme" data-index="{{ $index }}" draggable="true">
-						<div class="row">
-							<div class="col-md-3">
-								<div data---="input__?.rules[{{ $index }}].rule__dirsource:REPO.modify_rules" class="m"></div>
-							</div>
-							<div class="col-md-1">
-								<div class="m">--&gt;</div>
-								<div data-bind="?.rules[{{ $index }}].rule__hide:value == 'remove'">to:</div>
-							</div>
-							<div class="col-md-7">
-								<div class="modify-input-group m">
-									<div data---="input__?.rules[{{ $index }}].target__dirsource:REPO.modify_targets"></div>
-									<div data---="input__?.rules[{{ $index }}].targetpath__placeholder:value"></div>
+			<ui-bind path="?.rules" config="template:.modify-rule -> data-index" class="block"> 
+				<ui-component name="movable" path="?.rules" config="selector:.dragme;exec:FUNC.modify_rule_dragged">
+					<script type="text/html">
+						{{ foreach rule in value }}
+						<div class="modify-rule dragme" data-index="{{ $index }}" draggable="true">
+							<div class="row">
+								<div class="col-md-3">
+									<ui-component name="input" path="?.rules[{{ $index }}].rule" config="dirsource:REPO.modify_rules" class="m"></ui-component>
 								</div>
-								<div class="modify-input-group" data-bind="?.rules[{{ $index }}].rule__hide:value == 'remove'">
-									<div data---="input__?.rules[{{ $index }}].source__dirsource:REPO.modify_sources"></div>
-									<div data---="input__?.rules[{{ $index }}].sourcepath__placeholder:value"></div>
+								<div class="col-md-1">
+									<div class="m">--&gt;</div>
+									<ui-bind path="?.rules[{{ $index }}].rule" config="hide:value == 'remove'" class="block">to:</ui-bind>
 								</div>
-							</div>
-							<div class="col-md-1">
-								<i class="ti ti-trash red exec" data-exec="FUNC.modify_remove_rule"></i>
+								<div class="col-md-7">
+									<div class="modify-input-group m">
+										<ui-component name="input" path="?.rules[{{ $index }}].target" config="dirsource:REPO.modify_targets"></ui-component>
+										<ui-component name="input" path="?.rules[{{ $index }}].targetpath" config="placeholder:value"></ui-component>
+									</div>
+									<ui-bind path="?.rules[{{ $index }}].rule" config="hide:value == 'remove'" class="modify-input-group block">
+										<ui-component name="input" path="?.rules[{{ $index }}].source" config="dirsource:REPO.modify_sources"></ui-component>
+										<ui-component name="input" path="?.rules[{{ $index }}].sourcepath" config="placeholder:value"></ui-component>
+									</ui-bind>
+								</div>
+								<div class="col-md-1">
+									<i class="ti ti-trash red exec" data-exec="FUNC.modify_remove_rule"></i>
+								</div>
 							</div>
 						</div>
-					</div>
-					{{ end }}
-				</script>
-			</div>
+						{{ end }}
+					</script>
+				</ui-component>
+			</ui-bind>
 			<div class="help m">Each rule will be applied in the order from top to bottom.</div>
 			<button class="button-add exec" data-exec="FUNC.modify_add_rule">ADD</button>
 		</section>
@@ -285,10 +287,10 @@
 	.ui-dark .button-add:active { background-color: #404040; }
 
 	.modify-input-group { clear: both; height: 36px; }
-	.modify-input-group > div:first-child .ui-input-control { border-right: none; border-bottom-right-radius: 0; border-top-right-radius: 0; width: 120px; float: left; background-color: #f0f0f0; }
-	.modify-input-group > div:last-child .ui-input-control { border-bottom-left-radius: 0; border-top-left-radius: 0; float: left; width: calc(100% - 120px); }
-	.modify-input-group.wide > div:first-child .ui-input-control { width: 200px; }
-	.modify-input-group.wide > div:last-child .ui-input-control { width: calc(100% - 200px); }
+	.modify-input-group > ui-component:first-child .ui-input-control { border-right: none; border-bottom-right-radius: 0; border-top-right-radius: 0; width: 120px; float: left; background-color: #f0f0f0; }
+	.modify-input-group > ui-component:last-child .ui-input-control { border-bottom-left-radius: 0; border-top-left-radius: 0; float: left; width: calc(100% - 120px); }
+	.modify-input-group.wide > ui-component:first-child .ui-input-control { width: 200px; }
+	.modify-input-group.wide > ui-component:last-child .ui-input-control { width: calc(100% - 200px); }
 	.modify-rules { border: 1px solid #e0e0e0; padding: 8px; border-radius: 3px; }
 	.modify-rule { border: 1px solid #e0e0e0; border-radius: 3px; padding: 8px; margin-bottom:4px; }
 	.modify-rule > .row > .col-md-1 { height: 36px; line-height: 36px; }
