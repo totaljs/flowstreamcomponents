@@ -166,12 +166,14 @@ If the controller is stored in the `message.refs.controller` property, then its 
 </style>
 
 <body>
-	<header data-bind="CONFIG__template">
-		<script type="text/html">
-			<div {{ if value.color }} style="background:{{ value.color }}"{{ fi }}>
-				<i class="{{ value.icon }}"></i><span>{{ value.name }}</span>
-			</div>
-		</script>
+	<header>
+		<ui-bind path="CONFIG" config="template">
+			<script type="text/html">
+				<div {{ if value.color }} style="background:{{ value.color }}"{{ fi }}>
+					<i class="{{ value.icon }}"></i><span>{{ value.name }}</span>
+				</div>
+			</script>
+		</ui-bind>
 	</header>
 </body>
 
