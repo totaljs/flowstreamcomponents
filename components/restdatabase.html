@@ -307,41 +307,41 @@ __Good to know__: If the `data` (payload) can contain special key names in the f
 			<div class="panel m">
 				<label class="bg-smoke">Condition</label>
 				<div class="padding">
-				<ui-component name="listform" path="?.where" config="autofocus:1;empty:You do not have defined any rules">
-					<script type="text/html">
-						<div class="item monospace"><div class="controls nmr"><button name="up"><i class="ti ti-long-arrow-up"></i></button><button name="down"><i class="ti ti-long-arrow-alt-down"></i></button><button name="remove" class="red"><i class="ti ti-trash"></i></button></div><i class="ti ti-filter mr5"></i>{{ name }} {{ comparer }} <b>{{ if type == '6' }}null{{ else }}{{ value }}{{ fi }}</b></div>
-					</script>
-					<script type="text/html">
-						<div class="padding">
-							<div class="row">
-								<div class="col-sm-3 m">
-									<ui-component name="input" path="?.name" config="required:1;align:1;monospace:1" default="'id'">Name</ui-component>
+					<ui-component name="listform" path="?.where" config="autofocus:1;empty:You do not have defined any rules">
+						<script type="text/html">
+							<div class="item monospace"><div class="controls nmr"><button name="up"><i class="ti ti-long-arrow-up"></i></button><button name="down"><i class="ti ti-long-arrow-alt-down"></i></button><button name="remove" class="red"><i class="ti ti-trash"></i></button></div><i class="ti ti-filter mr5"></i>{{ name }} {{ comparer }} <b>{{ if type == '6' }}null{{ else }}{{ value }}{{ fi }}</b></div>
+						</script>
+						<script type="text/html">
+							<div class="padding">
+								<div class="row">
+									<div class="col-sm-3 m">
+										<ui-component name="input" path="?.name" config="required:1;align:1;monospace:1" default="'id'">Name</ui-component>
+									</div>
+									<div class="col-sm-3 m">
+										<ui-component name="input" path="?.comparer" config="required:1;align:1;dirsource:tmpapidatabase.comparers" default="'='">Comparer</ui-component>
+									</div>
+									<div class="col-sm-3 m">
+										<ui-component name="input" path="?.type" config="required:1;align:1;dirsource:tmpapidatabase.types" default="'1'">Type</ui-component>
+									</div>
+									<div class="col-sm-3 m">
+										<ui-bind path="?.type" config="enable:value!=='6'">
+											<ui-component name="input" path="?.value" config="monospace:1;align:1" default="''">Value</ui-component>
+										</ui-bind>
+									</div>
 								</div>
-								<div class="col-sm-3 m">
-									<ui-component name="input" path="?.comparer" config="required:1;align:1;dirsource:tmpapidatabase.comparers" default="'='">Comparer</ui-component>
-								</div>
-								<div class="col-sm-3 m">
-									<ui-component name="input" path="?.type" config="required:1;align:1;dirsource:tmpapidatabase.types" default="'1'">Type</ui-component>
-								</div>
-								<div class="col-sm-3 m">
-									<ui-bind path="?.type" config="enable:value!=='6'">
-										<ui-component name="input" path="?.value" config="monospace:1;align:1" default="''">Value</ui-component>
-									</ui-bind>
-								</div>
+								<div class="help"><b>Expression</b> supports these commands <code>params {Object}</code>, <code>query {Object}</code>, <code>data {Object}</code>, <code>user {Object}</code>. A value for date field can contain <code>now</code> with the current date/time.</div>
+								<br />
+								<ui-component name="validate" path="?" config="validonly:true" class="toolbar">
+									<button name="submit"><i class="ti ti-file-code"></i>Save</button>
+									<button name="remove">Remove</button>
+									<button name="cancel">Cancel</button>
+								</ui-component>
 							</div>
-							<div class="help"><b>Expression</b> supports these commands <code>params {Object}</code>, <code>query {Object}</code>, <code>data {Object}</code>, <code>user {Object}</code>. A value for date field can contain <code>now</code> with the current date/time.</div>
-							<br />
-							<ui-component name="validate" path="?" validate="validonly:true" class="toolbar">
-								<button name="submit"><i class="ti ti-file-code"></i>Save</button>
-								<button name="remove">Remove</button>
-								<button name="cancel">Cancel</button>
-							</ui-component>
-						</div>
-					</script>
-					<script type="text/html">
-						<div style="margin-top:15px"><button class="button button-inline" name="create"><i class="ti ti-plus-circle green"></i>Create</button></div>
-					</script>
-				</ui-component>
+						</script>
+						<script type="text/html">
+							<div style="margin-top:15px"><button class="button button-inline" name="create"><i class="ti ti-plus-circle green"></i>Create</button></div>
+						</script>
+					</ui-component>
 				</div>
 			</div>
 
