@@ -1,0 +1,247 @@
+<script total>
+
+	exports.name = 'Extend';
+	exports.group = 'Common';
+	exports.version = '1';
+	exports.icon = 'ti ti-expand';
+	exports.author = 'Total.js';
+	exports.config = { path: '', schema: [] };
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }];
+
+	exports.make = function(instance, config) {
+
+		var convert = function(item) {
+			var max;
+			switch (item.convert) {
+				case 'string':
+					return item.value;
+				case 'boolean':
+					return item.value == 'true' || item.value === 'on' || item.value === '1';
+				case 'number':
+					return +item.value;
+				case 'object':
+					try {
+						return new Function('return ' + item.value)();
+					} catch (e) {}
+				case 'date':
+					return item.value.parseDate();
+				case 'now':
+					return new Date();
+				case 'uid':
+					return UID();
+				case 'time':
+					return (new Date()).format('HH:mm:ss');
+				case 'guid':
+					return GUID();
+				case 'random_number':
+					max = item.value ? +item.value : 20;
+					return U.random_number(max);
+				case 'random_string':
+					max = item.value ? +item.value : 20;
+					return U.random_string(max);
+			}
+
+			return item.value;
+		};
+
+		instance.message = function($) {
+
+			var data = $.data;
+
+			if (config.path)
+				data = config.path ? U.get(data, config.path) : $.data;
+
+			if (data) {
+				for (var item of config.schema) {
+					var val = convert(item);
+					if (item.path) {
+						U.set(data, item.path, val);
+					} else {
+						data = val;
+						break;
+					}
+				}
+			}
+
+			$.send('output');
+		};
+	};
+
+</script>
+
+<readme>
+This component extends the current message by adding new properties.
+</readme>
+
+<style>
+	.CLASS-settings .fields { border: 1px solid #E0E0E0; border-radius: var(--radius); }
+	.CLASS-settings figure { height: 24px; border-top: 1px solid #E0E0E0; line-height: 23px; font-size: 11px; }
+	.CLASS-settings figure .edit-open { background-color: #F0F0F0; }
+	.CLASS-settings figure .convert { line-height: 23px; margin-left: 400px; margin-right: 30px; padding: 0 8px; cursor: pointer; background-color: rgba(0,0,0,0.2); }
+	.CLASS-settings figure .path { width: 150px; line-height: 14px; float: left; }
+	.CLASS-settings figure .path span { float: left; width: 50px; line-height: 23px; text-align: center; }
+	.CLASS-settings figure .path div { outline: 0; margin-left: 50px; line-height: 23px; padding: 0 5px; min-height: 23px; color: #B92EC5; }
+	.CLASS-settings figure .value { width: 250px; line-height: 14px; float: left; }
+	.CLASS-settings figure .value span { float: left; width: 50px; line-height: 23px; text-align: center; }
+	.CLASS-settings figure .value div { outline: 0; margin-left: 50px; line-height: 23px; padding: 0 5px; min-height: 23px; color: #4285F4; }
+	.CLASS-settings figure .controls { float: right; width: 30px; padding: 0; margin: 0; border-left: 1px solid #E0E0E0; text-align: center; }
+	.CLASS-settings figure .controls span { cursor: pointer; margin-left: 5px; }
+	.CLASS-settings figure .controls span:first-child { margin-left: 0; }
+	.CLASS-settings figure:first-child { border-top: 0; line-height: 24px; }
+	.CLASS-settings figure:first-child div { line-height: 24px; }
+	.CLASS footer { height: 40px; line-height: 40px; padding: 0 10px; font-size: 12px; }
+
+	.ui-dark .CLASS-settings .fields { border-color: #404040; }
+	.ui-dark .CLASS-settings figure { border-top-color: #404040; }
+	.ui-dark .CLASS-settings figure .edit-open { background-color: #404040; }
+	.ui-dark .CLASS-settings figure .controls { border-left-color: #404040; }
+</style>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+	<footer is="is-footer" path="CONFIG.path" config="show;text span">
+		Path: <span class="b"></span>
+	</footer>
+</body>
+
+<settings>
+	<div class="CLASS-settings">
+		<div class="padding bg-smoke">
+			<ui-component name="input" path="?.path" config="placeholder:path.to.property;monospace:1">Load data from the specific property/field</ui-component>
+			<div class="help">Optional. The data for the extending will be loaded from the specific property/field.</div>
+		</div>
+		<div class="padding">
+			<div class="caption m">
+				<div class="toolbar">
+					<nav>
+						<button class="exec" data-exec="tmpextend.add"><i class="ti ti-plus-circle"></i>Add</button>
+					</nav>
+				</div>
+				<label>Paths</label>
+			</div>
+			<ui-bind path="?.schema" config="template:figure --> data-id;show:value && value.length" class="fields m block">
+				<script type="text/html">
+					{{ foreach m in value }}
+					<figure data-id="{{ m.id }}">
+						<div class="controls">
+							<span class="exec" data-exec="tmpextend.rem" title="Remove"><i class="ti ti-trash red"></i></span>
+						</div>
+						<div class="path">
+							<span>Path</span><div class="monospace edit hellip" data-edit="exec:tmpextend.path;required:1">{{ m.path }}</div>
+						</div>
+						<div class="value">
+							<span>Value</span><div class="edit monospace hellip" data-type="to" data-edit="exec:tmpextend.value;selectall:1">{{ m.value }}</div>
+						</div>
+						<div class="convert">
+							<div class="exec hellip" data-exec="tmpextend.convert">{{ m.convert | tmpextendconvert }}</div>
+						</div>
+					</figure>
+					{{ end }}
+				</script>
+			</ui-bind>
+		</div>
+	</div>
+</settings>
+
+<script>
+
+	TOUCH(function(exports, reinit) {
+
+		exports.settings = function(meta) {
+
+			var defitem = { path: 'name', value: 'Hello Total.js Flow', convert: 'string' };
+
+			if (!meta.config.schema.length) {
+				var obj = CLONE(defitem);
+				obj.id = Math.random().toString(36).substring(4);
+				meta.config.schema.push(obj);
+			}
+
+			var tmp = W.tmpextend;
+
+			if (!tmp) {
+
+				tmp = {};
+				tmp.add = function(el) {
+					var scope = el.scope();
+					var obj = CLONE(defitem);
+					obj.id = Math.random().toString(36).substring(4);
+					scope.push('schema', obj);
+					scope.change('*');
+				};
+
+				tmp.rem = function(el) {
+					var id = ATTRD(el);
+					var scope = el.scope();
+					var model = scope.get();
+					var index = model.schema.findIndex('id', id);
+					model.schema.splice(index, 1);
+					scope.update('schema');
+					scope.change('*');
+				};
+
+				tmp.path = function(opt, next) {
+					opt.value = opt.value.replace(/(;|\s|,)/g, '').trim();
+					var scope = opt.element.scope();
+					var id = ATTRD(opt.element);
+					var item = scope.get().schema.findItem('id', id);
+					item.path = opt.value;
+					scope.change('*');
+					next(true);
+				};
+
+				tmp.value = function(opt, next) {
+					opt.value = opt.value.replace(/(;|\s|,)/g, '').trim();
+					var scope = opt.element.scope();
+					var id = ATTRD(opt.element);
+					var item = scope.get().schema.findItem('id', id);
+					item.value = opt.value;
+					scope.change('*');
+					next(true);
+				};
+
+				tmp.convert = function(el) {
+					var opt = {};
+					opt.element = el;
+					opt.align = 'left';
+					opt.raw = true;
+					opt.items = tmp.convertors;
+					opt.callback = function(selected) {
+						var scope = el.scope();
+						var id = ATTRD(el);
+						var item = scope.get().schema.findItem('id', id);
+						if (item)
+							item.convert = selected.id;
+						el.html(selected.name);
+						scope.change('*');
+					};
+					SETTER('directory/show', opt);
+				};
+
+				tmp.convertors = [];
+				tmp.convertors.push({ id: 'string', name: 'String' });
+				tmp.convertors.push({ id: 'number', name: 'Number' });
+				tmp.convertors.push({ id: 'boolean', name: 'Boolean' });
+				tmp.convertors.push({ id: 'object', name: 'Object' });
+				tmp.convertors.push({ id: 'date', name: 'Date' });
+				tmp.convertors.push({ id: 'time', name: 'Time' });
+				tmp.convertors.push({ id: 'now', name: 'Current date/time' });
+				tmp.convertors.push({ id: 'uid', name: 'UI' + 'D' });
+				tmp.convertors.push({ id: 'guid', name: 'Guid' });
+				tmp.convertors.push({ id: 'random_number', name: 'Random number' });
+				tmp.convertors.push({ id: 'random_string', name: 'Random string' });
+
+				Thelpers.tmpextendconvert = function(val) {
+					return tmp.convertors.findValue('id', val, 'name', DEF.empty);
+				};
+
+				W.tmpextend = tmp;
+			}
+		};
+
+	});
+
+</script>

@@ -76,7 +76,21 @@
 		<ui-component name="codemirror" path="?.code" config="type:javascript;minheight:300;parent:auto;margin:60;tabs:true;trim:true" class="m"></ui-component>
 	</div>
 </settings>
-
+<script>
+	TOUCH(function(exports, init) {
+		exports.configure = function() {
+			var changes = exports.instance.changes;
+			if (changes && changes.newbie) {
+				var outputs = [];
+				var count = exports.instance.config.outputs;
+				for (let i = 1; i <= count; i++)
+					outputs.push({ id: 'output' + (i === 1 ? '' : i), name: (count === 1 ? 'Output' : 'Output #' + i) });
+				exports.instance.outputs = outputs;
+				UPD('flow.data');
+			}
+		}
+	});
+</script>
 <body>
 	<header>
 		<i class="ICON"></i>NAME

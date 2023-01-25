@@ -140,7 +140,7 @@
 
 		instance.configure = function() {
 
-			var locked = config.lock ? NOW.add(lock) : null;
+			var locked = config.lock ? NOW.add(config.lock) : null;
 
 			for (var key in codes) {
 				var item = codes[key];
