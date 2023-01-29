@@ -7,24 +7,22 @@
 	exports.author = 'Total.js';
 	exports.version = '1';
 	exports.config = {};
-	exports.inputs = [{ id: 'input', name: 'Input' }];
-	exports.outputs = [{ id: 'output', name: 'Output' }];
+	exports.inputs = [{ id: 'input', name: 'Trigger' }];
+	exports.outputs = [{ id: 'output', name: 'Date/Time' }];
 
 	exports.make = function(instance, config) {
 
+		var makedate = function() {
+			var dt = new Date();
+			return config.format ? dt.format(config.format) : dt;
+		};
+
 		instance.message = function($) {
-			var data = $.data;
-			$.send('output', new Date().format(config.format || 'yyyy-MM-dd HH:mm:ss'));
+			$.send('output', dt);
 		};
 
-		instance.configure = function configure() {
-			instance.status(config.format || 'yyyy-MM-dd HH:mm:ss');
-		};
-
-		instance.configure();
-
-		instance.trigger = function trigger() {
-			instance.send('output', new Date().format(config.format || 'yyyy-MM-dd HH:mm:ss'));
+		instance.trigger = function() {
+			instance.send('output', makedate());
 		};
 
 	};
@@ -37,6 +35,8 @@
 <settings>
 	<div class="padding">
 		<ui-component name="input" path="?.format" config="placeholder:yyyy-MM-dd HH\:mm\:ss">Date format</ui-component>
+		<div class="help">Empty value will return current <code>datetime</code> object.</div>
+		<hr />
 		<p>
 			d - day e.g. 1<br>
 			dd - day e.g. 01<br>
@@ -66,11 +66,11 @@
 	.CLASS button { width: 100%; height: 24px; border: 1px solid #E0E0E0; border-radius: var(--radius); color: #000; background-color: #F0F0F0; margin: 0; }
 	.CLASS button:hover { background-color: #F8F8F8; }
 	.CLASS button:active { background-color: #E0E0E0; }
+	.CLASS footer { padding: 10px; font-size: 12px; }
+
 	.ui-dark .CLASS button { border-color: #404040; color: #FFF; background-color: #222; }
 	.ui-dark .CLASS button:hover { background-color: #303030; }
 	.ui-dark .CLASS button:active { background-color: #404040; }
-
-	.CLASS footer { padding: 10px; font-size: 12px; }
 </style>
 
 <body>
@@ -80,5 +80,5 @@
 	<div class="padding">
 		<button class="exec" data-exec="FUNC.trigger">Run</button>
 	</div>
-	<footer><ui-bind name="!STATUS" config="text"></ui-bind></footer>
+	<footer is="is-footer" path="CONFIG.format" config="text;show"></footer>
 </body>
