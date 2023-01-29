@@ -6,13 +6,14 @@
 	exports.version = '2';
 	exports.icon = 'ti ti-database';
 	exports.author = 'Peter Širka';
-	exports.config = { name: '', unit: '', icon: '', color: '', decimals: 2, type: 'daily', sum: 0 };
-	exports.inputs = [{ id: 'input', name: 'Value' }];
+	exports.config = { name: '', unit: '', icon: '', color: '', decimals: 2, type: 'daily', sum: 0, hours: 48, days: 12, months: 12, years: 6 };
+	exports.inputs = [{ id: 'input', name: 'Value' }, { id: 'live', name: 'Live stats' }, { id: 'stats', name: 'Stats' }];
+	exports.outputs = [{ id: 'stats', name: 'Output' }];
 
 	exports.make = function(instance, config) {
 
-		var uid = (instance.main.id + '_' + instance.id).makeid();
-		var filename_meta = PATH.private('dataset_' + uid + '.meta');
+		var uid = instance.id;
+		var filename_meta = PATH.private('dataset_' + uid + '.json');
 		var filename_data = PATH.private('dataset_' + uid + '.csv');
 		var meta = {};
 
@@ -210,7 +211,7 @@
 			}
 		};
 
-		instance.message = function($) {
+		instance.message_input = function($) {
 
 			var data = $.data;
 			var type = typeof(data);
@@ -222,9 +223,181 @@
 			$.destroy();
 		};
 
+		instance.message_stats = function($) {
+			var opt = {};
+			opt.filename = filename_data;
+			opt.hours = 48;
+			opt.days = 12;
+			opt.months = 12;
+			opt.years = 6;
+			instance.readstats(opt, function(response) {
+				$.send('stats', response);
+			});
+		};
+
+		instance.message_live = function($) {
+
+			var output = [];
+
+			for (var key in meta.keys) {
+				var data = CLONE(meta.keys[key]);
+				data.id = key.makeid();
+				data.name = key;
+				data.color = meta.color;
+				data.icon = meta.icon;
+				data.unit = meta.unit;
+				data.decimals = meta.decimals;
+				output.push(data);
+			}
+
+			$.send('stats', output);
+		};
+
 		instance.configure = function() {
 			COPY(config, meta);
 			F.Fs.writeFile(filename_meta, JSON.stringify(meta, null, '\t'), NOOP);
+		};
+
+		instance.readstats = function(opt, callback) {
+
+			var builder = [];
+			var response = {};
+			var prop = 'd';
+
+			var fromhours = opt.hours ? (+(NOW.add('-' + opt.hours + ' hours').format('yyyyMMddHH'))) : 0;
+			var fromdays = opt.days ? (+(NOW.add('-' + opt.days + ' days').format('yyyyMMdd'))) : 0;
+			var frommonths = opt.months ? (+(NOW.add('-' + opt.months + ' months').format('yyyyMM'))) : 0;
+			var fromyear = opt.years ? (NOW.getFullYear() - opt.years) : 0;
+
+			if (opt.hours)
+				response.hours = {};
+
+			if (opt.days)
+				response.days = {};
+
+			if (opt.months)
+				response.months = {};
+
+			if (opt.years)
+				response.years = {};
+
+			if (!opt.type)
+				opt.type = 'max';
+
+			var start = function() {
+
+				var add = function(type, key, x, y) {
+
+					if (!response[type][key])
+						response[type][key] = {};
+
+					var items = response[type][key];
+					var key2 = x + '';
+					var tmp;
+
+					switch (opt.type) {
+						case 'max':
+							tmp = items[key2];
+							if (tmp == null) {
+								items[key2] = y;
+							} else if (tmp < y)
+								items[key2] = y;
+							break;
+						case 'min':
+							tmp = items[key2];
+							if (tmp == null) {
+								items[key2] = y;
+							} else if (tmp > y)
+								items[key2] = y;
+							break;
+					}
+
+				};
+
+				var push = function() {
+
+					var tmp = builder.splice(0);
+					var arr = tmp.join('\n').parseCSV(',');
+					for (var item of arr) {
+
+						for (var key in item) {
+							if (key !== 'a')
+								item[key] = item[key] ? (+item[key]) : 0;
+						}
+
+						if (response.hours && item.g >= fromhours)
+							add('hours', item.a, item.g, item[prop]);
+
+						if (response.days && item.h >= fromdays)
+							add('days', item.a, item.h, item[prop]);
+
+						if (response.months && item.j >= frommonths)
+							add('months', item.a, item.j, item[prop]);
+
+						if (response.years && item.k >= fromyear)
+							add('years', item.a, item.k, item[prop]);
+					}
+				};
+
+				var stream = F.Fs.createReadStream(opt.filename);
+				stream.on('data', U.streamer('\n', function(line, index) {
+					if (index) {
+						var count = builder.push(line.trim());
+						if (count > 100)
+							push();
+					}
+				}));
+
+				CLEANUP(stream, function() {
+
+					builder.length && push();
+
+					var output = {};
+					var tmp;
+
+					for (var a in response) {
+
+						var stat = response[a];
+
+						output[a] = [];
+
+						for (var b in stat) {
+
+							var tmp = stat[b];
+							var arr = [];
+
+							for (var c in tmp) {
+								var date;
+
+								switch (a) {
+									case 'hours':
+										date = new Date(+c.substring(0, 4), (+c.substring(4, 6)) - 1, +c.substring(6, 8), +c.substring(8, 10), 0, 0);
+										break;
+									case 'days':
+										date = new Date(+c.substring(0, 4), (+c.substring(4, 6)) - 1, +c.substring(6, 8), 12, 0, 0);
+										break;
+									case 'months':
+										date = new Date(+c.substring(0, 4), (+c.substring(4, 6)) - 1, 1, 12, 0, 0);
+										break;
+									case 'years':
+										date = new Date(+c.substring(0, 4), 0, 1, 12, 0, 0);
+										break;
+								}
+
+								arr.push({ x: date, y: tmp[c] });
+							}
+
+							output[a].push({ name: b, unit: config.unit, decimals: config.decimals, data: arr });
+						}
+
+					}
+
+					callback && callback(output);
+				});
+
+			};
+
+			setImmediate(start);
 		};
 
 	};
@@ -252,21 +425,42 @@
 				<ui-component name="input" path="?.sum" config="dirsource:0|Disabled,1|Periodical sum,2|Total sum;type:number">Calculate the sum</ui-component>
 			</div>
 		</div>
-		<div class="row">
-			<div class="col-md-3 m">
+		<div class="grid-4">
+			<div class="m">
 				<ui-component name="input" path="?.unit" config="align:1">Unit</ui-component>
 			</div>
-			<div class="col-md-3 m">
+			<div class="m">
 				<ui-component name="input" path="?.decimals" config="align:1;type:number" default="2">Decimals</ui-component>
 			</div>
-			<div class="col-md-3 m">
+			<div class="m">
 				<ui-component name="input" path="?.icon" config="type:icon">Icon</ui-component>
 			</div>
-			<div class="col-md-3 m">
+			<div class="m">
 				<ui-component name="input" path="?.color" config="type:color">Color</ui-component>
 			</div>
 		</div>
-		<hr />
+		<div class="caption m">
+			<label><i class="ti ti-chart-line"></i>Stats</label>
+		</div>
+		<p>Zero values will prevent statistics from being displayed for the selected period.</p>
+		<div class="grid-4">
+			<div class="m">
+				<ui-component name="input" path="?.hours" config="type:number">Hours</ui-component>
+				<div class="help">How many hours to be returned?</div>
+			</div>
+			<div class="m">
+				<ui-component name="input" path="?.days" config="type:number">Days</ui-component>
+				<div class="help">How many days to be returned?</div>
+			</div>
+			<div class="m">
+				<ui-component name="input" path="?.months" config="type:number">Months</ui-component>
+				<div class="help">How many months to be returned?</div>
+			</div>
+			<div class="m">
+				<ui-component name="input" path="?.years" config="type:number">Years</ui-component>
+				<div class="help">How many years to be returned?</div>
+			</div>
+		</div>
 	</div>
 </settings>
 
@@ -274,6 +468,8 @@
 The component stores data as CSV Dataset for e.g. Dashboard application. Dataset is stored in `/private/` path that is available with the help of the Flow access token.
 
 CSV file contains only processed values (according to the period) and the `.meta` file contains meta data + last value.
+
+__Input for data processing__:
 
 ```js
 {
@@ -284,17 +480,17 @@ CSV file contains only processed values (according to the period) and the `.meta
 
 ### CSV columns
 
-1. `key {String}`
-1. `value {Number}`
-1. `min {Number}`
-1. `max {Number}`
-1. `sum {Number}`
-1. `count {Number}`
-1. `tshour {Number}`in the form `yyyyMMddhh`
-1. `tsday {Number}` in the form `yyyyMMdd`
-1. `tsweek {Number}` in the form `yyyyww`
-1. `tsmonth {Number}` in the form `yyyyMM`
-1. `tsyear {Number}` in the form `yyyy`
+- `a` = `key {String}`
+- `b` = `value {Number}`
+- `c` = `min {Number}`
+- `d` = `max {Number}`
+- `e` = `sum {Number}`
+- `f` = `count {Number}`
+- `g` = `tshour {Number}`in the form `yyyyMMddhh`
+- `h` = `tsday {Number}` in the form `yyyyMMdd`
+- `i` = `tsweek {Number}` in the form `yyyyww`
+- `j` = `tsmonth {Number}` in the form `yyyyMM`
+- `k` = `tsyear {Number}` in the form `yyyy`
 </readme>
 
 <script>
@@ -360,7 +556,7 @@ CSV file contains only processed values (according to the period) and the `.meta
 				<script type="text/html">
 					<div class="selectable">
 						<div class="meta mt5">
-							<span>Meta:</span><div><a href="/private/?filename=dataset_{{ value.id }}.meta&token=" target="_blank">dataset_{{ value.id }}.meta</a></div>
+							<span>Meta:</span><div><a href="/private/?filename=dataset_{{ value.id }}.json&token=" target="_blank">dataset_{{ value.id }}.json</a></div>
 						</div>
 						{{ if value.type !== 'lastvalue' }}
 						<div class="meta">
