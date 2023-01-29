@@ -401,7 +401,7 @@ __Good to know__: If the `data` (payload) can contain special key names in the f
 				<label>Inputs</label>
 			</div>
 
-			<ui-bind name="?.items" config="template:.item" class="listing block">
+			<ui-bind path="?.items" config="template:.item" class="listing block">
 				<script type="text/html">
 					{{ foreach m in value }}
 					<div class="item exec" data-id="{{ m.id }}" data-exec="tmpapidatabase.upd"><span class="controls nmr"><button class="exec red" data-prevent="true" data-exec="tmpapidatabase.rem"><i class="ti ti-trash-alt"></i></button></span><i class="ti ti-crosshairs mr5"></i>{{ m.name }} ({{ m.command | tmpapidatabasecommand }})</div>

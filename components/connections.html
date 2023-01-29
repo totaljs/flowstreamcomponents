@@ -68,7 +68,7 @@ __Data Example__:
 
 <style>
 	.CLASS footer { padding: 10px; font-size: 11px; }
-	.CLASS footer > ui-bind > div { height: 16px; }
+	.CLASS footer > div { height: 16px; }
 	.CLASS footer b { float: right; }
 </style>
 
@@ -90,12 +90,10 @@ __Data Example__:
 	<header>
 		<i class="ICON"></i>NAME
 	</header>
-	<footer>
-		<ui-bind name="!STATUS" config="template;show">
-			<script type="text/html">
-				<div><b>{{ value.port }}</b>Port</div>
-				<div><b>{{ value.connections }}x</b>Connections</div>
-			</script>
-		</ui-bind>
+	<footer is="is-footer" path="!STATUS" config="template;show">
+		<script type="text/html">
+			<div><b>{{ value.port }}</b>Port</div>
+			<div><b>{{ value.connections }}x</b>Connections</div>
+		</script>
 	</footer>
 </body>

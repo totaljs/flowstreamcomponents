@@ -57,6 +57,10 @@
 			if (tmp && tmp.locked && tmp.locked > NOW) {
 				if (tmp.limit <= 0) {
 					msg.success = tmp.count > 0;
+
+					if (msg.success)
+						msg.value = val;
+
 					msg.slots = tmp.count;
 					msg.error = 'locked';
 					msg.limit = tmp.limit;
@@ -235,7 +239,7 @@ __Verify output__:
 		<i class="ICON"></i>NAME
 	</header>
 	<footer>
-		<div>Pending: <b><ui-bind name="STATUS.count" config="text;empty"></ui-bind></b></div>
+		<div>Pending: <ui-bind path="STATUS.count" config="text;empty" class="b"></ui-bind></div>
 		<ui-bind path="CONFIG" config="template">
 			<script type="text/html">
 				<div class="keyvalue small"><span>Type</span><div class="right b">{{ value.type | cl('confirmcodetypes') }}</div></div>

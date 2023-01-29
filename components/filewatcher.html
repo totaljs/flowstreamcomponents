@@ -103,6 +103,6 @@ The component watches the existence of the file, then reads the content and send
 		<div><i class="ti ti-calendar mr5"></i><ui-bind path="STATUS.used" config="text;format:yyyy-MM-dd HH:mm:ss;empty"></ui-bind></div>
 		<div><i class="ti ti-calculator mr5"></i><ui-bind path="STATUS.size" config="text;helper:filesize;empty"></ui-bind></div>
 		<hr />
-		<ui-bind name="CONFIG.path" config="text;empty"></ui-bind>
+		<ui-bind path="CONFIG.path" config="text;empty" class="block"></ui-bind>
 	</footer>
 </body>
