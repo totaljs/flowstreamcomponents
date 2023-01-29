@@ -121,10 +121,8 @@ This component reads specific values according to the configured map.
 	<header>
 		<i class="ICON"></i>NAME
 	</header>
-	<footer>
-		<ui-bind path="CONFIG.path" config="show;text span">
-			Path: <span class="b"></span>
-		</ui-bind>
+	<footer is="is-footer" path="CONFIG.path" config="show;text span">
+		Path: <span class="b"></span>
 	</footer>
 </body>
 
