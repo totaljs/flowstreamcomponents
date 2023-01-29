@@ -213,7 +213,7 @@ If the controller is stored in the `message.refs.controller` property, then its 
 				<label>Schema</label>
 			</div>
 			<div class="message message-alert"><i class="ti ti-exclamation-triangle"></i>Every name of identifier must be unique per Flow. You can use dynamic arguments in the form <code>{argument_name}</code></div>
-			<ui-bind path="?.schema" config="template:figure --> data-id;show:value && value.length" class="fields m">
+			<ui-bind path="?.schema" config="template:figure --> data-id;show:value && value.length" class="fields m block">
 				<script type="text/html">
 					{{ foreach m in value }}
 					<figure data-id="{{ m.id }}">
