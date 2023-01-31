@@ -34,7 +34,7 @@
 	},
 	{
 		"id": "comment",
-		"group": "",
+		"group": "Common",
 		"name": "Comment",
 		"url": "https://cdn.totaljs.com/flowstream/webcomponents/comment.html",
 		"author": "Total.js",
@@ -99,7 +99,7 @@
 	},
 	{
 		"id": "cron",
-		"group": "",
+		"group": "Common",
 		"name": "Cron",
 		"url": "https://cdn.totaljs.com/flowstream/webcomponents/cron.html",
 		"author": "Total.js",
@@ -117,7 +117,7 @@
 		"icon": "ti ti-database",
 		"color": "",
 		"version": "2",
-		"readme": "The component stores data as CSV Dataset for e.g. Dashboard application. Dataset is stored in `/private/` path that is available with the help of the Flow access token.\n\nCSV file contains only processed values (according to the period) and the `.meta` file contains meta data + last value.\n\n```js\n{\n\tkey: String,    // optional, e.g. device_id | device_name\n\tvalue: Number   // measured value\n}\n```\n\n### CSV columns\n\n1. `key {String}`\n1. `value {Number}`\n1. `min {Number}`\n1. `max {Number}`\n1. `sum {Number}`\n1. `count {Number}`\n1. `tshour {Number}`in the form `yyyyMMddhh`\n1. `tsday {Number}` in the form `yyyyMMdd`\n1. `tsweek {Number}` in the form `yyyyww`\n1. `tsmonth {Number}` in the form `yyyyMM`\n1. `tsyear {Number}` in the form `yyyy`"
+		"readme": "The component stores data as CSV Dataset for e.g. Dashboard application. Dataset is stored in `/private/` path that is available with the help of the Flow access token.\n\nCSV file contains only processed values (according to the period) and the `.meta` file contains meta data + last value.\n\n__Input for data processing__:\n\n```js\n{\n\tkey: String,    // optional, e.g. device_id | device_name\n\tvalue: Number   // measured value\n}\n```\n\n### CSV columns\n\n- `a` = `key {String}`\n- `b` = `value {Number}`\n- `c` = `min {Number}`\n- `d` = `max {Number}`\n- `e` = `sum {Number}`\n- `f` = `count {Number}`\n- `g` = `tshour {Number}`in the form `yyyyMMddhh`\n- `h` = `tsday {Number}` in the form `yyyyMMdd`\n- `i` = `tsweek {Number}` in the form `yyyyww`\n- `j` = `tsmonth {Number}` in the form `yyyyMM`\n- `k` = `tsyear {Number}` in the form `yyyy`"
 	},
 	{
 		"id": "dataparser",
@@ -161,7 +161,7 @@
 		"icon": "ti ti-calendar",
 		"color": "",
 		"version": "1",
-		"readme": ""
+		"readme": "The component will return a Date/Time object (raw or formatted) according to its configuration."
 	},
 	{
 		"id": "debug",
@@ -187,7 +187,7 @@
 	},
 	{
 		"id": "downloader",
-		"group": "",
+		"group": "Common",
 		"name": "Downloader",
 		"url": "https://cdn.totaljs.com/flowstream/webcomponents/downloader.html",
 		"author": "Total.js",
@@ -319,7 +319,7 @@
 	},
 	{
 		"id": "httpresponse",
-		"group": "",
+		"group": "Triggers",
 		"name": "HTTP Response",
 		"url": "https://cdn.totaljs.com/flowstream/webcomponents/httpresponse.html",
 		"author": "Total.js",
@@ -363,7 +363,7 @@
 	},
 	{
 		"id": "jsonschemavalidator",
-		"group": "",
+		"group": "Common",
 		"name": "JSON Schema validator",
 		"url": "https://cdn.totaljs.com/flowstream/webcomponents/jsonschemavalidator.html",
 		"author": "Total Avengers",
@@ -374,7 +374,7 @@
 	},
 	{
 		"id": "kill",
-		"group": "",
+		"group": "FlowStream",
 		"name": "Kill",
 		"url": "https://cdn.totaljs.com/flowstream/webcomponents/kill.html",
 		"author": "Total.js",
@@ -396,7 +396,7 @@
 	},
 	{
 		"id": "macro",
-		"group": "",
+		"group": "Common",
 		"name": "Macro",
 		"url": "https://cdn.totaljs.com/flowstream/webcomponents/macro.html",
 		"author": "Total.js",
@@ -407,7 +407,7 @@
 	},
 	{
 		"id": "map-array",
-		"group": "",
+		"group": "Common",
 		"name": "Map array",
 		"url": "https://cdn.totaljs.com/flowstream/webcomponents/map-array.html",
 		"author": "Total.js",
@@ -495,7 +495,7 @@
 	},
 	{
 		"id": "modify",
-		"group": "",
+		"group": "Common",
 		"name": "Modify",
 		"url": "https://cdn.totaljs.com/flowstream/webcomponents/modify.html",
 		"author": "Total.js",
@@ -704,7 +704,7 @@
 	},
 	{
 		"id": "qrgenerator",
-		"group": "",
+		"group": "Common",
 		"name": "QR generator",
 		"url": "https://cdn.totaljs.com/flowstream/webcomponents/qrgenerator.html",
 		"author": "Total Avengers",
@@ -759,7 +759,7 @@
 	},
 	{
 		"id": "range",
-		"group": "",
+		"group": "Common",
 		"name": "Range",
 		"url": "https://cdn.totaljs.com/flowstream/webcomponents/range.html",
 		"author": "Total.js",
@@ -979,7 +979,7 @@
 	},
 	{
 		"id": "switch",
-		"group": "",
+		"group": "Common",
 		"name": "Switch",
 		"url": "https://cdn.totaljs.com/flowstream/webcomponents/switch.html",
 		"author": "Total.js",
@@ -1108,5 +1108,16 @@
 		"color": "",
 		"version": "3",
 		"readme": "The component simulates Total.js Schema Workflow operation. It can process data and store/read them into the database.\n\n__Properties__:\n- `$ {Message}`\n- `controller {Object}` A controller instance\n- `user {Object}` A user instance if exists\n- `headers {Object}` Request headers\n- `query {Object}` URL query arguments\n- `params {Object}` A dynamic URL params\n- `ip {String}` IP address\n- __`repo {Object}`__ a custom persistent repository object\n- __`model {Object}`__ an alias to `$.data`\n\n__Model/Data__:\n\n- `$.data {Object}` a message data\n- `$.repo {Object}` a message repository\n- `$.refs {Object}` a message references\n\n__Functions__:\n- `variable(key {String}) returns {String}` for reading variables\n- `cancel()` Cancels the processing without error and sending data next\n- `respond(data {Object})` Responds with data\n- `success(data {Object} optional)` Response with success object\n- `invalid(error {String})` Error handling`\n- `done(respond_value {Boolean/Object} optional)` return `function(err, response)` for handling callbacks\n\t- when it `fails` it calls `invalid()`\n\t- when it `done` it calls `success()`"
+	},
+	{
+		"id": "xmlparser",
+		"group": "Common",
+		"name": "XML parser",
+		"url": "https://cdn.totaljs.com/flowstream/webcomponents/xmlparser.html",
+		"author": "Total.js",
+		"icon": "fa fa-code",
+		"color": "",
+		"version": "1",
+		"readme": "Parse XML from string.\n- __Input__: {String}\n- __Ouput__: {String}"
 	}
 ]

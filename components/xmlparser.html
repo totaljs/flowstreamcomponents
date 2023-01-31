@@ -1,0 +1,37 @@
+<script total>
+
+	exports.name = 'XML parser';
+	exports.icon = 'fa fa-code';
+	exports.author = 'Total.js';
+	exports.version = '1';
+	exports.group = 'Common';
+	exports.config = {};
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }, { id: 'error', name: 'Error' }];
+
+	exports.make = function(instance, config) {
+
+		instance.message = function($) {
+			var data = $.data;
+
+			if (typeof data !=='string') {
+				$.send('error', 'Input must be string');
+				return;
+			} else
+				$.send('output', data.parseXML());
+
+		};
+	};
+
+</script>
+
+<readme>
+Parse XML from string.
+- __Input__: {String}
+- __Ouput__: {String}
+</readme>
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+</body>
