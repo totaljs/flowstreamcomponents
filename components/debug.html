@@ -115,7 +115,7 @@ The component prints incoming data into the JSON format.
 					}
 				};
 
-				$(document.body).append('<div data---="box__common.$debug__if:debugform;align:right;width:420;background:false;transparent:true;title:Debug panel;icon:ti ti-bug;zindex:5"><nav><button class="exec" data-exec="debugwindowclear"><i class="ti ti-trash"></i>Clear</button></nav><div class="padding debugform" id="debugformbody"></div></div>');
+				$(document.body).append('<ui-component name="box" path="common.$debug" config="if:debugform;align:right;width:420;background:false;transparent:true;title:Debug panel;icon:ti ti-bug;zindex:5"><nav><button class="exec" data-exec="debugwindowclear"><i class="ti ti-trash"></i>Clear</button></nav><div class="padding debugform" id="debugformbody"></div></ui-component>');
 
 				exports.element.on('click', 'button', function() {
 					SET('common.$debug', common.$debug ? '' : 'debugform');
