@@ -6,7 +6,7 @@
 	exports.icon = 'ti ti-circle-alt';
 	exports.color = '#E73323';
 	exports.author = 'Total.js';
-	exports.config = { repo: false, data: true, name: 'Debug', watch: [] };
+	exports.config = { repo: false, data: true, watch: [] };
 	exports.meta = { singleton: true };
 
 	exports.make = function(instance, config) {
@@ -104,7 +104,6 @@ The component prints incoming data into the JSON format.
 
 <settings>
 	<div class="padding">
-		<ui-component name="input" path="?.name" class="m">Name</ui-component>
 		<ui-component name="input" path="?.repo" config="type:checkbox">Shows repository</ui-component>
 		<ui-component name="input" path="?.data" config="type:checkbox">Shows data</ui-component>
 		<hr />
