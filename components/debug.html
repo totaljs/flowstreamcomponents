@@ -2,15 +2,21 @@
 
 	exports.name = 'Debug';
 	exports.group = 'Common';
-	exports.version = '1';
-	exports.icon = 'ti ti-print';
+	exports.version = '2';
+	exports.icon = 'ti ti-circle-alt';
+	exports.color = '#E73323';
 	exports.author = 'Total.js';
-	exports.config = { repo: false, data: true, name: 'Debug' };
-	exports.inputs = [{ id: 'input', name: 'Log window' }];
+	exports.config = { repo: false, data: true, name: 'Debug', watch: [] };
+	exports.meta = { singleton: true };
 
 	exports.make = function(instance, config) {
 
-		instance.message = function($) {
+		var filter = null;
+
+		instance.logger && instance.logger(function($) {
+
+			if (filter && !filter[$.fromid])
+				return;
 
 			var data = $.data;
 
@@ -42,8 +48,17 @@
 					output = $.data;
 			}
 
-			output && instance.status({ name: config.name, date: new Date(), data: output });
-			$.destroy();
+			NOW = new Date();
+			output && instance.status({ name: $.from.module.name, date: NOW, data: output });
+		});
+
+		instance.configure = function() {
+			if (config.watch && config.watch.length) {
+				filter = {};
+				for (var id of config.watch)
+					filter[id] = 1;
+			} else
+				filter = null;
 		};
 
 		instance.trigger = function() {
@@ -62,15 +77,25 @@
 
 		};
 
+		instance.configure();
+
+		if (!instance.logger)
+			instance.throw('You need to update Total.js framework');
+
 	};
 
 </script>
 
 <style>
+	.CLASS { border-color: #E73323 !important; }
+	.CLASS .area { background: #FEE7E7; }
+	.CLASS header i { animation: 1s blink infinite alternate forwards; border-radius: 100px; }
 	.CLASS footer { padding: 10px; }
 	.CLASS pre, .debugform pre { font-size: 10px; margin: 0; padding: 5px; background-color: #F0F0F0; border-radius: var(--radius); }
 	.debugform .date { font-size: 11px; margin-bottom: 5px; }
 	.debugform .name { float: right; font-size: 11px; font-weight: bold; }
+	.ui-dark .CLASS .area { background: #7e4d4d; }
+	.ui-dark .CLASS pre, .ui-dark .debugform pre { background-color: #404040; }
 </style>
 
 <readme>
@@ -82,12 +107,26 @@ The component prints incoming data into the JSON format.
 		<ui-component name="input" path="?.name" class="m">Name</ui-component>
 		<ui-component name="input" path="?.repo" config="type:checkbox">Shows repository</ui-component>
 		<ui-component name="input" path="?.data" config="type:checkbox">Shows data</ui-component>
+		<hr />
+		<ui-component name="selection" path="?.watch" config="datasource:flow.instances;click:figure">
+			<ui-bind path="flow.instances" config="template" class="block listing2 small">
+				<script type="text/html">
+					{{ foreach m in value }}
+					<figure>
+						<section>
+							<span class="selection" data-id="{{ m.id }}"><i class="ti ti-eye"></i></span>{{ m.Component.name }}{{ if m.note }}<span class="gray ml10">{{ m.note }}</span>{{ fi }}
+						</section>
+					</figure>
+					{{ end }}
+				</script>
+			</ui-bind>
+		</ui-component>
 	</div>
 </settings>
 
 <body>
 	<header>
-		<i class="ICON"></i>NAME
+		<i class="ti ti-bull" style="background:#E73323;color:#FFF"></i><b>NAME</b>
 	</header>
 	<footer>
 		<div><button class="button" name="toggle"><i class="ti ti-eye"></i>Toggle</button></div>
@@ -115,13 +154,20 @@ The component prints incoming data into the JSON format.
 					}
 				};
 
-				$(document.body).append('<ui-component name="box" path="common.$debug" config="if:debugform;align:right;width:420;background:false;transparent:true;title:Debug panel;icon:ti ti-bug;zindex:5"><nav><button class="exec" data-exec="debugwindowclear"><i class="ti ti-trash"></i>Clear</button></nav><div class="padding debugform" id="debugformbody"></div></ui-component>');
+				$(document.body).append('<ui-component name="box" path="common.$debug" config="if:debugform;align:right;width:420;background:false;transparent:true;title:Debug panel;icon:ti ti-bug;zindex:5;$id:debugwindowbox"><nav><button class="exec" data-exec="debugwindowclear"><i class="ti ti-remove red"></i>Clear</button></nav><div class="padding debugform" id="debugformbody"></div></ui-component>');
 
 				exports.element.on('click', 'button', function() {
 					SET('common.$debug', common.$debug ? '' : 'debugform');
 				});
 			}
 		}
+
+		exports.close = function() {
+			NUL('common.$debug');
+			delete W.debugwindow;
+			delete W.debugwindowclear;
+			SETTER('#debugwindowbox/remove');
+		};
 
 		exports.clear = function() {
 			exports.trigger();
