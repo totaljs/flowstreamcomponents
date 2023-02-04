@@ -124,9 +124,7 @@ __Output data__:
 	<header>
 		<i class="ICON"></i>NAME
 	</header>
-	<footer> 
-		<ui-bind path="CONFIG.method" config="show" class="hidden block">
-			<div><ui-bind path="CONFIG.method" config="text" class="method"></ui-bind> <a is="is-a" path="CONFIG.url" config="text;href:flow.head.proxyurl + (value[0] === '/' ? value.substring(1) : value)" target="_blank"></a></div>
-		</ui-bind>
+	<footer is="is-footer" path="CONFIG.method" config="show" class="hidden block">
+		<div><ui-bind path="CONFIG.method" config="text" class="method"></ui-bind> <a is="is-a" path="CONFIG.url" config="text;href:flow.head.proxyurl + (value.charAt(0)=== '/' ? value.substring(1) : value)" target="_blank"></a></div>
 	</footer>
 </body>

@@ -93,7 +93,7 @@ __Output data__:
 
 <style>
 	.CLASS footer { padding: 10px; }
-	.CLASS footer ui-bind > ui-bind { font-family: var(--monospace); }
+	.CLASS footer > div ui-bind { font-family: var(--monospace); }
 	.CLASS footer .method { background-color: var(--color); color: #FFF; padding: 2px 3px; border-radius: var(--radius); }
 </style>
 
@@ -101,7 +101,7 @@ __Output data__:
 	<header>
 		<i class="ICON"></i>NAME
 	</header>
-	<footer>
-		<ui-bind path="CONFIG.method" config="show" class="hidden"><ui-bind path="CONFIG.method" config="text" class="method"></ui-bind><a is="is-a" path="CONFIG.url" config="text;href:window.location.origin + value" target="_blank"></a></ui-bind>
+	<footer is="is-footer" path="CONFIG.method" config="show" class="hidden block">
+		<div><ui-bind path="CONFIG.method" config="text" class="method"></ui-bind> <a is="is-a" path="CONFIG.url" config="text;href:location.origin + value" target="_blank"></a></div>
 	</footer>
 </body>
