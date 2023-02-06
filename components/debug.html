@@ -107,18 +107,21 @@ The component prints incoming data into the JSON format.
 		<ui-component name="input" path="?.repo" config="type:checkbox">Shows repository</ui-component>
 		<ui-component name="input" path="?.data" config="type:checkbox">Shows data</ui-component>
 		<hr />
-		<ui-component name="selection" path="?.watch" config="datasource:flow.instances;click:figure">
-			<ui-bind path="flow.instances" config="template" class="block listing2 small">
-				<script type="text/html">
-					{{ foreach m in value }}
-					<figure>
-						<section>
-							<span class="selection" data-id="{{ m.id }}"><i class="ti ti-eye"></i></span>{{ m.Component.name }}{{ if m.note }}<span class="gray ml10">{{ m.note }}</span>{{ fi }}
-						</section>
-					</figure>
-					{{ end }}
-				</script>
-			</ui-bind>
+		<ui-component name="input" path="%debugsearch" config="type:search;placeholder:Search components" class="m">Search</ui-component>
+		<ui-component name="search" path="%debugsearch" config="selector:figure">
+			<ui-component name="selection" path="?.watch" config="datasource:flow.instances;click:figure">
+				<ui-bind path="flow.instances" config="template" class="block listing2 small">
+					<script type="text/html">
+						{{ foreach m in value }}
+						<figure data-search="{{ m.id }} {{ m.Component.name }}{{ if m.note }} {{ m.note }}{{ fi }}">
+							<section>
+								<span class="selection" data-id="{{ m.id }}"><i class="ti ti-eye"></i></span>{{ m.Component.name }}{{ if m.note }}<span class="gray ml10">{{ m.note }}</span>{{ fi }}
+							</section>
+						</figure>
+						{{ end }}
+					</script>
+				</ui-bind>
+			</ui-component>
 		</ui-component>
 	</div>
 </settings>
