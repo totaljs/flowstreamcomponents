@@ -169,9 +169,9 @@
 		"name": "Debug",
 		"url": "https://cdn.totaljs.com/flowstream/webcomponents/debug.html",
 		"author": "Total.js",
-		"icon": "ti ti-print",
-		"color": "",
-		"version": "1",
+		"icon": "ti ti-circle-alt",
+		"color": "#E73323",
+		"version": "2",
 		"readme": "The component prints incoming data into the JSON format."
 	},
 	{
@@ -690,6 +690,17 @@
 		"color": "",
 		"version": "1",
 		"readme": "This component monitors CPU (in %) and Memory consumption (in MB) in the Linux systems for the specific process. It uses `ps` command.\n\n__Data Example__:\n\n```js\n{\n\tgrep: 'nginx',\n\tcpu: 0.5,\n\tmemory: 45,\n\tfiles: 343,\n\tuptime: '1 day'\n}\n```"
+	},
+	{
+		"id": "restproxyroute",
+		"group": "REST API",
+		"name": "Proxy route",
+		"url": "https://cdn.totaljs.com/flowstream/webcomponents/restproxyroute.html",
+		"author": "Total.js",
+		"icon": "ti ti-exchange",
+		"color": "",
+		"version": "1",
+		"readme": "This component registers an HTTP Proxy route and sends request metadata next.\n\n< __IMPORTANT__:<br>The component works only with a defined Proxy endpoint in the Flow settings.\n< __URL__:<br>The URL must be relative to the defined Proxy endpoint. So if the endpoint is `/users/` and the desired address is `http://example.com/users/find` then the value must be `/find`\n\n__Output data__:\n\n```js\n{\n\t\"query\": Object,\n\t\"headers\": Object,\n\t\"url\": String,\n\t\"ip\": String\n}\n```"
 	},
 	{
 		"id": "publish",
