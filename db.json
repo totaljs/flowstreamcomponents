@@ -1093,10 +1093,21 @@
 		"name": "Transform",
 		"url": "https://cdn.totaljs.com/flowstream/webcomponents/transform.html",
 		"author": "Total.js",
-		"icon": "ti ti-ban",
+		"icon": "ti ti-robot",
 		"color": "",
 		"version": "1",
 		"readme": "This component can transform message data."
+	},
+	{
+		"id": "transformer",
+		"group": "Common",
+		"name": "Transformer",
+		"url": "https://cdn.totaljs.com/flowstream/webcomponents/transformer.html",
+		"author": "Total.js",
+		"icon": "ti ti-pulse",
+		"color": "",
+		"version": "1",
+		"readme": "With this component you can easily modify incoming data. Then the `data` content is delivered.\n\n__Example 1__:\n\n```js\n// \"data\" is a reference to message data\ndata.name = data.name.toUpperCase();\n```\n\n__Example 2__:\n\n```js\ndata = data.toUpperCase();\n```\n\n__Example 3__:\n\n```js\nvar tmp = data;\ndata = {};\ndata.name = tmp.Name;\n```"
 	},
 	{
 		"id": "trigger",
