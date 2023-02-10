@@ -1,0 +1,90 @@
+<script total>
+
+	exports.id = 'transformer';
+	exports.name = 'Transformer';
+	exports.icon = 'ti ti-pulse';
+	exports.author = 'Total.js';
+	exports.version = '1';
+	exports.group = 'Common';
+	exports.config = { code: 'data.name = data.name.toUpperCase()', clear: false };
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }];
+
+	exports.make = function(instance, config) {
+
+		var repo = {};
+		var fn;
+
+		instance.message = function($) {
+			var data = $.data;
+			if (fn) {
+				try {
+					var val = fn(data, repo, $.refs);
+					if (val != null)
+						data = val;
+				} catch (e) {
+					$.destroy();
+					instance.throw(e);
+					return;
+				}
+			}
+			$.send('output', data);
+		};
+
+		instance.configure = function() {
+			try {
+				if (config.code)
+					fn = new Function('data', 'repo', 'refs', config.code + ';return data;');
+				else
+					fn = null;
+				if (config.clear)
+					repo = {};
+			} catch (e) {
+				instance.throw(e);
+			}
+
+		};
+
+		instance.configure();
+
+	};
+
+</script>
+
+<readme>
+With this component you can easily modify incoming data. Then the `data` content is delivered.
+
+__Example 1__:
+
+```js
+// "data" is a reference to message data
+data.name = data.name.toUpperCase();
+```
+
+__Example 2__:
+
+```js
+data = data.toUpperCase();
+```
+
+__Example 3__:
+
+```js
+var tmp = data;
+data = {};
+data.name = tmp.Name;
+```
+</readme>
+
+<settings>
+	<div class="padding">
+		<ui-component name="codemirror" path="?.code" config="type:javascript;minheight:300;parent:auto;margin:85;tabs:true;trim:true" class="m"></ui-component>
+		<ui-component name="input" path="?.clear" config="type:checkbox">Clear repository object</ui-component>
+	</div>
+</settings>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+</body>
