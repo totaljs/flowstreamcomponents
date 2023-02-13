@@ -7,8 +7,8 @@
 	exports.version = '1';
 	exports.group = 'Services';
 	exports.config = { model: 'text-davinci-003', apikey: '' };
-	exports.inputs = [{ id: 'input', name: 'Input' }];
-	exports.outputs = [{ id: 'output', name: 'Output' }, { id: 'error', name: 'Error' }];
+	exports.inputs = [{ id: 'input', name: 'Question' }];
+	exports.outputs = [{ id: 'output', name: 'Answer' }, { id: 'error', name: 'Error' }];
 
 	exports.make = function(instance, config) {
 
@@ -50,7 +50,10 @@
 </script>
 
 <readme>
-This component can talk to chat-GPT.
+This component can talk to ChatGPT.
+
+- input `Question` must be `String`
+- output `Answer` is `String`
 </readme>
 
 <settings>
