@@ -11,6 +11,17 @@
 		"readme": "This component implements the [Total.js API Router](https://docs.totaljs.com/total4/cc674001rr51c/#total-js-routing) that allows you to provide only one endpoint (route) by adding multiple endpoints divided by keys. The component expects REST Route message or data in the form:\n\n```js\n{\n\t\"schema\": \"schema_name/{param_1}/{param_2}?query=arguments\",\n\t\"data\": {} // optional, request payload\n}\n```\n\n< __Good to know:__<br>Output data will be the same `data`, but extendend by adding new properties declared below.\n\n__Extended output data:__\n\n- `id {String}` first value from dynamic value\n- `params {Object}` dynamic values\n- `query {Object}` query arguments\n- `user {Object}` optional, inherited from the controller\n- `session {Object}` optional, inherited from the controller\n- `ip {String}` optional, inherited from the controller\n\nIf the controller is stored in the `message.refs.controller` property, then its properties like `controller.id`, `controller.params` and `controller.query` will be extendend by values from parsed schema."
 	},
 	{
+		"id": "chatgpl",
+		"group": "Services",
+		"name": "ChatGPT",
+		"url": "https://cdn.totaljs.com/flowstream/webcomponents/chatgpl.html",
+		"author": "Total.js",
+		"icon": "ti ti-robot-alt",
+		"color": "",
+		"version": "1",
+		"readme": "This component can talk to chat-GPT."
+	},
+	{
 		"id": "cheerio",
 		"group": "HTML",
 		"name": "Cheerio",

@@ -32,7 +32,7 @@
 					return;
 				}
 
-				if (response && response.choises) {
+				if (response && response.choices) {
 					var text = response.choices[0].text;
 					$.send('output', text);
 				}
@@ -55,7 +55,8 @@ This component can talk to chat-GPT.
 
 <settings>
 	<div class="padding">
-		<ui-component name="input" path="?.apikey" config="camouflage:1;required:1" class="m">API key</ui-component>
+		<ui-component name="input" path="?.apikey" config="camouflage:1;required:1">API key</ui-component>
+		<div class="help m"><a href="https://platform.openai.com/account/api-keys" target="_blank"><i class="ti ti-external"></i>Generate API key</a></div>
 		<ui-component name="input" path="?.model" config="type:select;dirsource:text-davinci-003|Davinci (Recommended),text-curie-001|Curie,text-babbage-001|Babbage, text-ada-001|ADA">Model</ui-component>
 	</div>
 </settings>
