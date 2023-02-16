@@ -1,0 +1,124 @@
+<script total>
+
+	exports.name = 'OpenWeather';
+	exports.icon = 'ti ti-weather';
+	exports.author = 'Total.js';
+	exports.version = '1';
+	exports.group = 'Services';
+	exports.config = { type: 'current', apikey: '', mode: 'json', time: 'hourly' };
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }, { id: 'error', name: 'Error' }];
+
+	exports.make = function(instance, config) {
+		var URL = 'https://api.openweathermap.org/data/2.5';
+		var cfg;
+		instance.message = function($) {
+			var data = $.data;
+
+			if (!data) {
+				$.send('error', 'Invalid or empty input');
+				return;
+			}
+
+			var obj = {};
+			obj.lon = data.long || data.lon || data.longitude;
+			obj.lat = data.lat || data.latitude;
+			obj.units = data.units;
+			obj.lang = data.lang || data.language;
+			obj.cnt = data.count || data.cnt;
+			obj.q = data.query || data.q;
+			obj.dt = data.date || data.dt;
+			obj.mode = cfg.mode;
+			obj.appid = cfg.apikey;
+
+
+			var url = QUERIFY(URL + '/weather', obj);
+
+			if (cfg.type !== 'current') {
+				switch (cfg.time) {
+					case 'hourly':
+						url = QUERIFY(URL + '/forecast/hourly', obj);
+						break;
+					case 'daily':
+						url = QUERIFY(URL + '/forecast/daily', obj);
+					case 'climate':
+						url = QUERIFY(URL + '/forecast/climate', obj);
+						break;
+				}
+			}
+
+			if (cfg.type === 'forecast' &&  cfg.time === 'climate' && (!obj.lon || !obj.lat)) {
+				$.send('error', 'Long and Lat are required to query Climate forecast');
+				return;
+			}
+
+			var builder = RESTBuilder.GET(url);
+
+			if (cfg.mode !== 'json')
+				builder.noparse();
+
+			builder.keepalive();
+			builder.callback(function(err, response, output) {
+
+				if (err) {
+					$.send('error', err);
+					return;
+				}
+
+				if (!response) {
+					$.send('error', output);
+					return;
+				}
+
+				$.send('output', response);
+			});
+		};
+
+		instance.configure = function() {
+			cfg = instance.replace(config);
+		};
+
+		instance.configure();
+
+	};
+
+</script>
+
+<readme>
+This component can retieve weather data from [OpenWheatherMap](https://openweathermap.org/api/);
+
+__Input__
+```js
+	{
+		query: {String},             // Optional, City name, Country code, State code e.g: London, Ouagadougou, sk
+		lon: {String},           // Optional, Longitude
+		lat: {String},           // Optional, Latitude
+		lang: {String},           // Optional, Output language e.g: `en`, `de`, `sk`, `fr` etc...
+		units: {String},         // Optional, standard, metric, imperial
+		date: {String},         // Optional,  Timestamp (Unix time, UTC time zone), e.g. date=1586468027.
+	}
+```
+</readme>
+
+<settings>
+	<div class="padding">
+		<ui-component name="input" path="?.apikey" config="required:1;camouflage:1">Api key</ui-component>
+		<br />
+		<div class="grid-2">
+			<ui-component name="input" path="?.type" config="dirsource:current|Current Weather,forecast|Forecast">Request Type</ui-component>
+			<ui-component name="input" path="?.mode" config="dirsource:json|JSON,xml|XML,html|HTML">Output Type</ui-component>
+		</div>
+		<br />
+		<div class="grid-2">
+			<ui-bind path='?.type' config="show:value === 'forecast'">
+				<ui-component name="input" path="?.time" config="dirsource:hourly|Hourly (4 days data),daily|Daily (16 days data),climate|Climate Forecast (30 Days)">Time</ui-component>
+			</ui-bind>
+		</div>
+	</div>
+</settings>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+</body>

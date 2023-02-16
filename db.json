@@ -19,7 +19,7 @@
 		"icon": "ti ti-robot-alt",
 		"color": "",
 		"version": "1",
-		"readme": "This component can talk to chat-GPT."
+		"readme": "This component can talk to ChatGPT.\n\n- input `Question` must be `String`\n- output `Answer` is `String`"
 	},
 	{
 		"id": "cheerio",
@@ -635,6 +635,17 @@
 		"color": "",
 		"version": "2",
 		"readme": "This component receives a data from the [OpenSync](https://docs.totaljs.com/opensync/) app. Data example:\n\n```js\n{\n\tid: String,              // Internal ID\n\ttype: String,            // Parsed content-type (can be empty with the \"GET\" method)\n\tchannel: String,         // Channel\n\tip: String,              // Host IP address\n\tmethod: String,          // HTTP method (upper-case)\n\theaders: Object,         // Key:value\n\tquery: Object,           // Key:value\n\tbody: Object,            // JSON/key:value/String\n\tua: String,              // Parsed user-agent\n\tfiles: [Object Array]    // Uploaded files { filename: String, extension: String, type: String, size: Number, url: String, width: Number, height: Number }\n}\n```"
+	},
+	{
+		"id": "openweather",
+		"group": "Services",
+		"name": "OpenWeather",
+		"url": "https://cdn.totaljs.com/flowstream/webcomponents/openweather.html",
+		"author": "Total.js",
+		"icon": "ti ti-weather",
+		"color": "",
+		"version": "1",
+		"readme": "This component can retieve weather data from [OpenWheatherMap](https://openweathermap.org/api/);\n\n__Input__\n```js\n\t{\n\t\tquery: {String},             // Optional, City name, Country code, State code e.g: London, Ouagadougou, sk\n\t\tlon: {String},           // Optional, Longitude\n\t\tlat: {String},           // Optional, Latitude\n\t\tlang: {String},           // Optional, Output language e.g: `en`, `de`, `sk`, `fr` etc...\n\t\tunits: {String},         // Optional, standard, metric, imperial\n\t\tdate: {String},         // Optional,  Timestamp (Unix time, UTC time zone), e.g. date=1586468027.\n\t}\n```"
 	},
 	{
 		"id": "output",
