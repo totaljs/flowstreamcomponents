@@ -1,0 +1,66 @@
+<script total>
+
+	exports.name = 'Google Search';
+	exports.icon = 'ti ti-google';
+	exports.author = 'Total.js';
+	exports.version = '1';
+	exports.group = 'Services';
+	exports.config = { lang: 'en', limit: 5 };
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }];
+
+	exports.npm = ['google-it'];
+
+	exports.make = function(instance, config) {
+			var google = require('google-it');
+			var cfg;
+
+		instance.message = async function($) {
+			google.resultsPerPage = cfg.limit;
+			google.lang = cfg.lang;
+			var query = $.data.text || $.data;
+			var response = await google({ query });
+			response && $.send('output', response);
+		};
+
+		instance.configure = function() {
+			cfg = instance.replace(config);
+		};
+
+		instance.configure();
+	};
+
+</script>
+
+<readme>
+This component can google any keyword you want.
+
+
+__Configuration__
+
+- `Language (optional)` : Search language;
+- `Limit (optional)` : Limit number of results.
+
+__Input__
+
+- `Object` | String : input expects `data: String` or `data.text: String` as search keywords.
+
+
+__Output__
+
+- `Array` of found results:
+</readme>
+
+<settings>
+	<div class="padding">
+		<div class="grid-2">
+			<ui-component name="input" path="?.limit" config="type:number">Results limit</ui-component>
+			<ui-component name="input" path="?.lang" config="dirsource:bg|Bulgaria,zh|Chinese,cs|Czech,da|Danish,nl|Dutch,en|English,et|Estonian,fi|Finnish,fr|French,de|German,el|Greek,hu|Hungarian,id|Indonessian,it|Italian,ja|Japanese,lv|Latvian,lt|Lithuanian,pl|Polish,pt|Portugese,ro|Romanian,ru|Russian,sk|Slovak|sl|Slovenian,es|Spanish,sv|Swedish,tr|Turkish,uk|Ukrainian;">Language</ui-component>
+		</div>
+	</div>
+</settings>
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+</body>
