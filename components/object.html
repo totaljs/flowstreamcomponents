@@ -1,0 +1,101 @@
+<script total>
+
+	exports.id = 'object';
+	exports.name = 'Object';
+	exports.icon = 'ti ti-list-alt';
+	exports.author = 'Total.js';
+	exports.version = '1';
+	exports.group = 'Data';
+	exports.config = { template: '{\n\tname: {{ data.name }},\n\temail: {{ data.email }},\n\tkey: {{ variables.key }},\n\thostname: {{ url }},\n\tenv: {{ env }}\n}' };
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }];
+
+	exports.make = function(instance, config) {
+
+		var template;
+		var helpers = {};
+		var variables = EMPTYOBJECT;
+
+		helpers.encode = function(val) {
+
+			if (val instanceof Date)
+				return 'new Date(' + val.getTime() + ')';
+
+			switch (typeof(val)) {
+				case 'string':
+					return JSON.stringify(val);
+				case 'boolean':
+				case 'number':
+					return val + '';
+				default:
+					return val == null ? 'null' : JSON.stringify(val);
+			}
+		};
+
+		instance.message = function($) {
+
+			var data = null;
+
+			try {
+				var model = { data: $.data, variables: variables };
+				model.hostname = instance.main.$schema.origin;
+				model.url = instance.main.$schema.origin + instance.main.$schema.proxypath;
+				model.env = instance.main.$schema.env;
+				data = template(model, null, helpers);
+				data = (new Function('return ' + data))();
+			} catch(e) {
+				$.destroy();
+				instance.throw(e);
+				return;
+			}
+
+			data && $.send('output', data);
+		};
+
+		instance.variables = instance.variables2 = function() {
+
+			variables = {};
+
+			for (var key in instance.main.variables2)
+				variables[key] = instance.main.variables2[key];
+
+			for (var key in instance.main.variables)
+				variables[key] = instance.main.variables[key];
+
+		};
+
+		instance.configure = function() {
+			template = config.template ? Tangular.compile(config.template) : NOOP;
+		};
+
+		instance.configure();
+		instance.variables();
+
+	};
+
+</script>
+
+<readme>
+The component creates an object from the defined string (Tangular) template. With the help of the Tangular template engine, you can use conditions, loops, etc..
+
+__Available markup__:
+
+- `{{ data.key }}` represents data
+- `{{ variables.key }}` represents local and global Flow variables
+- `{{ hostname }}` contains a current URL address to the main Flow app `{String}`
+- `{{ url }}` contains a current URL address to the current Flow `{String}`
+- `{{ env }}` contains a current environment `{String}`
+</readme>
+
+<settings>
+	<div class="padding">
+		<p>Design your object with the help of the <a href="https://docs.totaljs.com/components/40d06002lm50c/#advanced-functionality" target="_blank">Tangular template engine</a>. All values are automatically transformed into JavaScript types.</p>
+		<ui-component name="input" path="?.template" config="type:multiline;height:300;tabs:1;monospace:1"></ui-component>
+	</div>
+</settings>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+</body>
