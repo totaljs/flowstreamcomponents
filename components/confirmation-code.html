@@ -59,14 +59,14 @@
 					msg.success = tmp.count > 0;
 
 					if (msg.success)
-						msg.value = val;
+						tmp.value = msg.value = val;
 
 					msg.slots = tmp.count;
 					msg.error = 'locked';
 					msg.limit = tmp.limit;
 				} else {
 					tmp.limit--;
-					msg.value = val;
+					tmp.value = msg.value = val;
 					tmp.slots = msg.slots = tmp.count;
 					tmp.expire = now.add(config.expire);
 					msg.limit = tmp.limit;
