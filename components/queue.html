@@ -2,7 +2,7 @@
 
 	exports.name = 'Queue';
 	exports.group = 'Common';
-	exports.version = '2';
+	exports.version = '3';
 	exports.icon = 'ti ti-list';
 	exports.author = 'Total.js';
 	exports.config = {};
@@ -77,10 +77,12 @@
 		PATH.fs.readFile(filename, function(err, response) {
 			if (response) {
 				var arr = response.toString('utf8').parseJSON(true);
-				if (queue.length)
-					arr.push.apply(arr, queue);
-				else
-					queue = arr;
+				if (arr instanceof Array) {
+					if (queue.length)
+						arr.push.apply(arr, queue);
+					else
+						queue = arr;
+				}
 				instance.queue_next();
 			}
 			isready = true;
