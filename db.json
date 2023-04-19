@@ -11,15 +11,15 @@
 		"readme": "This component implements the [Total.js API Router](https://docs.totaljs.com/total4/cc674001rr51c/#total-js-routing) that allows you to provide only one endpoint (route) by adding multiple endpoints divided by keys. The component expects REST Route message or data in the form:\n\n```js\n{\n\t\"schema\": \"schema_name/{param_1}/{param_2}?query=arguments\",\n\t\"data\": {} // optional, request payload\n}\n```\n\n< __Good to know:__<br>Output data will be the same `data`, but extendend by adding new properties declared below.\n\n__Extended output data:__\n\n- `id {String}` first value from dynamic value\n- `params {Object}` dynamic values\n- `query {Object}` query arguments\n- `user {Object}` optional, inherited from the controller\n- `session {Object}` optional, inherited from the controller\n- `ip {String}` optional, inherited from the controller\n\nIf the controller is stored in the `message.refs.controller` property, then its properties like `controller.id`, `controller.params` and `controller.query` will be extendend by values from parsed schema."
 	},
 	{
-		"id": "chatgpl",
+		"id": "chatgpt",
 		"group": "Services",
 		"name": "ChatGPT",
-		"url": "https://cdn.totaljs.com/flowstream/webcomponents/chatgpl.html",
+		"url": "https://cdn.totaljs.com/flowstream/webcomponents/chatgpt.html",
 		"author": "Total.js",
 		"icon": "ti ti-robot-alt",
 		"color": "",
-		"version": "1",
-		"readme": "This component can talk to ChatGPT.\n\n- input `Question` must be `String`\n- output `Answer` is `String`"
+		"version": "2",
+		"readme": "This component can talk to ChatGPT.\nopenai\n\n# input\n\nInput will depend on selected model\n\n- __CPT 3.5 Turbo__\n```js\n\n// Object\n{\nmessages : [{ role: 'user', content: 'Text' }]\n}\n\n// or\n\n\n// Array\n[{ role: 'assistant', content: 'Text' }]\n```\n\n- __Whisper__\n```js\n\n// Object\n{\npath : 'path-to-file'\n}\n\n// or\n\n\n// String\n'path-to-file'\n```\n\n- __Other__\n```js\n\n// Object\n{\ntext : 'your question'\n}\n\n// or\n\n\n// String\n'your question'\n```\n\n\n# output\n\nOutput also depends on selected model\n- __CPT 3.5 Turbo__\n```js\n'Response from assistant'\n```\n\n- __Whisper__\n```js\n\n// Object\n{\ntext : 'transcipted text'\n}\n```\n- __Other__\n```js\n\n// String\n'your question'\n```"
 	},
 	{
 		"id": "cheerio",
@@ -83,7 +83,7 @@
 		"author": "Total.js",
 		"icon": "ti ti-html5",
 		"color": "",
-		"version": "1",
+		"version": "2",
 		"readme": "The component enables Cross-Origin Resource Sharing `CORS`, so the web browser will be able to communicate directly with the REST API. The functionality will work only with a defined Proxy endpoint for this Flow."
 	},
 	{
@@ -117,7 +117,18 @@
 		"icon": "ti ti-clock",
 		"color": "",
 		"version": "1",
-		"readme": "[node-schedule](https://www.npmjs.com/package/node-schedule) on npmjs.com\n\nSyntax:\n`cron string | data (only string supported) | comment`\n\n## Cron string:\n`* * * * * *`\nMeaning of each `*` explained bellow, in order from left to right\nsecond (0 - 59, OPTIONAL)\nminute (0 - 59)\nhour (0 - 23)\nday of month (1 - 31)\nmonth (1 - 12)\nday of week (0 - 7) (0 or 7 is Sun)\n\nor\n`@startup` to run once at the start or restart of an app (after 5 seconds)\n\n### Examples of cron string:\n```\n0 16 * * *      -> trigger every day at 16:00\n* 0 16 * * *    -> trigger at 16:00 every day and it will keep triggering every second until 16:01\n20,40 19 * * *  -> every day at 19:20 and 19:40\n*/5 * * * *     -> trigger every 5 seconds\n0 20 * * 1      -> every monday at 20:00\n@startup        -> runs once at startup\n```\n\n### Full example:\n```\n* 0 16 * * * | hello data | this is hello comment\n@startup | start\n```"
+		"readme": "[node-schedule](https://www.npmjs.com/package/node-schedule) on npmjs.com\n\nSyntax: `cron string | data (only string supported) | comment`\n\n## Cron string: `* * * * * *`\n\nMeaning of each `*` explained bellow, in order from left to right:\n\n- second (0 - 59, OPTIONAL)\n- minute (0 - 59)\n- hour (0 - 23)\n- day of month (1 - 31)\n- month (1 - 12)\n- day of week (0 - 7) (0 or 7 is Sun)\n\nor `@startup` to run once at the start or restart of an app (after 5 seconds)\n\n### Examples of cron string:\n\n```\n0 16 * * *      -> trigger every day at 16:00\n* 0 16 * * *    -> trigger at 16:00 every day and it will keep triggering every second until 16:01\n20,40 19 * * *  -> every day at 19:20 and 19:40\n*/5 * * * *     -> trigger every 5 seconds\n0 20 * * 1      -> every monday at 20:00\n@startup        -> runs once at startup\n```\n\n### Full example:\n\n```\n* 0 16 * * * | hello data | this is hello comment\n@startup | start\n```"
+	},
+	{
+		"id": "crontab",
+		"group": "Triggers",
+		"name": "Crontab",
+		"url": "https://cdn.totaljs.com/flowstream/webcomponents/crontab.html",
+		"author": "Peter Širka",
+		"icon": "ti ti-clock",
+		"color": "",
+		"version": "1",
+		"readme": "The component can make a trigger in the specific time and date.\n\n## Cron string: `* * * * *`\n\nMeaning of each `*` explained bellow, in order from left to right:\n\n- minute `0 - 59`\n- hour `0 - 23`\n- day of month `1 - 31`\n- month `1 - 12`\n- day of week `0 - 6` and `0` is Sunday\n\nor `@startup` to run once at the start or restart of an app after 5 seconds\n\n```\n0 16 * * *      -> trigger every day at 16:00\n20 19 * * *     -> every day at 19:20 and 19:40\n* * * * *       -> trigger every minute\n0 20 * * 1      -> every monday at 20:00\n@startup        -> runs once at startup after 5 seconds\n```"
 	},
 	{
 		"id": "csvdataset",
@@ -318,6 +329,17 @@
 		"readme": "The component send message next only. It's targeted for colorized connections to targeted to the same input.\n- The data will Flow only from input a specific color (except black)\n- The color black is a universal color and it will transport everything"
 	},
 	{
+		"id": "googlesearch",
+		"group": "Services",
+		"name": "Google Search",
+		"url": "https://cdn.totaljs.com/flowstream/webcomponents/googlesearch.html",
+		"author": "Total.js",
+		"icon": "ti ti-google",
+		"color": "",
+		"version": "1",
+		"readme": "This component can google any keyword you want.\n\n\n__Configuration__\n\n- `Language (optional)` : Search language;\n- `Limit (optional)` : Limit number of results.\n\n__Input__\n\n- `Object` | String : input expects `data: String` or `data.text: String` as search keywords.\n\n\n__Output__\n\n- `Array` of found results:"
+	},
+	{
 		"id": "hdd",
 		"group": "Linux Monitoring",
 		"name": "HDD",
@@ -370,7 +392,7 @@
 		"icon": "ti ti-wifi",
 		"color": "",
 		"version": "1",
-		"readme": "The component receives data from a `Publish` component from another FlowStream instance."
+		"readme": "The component receives data in an encapsulated FlowStream."
 	},
 	{
 		"id": "jsonschemavalidator",
@@ -578,7 +600,7 @@
 		"author": "Total.js",
 		"icon": "ti ti-database",
 		"color": "",
-		"version": "1",
+		"version": "2",
 		"readme": "MySQL\n\n## Input\nExpected data:\n```javascript\n{\n\tquery: 'SELECT * FROM tblname;'\n}\n```"
 	},
 	{
@@ -613,6 +635,17 @@
 		"color": "",
 		"version": "1",
 		"readme": "This component can obtain OAuth 2.0 access token from 3rd party service."
+	},
+	{
+		"id": "object",
+		"group": "Data",
+		"name": "Object",
+		"url": "https://cdn.totaljs.com/flowstream/webcomponents/object.html",
+		"author": "Total.js",
+		"icon": "ti ti-list-alt",
+		"color": "",
+		"version": "1",
+		"readme": "The component creates an object from the defined string (Tangular) template. With the help of the Tangular template engine, you can use conditions, loops, etc..\n\n__Available markup__:\n\n- `{{ data.key }}` represents data\n- `{{ variables.key }}` represents local and global Flow variables\n- `{{ hostname }}` contains a current URL address to the main Flow app `{String}`\n- `{{ url }}` contains a current URL address to the current Flow `{String}`\n- `{{ env }}` contains a current environment `{String}`"
 	},
 	{
 		"id": "rpi-ds18b20",
@@ -656,7 +689,7 @@
 		"icon": "ti ti-crosshairs",
 		"color": "",
 		"version": "1",
-		"readme": "The component sends data to a `Subscribe` component in another FlowStream."
+		"readme": "The component can send data from an encapsulated FlowStream."
 	},
 	{
 		"id": "postgresql",
@@ -743,7 +776,7 @@
 		"author": "Total Avengers",
 		"icon": "ti ti-qrcode",
 		"color": "",
-		"version": "1",
+		"version": "2",
 		"readme": "## Input\n```js\n{\n\ttext: 'text to write to qr code',\n\tfilename: '/public/img/', // optionaly writes the file to filesystem\n\t...\n}\n```\n## Output\n```js\n{\n\ttext: 'text to write to qr code',\n\t...\n\t_qrcode: 'base64 encoded buffer'\n}\n```"
 	},
 	{
@@ -754,7 +787,7 @@
 		"author": "Total.js",
 		"icon": "ti ti-list",
 		"color": "",
-		"version": "2",
+		"version": "3",
 		"readme": "A simple persistent queue for the incomming messages."
 	},
 	{
@@ -853,7 +886,7 @@
 		"author": "Total.js",
 		"icon": "ti ti-share",
 		"color": "",
-		"version": "2",
+		"version": "3",
 		"readme": "This component can respond on the REST Route component."
 	},
 	{
