@@ -1,0 +1,210 @@
+<script total>
+
+	exports.id = 'crontab'
+	exports.name = 'Crontab';
+	exports.icon = 'ti ti-clock';
+	exports.author = 'Peter Širka';
+	exports.version = '1';
+	exports.group = 'Triggers';
+	exports.config = { random: true, type: 'now', data: '', jobs: ['0 9 * * *'] };
+	exports.outputs = [{ id: 'output', name: 'Output' }];
+
+	exports.make = function(instance, config) {
+
+		var jobs = null;
+		var days = ['su', 'mo', 'tu', 'we', 'th', 'fr', 'sa'];
+		var startup = false;
+
+		instance.configure = function() {
+
+			jobs = [];
+			startup = false;
+
+			for (var m of config.jobs) {
+				// minute hour date month day
+				var arr = m.toLowerCase().split(/\s|\t/).trim();
+
+				if (arr[0] === 'startup') {
+					startup = true;
+					continue;
+				}
+
+				for (var i = 0; i < arr.length; i++) {
+					if (i < 3 && arr[i] !== '*')
+						arr[i] = +arr[i];
+				}
+
+				jobs.push(arr);
+			}
+		};
+
+		var send = function() {
+
+			var val;
+
+			switch (config.type) {
+				case 'now':
+					val = new Date();
+					break;
+				case 'number':
+					val = config.random ? U.random() : config.data.parseFloat();
+					break;
+				case 'buffer':
+					try {
+						val = config.random ? Buffer.from(U.random_string()) : Buffer.from(config.data, 'base64');
+					} catch (e) {
+						instance.throw(e);
+					}
+					break;
+				case 'date':
+					val = config.random ? NOW.add('-' + U.random(500, 10) + ' seconds') : config.data.parseDate();
+					break;
+				case 'object':
+					try {
+						val = config.random ? {} : (new Function('return ' + config.data))();
+					} catch (e) {
+						instance.throw(e);
+					}
+					break;
+				case 'boolean':
+					val = config.random ? U.random() % 2 === 0 : config.data === 'true' || config.data === 'on' || config.data === '1';
+					break;
+				default:
+					val = config.random ? U.random_string(20) : config.data;
+					break;
+			}
+
+			instance.newmessage(val).send('output');
+		};
+
+		instance.service = function() {
+
+			var m = NOW.getMinutes();
+			var h = NOW.getHours();
+			var d = NOW.getDate();
+			var M = NOW.getMonth() + 1;
+			var d1 = NOW.getDay();
+			var d2 = days[d1];
+
+			for (var arr of jobs) {
+
+				var skip = false;
+
+				for (var i = 0; i < arr.length; i++) {
+					var val = arr[i];
+
+					if (val === '*')
+						continue;
+
+					if (i === 0) {
+						// Minutes
+						if (val !== m) {
+							skip = true;
+							break;
+						}
+					} else if (i === 1) {
+						// Hours
+						if (val !== h) {
+							skip = true;
+							break;
+						}
+					} else if (i === 2) {
+						// Days
+						if (val !== d) {
+							skip = true;
+							break;
+						}
+					} else if (i === 3) {
+						// Months
+						if (val !== M) {
+							skip = true;
+							break;
+						}
+					} else if (i === 3) {
+						// Months
+						if (val !== d1 && val !== d2) {
+							skip = true;
+							break;
+						}
+					}
+				}
+
+				if (!skip) {
+					send();
+					break;
+				}
+			}
+
+		};
+
+		instance.configure();
+		startup && setInterval(send, 5000);
+
+	};
+
+</script>
+
+<readme>
+The component can make a trigger in the specific time and date.
+
+## Cron string: `* * * * *`
+
+Meaning of each `*` explained bellow, in order from left to right:
+
+- minute `0 - 59`
+- hour `0 - 23`
+- day of month `1 - 31`
+- month `1 - 12`
+- day of week `0 - 6` and `0` is Sunday
+
+or `@startup` to run once at the start or restart of an app after 5 seconds
+
+```
+0 16 * * *      -> trigger every day at 16:00
+20 19 * * *     -> every day at 19:20 and 19:40
+* * * * *       -> trigger every minute
+0 20 * * 1      -> every monday at 20:00
+@startup        -> runs once at startup after 5 seconds
+```
+</readme>
+
+<settings>
+	<div class="padding CLASS-settings">
+
+		<ui-component name="textboxlist" path="?.jobs" config="maxlength:50;required:1;placeholder:* 1 * * *" class="m">Jobs</ui-component>
+
+		<div class="help monospace m">
+			<div>* * * * *</div>
+			<div>1MINUTE 2HOUR 3DAY 4MONTH 5DAYOFWEEK</div>
+		</div>
+
+		<div class="caption m">
+			<label><i class="ti ti-comment"></i>Data sending</label>
+		</div>
+
+		<ui-component name="input" path="?.type" config="dirsource:string|String,number|Number,boolean|Boolean,now|Current date and time,date|Date,object|Object,buffer|Buffer as Base64;required:1">Type</ui-component>
+
+		<ui-bind path="?.type" config="show:value!=='now'" class="block">
+			<div class="mt10 m">
+				<ui-component name="input" path="?.random" config="type:checkbox">Random data</ui-component>
+			</div>
+			<ui-bind path="?.random" config="hide" class="hidden block">
+				<hr />
+				<ui-component name="input" path="?.data" config="required:1;height:250;type:multiline;maxlength:100000;monospace:1">Data</ui-component>
+			</ui-bind>
+		</ui-bind>
+
+	</div>
+</settings>
+
+<style>
+	.CLASS-settings input { font-family: Menlo, Consolas, monospace; }
+	.CLASS footer { padding: 10px; font-size: 12px; }
+</style>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+	<footer>Count of jobs: <ui-bind path="CONFIG.jobs" config="text:value ? value.length : 0" class="b"></ui-bind></footer>
+</body>
