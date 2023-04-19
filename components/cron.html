@@ -73,23 +73,23 @@
 <readme>
 [node-schedule](https://www.npmjs.com/package/node-schedule) on npmjs.com
 
-Syntax:
-`cron string | data (only string supported) | comment`
+Syntax: `cron string | data (only string supported) | comment`
 
-## Cron string:
-`* * * * * *`
-Meaning of each `*` explained bellow, in order from left to right
-second (0 - 59, OPTIONAL)
-minute (0 - 59)
-hour (0 - 23)
-day of month (1 - 31)
-month (1 - 12)
-day of week (0 - 7) (0 or 7 is Sun)
+## Cron string: `* * * * * *`
 
-or
-`@startup` to run once at the start or restart of an app (after 5 seconds)
+Meaning of each `*` explained bellow, in order from left to right:
+
+- second (0 - 59, OPTIONAL)
+- minute (0 - 59)
+- hour (0 - 23)
+- day of month (1 - 31)
+- month (1 - 12)
+- day of week (0 - 7) (0 or 7 is Sun)
+
+or `@startup` to run once at the start or restart of an app (after 5 seconds)
 
 ### Examples of cron string:
+
 ```
 0 16 * * *      -> trigger every day at 16:00
 * 0 16 * * *    -> trigger at 16:00 every day and it will keep triggering every second until 16:01
@@ -100,6 +100,7 @@ or
 ```
 
 ### Full example:
+
 ```
 * 0 16 * * * | hello data | this is hello comment
 @startup | start
