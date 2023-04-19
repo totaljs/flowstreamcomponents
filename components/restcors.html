@@ -3,17 +3,28 @@
 	exports.name = 'CORS';
 	exports.group = 'REST API';
 	exports.icon = 'ti ti-html5';
-	exports.version = '1';
+	exports.version = '2';
 	exports.author = 'Total.js';
-	exports.config = {};
+	exports.config = { hostnames: [] };
 	exports.meta = { singleton: true };
 
 	exports.make = function(instance, config) {
-		var route = CORS();
+
+		var route = null;
+
 		instance.close = function() {
 			route && route.remove && route.remove();
 			route = null;
 		};
+
+		instance.configure = function() {
+			route && route.remove && route.remove();
+			var url = config.hostnames.join(',');
+			route = CORS(url);
+		};
+
+		instance.configure();
+
 	};
 
 </script>
@@ -21,6 +32,12 @@
 <readme>
 The component enables Cross-Origin Resource Sharing `CORS`, so the web browser will be able to communicate directly with the REST API. The functionality will work only with a defined Proxy endpoint for this Flow.
 </readme>
+
+<settings>
+	<div class="padding">
+		<ui-component name="textboxlist" path="?.hostnames" config="maxlength:50;placeholder:https://www.totaljs.com" class="m">Hostnames with a protocol</ui-component>
+	</div>
+</settings>
 
 <body>
 	<div class="padding center">
