@@ -3,24 +3,26 @@
 	exports.id = 'crontab'
 	exports.name = 'Crontab';
 	exports.icon = 'ti ti-clock';
-	exports.author = 'Peter Širka';
+	exports.author = 'Peter Širka / Total.js';
 	exports.version = '1';
 	exports.group = 'Triggers';
-	exports.config = { random: true, type: 'now', data: '', jobs: ['0 9 * * *'] };
+	exports.config = { random: true, type: 'now', data: '', timers: ['0 9 * * *'] };
 	exports.outputs = [{ id: 'output', name: 'Output' }];
 
 	exports.make = function(instance, config) {
 
-		var jobs = null;
+		var timers = null;
 		var days = ['su', 'mo', 'tu', 'we', 'th', 'fr', 'sa'];
 		var startup = false;
 
 		instance.configure = function() {
 
-			jobs = [];
+			var dt = config.offset ? new Date(NOW.getTime() - (config.offset * 60 * 1000)) : NOW;
+
+			timers = [];
 			startup = false;
 
-			for (var m of config.jobs) {
+			for (var m of config.timers) {
 				// minute hour date month day
 				var arr = m.toLowerCase().split(/\s|\t/).trim();
 
@@ -34,7 +36,7 @@
 						arr[i] = +arr[i];
 				}
 
-				jobs.push(arr);
+				timers.push(arr);
 			}
 		};
 
@@ -79,14 +81,16 @@
 
 		instance.service = function() {
 
-			var m = NOW.getMinutes();
-			var h = NOW.getHours();
-			var d = NOW.getDate();
-			var M = NOW.getMonth() + 1;
-			var d1 = NOW.getDay();
+			var dt = config.offset ? new Date(NOW - (config.offset * 1000 * 1000)) : NOW;
+
+			var m = dt.getMinutes();
+			var h = dt.getHours();
+			var d = dt.getDate();
+			var M = dt.getMonth() + 1;
+			var d1 = dt.getDay();
 			var d2 = days[d1];
 
-			for (var arr of jobs) {
+			for (var arr of timers) {
 
 				var skip = false;
 
@@ -171,18 +175,28 @@ or `@startup` to run once at the start or restart of an app after 5 seconds
 <settings>
 	<div class="padding CLASS-settings">
 
-		<ui-component name="textboxlist" path="?.jobs" config="maxlength:50;required:1;placeholder:* 1 * * *" class="m">Jobs</ui-component>
+		<ui-component name="textboxlist" path="?.timers" config="maxlength:50;required:1;placeholder:* 1 * * *" class="m">Timers</ui-component>
 
 		<div class="help monospace m">
 			<div>* * * * *</div>
 			<div>1MINUTE 2HOUR 3DAY 4MONTH 5DAYOFWEEK</div>
 		</div>
 
+		<hr />
+
+		<div class="grid-4">
+			<div>
+				<ui-component name="input" path="?.offset" config="type:number" default="NOW.getTimezoneOffset()">Time zone offset</ui-component>
+			</div>
+		</div>
+		<div class="help m">Must be defined in minutes. The backend time is in UTC format.<br />Your current time zone offset is: <ui-bind path="NOW" config="text:value.getTimezoneOffset()" class="b"></ui-bind> minutes</div>
+
 		<div class="caption m">
 			<label><i class="ti ti-comment"></i>Data sending</label>
 		</div>
 
 		<ui-component name="input" path="?.type" config="dirsource:string|String,number|Number,boolean|Boolean,now|Current date and time,date|Date,object|Object,buffer|Buffer as Base64;required:1">Type</ui-component>
+		<div class="help">Choose an output type</div>
 
 		<ui-bind path="?.type" config="show:value!=='now'" class="block">
 			<div class="mt10 m">
@@ -206,5 +220,5 @@ or `@startup` to run once at the start or restart of an app after 5 seconds
 	<header>
 		<i class="ICON"></i>NAME
 	</header>
-	<footer>Count of jobs: <ui-bind path="CONFIG.jobs" config="text:value ? value.length : 0" class="b"></ui-bind></footer>
+	<footer>Count of timers: <ui-bind path="CONFIG.timers" config="text:value ? value.length : 0" class="b"></ui-bind></footer>
 </body>
