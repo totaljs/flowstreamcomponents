@@ -124,7 +124,7 @@
 		"group": "Triggers",
 		"name": "Crontab",
 		"url": "https://cdn.totaljs.com/flowstream/webcomponents/crontab.html",
-		"author": "Peter Širka",
+		"author": "Peter Širka / Total.js",
 		"icon": "ti ti-clock",
 		"color": "",
 		"version": "1",
