@@ -17,8 +17,6 @@
 
 		instance.configure = function() {
 
-			var dt = config.offset ? new Date(NOW.getTime() - (config.offset * 60 * 1000)) : NOW;
-
 			timers = [];
 			startup = false;
 
@@ -81,7 +79,7 @@
 
 		instance.service = function() {
 
-			var dt = config.offset ? new Date(NOW - (config.offset * 1000 * 1000)) : NOW;
+			var dt = config.offset ? new Date(NOW.getTime() - (config.offset * 60 * 1000)) : NOW;
 
 			var m = dt.getMinutes();
 			var h = dt.getHours();
