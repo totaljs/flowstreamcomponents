@@ -4,7 +4,7 @@
 	exports.group = 'Common';
 	exports.icon = 'ti ti-vector';
 	exports.author = 'Total.js';
-	exports.version = '2';
+	exports.version = '3';
 	exports.config = { conditions: [] };
 	exports.inputs = [{ id: 'input', name: 'Input' }];
 
@@ -67,12 +67,12 @@ The component sort data according to the custom defined conditions. You can defi
 <style>
 	.CLASS footer > ui-bind { padding: 10px; font-size: 12px; }
 	.CLASS.isnewbie footer .newbie { display: block; font-size: 12px; color: red; }
-	.CLASSsettings .item { padding: 8px 10px; font-size: 12px; }
-	.CLASSsettings .item i { margin-right: 5px; }
+	.CLASS-settings .item { padding: 8px 10px; font-size: 12px; }
+	.CLASS-settings .item i { margin-right: 5px; }
 </style>
 
 <settings>
-	<div class="padding CLASSsettings">
+	<div class="padding CLASS-settings">
 		<ui-component name="listform" path="?.conditions" config="autofocus:1;empty:You do not have defined any rules">
 
 			<script type="text/html">
