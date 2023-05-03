@@ -2,20 +2,25 @@
 
 	exports.name = 'Print';
 	exports.group = 'Common';
-	exports.version = '4';
+	exports.version = '5';
 	exports.icon = 'ti ti-print';
 	exports.author = 'Total.js';
 	exports.config = { repo: false, data: true };
 	exports.inputs = [{ id: 'input', name: 'Input' }];
 
 	exports.make = function(instance, config) {
+
+		function serializer(key, value) {
+			return value && value.type === 'Buffer' && value.data ? ('<Buffer ' + value.data.splice(0, 10).map(n => n.toString(16).padLeft(2, '0')).join('') + '...') : value;
+		}
+
 		instance.message = function($) {
 
 			var data = $.data;
 
 			if (config.data !== false) {
 				if (data instanceof Buffer)
-					data = data.toString('hex').substring(0, 200);
+					data = '<Buffer ' + data.toString('hex').substring(0, 10) + '...';
 			}
 
 			var count = 0;
@@ -41,7 +46,11 @@
 					output = $.data;
 			}
 
-			output && instance.status(output, 200);
+			if (output) {
+				output = JSON.stringify(output, serializer);
+				instance.status(output, 200);
+			}
+
 			$.destroy();
 		};
 
@@ -56,6 +65,7 @@
 <style>
 	.CLASS footer > ui-bind { margin: 10px; }
 	.CLASS pre { font-size: 10px; margin: 0; padding: 5px; background-color: #F0F0F0; border-radius: var(--radius); }
+	.CLASS .json { white-space: pre; }
 	.CLASS .noscrollbar { max-height: 250px; }
 	.CLASS .readme { position: absolute; position: absolute; font-size: 11px; right: 5px; margin-top: -5px; cursor: pointer; }
 	.ui-dark .CLASS pre { background-color: #404040; tab-size: 2; }
@@ -78,7 +88,7 @@ The component prints incoming data in a JSON format.
 		<i class="ICON"></i>NAME
 	</header>
 	<footer>
-		<ui-bind path="!STATUS" config="html pre:Thelpers.jsonformat(JSON.stringify(value, null, '\t'));show" class="hidden selectable block">
+		<ui-bind path="!STATUS" config="html pre:Thelpers.jsonformat(JSON.stringify(JSON.parse(value), null, '\t'));show:value && value.length > 0" class="hidden selectable block">
 			<span class="readme" title="Open in new window"><i class="ti ti-window"></i></span>
 			<div class="noscrollbar mt5">
 				<pre class="json"></pre>
@@ -100,7 +110,7 @@ The component prints incoming data in a JSON format.
 		};
 
 		exports.element.on('click', '.readme', function() {
-			FUNC.readme('Debug', '```json\n' + JSON.stringify(laststatus, null, '  ') + '\n```');
+			FUNC.readme('Debug', '```json\n' + JSON.stringify(JSON.parse(laststatus), null, '  ') + '\n```');
 		});
 
 	});
