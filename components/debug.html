@@ -2,7 +2,7 @@
 
 	exports.name = 'Debug';
 	exports.group = 'Common';
-	exports.version = '2';
+	exports.version = '3';
 	exports.icon = 'ti ti-circle-alt';
 	exports.color = '#E73323';
 	exports.author = 'Total.js';
@@ -12,6 +12,10 @@
 	exports.make = function(instance, config) {
 
 		var filter = null;
+
+		function serializer(key, value) {
+			return value && value.type === 'Buffer' && value.data ? ('<Buffer ' + value.data.splice(0, 10).map(n => n.toString(16).padLeft(2, '0')).join('') + '...') : value;
+		}
 
 		instance.logger && instance.logger(function($) {
 
@@ -49,7 +53,7 @@
 			}
 
 			NOW = new Date();
-			output && instance.status({ name: $.from.module.name, date: NOW, data: output });
+			output && instance.status({ name: $.from.module.name, date: NOW, data: JSON.stringify(output, serializer) });
 		});
 
 		instance.configure = function() {
@@ -178,7 +182,7 @@ The component prints incoming data into the JSON format.
 
 		exports.status = function(data) {
 			if (data && data.date)
-				$('#debugformbody').prepend('<div class="m"><div class="name">{0}</div><div class="date"><i class="ti ti-calendar mr5"></i>{1}</div><pre class="json">{2}</pre></div>'.format(data.name, data.date.format('[ts]'), Thelpers.jsonformat(JSON.stringify(data.data, '\t'))));
+				$('#debugformbody').prepend('<div class="m"><div class="name">{0}</div><div class="date"><i class="ti ti-calendar mr5"></i>{1}</div><pre class="json">{2}</pre></div>'.format(data.name, data.date.format('[ts]'), Thelpers.jsonformat(JSON.stringify(JSON.parse(data.data), '\t'))));
 		};
 
 	});
