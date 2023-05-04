@@ -402,7 +402,7 @@ This component prepares incoming data according to the defined schema. Output is
 				</div>
 				<label>Fields</label>
 			</div>
-			<ui-bind path="?.schema" config="template:figure;show:value && value.length" class="fields m">
+			<ui-bind path="?.schema" config="template:figure;show:value && value.length" class="fields m block">
 				<script type="text/html">
 					{{ foreach m in value }}
 					<figure data-id="{{ m.id }}"{{ if m.required }} class="isrequired"{{ fi }}>
