@@ -2,7 +2,7 @@
 
 	exports.name = 'Read';
 	exports.group = 'Common';
-	exports.version = '2';
+	exports.version = '3';
 	exports.icon = 'ti ti-filter';
 	exports.author = 'Total.js';
 	exports.config = { path: '', schema: [] };
@@ -36,7 +36,7 @@
 					return value instanceof Buffer ? value.toString(item.convert.substring(2)) : value == null ? '' : Buffer.from(value).toString(item.convert.substring(2));
 				case 'frombase64':
 				case 'fromhex':
-					return typeof(value) === 'string' ? Buffer.from(value, item.convert.substring(4)) : null;
+					return typeof(value) === 'string' ? (value.indexOf(':') === -1 ? Buffer.from(value, item.convert.substring(4)) : value.base64ToBuffer()) : null;
 				case 'tojson':
 					return JSON.stringify(value);
 				case 'fromjson':
