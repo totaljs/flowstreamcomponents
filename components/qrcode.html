@@ -1,0 +1,68 @@
+<script total>
+
+	exports.id = 'qrcode';
+	exports.name = 'QR Code';
+	exports.icon = 'ti ti-qrcode-alt';
+	exports.author = 'Peter Širka / Total.js';
+	exports.version = '1';
+	exports.group = 'Generators';
+	exports.config = { small: false, width: 200, height: 200, margin: 4 };
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }, { id: 'error', name: 'Error' }];
+
+	exports.npm = ['qrcode'];
+
+	exports.make = function(instance, config) {
+
+		const QRCode = require('qrcode')
+
+		instance.message = function($) {
+			var data = $.data;
+			var text = typeof(data) === 'string' ? data : data.text;
+			QRCode.toDataURL(text, config, function(err, url) {
+				if (err) {
+					$.send('error', err.toString());
+				} else {
+					if (typeof(data) === 'string')
+						data = { text: data };
+					data.data = url;
+					$.send('output', data);
+				}
+			})
+		};
+	};
+
+</script>
+
+<readme>
+The component generates QR Code.
+
+__Input data__:
+
+```js
+{
+	text: String
+}
+```
+
+__Output data__:
+
+```js
+{
+	text: String,
+	data: 'Data URL - BASE64'
+}
+```
+</readme>
+
+<settings>
+	<div class="padding">
+
+	</div>
+</settings>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+</body>
