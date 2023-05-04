@@ -1,0 +1,110 @@
+<script total>
+
+	exports.id = 'vs';
+	exports.name = 'Variable symbol';
+	exports.icon = 'ti ti-plus';
+	exports.author = 'Peter Širka / Total.js';
+	exports.version = '1';
+	exports.group = 'Generators';
+	exports.config = { format: 'yyyy####', path: '', autoreset: 'yyyy' };
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }];
+
+	exports.make = function(instance, config) {
+
+		var filename = PATH.databases('vs_' + instance.id) + '.json';
+		var meta = { index: 0, prev: 0 };
+		var timeout;
+
+		var save = function() {
+			timeout = null;
+			F.Fs.writeFile(filename, JSON.stringify(meta), NOOP);
+		};
+
+		F.Fs.readFile(filename, 'utf8', function(err, response) {
+			if (response) {
+				var tmp = response.parseJSON();
+				if (tmp && tmp.index)
+					meta = tmp;
+			}
+		});
+
+		instance.destroy = function() {
+			F.Fs.unlink(filename, NOOP);
+		};
+
+		instance.message = function($) {
+
+			var data = $.data;
+			var curr = NOW.format(config.autoreset);
+
+			if (meta.prev !== curr) {
+				meta.index = 0;
+				meta.prev = curr;
+			}
+
+			var number = config.format.replace(/y+|m+|d+/g, function(text) {
+				var diff = text.length % 2;
+				if (diff) {
+					for (let i = 0; i < diff; i++)
+						text += text[0];
+				}
+				return NOW.format(text);
+			}).replace(/#+/g, function(text) {
+				meta.index++;
+				return meta.index.padLeft(text.length, '0');
+			});
+
+			instance.status(number, 100);
+
+			timeout && clearTimeout(timeout);
+			timeout = setTimeout(save, 500);
+
+			if (config.path) {
+				if (config.path.indexOf('.') === -1)
+					data[config.path] = number;
+				else
+					U.set(data, config.path, number);
+			} else
+				data = number;
+
+			$.send('output', data);
+		};
+
+	};
+
+</script>
+
+<readme>
+The component will generate a variable symbol according to a custom format.
+</readme>
+
+<settings>
+	<div class="padding">
+		<div class="grid-3">
+			<div class="m">
+				<ui-component name="input" path="?.format" config="required:1">Format</ui-component>
+				<div class="help"><code>y</code> year, <code>m</code> month, <code>#</code> indexer</div>
+			</div>
+			<div class="m">
+				<ui-component name="input" path="?.path">Path</ui-component>
+				<div class="help">Where to assign a value?</div>
+			</div>
+			<div class="m">
+				<ui-component name="input" path="?.autoreset" config="dirsource:yyyy|Yearly,MM|Monthly,dd|Daily">Auto-reset</ui-component>
+				<div class="help">Auto-reset for indexer</div>
+			</div>
+		</div>
+	</div>
+</settings>
+
+<style>
+	.CLASS footer { padding: 10px; font-size: 12px; }
+</style>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+	<footer>Last: <ui-bind path="STATUS" config="text;empty"></ui-bind></footer>
+</body>
