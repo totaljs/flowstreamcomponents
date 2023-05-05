@@ -1,0 +1,137 @@
+<script total>
+
+	exports.id = 'localstorage';
+	exports.name = 'Local storage';
+	exports.icon = 'ti ti-hdd';
+	exports.author = 'Total.js';
+	exports.version = '1';
+	exports.group = 'Databases';
+	exports.config = { savekey: 'id', readkey: 'id', path: '', remove: true, expire: '1 hour' };
+	exports.inputs = [{ id: 'save', name: 'Save' }, { id: 'read', name: 'Read' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }, { id: 'error', name: 'Error' }];
+
+	exports.make = function(instance, config) {
+
+		var filename = PATH.databases('localstorage_' + instance.id + '.json');
+		var repo = {};
+		var timeout = null;
+
+		var saveforce = function() {
+			timeout = null;
+			F.Fs.writeFile(filename, JSON.stringify(repo), NOOP);
+		};
+
+		var save = function() {
+			timeout && clearTimeout(timeout);
+			timeout = setTimeout(saveforce, 500);
+		};
+
+		F.Fs.readFile(filename, 'utf8', function(err, response) {
+			if (response) {
+				var tmp = response.parseJSON(true);
+				if (tmp)
+					repo = tmp;
+			}
+		});
+
+		instance.destroy = function() {
+			F.Fs.unlink(filename, NOOP);
+		};
+
+		instance.message_save = function($) {
+			var data = $.data;
+			var key = config.savekey.indexOf('.') === -1 ? data[config.savekey] : U.get(data, config.savekey);
+			repo[key] = { ts: NOW.add(config.expire), data: CLONE(data) };
+			$.send('output', data);
+			save();
+		};
+
+		instance.message_read = function($) {
+
+			var data = $.data;
+			var key = config.readkey.indexOf('.') === -1 ? data[config.readkey] : U.get(data, config.readkey);
+			var item = repo[key];
+
+			if (item) {
+
+				if (config.path) {
+					if (config.path.indexOf('.') === -1)
+						data[config.path] = item.data;
+					else
+						U.set(data, config.path, item.data);
+				} else {
+					for (let key in item.data)
+						data[key] = item.data[key];
+				}
+
+				if (config.remove) {
+					delete repo[key];
+					save();
+				}
+
+				$.send('output', data);
+
+			} else
+				$.send('error', '404: ' + key);
+		};
+
+		instance.service = function() {
+
+			var is = false;
+			for (var key in repo) {
+				if (repo[key].ts < NOW) {
+					delete repo[key];
+					is = true;
+				}
+			}
+
+			is && save();
+
+		};
+
+	};
+
+</script>
+
+<readme>
+A small and simple persistent storage component is provided by this component. Data can be stored for a short period of time and read when needed.
+</readme>
+
+<settings>
+	<div class="padding">
+
+		<div class="caption m">
+			<label>Save input</label>
+		</div>
+		<div class="grid-3">
+			<div class="m">
+				<ui-component name="input" path="?.savekey" config="required:1;monospace:1">Save key</ui-component>
+			</div>
+			<div class="m">
+				<ui-component name="input" path="?.expire" config="required:1;monospace:1">Expiration</ui-component>
+			</div>
+		</div>
+
+		<div class="caption m">
+			<label>Read input</label>
+		</div>
+
+		<div class="grid-3">
+			<div class="m">
+				<ui-component name="input" path="?.readkey" config="required:1;monospace:1">Read key</ui-component>
+			</div>
+			<div class="m">
+				<ui-component name="input" path="?.path" config="monospace:1;placeholder:path.to.property">Where to save data?</ui-component>
+				<div class="help">Otherwise the message will be extended.</div>
+			</div>
+		</div>
+		<hr />
+		<ui-component name="input" path="?.remove" config="type:checkbox">Remove the item after reading</ui-component>
+	</div>
+</settings>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+</body>
