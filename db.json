@@ -128,7 +128,7 @@
 		"icon": "ti ti-clock",
 		"color": "",
 		"version": "1",
-		"readme": "The component can make a trigger in the specific time and date.\n\n## Cron string: `* * * * *`\n\nMeaning of each `*` explained bellow, in order from left to right:\n\n- minute `0 - 59`\n- hour `0 - 23`\n- day of month `1 - 31`\n- month `1 - 12`\n- day of week `0 - 6` and `0` is Sunday\n\nor `@startup` to run once at the start or restart of an app after 5 seconds\n\n```\n0 16 * * *      -> trigger every day at 16:00\n20 19 * * *     -> every day at 19:20 and 19:40\n* * * * *       -> trigger every minute\n0 20 * * 1      -> every monday at 20:00\n@startup        -> runs once at startup after 5 seconds\n```"
+		"readme": "The component can make a trigger in the specific time and date.\n\n## Cron string: `* * * * *`\n\nMeaning of each `*` explained bellow, in order from left to right:\n\n- minute `0 - 59`\n- hour `0 - 23`\n- day of month `1 - 31`\n- month `1 - 12`\n- day of week `0 - 6` and `0` is Sunday\n\n```\n0 16 * * *      -> trigger every day at 16:00\n20 19 * * *     -> every day at 19:20 and 19:40\n* * * * *       -> trigger every minute\n0 20 * * 1      -> every monday at 20:00\n```"
 	},
 	{
 		"id": "csvdataset",
@@ -160,7 +160,7 @@
 		"author": "Total.js",
 		"icon": "ti ti-vector",
 		"color": "",
-		"version": "2",
+		"version": "3",
 		"readme": "The component sort data according to the custom defined conditions. You can define unlimited count of outputs with various conditions."
 	},
 	{
@@ -193,7 +193,7 @@
 		"author": "Total.js",
 		"icon": "ti ti-circle-alt",
 		"color": "#E73323",
-		"version": "2",
+		"version": "3",
 		"readme": "The component prints incoming data into the JSON format."
 	},
 	{
@@ -314,7 +314,7 @@
 		"author": "Peter Širka & Jakub Urban",
 		"icon": "ti ti-history",
 		"color": "",
-		"version": "3",
+		"version": "4",
 		"readme": "The component remembers the data for repeating the action."
 	},
 	{
@@ -415,6 +415,17 @@
 		"color": "#E73323",
 		"version": "1",
 		"readme": "Be careful because this component will kill the current Flow instance. It's targeted only for exceptional cases."
+	},
+	{
+		"id": "localstorage",
+		"group": "Databases",
+		"name": "Local storage",
+		"url": "https://cdn.totaljs.com/flowstream/webcomponents/localstorage.html",
+		"author": "Total.js",
+		"icon": "ti ti-hdd",
+		"color": "",
+		"version": "1",
+		"readme": "A small and simple persistent storage component is provided by this component. Data can be stored for a short period of time and read when needed."
 	},
 	{
 		"id": "logger",
@@ -721,7 +732,7 @@
 		"author": "Total.js",
 		"icon": "ti ti-print",
 		"color": "",
-		"version": "4",
+		"version": "5",
 		"readme": "The component prints incoming data in a JSON format."
 	},
 	{
@@ -767,6 +778,17 @@
 		"color": "",
 		"version": "3",
 		"readme": "The component publish the data to the specific `Input` component."
+	},
+	{
+		"id": "qrcode",
+		"group": "Generators",
+		"name": "QR Code",
+		"url": "https://cdn.totaljs.com/flowstream/webcomponents/qrcode.html",
+		"author": "Peter Širka / Total.js",
+		"icon": "ti ti-qrcode-alt",
+		"color": "",
+		"version": "1",
+		"readme": "The component generates QR Code.\n\n__Input data__:\n\n```js\n{\n\ttext: String\n}\n```\n\n__Output data__:\n\n```js\n{\n\ttext: String,\n\tdata: 'Data URL - BASE64'\n}\n```"
 	},
 	{
 		"id": "qrgenerator",
@@ -842,7 +864,7 @@
 		"author": "Total.js",
 		"icon": "ti ti-filter",
 		"color": "",
-		"version": "2",
+		"version": "3",
 		"readme": "This component reads specific values according to the configured map."
 	},
 	{
@@ -1174,6 +1196,17 @@
 		"color": "",
 		"version": "3",
 		"readme": "The component triggers data into the Flow."
+	},
+	{
+		"id": "vs",
+		"group": "Generators",
+		"name": "Variable symbol",
+		"url": "https://cdn.totaljs.com/flowstream/webcomponents/vs.html",
+		"author": "Peter Širka / Total.js",
+		"icon": "ti ti-plus",
+		"color": "",
+		"version": "1",
+		"readme": "The component will generate a variable symbol according to a custom format."
 	},
 	{
 		"id": "restworkflow",
