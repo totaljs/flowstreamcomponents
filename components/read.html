@@ -5,7 +5,7 @@
 	exports.version = '3';
 	exports.icon = 'ti ti-filter';
 	exports.author = 'Total.js';
-	exports.config = { path: '', schema: [] };
+	exports.config = { path: '', schema: [], keep: false };
 	exports.inputs = [{ id: 'input', name: 'Input' }];
 	exports.outputs = [{ id: 'output', name: 'Output' }];
 
@@ -15,6 +15,10 @@
 			switch (item.convert) {
 				case 'empty':
 					return value;
+				case 'uid':
+					return UID();
+				case 'guid':
+					return GUID();
 				case 'upper':
 					return value == null ? '' : value.toString().toUpperCase();
 				case 'lower':
@@ -68,23 +72,31 @@
 			var obj = {};
 
 			for (var item of config.schema) {
-				var val = U.get(data, item.pathfrom);
+				var val = item.pathfrom.indexOf('.') === -1 ? data[item.pathfrom] : U.get(data, item.pathfrom);
 
 				if (item.convert && item.convert !== 'empty')
 					val = convert(item, val);
 
 				if (item.pathto) {
-					U.set(obj, item.pathto, val);
+					if (item.pathto.indexOf('.') === -1)
+						obj[item.pathto] = val;
+					else
+						U.set(obj, item.pathto, val);
 				} else {
 					obj = val;
 					break;
 				}
 			}
 
-			if (config.path && config.rewrite)
-				U.set($.data, config.path, obj);
-
-			$.send('output', obj);
+			if (config.keep) {
+				for (let key in obj)
+					$.data[key] = obj[key];
+				$.send('output');
+			} else {
+				if (config.path && config.rewrite)
+					U.set($.data, config.path, obj);
+				$.send('output', obj);
+			}
 		};
 	};
 
@@ -137,6 +149,12 @@ This component reads specific values according to the configured map.
 			</ui-bind>
 		</div>
 		<div class="padding">
+
+			<ui-bind path="?.path" config="hide" class="block">
+				<ui-component name="input" path="?.keep" config="type:checkbox"><b>Keep the message data</b> and transform only specific paths</ui-component>
+				<hr />
+			</ui-bind>
+
 			<div class="caption m">
 				<div class="toolbar">
 					<nav>
@@ -257,6 +275,8 @@ This component reads specific values according to the configured map.
 				tmp.convertors.push({ id: 'frombase64', name: 'From BASE64' });
 				tmp.convertors.push({ id: 'fromhex', name: 'From Hex' });
 				tmp.convertors.push({ id: 'fromjson', name: 'From JSON' });
+				tmp.convertors.push({ id: 'uid', name: 'Generate UI' + 'D' });
+				tmp.convertors.push({ id: 'guid', name: 'Generate GUI' + 'D' });
 
 				Thelpers.tmpreadconvert = function(val) {
 					return tmp.convertors.findValue('id', val, 'name', DEF.empty);
