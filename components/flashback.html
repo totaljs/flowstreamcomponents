@@ -45,8 +45,8 @@
 				status.empty = true;
 				instance.status(JSON.stringify(status.data));
 			} else {
-				var message = instance.newmessage(status.data);
-				message.repo = status.repo;
+				var message = instance.newmessage(CLONE(status.data));
+				message.repo = CLONE(status.repo);
 				message.send('output');
 			}
 		};
