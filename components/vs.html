@@ -6,7 +6,7 @@
 	exports.author = 'Peter Širka / Total.js';
 	exports.version = '1';
 	exports.group = 'Generators';
-	exports.config = { format: 'yyyy####', path: '', autoreset: 'yyyy' };
+	exports.config = { format: 'yyyy####', path: '', autoreset: 'yyyy', start: 0, reset: false };
 	exports.inputs = [{ id: 'input', name: 'Input' }];
 	exports.outputs = [{ id: 'output', name: 'Output' }];
 
@@ -33,10 +33,21 @@
 			F.Fs.unlink(filename, NOOP);
 		};
 
+		instance.configure = function() {
+			if (config.reset) {
+				meta.index = config.start || 0;
+				config.reset = false;
+				instance.status('');
+			}
+		};
+
 		instance.message = function($) {
 
 			var data = $.data;
 			var curr = NOW.format(config.autoreset);
+
+			if (!meta.index && config.start)
+				meta.index = config.start;
 
 			if (meta.prev !== curr) {
 				meta.index = 0;
@@ -81,7 +92,7 @@ The component will generate a variable symbol according to a custom format.
 
 <settings>
 	<div class="padding">
-		<div class="grid-3">
+		<div class="grid-4">
 			<div class="m">
 				<ui-component name="input" path="?.format" config="required:1">Format</ui-component>
 				<div class="help"><code>y</code> year, <code>m</code> month, <code>#</code> indexer</div>
@@ -94,7 +105,13 @@ The component will generate a variable symbol according to a custom format.
 				<ui-component name="input" path="?.autoreset" config="dirsource:yyyy|Yearly,MM|Monthly,dd|Daily">Auto-reset</ui-component>
 				<div class="help">Auto-reset for indexer</div>
 			</div>
+			<div class="m">
+				<ui-component name="input" path="?.start" config="type:number" default="0">Start from</ui-component>
+				<div class="help">Start index</div>
+			</div>
 		</div>
+		<hr />
+		<ui-component name="input" path="?.reset" config="type:checkbox">Reset indexer</ui-component>
 	</div>
 </settings>
 
@@ -106,5 +123,5 @@ The component will generate a variable symbol according to a custom format.
 	<header>
 		<i class="ICON"></i>NAME
 	</header>
-	<footer>Last: <ui-bind path="STATUS" config="text;empty"></ui-bind></footer>
+	<footer class="selectable">Last: <ui-bind path="STATUS" config="text;empty"></ui-bind></footer>
 </body>
