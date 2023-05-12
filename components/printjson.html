@@ -2,7 +2,7 @@
 
 	exports.name = 'Print JSON';
 	exports.group = 'Common';
-	exports.version = '1';
+	exports.version = '2';
 	exports.icon = 'ti ti-print';
 	exports.author = 'Martin Smola';
 	exports.config = { repo: false, data: true };
@@ -41,7 +41,7 @@
 					output = $.data;
 			}
 
-			output && instance.status(output);
+			output && instance.status(output, 200);
 			$.destroy();
 		};
 
