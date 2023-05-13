@@ -318,6 +318,17 @@
 		"readme": "The component remembers the data for repeating the action."
 	},
 	{
+		"id": "flowrecorder",
+		"group": "Flow",
+		"name": "Flow recorder",
+		"url": "https://cdn.totaljs.com/flowstream/webcomponents/flowrecorder.html",
+		"author": "Total.js",
+		"icon": "ti ti-history",
+		"color": "",
+		"version": "1",
+		"readme": "As the FlowStream worker runs, the component records significant information. The component can reveal hidden bugs or performance issues. The component stores data in the `logs/*` directory."
+	},
+	{
 		"id": "forward",
 		"group": "Common",
 		"name": "Forward",
@@ -743,7 +754,7 @@
 		"author": "Martin Smola",
 		"icon": "ti ti-print",
 		"color": "",
-		"version": "1",
+		"version": "2",
 		"readme": "The component prints incoming data in a JSON format."
 	},
 	{
