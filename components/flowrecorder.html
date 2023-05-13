@@ -1,0 +1,118 @@
+<script total>
+
+	exports.id = 'flowrecorder';
+	exports.name = 'Flow recorder';
+	exports.icon = 'ti ti-history';
+	exports.author = 'Total.js';
+	exports.version = '1';
+	exports.group = 'Flow';
+	exports.config = {};
+	exports.meta = { singleton: true };
+
+	exports.make = function(instance, config) {
+
+		var filename = PATH.logs(instance.main.metadata.name.slug() + '-' + NOW.format('yyyyMMdd-HHmmss') + '.log');
+		var interval = null;
+
+		var append = function(arr, id, name, input, output, pending, destroyed, duration) {
+			arr.push('| ' + id.padRight(15) + ' | ' + name.max(15).padRight(15, ' ') + ' | ' + input.padLeft(15, ' ') + ' | ' + output.padLeft(15, ' ') + ' | ' + pending.padLeft(15, ' ') + ' | ' + destroyed.padLeft(15, ' ') + ' | ' + duration.padLeft(15, ' ') + ' |');
+		};
+
+		var keyvalue = function(arr, name, value) {
+			arr.push('|- ' + name.max(30).padRight(33, ' ') + ': ' + value);
+		};
+
+		var record = function() {
+
+			var instances = instance.main.meta.flow;
+			var data = [];
+			NOW = new Date();
+
+			data.push('==============================');
+			data.push('----------- SNAPSHOT: ' + NOW.format('HH:mm:ss'));
+			append(data, 'I' + 'D', 'NA' + 'ME', 'INPUT', 'OUTPUT', 'PENDING', 'DESTROYED', 'DURATION');
+
+			for (var key in instances) {
+				var obj = instances[key];
+				if (obj.module) {
+					let stats = obj.stats || { input: 0, pending: 0, destroyed: 0, output: 0, duration: 0 };
+					append(data, key, obj.module.name || obj.module.id, stats.input, stats.output, stats.pending, stats.destroyed, stats.duration);
+				}
+			}
+
+			data.push('');
+
+			var is = false;
+
+			for (var key in instance.main.traffic) {
+				if (key !== 'priority') {
+					data.push(key.padRight(30, ' ') + ' : ' + instance.main.traffic[key]);
+					is = true;
+				}
+			}
+
+			is && data.push('');
+
+			let total = instance.main.stats;
+
+			keyvalue(data, 'Total messages', total.messages);
+			keyvalue(data, 'Pending messages', total.pending);
+			keyvalue(data, 'Messages/min', total.mm);
+
+			let stats = F.consumption;
+			keyvalue(data, 'Memory', stats.memory + ' MB');
+			keyvalue(data, 'Usage', stats.usage + ' %');
+			keyvalue(data, 'Timeouts', stats.timeouts);
+			keyvalue(data, 'Errors', stats.errors);
+			keyvalue(data, 'Uptime', stats.uptime);
+			keyvalue(data, 'Downloaded', stats.download + ' MB');
+			keyvalue(data, 'Uploaded', stats.upload + ' MB');
+			keyvalue(data, 'Overloads', stats.overload);
+			keyvalue(data, 'Requests/min', stats.rm);
+			keyvalue(data, 'Files/min', stats.fm);
+			keyvalue(data, 'WebSocket/min', stats.wm);
+			keyvalue(data, 'Open files/min', stats.om);
+			keyvalue(data, 'External req./min', stats.em);
+			keyvalue(data, 'DB writes/min', stats.dbwm);
+			keyvalue(data, 'DB reads/min', stats.dbrm);
+
+			data.push('');
+			data.push('');
+
+			F.Fs.appendFile(filename, data.join('\n'), NOOP);
+		};
+
+		instance.configure = function() {
+			interval && clearInterval(interval);
+			interval = setInterval(record, 30000);
+		};
+
+		instance.close = function() {
+			if (interval) {
+				clearInterval(interval);
+				interval = null;
+			}
+		};
+
+		instance.configure();
+
+	};
+
+</script>
+
+<readme>
+As the FlowStream worker runs, the component records significant information. The component can reveal hidden bugs or performance issues. The component stores data in the `logs/*` directory.
+</readme>
+
+<style>
+	.CLASS { font-size: 12px; border-color: #E8483F !important; }
+	.CLASS .content { min-width: auto; padding-right: 10px; background-color: #E8483F; color: #FFF; }
+	.CLASS figure > div { height: 24px; line-height: 24px; }
+	.CLASS figure i { width: 16px; height: 16px; font-size: 16px; line-height: 16px; text-align: center; float: left; margin: 4px 5px 0 4px; }
+</style>
+
+<body>
+	<div>
+		<i class="ti ti-clock ti-spin"></i>Flow <b>recorder</b>
+	</div>
+</body>
