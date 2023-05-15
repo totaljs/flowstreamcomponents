@@ -166,16 +166,6 @@ This component merges multiple inputs into one object.
 
 		exports.settings = function(meta) {
 
-			if (!meta.config.inputs.length) {
-				var obj = {};
-				obj.id = 'i' + Math.random().toString(36).substring(6);
-				obj.name = 'Name';
-				obj.path = '';
-				obj.clear = false;
-				obj.required = false;
-				meta.config.inputs.push(obj);
-			}
-
 			var tmp = W.tmpmerge;
 
 			if (!tmp) {
