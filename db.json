@@ -578,7 +578,7 @@
 		"author": "Martin Smola",
 		"icon": "ti ti-database",
 		"color": "",
-		"version": "1",
+		"version": "2",
 		"readme": "Uses mquery under the hood. Here is the [documentation](https://www.npmjs.com/package/mquery)\n\n## Input\n\nExample\n```javascript\n{\n    database: 'database-name',\n    collection: 'collection-name',\n\tdata: <any> // this prop will be passed into the query function\n}\n```\n\n## Query editor\n```js\n// query; mquery instance\n// data; data from the incomming object\n\nquery.find(); // return all documents\n```\n\n## Important\nIn the `.select()` you cannot use inclusion and exclusion together.\nThis is invalid: `.select('firstname -lastname')`\nValid exclusion: `.select('-lastname')` or `.select('-email -lastname')` etc.\nValid inclusion: `.select('name email')` or `.select('email lastname')` etc."
 	},
 	{

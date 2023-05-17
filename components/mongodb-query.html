@@ -4,7 +4,7 @@
 	exports.group = 'Databases';
 	exports.icon = 'ti ti-database';
 	exports.author = 'Martin Smola';
-	exports.version = '1';
+	exports.version = '2';
 	exports.config = {};
 	exports.inputs = [{ id: 'input', name: 'Input' }];
 	exports.outputs = [{ id: 'output', name: 'Output' }];
@@ -18,7 +18,7 @@
 		const mquery = require('mquery');
 
 		var MONGO;
-        var COLS = {};
+		var COLS = {};
 		var fn;
 
 		instance.message = function($) {
@@ -44,10 +44,8 @@
 			const builder = fn(query, data.data);
 
 			builder.exec(function(err, data){
-
-				instance.send('output', { err, data });
+				$.send('output', { err, data });
 			});
-
 		};
 
 		instance.close = function(callback) {
