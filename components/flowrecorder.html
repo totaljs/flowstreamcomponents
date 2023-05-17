@@ -60,21 +60,23 @@
 			keyvalue(data, 'Messages/min', total.mm);
 
 			let stats = F.consumption;
-			keyvalue(data, 'Memory', stats.memory + ' MB');
-			keyvalue(data, 'Usage', stats.usage + ' %');
-			keyvalue(data, 'Timeouts', stats.timeouts);
-			keyvalue(data, 'Errors', stats.errors);
-			keyvalue(data, 'Uptime', stats.uptime);
-			keyvalue(data, 'Downloaded', stats.download + ' MB');
-			keyvalue(data, 'Uploaded', stats.upload + ' MB');
-			keyvalue(data, 'Overloads', stats.overload);
-			keyvalue(data, 'Requests/min', stats.rm);
-			keyvalue(data, 'Files/min', stats.fm);
-			keyvalue(data, 'WebSocket/min', stats.wm);
-			keyvalue(data, 'Open files/min', stats.om);
-			keyvalue(data, 'External req./min', stats.em);
-			keyvalue(data, 'DB writes/min', stats.dbwm);
-			keyvalue(data, 'DB reads/min', stats.dbrm);
+			if (stats) {
+				keyvalue(data, 'Memory', stats.memory + ' MB');
+				keyvalue(data, 'Usage', stats.usage + ' %');
+				keyvalue(data, 'Timeouts', stats.timeouts);
+				keyvalue(data, 'Errors', stats.errors);
+				keyvalue(data, 'Uptime', stats.uptime);
+				keyvalue(data, 'Downloaded', stats.download + ' MB');
+				keyvalue(data, 'Uploaded', stats.upload + ' MB');
+				keyvalue(data, 'Overloads', stats.overload);
+				keyvalue(data, 'Requests/min', stats.rm);
+				keyvalue(data, 'Files/min', stats.fm);
+				keyvalue(data, 'WebSocket/min', stats.wm);
+				keyvalue(data, 'Open files/min', stats.om);
+				keyvalue(data, 'External req./min', stats.em);
+				keyvalue(data, 'DB writes/min', stats.dbwm);
+				keyvalue(data, 'DB reads/min', stats.dbrm);
+			}
 
 			data.push('');
 			data.push('');
