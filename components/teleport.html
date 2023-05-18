@@ -3,7 +3,7 @@
 	exports.name = 'Teleport';
 	exports.icon = 'ti ti-globe';
 	exports.author = 'Total.js';
-	exports.version = '1';
+	exports.version = '2';
 	exports.group = 'Common';
 	exports.config = { type: 'input', target: '', name: '', color: '#B9261A', is: false };
 
@@ -19,8 +19,16 @@
 			if (config.target) {
 				var target = instance.main.meta.flow[config.target];
 				if (target) {
+
+					instance.stats.pending--;
+					instance.stats.output++;
+
+					if (instance.stats.pending < 0)
+						instance.stats.pending = 0;
+
 					$.toid = target.id;
 					$.instance = target;
+					$.instance.stats.pending++;
 					target.message($);
 					return;
 				}
