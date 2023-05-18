@@ -5,7 +5,7 @@
 	exports.group = 'Triggers';
 	exports.icon = 'ti ti-comment';
 	exports.author = 'Total.js';
-	exports.version = '1';
+	exports.version = '2';
 	exports.config = {};
 	exports.inputs = [{ id: 'input', name: 'Input' }];
 
@@ -13,10 +13,11 @@
 
 		instance.message = function($) {
 			var data = $.data;
-			if ($.refs.response)
+			if ($.refs.response) {
 				$.refs.response({ type: config.type || 'json', body: $.data instanceof Buffer ? $.data.toString('base64') : $.data, status: $.status, headers: $.headers });
-			else
+			} else
 				instance.throw('NO RESPONSE FN');
+			$.destroy();
 		};
 	};
 
