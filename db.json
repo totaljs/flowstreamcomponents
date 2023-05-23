@@ -369,7 +369,7 @@
 		"author": "Total.js",
 		"icon": "ti ti-comment",
 		"color": "",
-		"version": "1",
+		"version": "2",
 		"readme": "This component only works with HTTP Route which must have set `Response` to `Custom`"
 	},
 	{
@@ -725,17 +725,6 @@
 		"readme": "PostgreSQL\n\n## Input\nExpected data:\n```javascript\n{\n\tquery: 'SELECT * FROM tblname;'\n}\n```\nOutput:\n```javascript\n{\n\tcommand: 'INSERT', // SELECT, etc.\n\trows: [], // \n\trowCount: 1\n}\n```"
 	},
 	{
-		"id": "restpostgresql",
-		"group": "REST API",
-		"name": "PostgreSQL",
-		"url": "https://cdn.totaljs.com/flowstream/webcomponents/restpostgresql.html",
-		"author": "Total.js",
-		"icon": "ti ti-database",
-		"color": "",
-		"version": "1",
-		"readme": "The component initializes QueryBuilder for PostgreSQL database. So you will able to use `API Database` component. Every connection must be separated by the alias.\n\n__Usage in API Database__:\n\n- `tbl_user` is targeted to the `default/tbl_user` alias connection\n- `anotherserver/tbl_user` will use `anotherserver` alias connection"
-	},
-	{
 		"id": "print",
 		"group": "Common",
 		"name": "Print",
@@ -811,6 +800,17 @@
 		"color": "",
 		"version": "2",
 		"readme": "## Input\n```js\n{\n\ttext: 'text to write to qr code',\n\tfilename: '/public/img/', // optionaly writes the file to filesystem\n\t...\n}\n```\n## Output\n```js\n{\n\ttext: 'text to write to qr code',\n\t...\n\t_qrcode: 'base64 encoded buffer'\n}\n```"
+	},
+	{
+		"id": "querybuilderpg",
+		"group": "REST API",
+		"name": "QueryBuilder PG",
+		"url": "https://cdn.totaljs.com/flowstream/webcomponents/querybuilderpg.html",
+		"author": "Total.js",
+		"icon": "ti ti-database",
+		"color": "",
+		"version": "1",
+		"readme": "The component initializes QueryBuilder for the PostgreSQL database. So you can use the 'API Database` component. Each connection must be separated by an alias.\n\n__Usage in API Database__:\n\n- `tbl_user` is targeted to the `default/tbl_user` alias connection\n- `anotherserver/tbl_user` will use `anotherserver` alias connection"
 	},
 	{
 		"id": "queue",
@@ -1000,6 +1000,17 @@
 		"readme": "The component downloads every item from the RSS source. A message on to this `Trigger` input starts downloading RSS data.\n\n__Example__:\n```js\n{\n\ttitle: String,\n\tdescription: String,\n\tlink: String,\n\timage: String, // optional\n\tdate: Date // optional\n}\n```"
 	},
 	{
+		"id": "secrets",
+		"group": "Common",
+		"name": "Secrets",
+		"url": "https://cdn.totaljs.com/flowstream/webcomponents/secrets.html",
+		"author": "Total.js",
+		"icon": "ti ti-lock",
+		"color": "",
+		"version": "1",
+		"readme": "The component creates secret variables from the input message data. You can read data easily via `{key}` in the component's settings. Keys and their values must be of String type.\n\n```js\n{\n\tkey1: value1,\n\tkey2: value2,\n\tkeyN: valueN\n}\n```"
+	},
+	{
 		"id": "serverextension",
 		"group": "Common",
 		"name": "Server extension",
@@ -1128,7 +1139,7 @@
 		"author": "Total.js",
 		"icon": "ti ti-globe",
 		"color": "",
-		"version": "1",
+		"version": "2",
 		"readme": "The component can teleport (input) message to another teleport (output) component."
 	},
 	{
