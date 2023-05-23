@@ -8,6 +8,7 @@
 	exports.group = 'Triggers';
 	exports.config = { random: true, type: 'now', data: '', timers: ['0 9 * * *'], restart: false };
 	exports.outputs = [{ id: 'output', name: 'Output' }];
+	exports.kind = 'trigger';
 
 	exports.make = function(instance, config) {
 
