@@ -47,6 +47,8 @@
 						opt.type = 'json';
 						if (opt.method !== 'GET')
 							opt.body = JSON.stringify($.data);
+						else
+							opt.query = JSON.stringify($.data);
 						break;
 
 					case 'urlencoded':
