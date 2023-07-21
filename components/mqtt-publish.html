@@ -22,11 +22,13 @@
 
 		instance.message = function($) {
 			var broker = instance.main.find(config.broker);
-			if (!broker)
+			if (!broker) {
+				$.destroy();
 				return;
+			}
 
 			broker.publish($.data.topic, $.data.message);
-			$.end();
+			$.destroy();
 		};
 
 		instance.configure();
