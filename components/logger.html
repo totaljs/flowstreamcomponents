@@ -2,7 +2,7 @@
 
 	exports.name = 'Logger';
 	exports.group = 'Total.js API';
-	exports.version = '1';
+	exports.version = '2';
 	exports.icon = 'ti ti-search';
 	exports.author = 'Total.js';
 	exports.config = { token: '', type: 'info', message: '', reference: '', url: '' };
@@ -12,11 +12,10 @@
 
 		instance.message = function($) {
 			var msg = {};
-			var doc = MAIN.flowstream.db[instance.main.id];
-			msg.schema = doc.name;
+			msg.schema = instance.main.$schema.name;
 			msg.ip = $.ip;
 			msg.data = JSON.stringify($.data);
-			msg.url = config.url || doc.url || CONF.url;
+			msg.url = config.url || instance.href() || CONF.url;
 			msg.app = config.name || CONF.name;
 			msg.type = config.type;
 			msg.message = $.variables(config.message);
