@@ -1,0 +1,107 @@
+<script total>
+
+	exports.name = 'String Operation';
+	exports.icon = 'ti ti-code';
+	exports.author = 'Total.js';
+	exports.version = '1';
+	exports.group = 'Common';
+	exports.config = { operation: 'lowercase' };
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }];
+
+	exports.make = function(instance, config) {
+
+		instance.message = function($) {
+			var data = $.data;
+			var output;
+			switch(config.operation) {
+				case 'lowercase':
+					output = data.toLowerCase();
+					$.send('output', output);
+					break;
+				case 'uppercase':
+					output = data.toUpperCase();
+					$.send('output', output);
+					break;
+				case 'capitalize':
+					output = data.capitalize();
+					$.send('output', output);
+					break;
+				case 'slug':
+					output = data.slug();
+					$.send('output', output);
+					break;
+				case 'deburr':
+					output = data.toASCII();
+					$.send('output', output);
+					break;
+				case 'reverse':
+					output = data.split('').reverse().join('');
+					$.send('output', output);
+					break;
+				case 'spaces':
+					output = data.replace(/|s/g, '');
+					$.send('output', output);
+					break;
+				case 'trim':
+					output = data.trim();
+					$.send('output', output);
+					break;
+			}
+		};
+
+		instance.configure = function() {
+			if (!config.operation)
+				config.operation = 'lowercase';
+		};
+
+		instance.configure();
+
+	};
+
+</script>
+
+<readme>
+This components can apply string operation to your components.
+## input
+	- String
+
+## output
+	- String
+
+## Available operations are:
+	- Lower case.
+	- Upper case.
+	- Capitalize.
+	- Slug Remove diacritic
+	- Reverse
+	- Remove spaces
+	- Trim
+
+</readme>
+
+<settings>
+	<div class="padding">
+		<div class="grid-2">
+			<div>
+				<ui-component name="input" path="?.operation" config="type:select;dirsource:capitalize|Capitalize,lowercase|Lower Case,uppercase|Upper Case,slug|Slug,deburr|Remove diacritic,reverse|Reverse,spaces|Remove spaces" >Select operation</ui-component>
+			</div>
+		</div>
+	</div>
+</settings>
+
+<style>
+	.CLASS footer { font-size: 12px; padding: 10px; font-weight: bold;}
+	.CLASS footer  span { float: right }
+	.CLASS footer  span i { font-size: 12px }
+</style>
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+	<footer>
+		<ui-bind path="CONFIG.operation" config="show">
+			Operation: <span class="blue" > <ui-bind path="CONFIG.operation" config="text:value.charAt(0).toUpperCase() + value.slice(1)"></ui-bind> </span>
+		</ui-bind>
+	</footer>
+</body>
