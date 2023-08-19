@@ -3,7 +3,7 @@
 	exports.name = 'Teleport';
 	exports.icon = 'ti ti-globe';
 	exports.author = 'Total.js';
-	exports.version = '2';
+	exports.version = '3';
 	exports.group = 'Common';
 	exports.config = { type: 'input', target: '', name: '', color: '#B9261A', is: false };
 
@@ -157,6 +157,10 @@ The component can teleport (input) message to another teleport (output) componen
 <body>
 	<ui-component name="watcher" path="CONFIG">
 		<script type="text/js">
+
+			if (!value)
+				return;
+
 			component.watcherbackup && component.unwatch(component.watcherbackup);
 			var defcolor = '#888';
 			var deftext = 'Not configured';
