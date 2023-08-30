@@ -1,5 +1,7 @@
 # Total.js Flow components
 
+[![Made in EU](https://cdn.componentator.com/eu-small.png)](https://european-union.europa.eu/)
+
 - [Documentation](https://docs.totaljs.com)
 - [Join Total.js Telegram](https://t.me/totaljs)
 - [Support](https://www.totaljs.com/support/)
