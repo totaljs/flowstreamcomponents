@@ -2,10 +2,10 @@
 
 	exports.name = 'Request';
 	exports.group = 'Common';
-	exports.version = '4';
+	exports.version = '5';
 	exports.icon = 'ti ti-cloud-download';
 	exports.author = 'Total.js';
-	exports.config = { url: '', method: 'GET', dnscache: true, insecure: false, nocookies: true, xhr: false, parse: true, timeout: 10000, limit: 1024 * 500, responsebody: true, headers: {}, cookies: {}, serialize: null, send: 'all' };
+	exports.config = { url: '', method: 'GET', dnscache: true, insecure: false, secret: '', nocookies: true, xhr: false, parse: true, timeout: 10000, limit: 1024 * 500, responsebody: true, headers: {}, cookies: {}, serialize: null, send: 'all' };
 	exports.inputs = [{ id: 'payload', name: 'Payload' }];
 	exports.outputs = [{ id: 'response', name: 'Response' }, { id: 'error', name: 'Error' }];
 
@@ -40,6 +40,8 @@
 			opt.url = $.variables(config.url, true);
 			opt.cook = true;
 
+			var secret = config.secret ? $.variables(config.secret, true) : null;
+
 			if (config.serialize) {
 				switch (config.serialize) {
 
@@ -63,6 +65,13 @@
 						break;
 
 				}
+			}
+
+			if (secret && opt.body) {
+				opt.body = U.encrypt_data(opt.body, secret);
+				if (!opt.headers)
+					opt.headers = {};
+				opt.headers['X-Encryption'] = 'a';
 			}
 
 			if (config.dnscache)
@@ -111,6 +120,9 @@
 
 				body = response.body;
 
+				if (secret && response.headers['x-encryption'])
+					body = U.decrypt_data(body, secret);
+
 				if (config.parse) {
 					var type = response.headers['content-type'] || '';
 					if (type) {
@@ -156,8 +168,8 @@
 </script>
 
 <style>
-	.CLASS .status { font-size: 12px; margin: 0; padding: 10px; overflow-wrap: break-word; }
-	.CLASS .status span { padding: 2px 3px; border-radius: var(--radius); color: #FFF; }
+	.CLASS .status { font-size: 12px; margin: 0; padding: 5px 10px 10px; }
+	.CLASS .status span { padding: 1px 3px; border-radius: var(--radius); color: #FFF; }
 </style>
 
 <readme>
@@ -180,17 +192,11 @@ __Response__:
 	<header>
 		<i class="ICON"></i>NAME
 	</header>
-	<footer class="hidden">
-		<ui-bind path="CONFIG.url" config="show">
-			<ui-bind path="CONFIG" config="template">
-				<div class="status">
-					<script type="text/html">
-						<div class="monospace"><span style="background:{{ value.method | color }}">{{ value.method }}</span> {{ value.url }}</div>
-					</script>
-				</div>
-			</ui-bind>
-		</ui-bind>
-	</footer>
+	<ui-bind path="CONFIG" config="template;show:value.url" class="block status">
+		<script type="text/html">
+			<div class="monospace hellip" title="{{ value.url }}"><span style="background:{{ value.method | color }}">{{ value.method }}</span> {{ value.url }}</div>
+		</script>
+	</ui-bind>
 </body>
 
 <settings>
@@ -235,5 +241,7 @@ __Response__:
 		<ui-component name="input" path="?.dnscache" config="type:checkbox">Enable DNS cache</ui-component>
 		<ui-component name="input" path="?.insecure" config="type:checkbox">Allow insecure connection</ui-component>
 		<ui-component name="input" path="?.xhr" config="type:checkbox">Add XHR header</ui-component>
+		<hr />
+		<ui-component name="input" path="?.secret" config="camouflage:1;icon:ti ti-totaljs">Total.js Encryption/Decryption secret</ui-component>
 	</div>
 </settings>
