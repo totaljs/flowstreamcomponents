@@ -2,7 +2,7 @@
 
 	exports.name = 'Subscribe';
 	exports.group = 'FlowStream';
-	exports.version = '2';
+	exports.version = '3';
 	exports.icon = 'ti ti-wifi';
 	exports.author = 'Total.js';
 	exports.config = { name: '' };
@@ -32,9 +32,12 @@
 		var flowstreamid;
 		var instanceid;
 
-		instance.input = function(fromflowstreamid, fromid, data) {
-			if (flowstreamid === fromflowstreamid && instanceid === fromid)
-				instance.send('data', data);
+		instance.input = function(fromflowstreamid, fromid, data, reference) {
+			if (flowstreamid === fromflowstreamid && instanceid === fromid) {
+				var msg = instance.newmessage(data);
+				msg.refs.reference = reference;
+				msg.send('data');
+			}
 		};
 
 		instance.flowstream = function(id, type) {

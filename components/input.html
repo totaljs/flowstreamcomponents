@@ -2,7 +2,7 @@
 
 	exports.name = 'Input';
 	exports.group = 'FlowStream';
-	exports.version = '1';
+	exports.version = '2';
 	exports.icon = 'ti ti-wifi';
 	exports.author = 'Total.js';
 	exports.config = { name: '', readme: '' };
@@ -11,8 +11,10 @@
 
 	exports.make = function(instance, config) {
 
-		instance.input = function(fromflowstreamid, fromid, data) {
-			instance.send('data', data);
+		instance.input = function(fromflowstreamid, fromid, data, reference) {
+			var msg = instance.newmessage(data);
+			msg.refs.reference = reference;
+			msg.send('data');
 		};
 
 	};

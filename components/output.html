@@ -2,7 +2,7 @@
 
 	exports.name = 'Output';
 	exports.group = 'FlowStream';
-	exports.version = '1';
+	exports.version = '2';
 	exports.icon = 'ti ti-crosshairs';
 	exports.author = 'Total.js';
 	exports.config = { name: 'Output', readme: '' };
@@ -12,7 +12,7 @@
 
 	exports.make = function(instance, config) {
 		instance.message = function($) {
-			instance.output($.data);
+			instance.output($.data, null, null, $.refs.reference);
 			$.destroy();
 		};
 	};

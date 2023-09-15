@@ -2,7 +2,7 @@
 
 	exports.name = 'Publish';
 	exports.group = 'FlowStream';
-	exports.version = '3';
+	exports.version = '4';
 	exports.icon = 'ti ti-crosshairs';
 	exports.author = 'Total.js';
 	exports.config = { name: '', readme: '' };
@@ -34,7 +34,7 @@
 
 		instance.message = function(msg) {
 			if (flowstreamid && instanceid)
-				instance.toinput(msg.data, flowstreamid, instanceid);
+				instance.toinput(msg.data, flowstreamid, instanceid, msg.refs.reference);
 			msg.destroy();
 		};
 
