@@ -3,7 +3,7 @@
 	exports.name = 'CORS';
 	exports.group = 'REST API';
 	exports.icon = 'ti ti-html5';
-	exports.version = '2';
+	exports.version = '3';
 	exports.author = 'Total.js';
 	exports.config = { hostnames: [] };
 	exports.meta = { singleton: true };
@@ -20,7 +20,7 @@
 		instance.configure = function() {
 			route && route.remove && route.remove();
 			var url = config.hostnames.join(',');
-			route = CORS(url);
+			route = url ? CORS(url) : CORS();
 		};
 
 		instance.configure();
