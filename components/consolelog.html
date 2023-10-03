@@ -1,0 +1,29 @@
+<script total>
+
+	exports.id = 'consolelog';
+	exports.name = 'console.log()';
+	exports.icon = 'ti ti-print';
+	exports.author = 'Total.js';
+	exports.version = '1';
+	exports.group = 'Common';
+	exports.config = {};
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+
+	exports.make = function(instance) {
+		instance.message = function($) {
+			console.log($.data);
+			$.destroy();
+		};
+	};
+
+</script>
+
+<readme>
+This component prints a message into the console.
+</readme>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+</body>
