@@ -1,7 +1,8 @@
 <script total>
 
+	exports.id = 'tangular';
 	exports.name = 'Tangular';
-	exports.icon = 'ti ti-code';
+	exports.icon = 'ti ti-variables';
 	exports.author = 'Total.js';
 	exports.version = '1';
 	exports.group = 'Templates';
@@ -31,22 +32,29 @@
 </script>
 
 <readme>
-Uses server-side implementation of [Tangular](https://docs.totaljs.com/components/40d06002lm50c/)
-**Example:**
-Incomming data
+The component uses server-side implementation of [Tangular template engine](https://docs.totaljs.com/components/40d06002lm50c/).
+
+## Example
+
+__Incomming data__:
+
 ```js
 {
 	app_name: 'Total.js Flow'
 }
 ```
-Template
-```
+
+__Template__:
+
+```html
 App name: {{ app_name }}
 ```
 
-$ --> {MessageInstance} https://docs.totaljs.com/total4/40844001ni51c/
-In the example bellow, the $.refs.controller is only available if the message was created by the Route component
-```
+- `$` type `{MessageInstance}` <https://docs.totaljs.com/total4/40844001ni51c/>
+
+In the example bellow, the $.refs.controller is only available if the message was created by the Route component:
+
+```html
 URL: {{ $.refs.controller.url }}
 ```
 </readme>
@@ -54,15 +62,9 @@ URL: {{ $.refs.controller.url }}
 <settings>
 	<div class="padding">
 		<div class="ui-input-label">Template:</div>
-		<ui-component name="codemirror" path="?.template" config="type:html;minheight:300;parent:auto;margin:60;tabs:true;trim:true" class="m"></ui-component>
+		<ui-component name="codemirror" path="?.template" config="type:html;minheight:300;parent:auto;margin:80;tabs:true;trim:true" class="m"></ui-component>
 	</div>
 </settings>
-
-<style>
-</style>
-
-<script>
-</script>
 
 <body>
 	<header>

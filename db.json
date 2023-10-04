@@ -19,7 +19,7 @@
 		"icon": "ti ti-robot-alt",
 		"color": "",
 		"version": "2",
-		"readme": "This component can talk to ChatGPT.\nopenai\n\n# input\n\nInput will depend on selected model\n\n- __CPT 3.5 Turbo__\n```js\n\n// Object\n{\nmessages : [{ role: 'user', content: 'Text' }]\n}\n\n// or\n\n\n// Array\n[{ role: 'assistant', content: 'Text' }]\n```\n\n- __Whisper__\n```js\n\n// Object\n{\npath : 'path-to-file'\n}\n\n// or\n\n\n// String\n'path-to-file'\n```\n\n- __Other__\n```js\n\n// Object\n{\ntext : 'your question'\n}\n\n// or\n\n\n// String\n'your question'\n```\n\n\n# output\n\nOutput also depends on selected model\n- __CPT 3.5 Turbo__\n```js\n'Response from assistant'\n```\n\n- __Whisper__\n```js\n\n// Object\n{\ntext : 'transcipted text'\n}\n```\n- __Other__\n```js\n\n// String\n'your question'\n```"
+		"readme": "This component can talk to ChatGPT.\n\n## Input\n\nInput will depend on selected model\n\n- __CPT 3.5 Turbo__\n```js\n\n// Object\n{\nmessages : [{ role: 'user', content: 'Text' }]\n}\n\n// or\n\n\n// Array\n[{ role: 'assistant', content: 'Text' }]\n```\n\n- __Whisper__\n```js\n\n// Object\n{\npath : 'path-to-file'\n}\n\n// or\n\n\n// String\n'path-to-file'\n```\n\n- __Other__\n```js\n\n// Object\n{\ntext : 'your question'\n}\n\n// or\n\n\n// String\n'your question'\n```\n\n\n## Output\n\nOutput also depends on selected model\n- __CPT 3.5 Turbo__\n```js\n'Response from assistant'\n```\n\n- __Whisper__\n```js\n\n// Object\n{\ntext : 'transcipted text'\n}\n```\n- __Other__\n```js\n\n// String\n'your question'\n```"
 	},
 	{
 		"id": "cheerio",
@@ -30,7 +30,7 @@
 		"icon": "ti ti-code",
 		"color": "",
 		"version": "1",
-		"readme": "Uses [Cheerio](https://cheerio.js.org/index.html)\nPlease refer to the [documentation](https://cheerio.js.org/classes/Cheerio.html) for available functions.\n## Input\n```js\n<any>\n```\n\n## Output\n```js\n{\n\tresult: <the data returned from the code>,\n\tinput: <incomming data>\n}\n```\n\n## Example code\n```js\n// instance : component instance\n// $: cheerio instance\n// html: html string\n\nvar txt = [];\n$('ul > li').each(function (i, elem) {\n\ttxt.push($(this).text());\n});\nreturn txt;\n```"
+		"readme": "Uses [Cheerio](https://cheerio.js.org/index.html)\nPlease refer to the [documentation](https://cheerio.js.org/classes/Cheerio.html) for available functions.\n## Input\n```js\n<any>\n```\n\n## Output\n```js\n{\nresult: <the data returned from the code>,\ninput: <incomming data>\n}\n```\n\n## Example code\n```js\n// instance : component instance\n// $: cheerio instance\n// html: html string\n\nvar txt = [];\n$('ul > li').each(function (i, elem) {\ntxt.push($(this).text());\n});\nreturn txt;\n```"
 	},
 	{
 		"id": "code",
@@ -51,7 +51,8 @@
 		"author": "Total.js",
 		"icon": "ti ti-comment",
 		"color": "",
-		"version": "1"
+		"version": "1",
+		"readme": "This component renders a small markdown comment inside the body."
 	},
 	{
 		"id": "confirmation-code",
@@ -65,15 +66,15 @@
 		"readme": "This component can help you with generating confirmation codes. Keep data structure for inputs according to the documentation below.\n\n### `create` input/output\n\n__Create input__:\n\n- `id {String}` identifier (email, phone number, identifier, etc.)\n- `param {String}` a custom parameter\n\n__Create output__:\n\n- `success {Boolean}` determines if the code is verified or not accroding to its identifier\n- `value {String}` a pin/code/token\n- `param {String}` a custom parameter (it sends only if the value is true)\n- `error {String}` (optional) a simple error identifier, it can contain:\n\t- `locked` the identifier is locked by the previous call\n\n### `verify` input/output\n\n__Verify input__:\n\n- `id {String}` identifier (email, phone number, identifier, etc.)\n- `value {String}` a pin/code/token\n\n__Verify output__:\n\n- `success {Boolean}` determines if the code is verified or not accroding to its identifier\n- `slots {Number}` free slots/attempts\n- `error {String}` (optional) a simple error identifier, it can contain:\n\t- `invalid` the code is invalid\n\t- `404` identifier not found\n\n---\n\n### Settings\n\n- __Lock__ prevents overwriting of the code according to the identifier"
 	},
 	{
-		"id": "connections",
-		"group": "Linux Monitoring",
-		"name": "Connections",
-		"url": "https://cdn.totaljs.com/flowstream/webcomponents/connections.html",
-		"author": "Peter Širka",
-		"icon": "ti ti-network",
+		"id": "consolelog",
+		"group": "Common",
+		"name": "console.log()",
+		"url": "https://cdn.totaljs.com/flowstream/webcomponents/consolelog.html",
+		"author": "Total.js",
+		"icon": "ti ti-print",
 		"color": "",
 		"version": "1",
-		"readme": "This component monitors open connections to the specific port in the Linux systems for the specific process. It uses `netstat` command.\n\n__Data Example__:\n\n```js\n{\n\tport: 80,\n\tconnections: 54\n}\n```"
+		"readme": "This component prints a message into the console."
 	},
 	{
 		"id": "restcors",
@@ -83,7 +84,7 @@
 		"author": "Total.js",
 		"icon": "ti ti-html5",
 		"color": "",
-		"version": "2",
+		"version": "3",
 		"readme": "The component enables Cross-Origin Resource Sharing `CORS`, so the web browser will be able to communicate directly with the REST API. The functionality will work only with a defined Proxy endpoint for this Flow."
 	},
 	{
@@ -96,28 +97,6 @@
 		"color": "",
 		"version": "1",
 		"readme": "The component counts incoming messages."
-	},
-	{
-		"id": "cpu",
-		"group": "Linux Monitoring",
-		"name": "CPU",
-		"url": "https://cdn.totaljs.com/flowstream/webcomponents/cpu.html",
-		"author": "Peter Širka",
-		"icon": "ti ti-microchip",
-		"color": "",
-		"version": "1",
-		"readme": "This component monitors CPU `% percentage` consumption in the Linux systems. It uses `mpstat` command with 10 seconds interval.\n\n__Data Example__:\n\n```js\n{\n\tcpu: 30, // percentage\n\tcores: [4, 60, 0], // percentage\n\tcount: 3 // count of cores\n}\n```"
-	},
-	{
-		"id": "cron",
-		"group": "Common",
-		"name": "Cron",
-		"url": "https://cdn.totaljs.com/flowstream/webcomponents/cron.html",
-		"author": "Total.js",
-		"icon": "ti ti-clock",
-		"color": "",
-		"version": "1",
-		"readme": "[node-schedule](https://www.npmjs.com/package/node-schedule) on npmjs.com\n\nSyntax: `cron string | data (only string supported) | comment`\n\n## Cron string: `* * * * * *`\n\nMeaning of each `*` explained bellow, in order from left to right:\n\n- second (0 - 59, OPTIONAL)\n- minute (0 - 59)\n- hour (0 - 23)\n- day of month (1 - 31)\n- month (1 - 12)\n- day of week (0 - 7) (0 or 7 is Sun)\n\nor `@startup` to run once at the start or restart of an app (after 5 seconds)\n\n### Examples of cron string:\n\n```\n0 16 * * *      -> trigger every day at 16:00\n* 0 16 * * *    -> trigger at 16:00 every day and it will keep triggering every second until 16:01\n20,40 19 * * *  -> every day at 19:20 and 19:40\n*/5 * * * *     -> trigger every 5 seconds\n0 20 * * 1      -> every monday at 20:00\n@startup        -> runs once at startup\n```\n\n### Full example:\n\n```\n* 0 16 * * * | hello data | this is hello comment\n@startup | start\n```"
 	},
 	{
 		"id": "crontab",
@@ -215,8 +194,8 @@
 		"author": "Total.js",
 		"icon": "ti ti-download",
 		"color": "",
-		"version": "1",
-		"readme": "## Input\n```js\n{\n\turl: 'https://example.com/file.jpg', // file url\n}\n```\n\n## Output\nA response object as returned by [DOWNLOAD()](https://docs.totaljs.com/total4/407ff001jy51c/#88aab001hd51c) function.\n```js\n{\n\tfilename: '/tmp/xyz.ext',\n\t...\n}\n```\nThe file will be automaticaly deleted once the message is destroyed."
+		"version": "2",
+		"readme": "## Input\n\n```js\n{\n\turl: 'https://example.com/file.jpg', // file url\n}\n```\n\n## Output\n\n```js\n{\n\tvalue: '/tmp/xyz.ext',\n\t...\n}\n```\n\nThe file will be automaticaly deleted once the message is destroyed."
 	},
 	{
 		"id": "duration",
@@ -351,39 +330,6 @@
 		"readme": "This component can google any keyword you want.\n\n\n__Configuration__\n\n- `Language (optional)` : Search language;\n- `Limit (optional)` : Limit number of results.\n\n__Input__\n\n- `Object` | String : input expects `data: String` or `data.text: String` as search keywords.\n\n\n__Output__\n\n- `Array` of found results:"
 	},
 	{
-		"id": "hdd",
-		"group": "Linux Monitoring",
-		"name": "HDD",
-		"url": "https://cdn.totaljs.com/flowstream/webcomponents/hdd.html",
-		"author": "Total.js",
-		"icon": "ti ti-hdd",
-		"color": "",
-		"version": "1",
-		"readme": "This component monitors HDD consumption (in MB) in the Linux systems. It uses `df` command.\n\n__Data Example__:\n\n```js\n{\n\tfree: 0,\n\ttotal: 0,\n\tused: 0\n}\n```"
-	},
-	{
-		"id": "httpresponse",
-		"group": "Triggers",
-		"name": "HTTP Response",
-		"url": "https://cdn.totaljs.com/flowstream/webcomponents/httpresponse.html",
-		"author": "Total.js",
-		"icon": "ti ti-comment",
-		"color": "",
-		"version": "2",
-		"readme": "This component only works with HTTP Route which must have set `Response` to `Custom`"
-	},
-	{
-		"id": "httproute",
-		"group": "Triggers",
-		"name": "HTTP Route",
-		"url": "https://cdn.totaljs.com/flowstream/webcomponents/httproute.html",
-		"author": "Total.js",
-		"icon": "ti ti-map-pin",
-		"color": "",
-		"version": "3",
-		"readme": "This component registers an HTTP Route and sends request data next.\n\n__Output data__:\n\n```js\n{\n\t\"route\": String,\n\t\"params\": Object,\n\t\"query\": Object,\n\t\"body\": Object,\n\t\"files\": Array,\n\t\"headers\": Object,\n\t\"url\": String,\n\t\"ip\": String,\n\t\"cookies\": Object\n}\n```"
-	},
-	{
 		"id": "influxdb",
 		"group": "Databases",
 		"name": "Influxdb",
@@ -392,7 +338,7 @@
 		"icon": "ti ti-database",
 		"color": "",
 		"version": "1",
-		"readme": "InfluxDB\n\n## Input\nExpected data for \"Write data\":\n```javascript\n{\n    measurement: '<measurement-name>',\n\tfields: {\n        fieldname: <fieldvalue>,\n    },\n    tags: {\n        tagname: '<tagvalue>'\n    }\n}\n```\n\nExpected data for \"Execute a Flux query\":\n```javascript\n{\n    query: 'from(bucket: \"Some Bucket\") |> range(start: -1h)'\n}\n```"
+		"readme": "## Input\n\nExpected data for \"Write data\":\n\n```js\n{\n    measurement: '<measurement-name>',\n\tfields: {\n        fieldname: <fieldvalue>,\n    },\n    tags: {\n        tagname: '<tagvalue>'\n    }\n}\n```\n\nExpected data for \"Execute a Flux query\":\n\n```js\n{\n    query: 'from(bucket: \"Some Bucket\") |> range(start: -1h)'\n}\n```"
 	},
 	{
 		"id": "input",
@@ -402,7 +348,7 @@
 		"author": "Total.js",
 		"icon": "ti ti-wifi",
 		"color": "",
-		"version": "1",
+		"version": "2",
 		"readme": "The component receives data in an encapsulated FlowStream."
 	},
 	{
@@ -414,7 +360,7 @@
 		"icon": "ti ti-code",
 		"color": "",
 		"version": "1",
-		"readme": "JSON schema [documentation](https://json-schema.org/learn/getting-started-step-by-step.html)\n## Inputs\n\t- input -> validate data and send the result to output if no error, otherwise send error to error output\n\t- schema -> read the schema and send it to the schema output"
+		"readme": "[JSON schema documentation](https://json-schema.org/learn/getting-started-step-by-step.html)\n\n## Inputs\n\n- `input` validates data and send the result to output if no error, otherwise send error to error output\n- `schema` reads the schema and send it to the schema output"
 	},
 	{
 		"id": "kill",
@@ -446,7 +392,7 @@
 		"author": "Total.js",
 		"icon": "ti ti-search",
 		"color": "",
-		"version": "1",
+		"version": "2",
 		"readme": "The component logs incoming messages into the Total.js Cloud Logger."
 	},
 	{
@@ -469,18 +415,7 @@
 		"icon": "ti ti-table",
 		"color": "",
 		"version": "1",
-		"readme": "## The input must be an array of objects !!\n\nThis component can iterate over an array and only take properties listed in the configuration.\n### Example data:\n```js\n\t[\n\t\t{ sensor: { temperature: 25, humidity: 50, ... some more properties }},\n\t\t{ sensor: { temperature: 24, humidity: 55, ... some more properties }},\n\t\t{ sensor: { temperature: 23, humidity: 60, ... some more properties }}\n\t]\n```\n### Example configuration:\n`sensor.temperature` -> `temp`\n`sensor.humidity` -> `hum`\n\n### Example output:\n```js\n\t[\n\t\t{ temp: 25, hum: 50 },\n\t\t{ temp: 24, hum: 55 },\n\t\t{ temp: 23, hum: 60 }\n\t]\n```\n\nIf `Return an Array of Arrays` is checked then\neach of the Map properties will be pushed to a new array, see example bellow\n\n### Example given the data above and this configuration:\n`Return an Array of Arrays` -> **checked**\n**Map**\n`sensor.temperature`\n`sensor.humidity`\n\n### Example output:\n```js\n\t[\n\t\t[25, 50],\n\t\t[24, 55],\n\t\t[23, 60],\n\t]\n```"
-	},
-	{
-		"id": "memory",
-		"group": "Linux Monitoring",
-		"name": "Memory",
-		"url": "https://cdn.totaljs.com/flowstream/webcomponents/memory.html",
-		"author": "Total.js",
-		"icon": "ti ti-hdd",
-		"color": "",
-		"version": "1",
-		"readme": "This component monitors a memory consumption (in MB) in the Linux systems. It uses `free` command.\n\n__Data Example__:\n\n```js\n{\n\tfree: 0,\n\ttotal: 0,\n\tused: 0\n}\n```"
+		"readme": "This component can iterate over an array and only take properties listed in the configuration. __The input must be an array of objects!__\n\n### Example data\n\n```js\n[\n\t{ sensor: { temperature: 25, humidity: 50, ... some more properties }},\n\t{ sensor: { temperature: 24, humidity: 55, ... some more properties }},\n\t{ sensor: { temperature: 23, humidity: 60, ... some more properties }}\n]\n```\n### Example configuration\n\n- `sensor.temperature` -> `temp`\n- `sensor.humidity` -> `hum`\n\n### Example output\n\n```js\n[\n\t{ temp: 25, hum: 50 },\n\t{ temp: 24, hum: 55 },\n\t{ temp: 23, hum: 60 }\n]\n```\n\nIf `Return an Array of Arrays` is checked then\neach of the Map properties will be pushed to a new array, see example bellow\n\n### Example given the data above and this configuration:\n\n`Return an Array of Arrays` -> **checked**\n\n**Map**:\n\n- `sensor.temperature`\n- `sensor.humidity`\n\n### Example output:\n\n```js\n[\n\t[25, 50],\n\t[24, 55],\n\t[23, 60],\n]\n```"
 	},
 	{
 		"id": "merge",
@@ -492,28 +427,6 @@
 		"color": "",
 		"version": "1",
 		"readme": "This component merges multiple inputs into one object."
-	},
-	{
-		"id": "middlewareexec",
-		"group": "Common",
-		"name": "Middleware Exec",
-		"url": "https://cdn.totaljs.com/flowstream/webcomponents/middlewareexec.html",
-		"author": "Martin Smola",
-		"icon": "ti ti-code",
-		"color": "",
-		"version": "1",
-		"readme": "This component executes a custom JavaScript code as it is."
-	},
-	{
-		"id": "middlewarefunction",
-		"group": "Common",
-		"name": "Middleware Function",
-		"url": "https://cdn.totaljs.com/flowstream/webcomponents/middlewarefunction.html",
-		"author": "Martin Smola",
-		"icon": "ti ti-code",
-		"color": "",
-		"version": "1",
-		"readme": "The code defined in this component can be executed by multiple `Middleware Exec`.\n**Example:**\n```js\n// available arguments\n// instance {FlowStreamComponent}\n// $        {FlowStreamMessage}\n// data     reference to $.data\n// repo     reference to $.repo\n// vars     reference to instance.main.variables\n\nif (data.headers['x-token'] === instance.main.variables.token)\n\t// data will be send to `Output` output of `Middleware Exec` component\n\tcallback(null, data);\nelse\n\t// data will be send to `Error` output of `Middleware Exec` component\n\tcallback('an error occured');\n```"
 	},
 	{
 		"id": "minutely",
@@ -557,7 +470,7 @@
 		"icon": "ti ti-cog",
 		"color": "",
 		"version": "3",
-		"readme": "This component allows you to set/modify/move/remove properties of the incomming data.\nFor eaxample, to set the message data to a string `Hello world` select *Message data* in the rule dropdown and leave the text field empty.\nThen in the bellow dropdown select `string` and enter the desired string in the text field.\nResult:\n- before: $.data -> 'Hello world'\n- after:  $.data -> 'New string'\n\n## Expression\nAvailable params are: `data`, `repo`, `variables` ,`variables2`\nWhere data is message.data, repo is message.repo --> [Documentation](https://docs.totaljs.com/total4/40844001ni51c)\nAnd variables are local variables which can be set in the Variables dialog accessible on the main toolbar(the button between Plus icon and Bug icon)\nFor example, we want message data to be the value of (data.value + variables.offset)\nResult:\n- before: $.data --> `{ value: 100 }` / variables --> `{ offset: 20, ... many other properties }`\n- after:  $.data -> `{ value: 120 }`\nThe expression: `data.value + variables.offset`\n\n### Important\n- `Remove` -> `Message data / Message repo` -> `<empty path>` will set `Message data / Message repo` to `null`;\n- `Remove` -> `Local variables / Global variables` -> `<empty path>` will be ignored but `Remove` -> `Local variables / Global variables` -> `myVar` will work.\n- `Set` -> `Message data` -> `some.path` to: `Message data` -> `some.other.path` will add another property to the incoming data and rest of the data will remain untouched\n- `Set` -> `Message data` -> `<empty path>` to: `Message data` -> `some.path` will essentialy overwrite the incomming data, after this there's no longer access to original data(same goes for repo)"
+		"readme": "This component allows you to set/modify/move/remove properties of the incomming data.\nFor eaxample, to set the message data to a string `Hello world` select *Message data* in the rule dropdown and leave the text field empty.\nThen in the bellow dropdown select `string` and enter the desired string in the text field.\n\n__Result:__\n\n- before: $.data -> 'Hello world'\n- after:  $.data -> 'New string'\n\n## Expression\n\nAvailable params are: `data`, `repo`, `variables` ,`variables2`\nWhere data is message.data, repo is message.repo --> [Documentation](https://docs.totaljs.com/total4/40844001ni51c)\nAnd variables are local variables which can be set in the Variables dialog accessible on the main toolbar(the button between Plus icon and Bug icon)\nFor example, we want message data to be the value of (data.value + variables.offset)\n\n__Result:__\n\n- before: $.data --> `{ value: 100 }` / variables --> `{ offset: 20, ... many other properties }`\n- after:  $.data -> `{ value: 120 }`\n\nThe expression: `data.value + variables.offset`\n\n### Important\n\n- `Remove` -> `Message data / Message repo` -> `<empty path>` will set `Message data / Message repo` to `null`;\n- `Remove` -> `Local variables / Global variables` -> `<empty path>` will be ignored but `Remove` -> `Local variables / Global variables` -> `myVar` will work.\n- `Set` -> `Message data` -> `some.path` to: `Message data` -> `some.other.path` will add another property to the incoming data and rest of the data will remain untouched\n- `Set` -> `Message data` -> `<empty path>` to: `Message data` -> `some.path` will essentialy overwrite the incomming data, after this there's no longer access to original data(same goes for repo)"
 	},
 	{
 		"id": "mongodb-insert",
@@ -623,7 +536,7 @@
 		"icon": "ti ti-database",
 		"color": "",
 		"version": "2",
-		"readme": "MySQL\n\n## Input\nExpected data:\n```javascript\n{\n\tquery: 'SELECT * FROM tblname;'\n}\n```"
+		"readme": "## Input\n\nExpected data:\n\n```javascript\n{\n\tquery: 'SELECT * FROM tblname;'\n}\n```"
 	},
 	{
 		"id": "nosql",
@@ -670,17 +583,6 @@
 		"readme": "The component creates an object from the defined string (Tangular) template. With the help of the Tangular template engine, you can use conditions, loops, etc..\n\n__Available markup__:\n\n- `{{ data.key }}` represents data\n- `{{ variables.key }}` represents local and global Flow variables\n- `{{ hostname }}` contains a current URL address to the main Flow app `{String}`\n- `{{ url }}` contains a current URL address to the current Flow `{String}`\n- `{{ env }}` contains a current environment `{String}`"
 	},
 	{
-		"id": "rpi-ds18b20",
-		"group": "Raspberry Pi",
-		"name": "OneWire",
-		"url": "https://cdn.totaljs.com/flowstream/webcomponents/rpi-ds18b20.html",
-		"author": "Martin Smola",
-		"icon": "ti ti-code",
-		"color": "",
-		"version": "1",
-		"readme": "## Output\n```js\n{\n\t\"ts\": 1646643556666,      // timestamp\n\t\"ignorelist\": []          // list of ignored devices, the devices not in the \"Name/ID map\" in config form\n\t\"sensors\": [\n\t\t{\n\t\t\t\"id\": \"28-3c01e076b84d\", // onewire sensor id\n\t\t\t\"name\": \"livingroom\",    // friedly name assigned in the config form\n\t\t\t\"value\": 21.06,          // current value\n\t\t\t// optionaly, if enabled, the last 10 values, 1st(21.06) is most recent\n\t\t\t\"history\": [ 21.06, 21.13, 21.06, 21.06, 21.13, 21.13, 21.06, 21.06, 21.08, 21.09 ],\n\t\t},\n\t\t...\n]\n```"
-	},
-	{
 		"id": "opensync",
 		"group": "External",
 		"name": "OpenSync",
@@ -700,7 +602,7 @@
 		"icon": "ti ti-weather",
 		"color": "",
 		"version": "1",
-		"readme": "This component can retieve weather data from [OpenWheatherMap](https://openweathermap.org/api/);\n\n__Input__\n```js\n\t{\n\t\tquery: {String},             // Optional, City name, Country code, State code e.g: London, Ouagadougou, sk\n\t\tlon: {String},           // Optional, Longitude\n\t\tlat: {String},           // Optional, Latitude\n\t\tlang: {String},           // Optional, Output language e.g: `en`, `de`, `sk`, `fr` etc...\n\t\tunits: {String},         // Optional, standard, metric, imperial\n\t\tdate: {String},         // Optional,  Timestamp (Unix time, UTC time zone), e.g. date=1586468027.\n\t}\n```"
+		"readme": "This component can retieve weather data from [OpenWheatherMap](https://openweathermap.org/api/);\n\n__Input__:\n\n```js\n\t{\n\t\tquery: String,         // Optional, City name, Country code, State code e.g: London, Ouagadougou, sk\n\t\tlon: String,           // Optional, Longitude\n\t\tlat: String,           // Optional, Latitude\n\t\tlang: String,          // Optional, Output language e.g: `en`, `de`, `sk`, `fr` etc...\n\t\tunits: String,         // Optional, standard, metric, imperial\n\t\tdate: String           // Optional,  Timestamp (Unix time, UTC time zone), e.g. date=1586468027\n\t}\n```"
 	},
 	{
 		"id": "output",
@@ -710,7 +612,7 @@
 		"author": "Total.js",
 		"icon": "ti ti-crosshairs",
 		"color": "",
-		"version": "1",
+		"version": "2",
 		"readme": "The component can send data from an encapsulated FlowStream."
 	},
 	{
@@ -747,17 +649,6 @@
 		"readme": "The component prints incoming data in a JSON format."
 	},
 	{
-		"id": "process",
-		"group": "Linux Monitoring",
-		"name": "Process",
-		"url": "https://cdn.totaljs.com/flowstream/webcomponents/process.html",
-		"author": "Total.js",
-		"icon": "ti ti-chart-bar",
-		"color": "",
-		"version": "1",
-		"readme": "This component monitors CPU (in %) and Memory consumption (in MB) in the Linux systems for the specific process. It uses `ps` command.\n\n__Data Example__:\n\n```js\n{\n\tgrep: 'nginx',\n\tcpu: 0.5,\n\tmemory: 45,\n\tfiles: 343,\n\tuptime: '1 day'\n}\n```"
-	},
-	{
 		"id": "restproxyroute",
 		"group": "REST API",
 		"name": "Proxy route",
@@ -776,7 +667,7 @@
 		"author": "Total.js",
 		"icon": "ti ti-crosshairs",
 		"color": "",
-		"version": "3",
+		"version": "4",
 		"readme": "The component publish the data to the specific `Input` component."
 	},
 	{
@@ -789,17 +680,6 @@
 		"color": "",
 		"version": "1",
 		"readme": "The component generates QR Code.\n\n__Input data__:\n\n```js\n{\n\ttext: String\n}\n```\n\n__Output data__:\n\n```js\n{\n\ttext: String,\n\tdata: 'Data URL - BASE64'\n}\n```"
-	},
-	{
-		"id": "qrgenerator",
-		"group": "Common",
-		"name": "QR generator",
-		"url": "https://cdn.totaljs.com/flowstream/webcomponents/qrgenerator.html",
-		"author": "Total Avengers",
-		"icon": "ti ti-qrcode",
-		"color": "",
-		"version": "2",
-		"readme": "## Input\n```js\n{\n\ttext: 'text to write to qr code',\n\tfilename: '/public/img/', // optionaly writes the file to filesystem\n\t...\n}\n```\n## Output\n```js\n{\n\ttext: 'text to write to qr code',\n\t...\n\t_qrcode: 'base64 encoded buffer'\n}\n```"
 	},
 	{
 		"id": "querybuilderpg",
@@ -822,50 +702,6 @@
 		"color": "",
 		"version": "3",
 		"readme": "A simple persistent queue for the incomming messages."
-	},
-	{
-		"id": "rabbitmqconnection",
-		"group": "RabbitMQ",
-		"name": "RabbitMQ Connection",
-		"url": "https://cdn.totaljs.com/flowstream/webcomponents/rabbitmqconnection.html",
-		"author": "Total.js",
-		"icon": "ti ti-envelope",
-		"color": "",
-		"version": "1",
-		"readme": ""
-	},
-	{
-		"id": "rabbitmqconsume",
-		"group": "RabbitMQ",
-		"name": "RabbitMQ Consume",
-		"url": "https://cdn.totaljs.com/flowstream/webcomponents/rabbitmqconsume.html",
-		"author": "Total Avengers",
-		"icon": "ti ti-envelope",
-		"color": "",
-		"version": "1",
-		"readme": "Uses [amqp-connection-manager](https://github.com/jwalton/node-amqp-connection-manager)"
-	},
-	{
-		"id": "rabbitmqpublish",
-		"group": "RabbitMQ",
-		"name": "RabbitMQ Publish",
-		"url": "https://cdn.totaljs.com/flowstream/webcomponents/rabbitmqpublish.html",
-		"author": "Total Avengers",
-		"icon": "ti ti-envelope",
-		"color": "",
-		"version": "1",
-		"readme": "Uses [amqp-connection-manager](https://github.com/jwalton/node-amqp-connection-manager)"
-	},
-	{
-		"id": "range",
-		"group": "Common",
-		"name": "Range",
-		"url": "https://cdn.totaljs.com/flowstream/webcomponents/range.html",
-		"author": "Total.js",
-		"icon": "ti ti-arrows-h",
-		"color": "",
-		"version": "1",
-		"readme": ""
 	},
 	{
 		"id": "read",
@@ -908,7 +744,7 @@
 		"author": "Total.js",
 		"icon": "ti ti-cloud-download",
 		"color": "",
-		"version": "4",
+		"version": "6",
 		"readme": "The component makes a HTTP request. The response data will be serialized as the payload.\n\n__Response__:\n\n```json\n{\n\tstatus: Number,\n\theaders: { key: value },\n\tcookies: { key: value },\n\thost: String,\n\tbody: String/Object/Buffer\n}\n```"
 	},
 	{
@@ -934,61 +770,6 @@
 		"readme": "This component registers an HTTP Route and sends request data next. It stores `controller` instance in the `message.refs.controller` property. You must respond to the REST response component.\n\n< __IMPORTANT__:<br>The component works only with a defined Proxy endpoint in the Flow settings.\n< __URL__:<br>The URL must be relative to the defined Proxy endpoint. So if the endpoint is `/users/` and the desired address is `http://example.com/users/find` then the value must be `/find`\n\n__Output data__:\n\n```js\n{\n\t\"route\": String,\n\t\"params\": Object,\n\t\"query\": Object,\n\t\"body\": Object,\n\t\"files\": Array,\n\t\"headers\": Object,\n\t\"url\": String,\n\t\"ip\": String\n}\n```"
 	},
 	{
-		"id": "rpi-gpio",
-		"group": "Raspberry",
-		"name": "RPIgpio",
-		"url": "https://cdn.totaljs.com/flowstream/webcomponents/rpi-gpio.html",
-		"author": "Thecoolpeople",
-		"icon": "ti ti-table-alt",
-		"color": "",
-		"version": "1",
-		"readme": "# GPIO\r\n\r\n__Write mode__:\r\n\r\n- Select the GPIO you want\r\n- Set the read/write option to write\r\n- Send true to the component to set the GPIO to HIGH\r\n- Send false to the component to set the GPIO to LOW\r\n\r\n__Read mode__:\r\n\r\n- Select the GPIO you want\r\n- Set the read/write option to write\r\n- Send true to the node so read the state of the gpio"
-	},
-	{
-		"id": "rpi-i2c-read",
-		"group": "Raspberry",
-		"name": "RPIi2cRead",
-		"url": "https://cdn.totaljs.com/flowstream/webcomponents/rpi-i2c-read.html",
-		"author": "Thecoolpeople",
-		"icon": "ti ti-table-alt",
-		"color": "",
-		"version": "1",
-		"readme": "# I2C Read\r\n\r\nParameters, can be transmitted to the component, or directly set as setting.\r\n\r\n- `address`: The I2C address of the device\r\n- `register`: The (starting) register\r\n- `readLength`: The length of how many bits will be read"
-	},
-	{
-		"id": "rpi-i2c-write",
-		"group": "Raspberry",
-		"name": "RPIi2cWrite",
-		"url": "https://cdn.totaljs.com/flowstream/webcomponents/rpi-i2c-write.html",
-		"author": "Thecoolpeople",
-		"icon": "ti ti-table-alt",
-		"color": "",
-		"version": "1",
-		"readme": "# I2C Write\r\n\r\nParameters, can be transmitted to the component, or directly set as setting.\r\n\r\n- `address`: The I2C address of the device\r\n- `register`: The (starting) register\r\n- `bytes`: The bytes which will be written"
-	},
-	{
-		"id": "rpi-uart",
-		"group": "Raspberry",
-		"name": "RPIuart",
-		"url": "https://cdn.totaljs.com/flowstream/webcomponents/rpi-uart.html",
-		"author": "Thecoolpeople",
-		"icon": "ti ti-table-alt",
-		"color": "",
-		"version": "1",
-		"readme": "# UART\r\n\r\n- send a string directly to a port\r\n- when device from a port sends data to the host, it will be send to the output of the component"
-	},
-	{
-		"id": "rpi-uart-getdevices",
-		"group": "Raspberry",
-		"name": "RPIuartDevices",
-		"url": "https://cdn.totaljs.com/flowstream/webcomponents/rpi-uart-getdevices.html",
-		"author": "Thecoolpeople",
-		"icon": "ti ti-table-alt",
-		"color": "",
-		"version": "1",
-		"readme": "# UART\r\n\r\nGet all devices which are possible to send"
-	},
-	{
 		"id": "rssreader",
 		"group": "Transformations",
 		"name": "RSS reader",
@@ -997,7 +778,7 @@
 		"icon": "ti ti-rss-square",
 		"color": "",
 		"version": "1",
-		"readme": "The component downloads every item from the RSS source. A message on to this `Trigger` input starts downloading RSS data.\n\n__Example__:\n```js\n{\n\ttitle: String,\n\tdescription: String,\n\tlink: String,\n\timage: String, // optional\n\tdate: Date // optional\n}\n```"
+		"readme": "The component downloads every item from the RSS source. A message on to this `Trigger` input starts downloading RSS data.\n\n__Example__:\n\n```js\n{\n\ttitle: String,\n\tdescription: String,\n\tlink: String,\n\timage: String, // optional\n\tdate: Date // optional\n}\n```"
 	},
 	{
 		"id": "secrets",
@@ -1063,7 +844,7 @@
 		"icon": "ti ti-database",
 		"color": "",
 		"version": "1",
-		"readme": "SQLite3 [Documentation](https://github.com/JoshuaWise/better-sqlite3/blob/HEAD/docs/api.md)\n\n```js\n{\n\t// query\n\tprepare: 'INSERT INTO cats (name, age) VALUES (?, ?)',\n\n\t// function name: run, get, all, exec\n\tfn: 'run',\n\n\t// data, optional\n\tdata: ['Joey', 2] // string/number or array\n\n}\n```\n\nFunctions:\n\t- [run](https://github.com/JoshuaWise/better-sqlite3/blob/HEAD/docs/api.md#runbindparameters---object)\n\t- [get](https://github.com/JoshuaWise/better-sqlite3/blob/HEAD/docs/api.md#getbindparameters---row)\n\t- [all](https://github.com/JoshuaWise/better-sqlite3/blob/HEAD/docs/api.md#allbindparameters---array-of-rows)\n\t- [exec](https://github.com/JoshuaWise/better-sqlite3/blob/HEAD/docs/api.md#execstring---this)"
+		"readme": "SQLite3 [Documentation](https://github.com/JoshuaWise/better-sqlite3/blob/HEAD/docs/api.md)\n\n```js\n{\n\t// query\n\tprepare: 'INSERT INTO cats (name, age) VALUES (?, ?)',\n\n\t// function name: run, get, all, exec\n\tfn: 'run',\n\n\t// data, optional\n\tdata: ['Joey', 2] // string/number or array\n\n}\n```\n\n__Functions:__\n\n- [run](https://github.com/JoshuaWise/better-sqlite3/blob/HEAD/docs/api.md#runbindparameters---object)\n- [get](https://github.com/JoshuaWise/better-sqlite3/blob/HEAD/docs/api.md#getbindparameters---row)\n- [all](https://github.com/JoshuaWise/better-sqlite3/blob/HEAD/docs/api.md#allbindparameters---array-of-rows)\n- [exec](https://github.com/JoshuaWise/better-sqlite3/blob/HEAD/docs/api.md#execstring---this)"
 	},
 	{
 		"id": "stopwatch",
@@ -1077,6 +858,17 @@
 		"readme": "The component runs a simple stopwatch for incomming messages."
 	},
 	{
+		"id": "stringoperations",
+		"group": "Common",
+		"name": "String Operations",
+		"url": "https://cdn.totaljs.com/flowstream/webcomponents/stringoperations.html",
+		"author": "Total.js",
+		"icon": "ti ti-font",
+		"color": "",
+		"version": "1",
+		"readme": "This components can apply string operation to your components.\n\n- input: `String`\n- output: `String`"
+	},
+	{
 		"id": "subscribe",
 		"group": "FlowStream",
 		"name": "Subscribe",
@@ -1084,7 +876,7 @@
 		"author": "Total.js",
 		"icon": "ti ti-wifi",
 		"color": "",
-		"version": "2",
+		"version": "3",
 		"readme": "The component subscribes to the specific `Output` component."
 	},
 	{
@@ -1093,21 +885,10 @@
 		"name": "Switch",
 		"url": "https://cdn.totaljs.com/flowstream/webcomponents/switch.html",
 		"author": "Total.js",
-		"icon": "ti ti-sitemap ti-redo",
+		"icon": "ti ti-sitemap",
 		"color": "",
 		"version": "4",
 		"readme": "## Source and Path\nUse the **Source** dropdown to select where to look for the value to use in the conditions check.\nSet a **Path** if the value is not the data itself. It supports dot notation: `position.longitude` or `sensor.0.value` for arrays, it does not support `sensor[0].value`.\n**Expression** supports javascript syntax. Should return a value which will be used in condition check as `data`. Available variables: data, repo, variables, variables2\n**Expressions example:**\n```js\ndata.value - variables.offset\n```\n\n## Conditions\nEach of the **Conditions** corresponds to an output in the exact same order. First condition -> First output.\n\n**Operator**\nNot all operators work on all data types. For example it is not possible to use `&gt;` or `&lt;` for strings, etc.\n*index of* only works for data of type array or string.\n**Expression operator**\nIn this case the **type** field is ignored and the expression in the **value** field must return `true` or `false`. Available variables: data, repo, variables, variables2.\nExpressions operator example:\n```js\ndata.value > variables.threshold;\n```\nor with a conditions\n```js\nif (typeof data.value !== 'number') return false; else return data.value > parseInt(variables.threshold);\n```\n\n**Expression type**\nThe expression in the **value** field must return a value which will be used in the given operation. Available variables: data, repo, variables, variables2.\nExpressions example:\n```js\ndata.value - variables.offset\n```\n\n**Between operator** only works with datatype number and the value must be two comma separated values. e.g.: `2,4` so the condition becomes `val &gt; 2 && val &lt; 4`"
-	},
-	{
-		"id": "tail",
-		"group": "Linux Monitoring",
-		"name": "Tail",
-		"url": "https://cdn.totaljs.com/flowstream/webcomponents/tail.html",
-		"author": "Total.js",
-		"icon": "ti ti-file",
-		"color": "",
-		"version": "1",
-		"readme": "This component monitors last line in some text file with the help of `tail` command in the Linux systems.\n\n__Data Example__:\n\n```js\n{\n\tvalue: 'Some meessage'\n\tdate: Date\n}\n```"
 	},
 	{
 		"id": "tangular",
@@ -1115,10 +896,10 @@
 		"name": "Tangular",
 		"url": "https://cdn.totaljs.com/flowstream/webcomponents/tangular.html",
 		"author": "Total.js",
-		"icon": "ti ti-code",
+		"icon": "ti ti-variables",
 		"color": "",
 		"version": "1",
-		"readme": "Uses server-side implementation of [Tangular](https://docs.totaljs.com/components/40d06002lm50c/)\n**Example:**\nIncomming data\n```js\n{\n\tapp_name: 'Total.js Flow'\n}\n```\nTemplate\n```\nApp name: {{ app_name }}\n```\n\n$ --> {MessageInstance} https://docs.totaljs.com/total4/40844001ni51c/\nIn the example bellow, the $.refs.controller is only available if the message was created by the Route component\n```\nURL: {{ $.refs.controller.url }}\n```"
+		"readme": "The component uses server-side implementation of [Tangular template engine](https://docs.totaljs.com/components/40d06002lm50c/).\n\n## Example\n\n__Incomming data__:\n\n```js\n{\n\tapp_name: 'Total.js Flow'\n}\n```\n\n__Template__:\n\n```html\nApp name: {{ app_name }}\n```\n\n- `$` type `{MessageInstance}` <https://docs.totaljs.com/total4/40844001ni51c/>\n\nIn the example bellow, the $.refs.controller is only available if the message was created by the Route component:\n\n```html\nURL: {{ $.refs.controller.url }}\n```"
 	},
 	{
 		"id": "telemetry",
@@ -1139,7 +920,7 @@
 		"author": "Total.js",
 		"icon": "ti ti-globe",
 		"color": "",
-		"version": "2",
+		"version": "3",
 		"readme": "The component can teleport (input) message to another teleport (output) component."
 	},
 	{
@@ -1239,7 +1020,7 @@
 		"icon": "ti ti-code",
 		"color": "",
 		"version": "3",
-		"readme": "The component simulates Total.js Schema Workflow operation. It can process data and store/read them into the database.\n\n__Properties__:\n- `$ {Message}`\n- `controller {Object}` A controller instance\n- `user {Object}` A user instance if exists\n- `headers {Object}` Request headers\n- `query {Object}` URL query arguments\n- `params {Object}` A dynamic URL params\n- `ip {String}` IP address\n- __`repo {Object}`__ a custom persistent repository object\n- __`model {Object}`__ an alias to `$.data`\n\n__Model/Data__:\n\n- `$.data {Object}` a message data\n- `$.repo {Object}` a message repository\n- `$.refs {Object}` a message references\n\n__Functions__:\n- `variable(key {String}) returns {String}` for reading variables\n- `cancel()` Cancels the processing without error and sending data next\n- `respond(data {Object})` Responds with data\n- `success(data {Object} optional)` Response with success object\n- `invalid(error {String})` Error handling`\n- `done(respond_value {Boolean/Object} optional)` return `function(err, response)` for handling callbacks\n\t- when it `fails` it calls `invalid()`\n\t- when it `done` it calls `success()`"
+		"readme": "The component simulates Total.js Schema Workflow operation. It can process data and store/read them into the database.\n\n__Properties__:\n\n- `$ {Message}`\n- `controller {Object}` A controller instance\n- `user {Object}` A user instance if exists\n- `headers {Object}` Request headers\n- `query {Object}` URL query arguments\n- `params {Object}` A dynamic URL params\n- `ip {String}` IP address\n- __`repo {Object}`__ a custom persistent repository object\n- __`model {Object}`__ an alias to `$.data`\n\n__Model/Data__:\n\n- `$.data {Object}` a message data\n- `$.repo {Object}` a message repository\n- `$.refs {Object}` a message references\n\n__Functions__:\n\n- `variable(key {String}) returns {String}` for reading variables\n- `cancel()` Cancels the processing without error and sending data next\n- `respond(data {Object})` Responds with data\n- `success(data {Object} optional)` Response with success object\n- `invalid(error {String})` Error handling`\n- `done(respond_value {Boolean/Object} optional)` return `function(err, response)` for handling callbacks\n\t- when it `fails` it calls `invalid()`\n\t- when it `done` it calls `success()`"
 	},
 	{
 		"id": "xmlparser",

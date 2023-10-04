@@ -1,5 +1,6 @@
 <script total>
 
+	exports.id = 'telemetry';
 	exports.name = 'Telemetry';
 	exports.group = 'Common';
 	exports.version = '4';
@@ -9,6 +10,7 @@
 	exports.inputs = [{ id: 'input', name: 'Input' }];
 
 	exports.make = function(instance, config) {
+
 		var last = { items: [], format: config.format || 'dd.MM.yyyy HH:mm:ss' };
 		var interval;
 

@@ -1,4 +1,5 @@
 <script total>
+
 	exports.id = 'modify';
 	exports.name = 'Modify';
 	exports.icon = 'ti ti-cog';
@@ -165,28 +166,35 @@
 </script>
 
 <readme>
-	This component allows you to set/modify/move/remove properties of the incomming data.
-	For eaxample, to set the message data to a string `Hello world` select *Message data* in the rule dropdown and leave the text field empty.
-	Then in the bellow dropdown select `string` and enter the desired string in the text field.
-	Result:
-	- before: $.data -> 'Hello world'
-	- after:  $.data -> 'New string'
+This component allows you to set/modify/move/remove properties of the incomming data.
+For eaxample, to set the message data to a string `Hello world` select *Message data* in the rule dropdown and leave the text field empty.
+Then in the bellow dropdown select `string` and enter the desired string in the text field.
 
-	## Expression
-	Available params are: `data`, `repo`, `variables` ,`variables2`
-	Where data is message.data, repo is message.repo --> [Documentation](https://docs.totaljs.com/total4/40844001ni51c)
-	And variables are local variables which can be set in the Variables dialog accessible on the main toolbar(the button between Plus icon and Bug icon)
-	For example, we want message data to be the value of (data.value + variables.offset)
-	Result:
-	- before: $.data --> `{ value: 100 }` / variables --> `{ offset: 20, ... many other properties }`
-	- after:  $.data -> `{ value: 120 }`
-	The expression: `data.value + variables.offset`
+__Result:__
 
-	### Important
-	- `Remove` -> `Message data / Message repo` -> `<empty path>` will set `Message data / Message repo` to `null`;
-	- `Remove` -> `Local variables / Global variables` -> `<empty path>` will be ignored but `Remove` -> `Local variables / Global variables` -> `myVar` will work.
-	- `Set` -> `Message data` -> `some.path` to: `Message data` -> `some.other.path` will add another property to the incoming data and rest of the data will remain untouched
-	- `Set` -> `Message data` -> `<empty path>` to: `Message data` -> `some.path` will essentialy overwrite the incomming data, after this there's no longer access to original data(same goes for repo)
+- before: $.data -> 'Hello world'
+- after:  $.data -> 'New string'
+
+## Expression
+
+Available params are: `data`, `repo`, `variables` ,`variables2`
+Where data is message.data, repo is message.repo --> [Documentation](https://docs.totaljs.com/total4/40844001ni51c)
+And variables are local variables which can be set in the Variables dialog accessible on the main toolbar(the button between Plus icon and Bug icon)
+For example, we want message data to be the value of (data.value + variables.offset)
+
+__Result:__
+
+- before: $.data --> `{ value: 100 }` / variables --> `{ offset: 20, ... many other properties }`
+- after:  $.data -> `{ value: 120 }`
+
+The expression: `data.value + variables.offset`
+
+### Important
+
+- `Remove` -> `Message data / Message repo` -> `<empty path>` will set `Message data / Message repo` to `null`;
+- `Remove` -> `Local variables / Global variables` -> `<empty path>` will be ignored but `Remove` -> `Local variables / Global variables` -> `myVar` will work.
+- `Set` -> `Message data` -> `some.path` to: `Message data` -> `some.other.path` will add another property to the incoming data and rest of the data will remain untouched
+- `Set` -> `Message data` -> `<empty path>` to: `Message data` -> `some.path` will essentialy overwrite the incomming data, after this there's no longer access to original data(same goes for repo)
 </readme>
 
 <settings>

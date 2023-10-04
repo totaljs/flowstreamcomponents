@@ -44,10 +44,12 @@
 </script>
 
 <readme>
-JSON schema [documentation](https://json-schema.org/learn/getting-started-step-by-step.html)
+[JSON schema documentation](https://json-schema.org/learn/getting-started-step-by-step.html)
+
 ## Inputs
-	- input -> validate data and send the result to output if no error, otherwise send error to error output
-	- schema -> read the schema and send it to the schema output
+
+- `input` validates data and send the result to output if no error, otherwise send error to error output
+- `schema` reads the schema and send it to the schema output
 </readme>
 
 <settings>
@@ -55,13 +57,6 @@ JSON schema [documentation](https://json-schema.org/learn/getting-started-step-b
 		<ui-component name="codemirror" path="?.schema" config="type:javascript;required:true;height:500">JSON schema</ui-component>
 	</div>
 </settings>
-
-<style>
-</style>
-
-<script>
-
-</script>
 
 <body>
 	<header>

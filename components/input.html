@@ -1,5 +1,6 @@
 <script total>
 
+	exports.id = 'input';
 	exports.name = 'Input';
 	exports.group = 'FlowStream';
 	exports.version = '2';
@@ -10,13 +11,11 @@
 	exports.type = 'input';
 
 	exports.make = function(instance, config) {
-
 		instance.input = function(fromflowstreamid, fromid, data, reference) {
 			var msg = instance.newmessage(data);
 			msg.refs.reference = reference;
 			msg.send('data');
 		};
-
 	};
 
 </script>

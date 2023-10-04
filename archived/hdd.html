@@ -1,41 +1,44 @@
 <script total>
 
-	exports.name = 'Connections';
-	exports.icon = 'ti ti-network';
+	exports.id = 'hdd';
+	exports.name = 'HDD';
+	exports.icon = 'ti ti-hdd';
 	exports.group = 'Linux Monitoring';
-	exports.config = { interval: 10, port: 80 };
+	exports.config = { interval: 60, path: '/' };
 	exports.outputs = [{ id: 'output', name: 'Output' }, { id: 'error', name: 'Error' }];
-	exports.author = 'Peter Širka';
+	exports.author = 'Total.js';
 	exports.version = '1';
 
 	exports.make = function(instance, config) {
 
-		var stats = { connections: 0 };
+		var stats = { free: 0, total: 0, used: 0 };
 		var interval;
 
 		var measure = function() {
 
-			if (config.port <= 0)
+			if (!config.path)
 				return;
 
-			F.Child.exec('netstat -an | grep :{0} | wc -l'.format(config.port), function(err, response) {
+			F.Child.exec('df -hTB1 {0}'.format(config.path), function(err, response) {
 
 				if (err) {
 					instance.send('error', err + '');
 					return;
 				}
 
-				var connections = response.trim().parseInt2() - 1;
+				response.parseTerminal(function(info) {
+					stats.total = info[2].parseInt();
+					stats.free = info[4].parseInt();
+					stats.used = info[3].parseInt();
+				}, 1);
 
-				if (connections < 0)
-					connections = 0;
-
-				stats.port = config.port;
-				stats.connections = Math.max(stats.connections || 0, connections || 0);
 				instance.status(stats);
+				stats.total = (stats.total / 1024 / 1024).floor(2);
+				stats.free = (stats.free / 1024 / 1024).floor(2);
+				stats.used = (stats.used / 1024 / 1024).floor(2);
 				instance.send('output', stats);
 			});
-		};
+		}
 
 		instance.configure = function() {
 			interval && clearInterval(interval);
@@ -54,21 +57,22 @@
 </script>
 
 <readme>
-This component monitors open connections to the specific port in the Linux systems for the specific process. It uses `netstat` command.
+This component monitors HDD consumption (in MB) in the Linux systems. It uses `df` command.
 
 __Data Example__:
 
 ```js
 {
-	port: 80,
-	connections: 54
+	free: 0,
+	total: 0,
+	used: 0
 }
 ```
 </readme>
 
 <style>
 	.CLASS footer { padding: 10px; font-size: 11px; }
-	.CLASS footer > div { height: 16px; }
+	.CLASS footer > ui-bind > div { height: 16px; }
 	.CLASS footer b { float: right; }
 </style>
 
@@ -76,11 +80,11 @@ __Data Example__:
 	<div class="padding">
 		<div class="row">
 			<div class="col-md-4">
-				<ui-component name="input" path="?.port" config="type:number;required:1">Port number</ui-component>
-			</div>
-			<div class="col-md-4">
 				<ui-component name="input" path="?.interval" config="type:number;required:1">Interval</ui-component>
 				<div class="help">In seconds</div>
+			</div>
+			<div class="col-md-4">
+				<ui-component name="input" path="?.path" config="required:1">Path</ui-component>
 			</div>
 		</div>
 	</div>
@@ -90,10 +94,13 @@ __Data Example__:
 	<header>
 		<i class="ICON"></i>NAME
 	</header>
-	<footer is="is-footer" path="!STATUS" config="template;show">
-		<script type="text/html">
-			<div><b>{{ value.port }}</b>Port</div>
-			<div><b>{{ value.connections }}x</b>Connections</div>
-		</script>
+	<footer>
+		<ui-bind path="!STATUS" config="template;show">
+			<script type="text/html">
+				<div><b>{{ value.free | filesize }}</b>Free</div>
+				<div><b>{{ value.used | filesize }}</b>Used</div>
+				<div><b>{{ value.total | filesize }}</b>Total</div>
+			</script>
+		</ui-bind>
 	</footer>
 </body>

@@ -1,5 +1,6 @@
 <script total>
 
+	exports.id = 'openweather';
 	exports.name = 'OpenWeather';
 	exports.icon = 'ti ti-weather';
 	exports.author = 'Total.js';
@@ -10,8 +11,10 @@
 	exports.outputs = [{ id: 'output', name: 'Output' }, { id: 'error', name: 'Error' }];
 
 	exports.make = function(instance, config) {
+
 		var URL = 'https://api.openweathermap.org/data/2.5';
 		var cfg;
+
 		instance.message = function($) {
 			var data = $.data;
 
@@ -87,15 +90,16 @@
 <readme>
 This component can retieve weather data from [OpenWheatherMap](https://openweathermap.org/api/);
 
-__Input__
+__Input__:
+
 ```js
 	{
-		query: {String},             // Optional, City name, Country code, State code e.g: London, Ouagadougou, sk
-		lon: {String},           // Optional, Longitude
-		lat: {String},           // Optional, Latitude
-		lang: {String},           // Optional, Output language e.g: `en`, `de`, `sk`, `fr` etc...
-		units: {String},         // Optional, standard, metric, imperial
-		date: {String},         // Optional,  Timestamp (Unix time, UTC time zone), e.g. date=1586468027.
+		query: String,         // Optional, City name, Country code, State code e.g: London, Ouagadougou, sk
+		lon: String,           // Optional, Longitude
+		lat: String,           // Optional, Latitude
+		lang: String,          // Optional, Output language e.g: `en`, `de`, `sk`, `fr` etc...
+		units: String,         // Optional, standard, metric, imperial
+		date: String           // Optional,  Timestamp (Unix time, UTC time zone), e.g. date=1586468027
 	}
 ```
 </readme>

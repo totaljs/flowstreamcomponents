@@ -1,5 +1,6 @@
 <script total>
 
+	exports.id = 'influxdb';
 	exports.name = 'Influxdb';
 	exports.group = 'Databases';
 	exports.icon = 'ti ti-database';
@@ -126,11 +127,11 @@
 </script>
 
 <readme>
-InfluxDB
-
 ## Input
+
 Expected data for "Write data":
-```javascript
+
+```js
 {
     measurement: '<measurement-name>',
 	fields: {
@@ -143,7 +144,8 @@ Expected data for "Write data":
 ```
 
 Expected data for "Execute a Flux query":
-```javascript
+
+```js
 {
     query: 'from(bucket: "Some Bucket") |> range(start: -1h)'
 }
@@ -173,10 +175,6 @@ Expected data for "Execute a Flux query":
 <style>
 	.CLASS footer { padding: 10px; font-size: 12px; }
 </style>
-
-<script>
-
-</script>
 
 <body>
 	<header>

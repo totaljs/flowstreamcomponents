@@ -1,5 +1,6 @@
 <script total>
 
+	exports.id = 'sms';
 	exports.name = 'SMS';
 	exports.group = 'Total.js API';
 	exports.version = '1';
@@ -11,12 +12,13 @@
 	exports.make = function(instance, config) {
 
 		instance.message = function($) {
+			var cfg = $.variables(config, $.data);
 			var msg = {};
-			msg.to = $.variables(config.to);
-			msg.from = $.variables(config.from);
-			msg.body = config.isdata ? $.data : $.variables(config.body, $.data);
+			msg.to = cfg.to;
+			msg.from = cfg.from;
+			msg.body = cfg.isdata ? $.data : cfg.body;
 			$.destroy();
-			TotalAPI($.variables(config.token), 'sms', msg, function(err) {
+			TotalAPI(cfg.token, 'sms', msg, function(err) {
 				instance.status({ response: err ? err.toString() : '' });
 			});
 		};

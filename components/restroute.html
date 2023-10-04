@@ -1,5 +1,6 @@
 <script total>
 
+	exports.id = 'restroute';
 	exports.name = 'Route';
 	exports.group = 'REST API';
 	exports.icon = 'ti ti-map-pin';
@@ -54,6 +55,7 @@
 
 					msg.refs.controller = ctrl;
 					msg.send('output', data);
+
 				}, flags, config.limit);
 			}
 		};

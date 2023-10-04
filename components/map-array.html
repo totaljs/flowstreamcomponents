@@ -1,5 +1,6 @@
 <script total>
 
+	exports.id = 'maparray';
 	exports.name = 'Map array';
 	exports.icon = 'ti ti-table';
 	exports.author = 'Total.js';
@@ -136,46 +137,52 @@
 </script>
 
 <readme>
-## The input must be an array of objects !!
+This component can iterate over an array and only take properties listed in the configuration. __The input must be an array of objects!__
 
-This component can iterate over an array and only take properties listed in the configuration.
-### Example data:
+### Example data
+
 ```js
-	[
-		{ sensor: { temperature: 25, humidity: 50, ... some more properties }},
-		{ sensor: { temperature: 24, humidity: 55, ... some more properties }},
-		{ sensor: { temperature: 23, humidity: 60, ... some more properties }}
-	]
+[
+	{ sensor: { temperature: 25, humidity: 50, ... some more properties }},
+	{ sensor: { temperature: 24, humidity: 55, ... some more properties }},
+	{ sensor: { temperature: 23, humidity: 60, ... some more properties }}
+]
 ```
-### Example configuration:
-`sensor.temperature` -> `temp`
-`sensor.humidity` -> `hum`
+### Example configuration
 
-### Example output:
+- `sensor.temperature` -> `temp`
+- `sensor.humidity` -> `hum`
+
+### Example output
+
 ```js
-	[
-		{ temp: 25, hum: 50 },
-		{ temp: 24, hum: 55 },
-		{ temp: 23, hum: 60 }
-	]
+[
+	{ temp: 25, hum: 50 },
+	{ temp: 24, hum: 55 },
+	{ temp: 23, hum: 60 }
+]
 ```
 
 If `Return an Array of Arrays` is checked then
 each of the Map properties will be pushed to a new array, see example bellow
 
 ### Example given the data above and this configuration:
+
 `Return an Array of Arrays` -> **checked**
-**Map**
-`sensor.temperature`
-`sensor.humidity`
+
+**Map**:
+
+- `sensor.temperature`
+- `sensor.humidity`
 
 ### Example output:
+
 ```js
-	[
-		[25, 50],
-		[24, 55],
-		[23, 60],
-	]
+[
+	[25, 50],
+	[24, 55],
+	[23, 60],
+]
 ```
 </readme>
 

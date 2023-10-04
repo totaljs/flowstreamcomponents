@@ -1,5 +1,6 @@
 <script total>
 
+	exports.id = 'restworkflow';
 	exports.name = 'Workflow';
 	exports.group = 'REST API';
 	exports.version = '3';
@@ -105,6 +106,7 @@
 The component simulates Total.js Schema Workflow operation. It can process data and store/read them into the database.
 
 __Properties__:
+
 - `$ {Message}`
 - `controller {Object}` A controller instance
 - `user {Object}` A user instance if exists
@@ -122,6 +124,7 @@ __Model/Data__:
 - `$.refs {Object}` a message references
 
 __Functions__:
+
 - `variable(key {String}) returns {String}` for reading variables
 - `cancel()` Cancels the processing without error and sending data next
 - `respond(data {Object})` Responds with data

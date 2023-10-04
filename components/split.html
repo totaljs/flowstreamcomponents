@@ -1,5 +1,6 @@
 <script total>
 
+	exports.id = 'split';
 	exports.name = 'Split';
 	exports.icon = 'ti ti-strikethrough';
 	exports.group = 'Array';
@@ -12,7 +13,7 @@
 
 	exports.make = function(instance, config) {
 		instance.message = function($) {
-			var arr = config.path ? U.get(config.path, $.data) : $.data;
+			var arr = config.path ? (config.path.indexOf('.') === -1 ? $.data[config.path] : U.get(config.path, $.data)) : $.data;
 			$.destroy();
 			if (arr instanceof Array && arr.length) {
 				for (var item of arr)

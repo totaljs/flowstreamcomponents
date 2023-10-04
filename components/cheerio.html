@@ -75,28 +75,28 @@
 	Please refer to the [documentation](https://cheerio.js.org/classes/Cheerio.html) for available functions.
 ## Input
 ```js
-	<any>
+<any>
 ```
 
 ## Output
 ```js
-	{
-		result: <the data returned from the code>,
-		input: <incomming data>
-	}
+{
+	result: <the data returned from the code>,
+	input: <incomming data>
+}
 ```
 
 ## Example code
 ```js
-	// instance : component instance
-	// $: cheerio instance
-	// html: html string
+// instance : component instance
+// $: cheerio instance
+// html: html string
 
-	var txt = [];
-	$('ul > li').each(function (i, elem) {
-		txt.push($(this).text());
-	});
-	return txt;
+var txt = [];
+$('ul > li').each(function (i, elem) {
+	txt.push($(this).text());
+});
+return txt;
 ```
 </readme>
 
@@ -113,10 +113,6 @@
 <style>
 	.CLASS footer { padding: 10px; font-size: 12px; }
 </style>
-
-<script>
-
-</script>
 
 <body>
 	<header>

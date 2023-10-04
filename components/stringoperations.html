@@ -1,7 +1,8 @@
 <script total>
 
-	exports.name = 'String Operation';
-	exports.icon = 'ti ti-code';
+	exports.id = 'stringoperations';
+	exports.name = 'String Operations';
+	exports.icon = 'ti ti-font';
 	exports.author = 'Total.js';
 	exports.version = '1';
 	exports.group = 'Common';
@@ -63,45 +64,30 @@
 
 <readme>
 This components can apply string operation to your components.
-## input
-	- String
 
-## output
-	- String
-
-## Available operations are:
-	- Lower case.
-	- Upper case.
-	- Capitalize.
-	- Slug Remove diacritic
-	- Reverse
-	- Remove spaces
-	- Trim
-
+- input: `String`
+- output: `String`
 </readme>
 
 <settings>
 	<div class="padding">
-		<div class="grid-2">
-			<div>
-				<ui-component name="input" path="?.operation" config="type:select;dirsource:capitalize|Capitalize,lowercase|Lower Case,uppercase|Upper Case,slug|Slug,deburr|Remove diacritic,reverse|Reverse,spaces|Remove spaces" >Select operation</ui-component>
-			</div>
-		</div>
+		<ui-component name="input" path="?.operation" config="type:select;dirsource:capitalize|Capitalize,lowercase|Lower Case,uppercase|Upper Case,slug|Slug,deburr|Remove diacritic,reverse|Reverse,spaces|Remove spaces">Operation</ui-component>
 	</div>
 </settings>
 
 <style>
-	.CLASS footer { font-size: 12px; padding: 10px; font-weight: bold;}
-	.CLASS footer  span { float: right }
-	.CLASS footer  span i { font-size: 12px }
+	.CLASS footer { font-size: 12px; padding: 10px; font-weight: bold; }
+	.CLASS footer span { float: right; }
+	.CLASS footer span i { font-size: 12px; }
 </style>
+
 <body>
 	<header>
 		<i class="ICON"></i>NAME
 	</header>
 	<footer>
-		<ui-bind path="CONFIG.operation" config="show">
-			Operation: <span class="blue" > <ui-bind path="CONFIG.operation" config="text:value.charAt(0).toUpperCase() + value.slice(1)"></ui-bind> </span>
+		<ui-bind path="CONFIG.operation" config="show" class="block">
+			Operation: <span class="blue"><ui-bind path="CONFIG.operation" config="text:value.charAt(0).toUpperCase() + value.slice(1)"></ui-bind></span>
 		</ui-bind>
 	</footer>
 </body>
