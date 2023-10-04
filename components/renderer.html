@@ -1,0 +1,54 @@
+<script total>
+
+	exports.id = 'renderer';
+	exports.name = 'Renderer';
+	exports.icon = 'ti ti-paint-brush';
+	exports.author = 'Total.js';
+	exports.version = '1';
+	exports.group = 'Common';
+	exports.config = { template: '<b>{{ value }}</b>' };
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.kind = 'output';
+
+	exports.make = function(instance, config) {
+
+		var template;
+
+		instance.message = function($) {
+			$.status(template({ value: $.data }));
+			$.destroy();
+		};
+
+		instance.configure = function() {
+			template = Tangular.compile(config.template);
+		};
+
+		instance.configure();
+
+	};
+
+</script>
+
+<readme>
+The component transforms data in HTML format in the component body. You can easily visualize any data. Data is rendered server-side.
+</readme>
+
+<settings>
+	<div class="padding">
+		<div class="ui-input-label">Tangular template:</div>
+		<ui-component name="codemirror" path="?.template" config="type:htmlmixed;minheight:300;parent:auto;margin:80;tabs:true;trim:true;linenumbers:0"></ui-component>
+	</div>
+</settings>
+
+<style>
+	.CLASS > footer > ui-bind { font-size: 12px; }
+</style>
+
+<body>
+	<header>
+		<i class="$ICON"></i>$NAME
+	</header>
+	<footer>
+		<ui-bind path="STATUS" config="html;show" class="block"></ui-bind>
+	</footer>
+</body>
