@@ -16,8 +16,10 @@
 		instance.message = function($) {
 			var data = $.data;
 			try {
-				$.data = template(data, $);
-			} catch(e) { $.data = ''; }
+				$.data = template({ value: data }, $);
+			} catch(e) {
+				$.data = '';
+			}
 			$.send('output');
 		};
 
@@ -47,7 +49,7 @@ __Incomming data__:
 __Template__:
 
 ```html
-App name: {{ app_name }}
+App name: {{ value.app_name }}
 ```
 
 - `$` type `{MessageInstance}` <https://docs.totaljs.com/total4/40844001ni51c/>
