@@ -1,45 +1,107 @@
 <script total>
 
+	exports.id = 'downloader';
 	exports.name = 'Downloader';
 	exports.icon = 'ti ti-download';
 	exports.group = 'Common';
 	exports.author = 'Total.js';
-	exports.version = '1';
-	exports.config = {};
+	exports.version = '2';
+	exports.config = { output: 'file', path: 'value', urlpath: 'url' };
 	exports.inputs = [{ id: 'input', name: 'Input' }];
-	exports.outputs = [{ id: 'output', name: 'Output' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }, { id: 'error', name: 'Error' }];
 
 	exports.make = function(instance, config) {
 
-		const { unlink } = require('fs').promises;
-
-		const get = (obj, path) => path.split(".").reduce((r, k) => r?.[k], obj);
+		var cfg;
 
 		instance.message = function($) {
+
 			var data = $.data;
-			const urlpath = config.urlpath || 'url';
+			var opt = {};
 
-			const url = get(data, urlpath);
-			if (!url)
+			if (typeof(data) === 'string')
+				data = { url: data };
+
+			opt.url = cfg.urlpathdot ? U.get(data, cfg.urlpath) : data[cfg.urlpath];
+
+			if (!opt.url) {
+				$.send('error', 'Invalid URL address');
 				return;
+			}
 
-			const filename = 'tmp/{0}.{1}'.format(UID(), U.getExtension(url));
+			var iserror = false;
 
-			DOWNLOAD(data.url, filename, function(err, response){
-				if (err) {
-					instance.throw(err);
-					return;
+			opt.method = 'GET';
+			opt.custom = true
+
+			opt.callback = function(err, response) {
+
+				var abort = function(e) {
+					iserror = true;
+					$.send('error', (e || 'Aborted').toString());
+				};
+
+				if (cfg.output === 'file') {
+
+					var filename = PATH.temp('{0}.bin'.format(UID()));
+					var writer = F.Fs.createWriteStream(filename);
+
+					response.stream.pipe(writer);
+					response.stream.on('abort', abort);
+					response.stream.on('error', abort);
+
+					CLEANUP(writer, function() {
+
+						if (iserror) {
+							F.Fs.unlink(filename, NOOP);
+							return;
+						}
+
+						if (cfg.pathdot)
+							U.set(data, cfg.path, filename);
+						else
+							data[cfg.path] = filename;
+						$.send('output', data);
+					})
+					$.on('terminate', () => F.Fs.unlink(filename, NOOP));
+				} else {
+
+					var buffer = [];
+
+					response.stream.on('data', chunk => buffer.push(chunk));
+					response.stream.on('abort', abort);
+					response.stream.on('error', abort);
+
+					CLEANUP(response.stream, function() {
+
+						if (iserror)
+							return;
+
+						var buf = Buffer.concat(buffer);
+						if (config.output === 'base64')
+							buf = buf.toString('base64');
+						if (cfg.pathdot)
+							U.set(data, cfg.path, buf);
+						else
+							data[cfg.path] = buf;
+
+						$.send('output', data);
+					});
 				}
-				const { filename, body, origin, status, headers } = response;
-				$.send('output', { filename, body, origin, status, headers });
-				$.on('terminate', () => {
-					unlink(PATH.root(filename)).catch(e => console.log('[Downloader] Failed to unlink file: ' + filename  + ' | ' + e.message));
-				});
-			});
+
+			};
+
+			REQUEST(opt);
+		};
+
+		instance.vary = function() {
+			instance.configure();
 		};
 
 		instance.configure = function() {
-			// "config" is changed
+			cfg = instance.replace(config);
+			cfg.pathdot = cfg.path.indexOf('.') !== -1;
+			cfg.urlpathdot = cfg.urlpath.indexOf('.') !== -1;
 		};
 
 		instance.configure();
@@ -50,6 +112,7 @@
 
 <readme>
 ## Input
+
 ```js
 {
 	url: 'https://example.com/file.jpg', // file url
@@ -57,26 +120,33 @@
 ```
 
 ## Output
-A response object as returned by [DOWNLOAD()](https://docs.totaljs.com/total4/407ff001jy51c/#88aab001hd51c) function.
+
 ```js
 {
-	filename: '/tmp/xyz.ext',
+	value: '/tmp/xyz.ext',
 	...
 }
 ```
-The file will be automaticaly deleted once the message is destroyed.
 
+The file will be automaticaly deleted once the message is destroyed.
 </readme>
 
 <settings>
 	<div class="padding">
-		<ui-component name="input" path="?.urlpath">Path to URL in the incomming object (default 'url')</ui-component>
-		<div class="help m">Supports dot notation like so: "path.to.url" or "arr.0.url" if the "arr" is an array. "arr[0].url" is not supported</div>
+		<p>This component supports variables in the form <span class="badge badge-medium badge-silver">{variable}</span>.</p>
+		<div class="grid-3">
+			<div class="m">
+				<ui-component name="input" path="?.output" config="dirsource:file|File,base64|BASE64,buffer|Buffer">Output</ui-component>
+			</div>
+			<div class="m">
+				<ui-component name="input" path="?.urlpath" config="required:1;monospace:1">Path for reading URL</ui-component>
+			</div>
+			<div class="m">
+				<ui-component name="input" path="?.path" config="required:1;monospace:1">Path for storing values</ui-component>
+			</div>
+		</div>
 	</div>
 </settings>
-
-<style>
-</style>
 
 <body>
 	<header>
