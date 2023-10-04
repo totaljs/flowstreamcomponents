@@ -69,15 +69,16 @@ __Output__:
 <style>
 	.CLASS .keyvalue > span { width: 60px; }
 	.CLASS .keyvalue > div { margin-left: 0; }
+	.CLASS footer { padding: 10px; width: 180px; }
 </style>
 
 <body>
 	<header>
 		<i class="ICON"></i>NAME
 	</header>
-	<footer style="padding:10px;width:180px">
+	<footer >
 		<button class="exec button" data-exec="FUNC.trigger">Reset</button>
-		<ui-bind path="STATUS" config="template;.keyvalue" class="mt10">
+		<ui-bind path="STATUS" config="template;.keyvalue" class="mt10 block">
 			<script type="text/html">
 				<div class="keyvalue small">
 					<span>Min</span>
