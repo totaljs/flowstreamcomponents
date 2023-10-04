@@ -51,6 +51,7 @@ PATH.fs.readdir('components', function(err, response) {
 			var icon = response.match(/exports\.icon.*?;/);
 			var name = response.match(/exports\.name.*?;/);
 			var group = response.match(/exports\.group.*?;/);
+			var kind = response.match(/exports\.kind.*?;/);
 
 			data.group = group ? evaluate(group[0]).group : '';
 			data.name = name ? evaluate(name[0]).name : '';
@@ -59,6 +60,7 @@ PATH.fs.readdir('components', function(err, response) {
 			data.icon = icon ? evaluate(icon[0]).icon : '';
 			data.color = color ? evaluate(color[0]).color : '';
 			data.version = version ? evaluate(version[0]).version : '';
+			data.kind = kind ? evaluate(kind[0]).kind : '';
 
 			var index = response.indexOf('<readme>');
 

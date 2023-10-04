@@ -8,6 +8,7 @@
 		"icon": "ti ti-crosshairs",
 		"color": "",
 		"version": "3",
+		"kind": "",
 		"readme": "This component implements the [Total.js API Router](https://docs.totaljs.com/total4/cc674001rr51c/#total-js-routing) that allows you to provide only one endpoint (route) by adding multiple endpoints divided by keys. The component expects REST Route message or data in the form:\n\n```js\n{\n\t\"schema\": \"schema_name/{param_1}/{param_2}?query=arguments\",\n\t\"data\": {} // optional, request payload\n}\n```\n\n< __Good to know:__<br>Output data will be the same `data`, but extendend by adding new properties declared below.\n\n__Extended output data:__\n\n- `id {String}` first value from dynamic value\n- `params {Object}` dynamic values\n- `query {Object}` query arguments\n- `user {Object}` optional, inherited from the controller\n- `session {Object}` optional, inherited from the controller\n- `ip {String}` optional, inherited from the controller\n\nIf the controller is stored in the `message.refs.controller` property, then its properties like `controller.id`, `controller.params` and `controller.query` will be extendend by values from parsed schema."
 	},
 	{
@@ -19,6 +20,7 @@
 		"icon": "ti ti-robot-alt",
 		"color": "",
 		"version": "2",
+		"kind": "",
 		"readme": "This component can talk to ChatGPT.\n\n## Input\n\nInput will depend on selected model\n\n- __CPT 3.5 Turbo__\n```js\n\n// Object\n{\nmessages : [{ role: 'user', content: 'Text' }]\n}\n\n// or\n\n\n// Array\n[{ role: 'assistant', content: 'Text' }]\n```\n\n- __Whisper__\n```js\n\n// Object\n{\npath : 'path-to-file'\n}\n\n// or\n\n\n// String\n'path-to-file'\n```\n\n- __Other__\n```js\n\n// Object\n{\ntext : 'your question'\n}\n\n// or\n\n\n// String\n'your question'\n```\n\n\n## Output\n\nOutput also depends on selected model\n- __CPT 3.5 Turbo__\n```js\n'Response from assistant'\n```\n\n- __Whisper__\n```js\n\n// Object\n{\ntext : 'transcipted text'\n}\n```\n- __Other__\n```js\n\n// String\n'your question'\n```"
 	},
 	{
@@ -30,6 +32,7 @@
 		"icon": "ti ti-code",
 		"color": "",
 		"version": "1",
+		"kind": "",
 		"readme": "Uses [Cheerio](https://cheerio.js.org/index.html)\nPlease refer to the [documentation](https://cheerio.js.org/classes/Cheerio.html) for available functions.\n## Input\n```js\n<any>\n```\n\n## Output\n```js\n{\nresult: <the data returned from the code>,\ninput: <incomming data>\n}\n```\n\n## Example code\n```js\n// instance : component instance\n// $: cheerio instance\n// html: html string\n\nvar txt = [];\n$('ul > li').each(function (i, elem) {\ntxt.push($(this).text());\n});\nreturn txt;\n```"
 	},
 	{
@@ -41,6 +44,7 @@
 		"icon": "ti ti-code",
 		"color": "",
 		"version": "3",
+		"kind": "",
 		"readme": "This component executes a custom JavaScript code as it is.\n\nTo send data to the default output use `send(somedata);`\nTo send data to specific output when number of outputs > 1 use `$.send('outputX', somedata)` where `X` is output index, see example bellow:\n- first output--> `send(somedata)` or `$.send('output', somedata)`\n- second output --> `$.send('output2', somedata)`\n- ...\n- 5th output --> `$.send('output5', somedata)`\n- etc."
 	},
 	{
@@ -52,6 +56,7 @@
 		"icon": "ti ti-comment",
 		"color": "",
 		"version": "1",
+		"kind": "",
 		"readme": "This component renders a small markdown comment inside the body."
 	},
 	{
@@ -63,6 +68,7 @@
 		"icon": "ti ti-barcode",
 		"color": "",
 		"version": "1",
+		"kind": "",
 		"readme": "This component can help you with generating confirmation codes. Keep data structure for inputs according to the documentation below.\n\n### `create` input/output\n\n__Create input__:\n\n- `id {String}` identifier (email, phone number, identifier, etc.)\n- `param {String}` a custom parameter\n\n__Create output__:\n\n- `success {Boolean}` determines if the code is verified or not accroding to its identifier\n- `value {String}` a pin/code/token\n- `param {String}` a custom parameter (it sends only if the value is true)\n- `error {String}` (optional) a simple error identifier, it can contain:\n\t- `locked` the identifier is locked by the previous call\n\n### `verify` input/output\n\n__Verify input__:\n\n- `id {String}` identifier (email, phone number, identifier, etc.)\n- `value {String}` a pin/code/token\n\n__Verify output__:\n\n- `success {Boolean}` determines if the code is verified or not accroding to its identifier\n- `slots {Number}` free slots/attempts\n- `error {String}` (optional) a simple error identifier, it can contain:\n\t- `invalid` the code is invalid\n\t- `404` identifier not found\n\n---\n\n### Settings\n\n- __Lock__ prevents overwriting of the code according to the identifier"
 	},
 	{
@@ -74,6 +80,7 @@
 		"icon": "ti ti-print",
 		"color": "",
 		"version": "1",
+		"kind": "",
 		"readme": "This component prints a message into the console."
 	},
 	{
@@ -85,6 +92,7 @@
 		"icon": "ti ti-html5",
 		"color": "",
 		"version": "3",
+		"kind": "",
 		"readme": "The component enables Cross-Origin Resource Sharing `CORS`, so the web browser will be able to communicate directly with the REST API. The functionality will work only with a defined Proxy endpoint for this Flow."
 	},
 	{
@@ -96,6 +104,7 @@
 		"icon": "ti ti-calculator",
 		"color": "",
 		"version": "1",
+		"kind": "",
 		"readme": "The component counts incoming messages."
 	},
 	{
@@ -107,6 +116,7 @@
 		"icon": "ti ti-clock",
 		"color": "",
 		"version": "1",
+		"kind": "trigger",
 		"readme": "The component can make a trigger in the specific time and date.\n\n## Cron string: `* * * * *`\n\nMeaning of each `*` explained bellow, in order from left to right:\n\n- minute `0 - 59`\n- hour `0 - 23`\n- day of month `1 - 31`\n- month `1 - 12`\n- day of week `0 - 6` and `0` is Sunday\n\n```\n0 16 * * *      -> trigger every day at 16:00\n20 19 * * *     -> every day at 19:20 and 19:40\n* * * * *       -> trigger every minute\n0 20 * * 1      -> every monday at 20:00\n```"
 	},
 	{
@@ -118,6 +128,7 @@
 		"icon": "ti ti-database",
 		"color": "",
 		"version": "2",
+		"kind": "",
 		"readme": "The component stores data as CSV Dataset for e.g. Dashboard application. Dataset is stored in `/private/` path that is available with the help of the Flow access token.\n\nCSV file contains only processed values (according to the period) and the `.meta` file contains meta data + last value.\n\n__Input for data processing__:\n\n```js\n{\n\tkey: String,    // optional, e.g. device_id | device_name\n\tvalue: Number   // measured value\n}\n```\n\n### CSV columns\n\n- `a` = `key {String}`\n- `b` = `value {Number}`\n- `c` = `min {Number}`\n- `d` = `max {Number}`\n- `e` = `sum {Number}`\n- `f` = `count {Number}`\n- `g` = `tshour {Number}`in the form `yyyyMMddhh`\n- `h` = `tsday {Number}` in the form `yyyyMMdd`\n- `i` = `tsweek {Number}` in the form `yyyyww`\n- `j` = `tsmonth {Number}` in the form `yyyyMM`\n- `k` = `tsyear {Number}` in the form `yyyy`"
 	},
 	{
@@ -129,6 +140,7 @@
 		"icon": "ti ti-compress",
 		"color": "",
 		"version": "1",
+		"kind": "",
 		"readme": "The component can parse newline data or begin/end phrases in the buffer or string. In addition, it can help with parsing XML or CSV files."
 	},
 	{
@@ -140,7 +152,8 @@
 		"icon": "ti ti-vector",
 		"color": "",
 		"version": "3",
-		"readme": "The component sort data according to the custom defined conditions. You can define unlimited count of outputs with various conditions."
+		"kind": "",
+		"readme": "The component sorts data according to the custom defined conditions. You can define unlimited count of outputs with various conditions."
 	},
 	{
 		"id": "restdatabase",
@@ -151,6 +164,7 @@
 		"icon": "ti ti-database",
 		"color": "",
 		"version": "2",
+		"kind": "",
 		"readme": "This component can perform some operations on a database with the help of Total.js QueryBuilder. First, you must initialize the connection string for the database via QueryBuilder initialization.\n\n__Input data__:\n\n- `data {Object}` or `body {Object}` optional - payload\n- `query {Object}` optional - query data, key/value must be string\n- `params {Object}` optional - dynamic values, key/value must be string\n- `user {Object}` optional - a user instance\n\n__Output__:\n\n- `insert` returns Number\n- `update` returns Number\n- `remove` returns Number\n- `query` returns Array of Objects\n- `read` returns Object\n- `list` returns:\n\n```json\n{\n\titems: Array,\n\tpage: Number,\n\tpages: Number,\n\tcount: Number\n}\n```\n\nQuery parameters for the `List` operation can contain the below fields which can affect filtering according to the values defined in the dynamic filter.\n\n- `sort {String}` can contain field name with `_asc` or `_desc` value\n- `fields {String}` can return only specified fields separated by comma\n- `page {Number}` page number\n- `limit {Number}` max. items per page (default: max. limit)\n- `column_name=VALUE` enables dynamic filtering\n\n---\n\n__Good to know__: If the `data` (payload) can contain special key names in the form:\n\n- `+key` increments a value\n- `-key` decrements a value\n- `!key` performs toggle for boolean values\n- `>key` stores only greater value\n- `<key` stores only lower value"
 	},
 	{
@@ -162,6 +176,7 @@
 		"icon": "ti ti-calendar",
 		"color": "",
 		"version": "1",
+		"kind": "",
 		"readme": "The component will return a Date/Time object (raw or formatted) according to its configuration."
 	},
 	{
@@ -173,6 +188,7 @@
 		"icon": "ti ti-circle-alt",
 		"color": "#E73323",
 		"version": "3",
+		"kind": "",
 		"readme": "The component prints incoming data into the JSON format."
 	},
 	{
@@ -184,6 +200,7 @@
 		"icon": "ti ti-hourglass",
 		"color": "",
 		"version": "3",
+		"kind": "",
 		"readme": "The component delays processing of a message."
 	},
 	{
@@ -195,6 +212,7 @@
 		"icon": "ti ti-download",
 		"color": "",
 		"version": "2",
+		"kind": "",
 		"readme": "## Input\n\n```js\n{\n\turl: 'https://example.com/file.jpg', // file url\n}\n```\n\n## Output\n\n```js\n{\n\tvalue: '/tmp/xyz.ext',\n\t...\n}\n```\n\nThe file will be automaticaly deleted once the message is destroyed."
 	},
 	{
@@ -206,6 +224,7 @@
 		"icon": "ti ti-clock",
 		"color": "",
 		"version": "1",
+		"kind": "",
 		"readme": "The component counts message duration. All values except `count` are defined in seconds.\n\n__Output__:\n\n```js\n{\n\tmin: Number,\n\tmax: Number,\n\tavg: Number,\n\tlast: Number,\n\tcount: Number\n}\n```"
 	},
 	{
@@ -217,6 +236,7 @@
 		"icon": "ti ti-ban",
 		"color": "",
 		"version": "1",
+		"kind": "",
 		"readme": "The component destroys the incoming message."
 	},
 	{
@@ -228,6 +248,7 @@
 		"icon": "ti ti-bug",
 		"color": "",
 		"version": "1",
+		"kind": "",
 		"readme": "This component transforms incoming data to the Total.js Error structure."
 	},
 	{
@@ -239,6 +260,7 @@
 		"icon": "ti ti-sliders-v",
 		"color": "",
 		"version": "1",
+		"kind": "trigger",
 		"readme": "The component is extraordinary because it must be executed directly from the source code via the `flowstream.exec()` method. The component triggers received data into the Flow.\n\n```js\nvar opt = {};\nopt.id = 'ID_OF_EXEC_INSTANCE';\nopt.data = { custom: 'data' };\nopt.callback = function(err, msg) {\n\t// msg.uid;\n\t// msg.ref;\n\t// msg.repo {Object}\n\t// msg.data {Object}\n\t// msg.cloned {Number} how many times was the message cloned?\n\t// msg.duration {Number} in milliseconds\n};\n\n// optional:\n// opt.vars = {};    --> custom variables\n// opt.repo = {};    --> custom repository data and this data will be returned in the callback\n// opt.uid;          --> for storing some unique ID\n// opt.ref;          --> for storing some reference ID\nflowinstance.exec(opt);\n```"
 	},
 	{
@@ -250,6 +272,7 @@
 		"icon": "ti ti-expand",
 		"color": "",
 		"version": "1",
+		"kind": "",
 		"readme": "This component extends the current message by adding new properties."
 	},
 	{
@@ -261,6 +284,7 @@
 		"icon": "ti ti-clock",
 		"color": "",
 		"version": "1",
+		"kind": "",
 		"readme": "The incomming message will only be forwarded after the timeout. Only the last message is forwarded, so any previously received messages are lost.\nIf messages are comming in within the given timeout period this component will never forward any message.\nThe timeout is activated by the first message.\nThe maximum timeout is 2147483 seconds, which is about 24.8 days.\nExample usage:\n\t- A sensor is supposed to send data every minute, use this component to notify you that there is a problem with receiving message.\n\t- HTTP request comes in and it takes too much time to respond? Use this component to notify you about it."
 	},
 	{
@@ -272,6 +296,7 @@
 		"icon": "ti ti-recycle",
 		"color": "",
 		"version": "1",
+		"kind": "",
 		"readme": "The component watches the existence of the file, then reads the content and sends it next. The file will be removed automatically after reading."
 	},
 	{
@@ -283,6 +308,7 @@
 		"icon": "ti ti-pencil",
 		"color": "",
 		"version": "1",
+		"kind": "",
 		"readme": "The component writes incoming data into the file."
 	},
 	{
@@ -294,6 +320,7 @@
 		"icon": "ti ti-history",
 		"color": "",
 		"version": "4",
+		"kind": "",
 		"readme": "The component remembers the data for repeating the action."
 	},
 	{
@@ -305,6 +332,7 @@
 		"icon": "ti ti-history",
 		"color": "",
 		"version": "1",
+		"kind": "",
 		"readme": "As the FlowStream worker runs, the component records significant information. The component can reveal hidden bugs or performance issues. The component stores data in the `logs/*` directory."
 	},
 	{
@@ -316,6 +344,7 @@
 		"icon": "ti ti-arrow-right",
 		"color": "",
 		"version": "1",
+		"kind": "",
 		"readme": "The component send message next only. It's targeted for colorized connections to targeted to the same input.\n- The data will Flow only from input a specific color (except black)\n- The color black is a universal color and it will transport everything"
 	},
 	{
@@ -327,6 +356,7 @@
 		"icon": "ti ti-google",
 		"color": "",
 		"version": "1",
+		"kind": "",
 		"readme": "This component can google any keyword you want.\n\n\n__Configuration__\n\n- `Language (optional)` : Search language;\n- `Limit (optional)` : Limit number of results.\n\n__Input__\n\n- `Object` | String : input expects `data: String` or `data.text: String` as search keywords.\n\n\n__Output__\n\n- `Array` of found results:"
 	},
 	{
@@ -338,6 +368,7 @@
 		"icon": "ti ti-database",
 		"color": "",
 		"version": "1",
+		"kind": "",
 		"readme": "## Input\n\nExpected data for \"Write data\":\n\n```js\n{\n    measurement: '<measurement-name>',\n\tfields: {\n        fieldname: <fieldvalue>,\n    },\n    tags: {\n        tagname: '<tagvalue>'\n    }\n}\n```\n\nExpected data for \"Execute a Flux query\":\n\n```js\n{\n    query: 'from(bucket: \"Some Bucket\") |> range(start: -1h)'\n}\n```"
 	},
 	{
@@ -349,6 +380,7 @@
 		"icon": "ti ti-wifi",
 		"color": "",
 		"version": "2",
+		"kind": "",
 		"readme": "The component receives data in an encapsulated FlowStream."
 	},
 	{
@@ -360,6 +392,7 @@
 		"icon": "ti ti-code",
 		"color": "",
 		"version": "1",
+		"kind": "",
 		"readme": "[JSON schema documentation](https://json-schema.org/learn/getting-started-step-by-step.html)\n\n## Inputs\n\n- `input` validates data and send the result to output if no error, otherwise send error to error output\n- `schema` reads the schema and send it to the schema output"
 	},
 	{
@@ -371,6 +404,7 @@
 		"icon": "ti ti-ban",
 		"color": "#E73323",
 		"version": "1",
+		"kind": "",
 		"readme": "Be careful because this component will kill the current Flow instance. It's targeted only for exceptional cases."
 	},
 	{
@@ -382,6 +416,7 @@
 		"icon": "ti ti-hdd",
 		"color": "",
 		"version": "1",
+		"kind": "",
 		"readme": "A small and simple persistent storage component is provided by this component. Data can be stored for a short period of time and read when needed."
 	},
 	{
@@ -393,6 +428,7 @@
 		"icon": "ti ti-search",
 		"color": "",
 		"version": "2",
+		"kind": "",
 		"readme": "The component logs incoming messages into the Total.js Cloud Logger."
 	},
 	{
@@ -404,6 +440,7 @@
 		"icon": "ti ti-long-arrow-down",
 		"color": "",
 		"version": "1",
+		"kind": "",
 		"readme": "The macro component uses Total.js Macro language that allows you to write much simple code like in JavaScript. Macros are targeted for small data transformation.\n\n- you don't need to solve Upper/Lower case\n- `return EXPRESSION` will return data and send them next\n- `data` keyword contains a message data\n- `temp` keyword can contain a persistent temporary data\n\n__Example__:\n\n```text\nIF DATA>20 AND DATA<35\n\tRETURN DATA * 5\nFI\n```"
 	},
 	{
@@ -415,6 +452,7 @@
 		"icon": "ti ti-table",
 		"color": "",
 		"version": "1",
+		"kind": "",
 		"readme": "This component can iterate over an array and only take properties listed in the configuration. __The input must be an array of objects!__\n\n### Example data\n\n```js\n[\n\t{ sensor: { temperature: 25, humidity: 50, ... some more properties }},\n\t{ sensor: { temperature: 24, humidity: 55, ... some more properties }},\n\t{ sensor: { temperature: 23, humidity: 60, ... some more properties }}\n]\n```\n### Example configuration\n\n- `sensor.temperature` -> `temp`\n- `sensor.humidity` -> `hum`\n\n### Example output\n\n```js\n[\n\t{ temp: 25, hum: 50 },\n\t{ temp: 24, hum: 55 },\n\t{ temp: 23, hum: 60 }\n]\n```\n\nIf `Return an Array of Arrays` is checked then\neach of the Map properties will be pushed to a new array, see example bellow\n\n### Example given the data above and this configuration:\n\n`Return an Array of Arrays` -> **checked**\n\n**Map**:\n\n- `sensor.temperature`\n- `sensor.humidity`\n\n### Example output:\n\n```js\n[\n\t[25, 50],\n\t[24, 55],\n\t[23, 60],\n]\n```"
 	},
 	{
@@ -426,6 +464,7 @@
 		"icon": "ti ti-filter",
 		"color": "",
 		"version": "1",
+		"kind": "",
 		"readme": "This component merges multiple inputs into one object."
 	},
 	{
@@ -437,6 +476,7 @@
 		"icon": "ti ti-clock",
 		"color": "",
 		"version": "1",
+		"kind": "trigger",
 		"readme": "The component triggers data into the Flow in every minute."
 	},
 	{
@@ -448,6 +488,7 @@
 		"icon": "ti ti-file",
 		"color": "",
 		"version": "3",
+		"kind": "",
 		"readme": "This component prepares incoming data according to the defined schema. Output is prepared model or Error."
 	},
 	{
@@ -459,6 +500,7 @@
 		"icon": "ti ti-map-pin",
 		"color": "",
 		"version": "1",
+		"kind": "",
 		"readme": "The component compares incoming data with previous data."
 	},
 	{
@@ -470,6 +512,7 @@
 		"icon": "ti ti-cog",
 		"color": "",
 		"version": "3",
+		"kind": "",
 		"readme": "This component allows you to set/modify/move/remove properties of the incomming data.\nFor eaxample, to set the message data to a string `Hello world` select *Message data* in the rule dropdown and leave the text field empty.\nThen in the bellow dropdown select `string` and enter the desired string in the text field.\n\n__Result:__\n\n- before: $.data -> 'Hello world'\n- after:  $.data -> 'New string'\n\n## Expression\n\nAvailable params are: `data`, `repo`, `variables` ,`variables2`\nWhere data is message.data, repo is message.repo --> [Documentation](https://docs.totaljs.com/total4/40844001ni51c)\nAnd variables are local variables which can be set in the Variables dialog accessible on the main toolbar(the button between Plus icon and Bug icon)\nFor example, we want message data to be the value of (data.value + variables.offset)\n\n__Result:__\n\n- before: $.data --> `{ value: 100 }` / variables --> `{ offset: 20, ... many other properties }`\n- after:  $.data -> `{ value: 120 }`\n\nThe expression: `data.value + variables.offset`\n\n### Important\n\n- `Remove` -> `Message data / Message repo` -> `<empty path>` will set `Message data / Message repo` to `null`;\n- `Remove` -> `Local variables / Global variables` -> `<empty path>` will be ignored but `Remove` -> `Local variables / Global variables` -> `myVar` will work.\n- `Set` -> `Message data` -> `some.path` to: `Message data` -> `some.other.path` will add another property to the incoming data and rest of the data will remain untouched\n- `Set` -> `Message data` -> `<empty path>` to: `Message data` -> `some.path` will essentialy overwrite the incomming data, after this there's no longer access to original data(same goes for repo)"
 	},
 	{
@@ -481,6 +524,7 @@
 		"icon": "ti ti-database",
 		"color": "",
 		"version": "1",
+		"kind": "",
 		"readme": "## Input\n\nExample\n```javascript\n{\n    database: 'database-name',\n    collection: 'collection-name',\n\tdata: { ... },  // data to insert, object for `insertOne` and an array of objects for `insertMany`\n\toptions: { ... }// insert options as passed to `insertOne(data, options)` or `insertMany(data, options)`\n}\n```"
 	},
 	{
@@ -492,6 +536,7 @@
 		"icon": "ti ti-database",
 		"color": "",
 		"version": "2",
+		"kind": "",
 		"readme": "Uses mquery under the hood. Here is the [documentation](https://www.npmjs.com/package/mquery)\n\n## Input\n\nExample\n```javascript\n{\n    database: 'database-name',\n    collection: 'collection-name',\n\tdata: <any> // this prop will be passed into the query function\n}\n```\n\n## Query editor\n```js\n// query; mquery instance\n// data; data from the incomming object\n\nquery.find(); // return all documents\n```\n\n## Important\nIn the `.select()` you cannot use inclusion and exclusion together.\nThis is invalid: `.select('firstname -lastname')`\nValid exclusion: `.select('-lastname')` or `.select('-email -lastname')` etc.\nValid inclusion: `.select('name email')` or `.select('email lastname')` etc."
 	},
 	{
@@ -503,6 +548,7 @@
 		"icon": "ti ti-exchange",
 		"color": "",
 		"version": "3",
+		"kind": "",
 		"readme": ""
 	},
 	{
@@ -514,6 +560,7 @@
 		"icon": "ti ti-sign-out",
 		"color": "",
 		"version": "3",
+		"kind": "",
 		"readme": "MQTT Publish\n\nInput:\n```javascript\n{\n\ttopic: 'some/topic',\n\tmessage: { some: 'data' },\n\t// optional\n\toptions: {\n\t\tqos: 0|1|2,\n\t\tretain: true|false\n\t}\n}\n```"
 	},
 	{
@@ -525,6 +572,7 @@
 		"icon": "ti ti-sign-in",
 		"color": "",
 		"version": "3",
+		"kind": "",
 		"readme": "MQTT Subscribe"
 	},
 	{
@@ -536,6 +584,7 @@
 		"icon": "ti ti-database",
 		"color": "",
 		"version": "2",
+		"kind": "",
 		"readme": "## Input\n\nExpected data:\n\n```javascript\n{\n\tquery: 'SELECT * FROM tblname;'\n}\n```"
 	},
 	{
@@ -547,6 +596,7 @@
 		"icon": "ti ti-database",
 		"color": "",
 		"version": "1",
+		"kind": "",
 		"readme": "## Outputs\n- response from nosql engine\n## Settings\n- collection: (optional) if not set, incomming data object must have a 'collection' property set\n- method: (optional) if not set, incomming data object must have a 'method' property set\n## Input\n```javascript\n{\n\tcollection: 'users', // optional, will override settings value\n\tmethod: 'query', // insert|read|query|update|remove - optional, will override settings value\n\t// for insert, update\n\tdata: { ... },\n\t// for query, read, update, remove\n\tfilter: [\n\t\t['where', 'sensor', 'temp'], // builder.where('sensor', 'temp');\n\t\t['limit', 2]                 // builder.limit(2);\n\t],\n\tupsert: true // only for update, if set then document will be inserted if it doesn't exist\n\taddid: true  // only for insert and update, if set then id prop will be automaticaly generated (for update only when upsert is also set)\n}\n```\n## Insert\n- inserts recieved data\n- expects data to be an Object\n- returns error, success, id\n## Read\n- returns first document found\n- requires `filter`\n- returns error, response\n## Update\n- updates document(s)\n- expects data to be an Object with all the props to be updated\n- requires `filter`\n- returns error, response\n- if response is 0 then update failed\n## Remove\n- removes document\n- requires `filter`\n- returns error, response\n- if response is 0 then remove failed\n## Query\n- returns all documents found\n- requires `filter`\n- returns error, response"
 	},
 	{
@@ -558,6 +608,7 @@
 		"icon": "ti ti-map-pin",
 		"color": "",
 		"version": "1",
+		"kind": "trigger",
 		"readme": "This component captures data on the `/notify/` endpoint.\n\n__Output data__:\n\n```js\n{\n\t\"method\": String,\n\t\"query\": Object,\n\t\"body\": Object,\n\t\"headers\": Object,\n\t\"cookies\": Object,\n\t\"url\": String,\n\t\"ip\": String\n}\n```"
 	},
 	{
@@ -569,6 +620,7 @@
 		"icon": "ti ti-key",
 		"color": "",
 		"version": "1",
+		"kind": "",
 		"readme": "This component can obtain OAuth 2.0 access token from 3rd party service."
 	},
 	{
@@ -580,6 +632,7 @@
 		"icon": "ti ti-list-alt",
 		"color": "",
 		"version": "1",
+		"kind": "",
 		"readme": "The component creates an object from the defined string (Tangular) template. With the help of the Tangular template engine, you can use conditions, loops, etc..\n\n__Available markup__:\n\n- `{{ data.key }}` represents data\n- `{{ variables.key }}` represents local and global Flow variables\n- `{{ hostname }}` contains a current URL address to the main Flow app `{String}`\n- `{{ url }}` contains a current URL address to the current Flow `{String}`\n- `{{ env }}` contains a current environment `{String}`"
 	},
 	{
@@ -591,6 +644,7 @@
 		"icon": "ti ti-sync",
 		"color": "",
 		"version": "2",
+		"kind": "",
 		"readme": "This component receives a data from the [OpenSync](https://docs.totaljs.com/opensync/) app. Data example:\n\n```js\n{\n\tid: String,              // Internal ID\n\ttype: String,            // Parsed content-type (can be empty with the \"GET\" method)\n\tchannel: String,         // Channel\n\tip: String,              // Host IP address\n\tmethod: String,          // HTTP method (upper-case)\n\theaders: Object,         // Key:value\n\tquery: Object,           // Key:value\n\tbody: Object,            // JSON/key:value/String\n\tua: String,              // Parsed user-agent\n\tfiles: [Object Array]    // Uploaded files { filename: String, extension: String, type: String, size: Number, url: String, width: Number, height: Number }\n}\n```"
 	},
 	{
@@ -602,6 +656,7 @@
 		"icon": "ti ti-weather",
 		"color": "",
 		"version": "1",
+		"kind": "",
 		"readme": "This component can retieve weather data from [OpenWheatherMap](https://openweathermap.org/api/);\n\n__Input__:\n\n```js\n\t{\n\t\tquery: String,         // Optional, City name, Country code, State code e.g: London, Ouagadougou, sk\n\t\tlon: String,           // Optional, Longitude\n\t\tlat: String,           // Optional, Latitude\n\t\tlang: String,          // Optional, Output language e.g: `en`, `de`, `sk`, `fr` etc...\n\t\tunits: String,         // Optional, standard, metric, imperial\n\t\tdate: String           // Optional,  Timestamp (Unix time, UTC time zone), e.g. date=1586468027\n\t}\n```"
 	},
 	{
@@ -613,6 +668,7 @@
 		"icon": "ti ti-crosshairs",
 		"color": "",
 		"version": "2",
+		"kind": "output",
 		"readme": "The component can send data from an encapsulated FlowStream."
 	},
 	{
@@ -624,6 +680,7 @@
 		"icon": "ti ti-database",
 		"color": "",
 		"version": "2",
+		"kind": "",
 		"readme": "PostgreSQL\n\n## Input\nExpected data:\n```javascript\n{\n\tquery: 'SELECT * FROM tblname;'\n}\n```\nOutput:\n```javascript\n{\n\tcommand: 'INSERT', // SELECT, etc.\n\trows: [], // \n\trowCount: 1\n}\n```"
 	},
 	{
@@ -635,6 +692,7 @@
 		"icon": "ti ti-print",
 		"color": "",
 		"version": "5",
+		"kind": "",
 		"readme": "The component prints incoming data in a JSON format."
 	},
 	{
@@ -646,6 +704,7 @@
 		"icon": "ti ti-print",
 		"color": "",
 		"version": "2",
+		"kind": "",
 		"readme": "The component prints incoming data in a JSON format."
 	},
 	{
@@ -657,6 +716,7 @@
 		"icon": "ti ti-exchange",
 		"color": "",
 		"version": "1",
+		"kind": "",
 		"readme": "This component registers an HTTP Proxy route and sends request metadata next.\n\n< __IMPORTANT__:<br>The component works only with a defined Proxy endpoint in the Flow settings.\n< __URL__:<br>The URL must be relative to the defined Proxy endpoint. So if the endpoint is `/users/` and the desired address is `http://example.com/users/find` then the value must be `/find`\n\n__Output data__:\n\n```js\n{\n\t\"query\": Object,\n\t\"headers\": Object,\n\t\"url\": String,\n\t\"ip\": String\n}\n```"
 	},
 	{
@@ -668,6 +728,7 @@
 		"icon": "ti ti-crosshairs",
 		"color": "",
 		"version": "4",
+		"kind": "",
 		"readme": "The component publish the data to the specific `Input` component."
 	},
 	{
@@ -679,6 +740,7 @@
 		"icon": "ti ti-qrcode-alt",
 		"color": "",
 		"version": "1",
+		"kind": "",
 		"readme": "The component generates QR Code.\n\n__Input data__:\n\n```js\n{\n\ttext: String\n}\n```\n\n__Output data__:\n\n```js\n{\n\ttext: String,\n\tdata: 'Data URL - BASE64'\n}\n```"
 	},
 	{
@@ -690,6 +752,7 @@
 		"icon": "ti ti-database",
 		"color": "",
 		"version": "1",
+		"kind": "",
 		"readme": "The component initializes QueryBuilder for the PostgreSQL database. So you can use the 'API Database` component. Each connection must be separated by an alias.\n\n__Usage in API Database__:\n\n- `tbl_user` is targeted to the `default/tbl_user` alias connection\n- `anotherserver/tbl_user` will use `anotherserver` alias connection"
 	},
 	{
@@ -701,6 +764,7 @@
 		"icon": "ti ti-list",
 		"color": "",
 		"version": "3",
+		"kind": "",
 		"readme": "A simple persistent queue for the incomming messages."
 	},
 	{
@@ -712,6 +776,7 @@
 		"icon": "ti ti-filter",
 		"color": "",
 		"version": "3",
+		"kind": "",
 		"readme": "This component reads specific values according to the configured map."
 	},
 	{
@@ -723,6 +788,7 @@
 		"icon": "ti ti-share",
 		"color": "",
 		"version": "2",
+		"kind": "",
 		"readme": "## Input\n\nIncomming data have higher priority than the values set in the Configuration form. Both the `url` and `permanent` are optional.\n\n```js\n{\n\turl: 'https://example.com',\n\tpermanent: true|false\n}\n```"
 	},
 	{
@@ -734,6 +800,7 @@
 		"icon": "ti ti-save",
 		"color": "",
 		"version": "1",
+		"kind": "",
 		"readme": "The primary goal of this component is to remember data. The component contains two inputs:\n\n- Remember input for remembering data\n- Request input as a trigger for obtaining data, then remembered data would extend the request message (its data), and the component will send it to the Response output"
 	},
 	{
@@ -745,6 +812,7 @@
 		"icon": "ti ti-cloud-download",
 		"color": "",
 		"version": "6",
+		"kind": "",
 		"readme": "The component makes a HTTP request. The response data will be serialized as the payload.\n\n__Response__:\n\n```json\n{\n\tstatus: Number,\n\theaders: { key: value },\n\tcookies: { key: value },\n\thost: String,\n\tbody: String/Object/Buffer\n}\n```"
 	},
 	{
@@ -756,6 +824,7 @@
 		"icon": "ti ti-share",
 		"color": "",
 		"version": "3",
+		"kind": "",
 		"readme": "This component can respond on the REST Route component."
 	},
 	{
@@ -767,6 +836,7 @@
 		"icon": "ti ti-map-pin",
 		"color": "",
 		"version": "1",
+		"kind": "trigger",
 		"readme": "This component registers an HTTP Route and sends request data next. It stores `controller` instance in the `message.refs.controller` property. You must respond to the REST response component.\n\n< __IMPORTANT__:<br>The component works only with a defined Proxy endpoint in the Flow settings.\n< __URL__:<br>The URL must be relative to the defined Proxy endpoint. So if the endpoint is `/users/` and the desired address is `http://example.com/users/find` then the value must be `/find`\n\n__Output data__:\n\n```js\n{\n\t\"route\": String,\n\t\"params\": Object,\n\t\"query\": Object,\n\t\"body\": Object,\n\t\"files\": Array,\n\t\"headers\": Object,\n\t\"url\": String,\n\t\"ip\": String\n}\n```"
 	},
 	{
@@ -778,6 +848,7 @@
 		"icon": "ti ti-rss-square",
 		"color": "",
 		"version": "1",
+		"kind": "",
 		"readme": "The component downloads every item from the RSS source. A message on to this `Trigger` input starts downloading RSS data.\n\n__Example__:\n\n```js\n{\n\ttitle: String,\n\tdescription: String,\n\tlink: String,\n\timage: String, // optional\n\tdate: Date // optional\n}\n```"
 	},
 	{
@@ -789,6 +860,7 @@
 		"icon": "ti ti-lock",
 		"color": "",
 		"version": "1",
+		"kind": "",
 		"readme": "The component creates secret variables from the input message data. You can read data easily via `{key}` in the component's settings. Keys and their values must be of String type.\n\n```js\n{\n\tkey1: value1,\n\tkey2: value2,\n\tkeyN: valueN\n}\n```"
 	},
 	{
@@ -800,6 +872,7 @@
 		"icon": "ti ti-check-square",
 		"color": "",
 		"version": "1",
+		"kind": "",
 		"readme": "The component installs Total.js server-side extension. In other words: it can evaluate JavaScript code when the component is initialized or the component settings is changed."
 	},
 	{
@@ -811,6 +884,7 @@
 		"icon": "ti ti-tablet",
 		"color": "",
 		"version": "1",
+		"kind": "",
 		"readme": "The component sends a SMS message."
 	},
 	{
@@ -822,6 +896,7 @@
 		"icon": "ti ti-strikethrough",
 		"color": "",
 		"version": "1",
+		"kind": "",
 		"readme": "The component splits a message with an array of objects on the input into separate messages with individual objects on the output.\n\n__Input example__:\n\n```js\n[\n\t{\n\t\t\"email\": \"michal@totaljs.com\",\n\t\t\"date\": 20220202,\n\t\t\"meno\": \"Michal Klacan\"\n\t},\n\t{\n\t\t\"email\": \"martin@totaljs.com\",\n\t\t\"date\": 20220204,\n\t\t\"meno\": \"Martin Smola\"\n\t},\n\t{\n\t\t\"email\": \"peter@totaljs.com\",\n\t\t\"datum\": 20220210,\n\t\t\"meno\": \"Peter Sirka\"\n\t}\n]\n```\n\n__Output example__:\n\n```js\n{\n\t\"email\": \"michal@totaljs.com\",\n\t\"date\": 20220202,\n\t\"meno\": \"Michal Klacan\"\n}\n```\n\n```js\n{\n\t\"email\": \"martin@totaljs.com\",\n\t\"date\": 20220204,\n\t\"meno\": \"Martin Smola\"\n}\n```\n\n```js\n{\n\t\"email\": \"peter@totaljs.com\",\n\t\"datum\": 20220210,\n\t\"meno\": \"Peter Sirka\"\n}\n```"
 	},
 	{
@@ -833,6 +908,7 @@
 		"icon": "ti ti-database",
 		"color": "",
 		"version": "1",
+		"kind": "",
 		"readme": "The component executes SQL command on the specifi connection. This component depends on the `API PostgreSQL` component."
 	},
 	{
@@ -844,6 +920,7 @@
 		"icon": "ti ti-database",
 		"color": "",
 		"version": "1",
+		"kind": "",
 		"readme": "SQLite3 [Documentation](https://github.com/JoshuaWise/better-sqlite3/blob/HEAD/docs/api.md)\n\n```js\n{\n\t// query\n\tprepare: 'INSERT INTO cats (name, age) VALUES (?, ?)',\n\n\t// function name: run, get, all, exec\n\tfn: 'run',\n\n\t// data, optional\n\tdata: ['Joey', 2] // string/number or array\n\n}\n```\n\n__Functions:__\n\n- [run](https://github.com/JoshuaWise/better-sqlite3/blob/HEAD/docs/api.md#runbindparameters---object)\n- [get](https://github.com/JoshuaWise/better-sqlite3/blob/HEAD/docs/api.md#getbindparameters---row)\n- [all](https://github.com/JoshuaWise/better-sqlite3/blob/HEAD/docs/api.md#allbindparameters---array-of-rows)\n- [exec](https://github.com/JoshuaWise/better-sqlite3/blob/HEAD/docs/api.md#execstring---this)"
 	},
 	{
@@ -855,6 +932,7 @@
 		"icon": "ti ti-hourglass",
 		"color": "",
 		"version": "3",
+		"kind": "",
 		"readme": "The component runs a simple stopwatch for incomming messages."
 	},
 	{
@@ -866,6 +944,7 @@
 		"icon": "ti ti-font",
 		"color": "",
 		"version": "1",
+		"kind": "",
 		"readme": "This components can apply string operation to your components.\n\n- input: `String`\n- output: `String`"
 	},
 	{
@@ -877,6 +956,7 @@
 		"icon": "ti ti-wifi",
 		"color": "",
 		"version": "3",
+		"kind": "",
 		"readme": "The component subscribes to the specific `Output` component."
 	},
 	{
@@ -888,6 +968,7 @@
 		"icon": "ti ti-sitemap",
 		"color": "",
 		"version": "4",
+		"kind": "",
 		"readme": "## Source and Path\nUse the **Source** dropdown to select where to look for the value to use in the conditions check.\nSet a **Path** if the value is not the data itself. It supports dot notation: `position.longitude` or `sensor.0.value` for arrays, it does not support `sensor[0].value`.\n**Expression** supports javascript syntax. Should return a value which will be used in condition check as `data`. Available variables: data, repo, variables, variables2\n**Expressions example:**\n```js\ndata.value - variables.offset\n```\n\n## Conditions\nEach of the **Conditions** corresponds to an output in the exact same order. First condition -> First output.\n\n**Operator**\nNot all operators work on all data types. For example it is not possible to use `&gt;` or `&lt;` for strings, etc.\n*index of* only works for data of type array or string.\n**Expression operator**\nIn this case the **type** field is ignored and the expression in the **value** field must return `true` or `false`. Available variables: data, repo, variables, variables2.\nExpressions operator example:\n```js\ndata.value > variables.threshold;\n```\nor with a conditions\n```js\nif (typeof data.value !== 'number') return false; else return data.value > parseInt(variables.threshold);\n```\n\n**Expression type**\nThe expression in the **value** field must return a value which will be used in the given operation. Available variables: data, repo, variables, variables2.\nExpressions example:\n```js\ndata.value - variables.offset\n```\n\n**Between operator** only works with datatype number and the value must be two comma separated values. e.g.: `2,4` so the condition becomes `val &gt; 2 && val &lt; 4`"
 	},
 	{
@@ -899,6 +980,7 @@
 		"icon": "ti ti-variables",
 		"color": "",
 		"version": "1",
+		"kind": "",
 		"readme": "The component uses server-side implementation of [Tangular template engine](https://docs.totaljs.com/components/40d06002lm50c/).\n\n## Example\n\n__Incomming data__:\n\n```js\n{\n\tapp_name: 'Total.js Flow'\n}\n```\n\n__Template__:\n\n```html\nApp name: {{ app_name }}\n```\n\n- `$` type `{MessageInstance}` <https://docs.totaljs.com/total4/40844001ni51c/>\n\nIn the example bellow, the $.refs.controller is only available if the message was created by the Route component:\n\n```html\nURL: {{ $.refs.controller.url }}\n```"
 	},
 	{
@@ -910,6 +992,7 @@
 		"icon": "ti ti-rss-square",
 		"color": "",
 		"version": "4",
+		"kind": "",
 		"readme": "The component shows data in a template.\nHovering over the value shows the last update time.\nAssuming this incomming data:\n```javascript\n{\n\tspeed: 1,\n\tnested: { value: 2 },\n\tarray: [{ value: 3 }]\n}\n```\nThe paths bust be defined as:\n```\nspeed         // -> 1\nnested.value  // -> 2\narray.0.value // -> 3\n```"
 	},
 	{
@@ -921,6 +1004,7 @@
 		"icon": "ti ti-globe",
 		"color": "",
 		"version": "3",
+		"kind": "",
 		"readme": "The component can teleport (input) message to another teleport (output) component."
 	},
 	{
@@ -932,6 +1016,7 @@
 		"icon": "ti ti-filter",
 		"color": "",
 		"version": "1",
+		"kind": "",
 		"readme": "The component sends only limited count of messages."
 	},
 	{
@@ -943,6 +1028,7 @@
 		"icon": "ti ti-clock",
 		"color": "",
 		"version": "2",
+		"kind": "trigger",
 		"readme": "The component triggers data into the Flow in the specified interval."
 	},
 	{
@@ -954,6 +1040,7 @@
 		"icon": "ti ti-key",
 		"color": "",
 		"version": "1",
+		"kind": "",
 		"readme": "This component must be used only with REST Route component. It reads a token from the request header and compares it with the token declared in the configuration."
 	},
 	{
@@ -965,6 +1052,7 @@
 		"icon": "ti ti-lock",
 		"color": "",
 		"version": "1",
+		"kind": "",
 		"readme": "## Time-Based One-Time Password Algorithm\n\nThis component can generate a secret and verifies the code (generated via Authenticator app) as a one-time password for 2FA authorization.\n\n- recommended mobile apps: __Google Authenticator__ or __Microsoft Authenticator__\n\n---\n\n__How does it work?__\n\nFirst, a user must generate a secret via`generate` input in the authenticator app. Then, for verification of the one-time generated password, you need to use the second input `verify,` which needs user secrets.\n\n### `generate` input/output\n\n__Input data__:\n\n- `user {String}` email or user/account name without special characters\n\n__Output data `object` with__:\n\n- `secret {String}` a generated secret which you must store for the specific user\n- `url {String}` an optimized url address for tokenization\n- `qrcode {String}` a link to the picture with QR code\n\n### `verify` input/outputs\n\n__Input data `object` with__:\n\n- `secret {String}`\n\n__Output data `object` with__:\n\n- `success {Boolean}` determines if the password is valid or not"
 	},
 	{
@@ -976,6 +1064,7 @@
 		"icon": "ti ti-robot",
 		"color": "",
 		"version": "1",
+		"kind": "",
 		"readme": "This component can transform message data."
 	},
 	{
@@ -987,6 +1076,7 @@
 		"icon": "ti ti-pulse",
 		"color": "",
 		"version": "1",
+		"kind": "",
 		"readme": "With this component you can easily modify incoming data. Then the `data` content is delivered.\n\n__Example 1__:\n\n```js\n// \"data\" is a reference to message data\ndata.name = data.name.toUpperCase();\n```\n\n__Example 2__:\n\n```js\ndata = data.toUpperCase();\n```\n\n__Example 3__:\n\n```js\nvar tmp = data;\ndata = {};\ndata.name = tmp.Name;\n```"
 	},
 	{
@@ -998,6 +1088,7 @@
 		"icon": "ti ti-bullhorn",
 		"color": "",
 		"version": "3",
+		"kind": "trigger",
 		"readme": "The component triggers data into the Flow."
 	},
 	{
@@ -1009,6 +1100,7 @@
 		"icon": "ti ti-plus",
 		"color": "",
 		"version": "1",
+		"kind": "",
 		"readme": "The component will generate a variable symbol according to a custom format."
 	},
 	{
@@ -1020,6 +1112,7 @@
 		"icon": "ti ti-code",
 		"color": "",
 		"version": "3",
+		"kind": "",
 		"readme": "The component simulates Total.js Schema Workflow operation. It can process data and store/read them into the database.\n\n__Properties__:\n\n- `$ {Message}`\n- `controller {Object}` A controller instance\n- `user {Object}` A user instance if exists\n- `headers {Object}` Request headers\n- `query {Object}` URL query arguments\n- `params {Object}` A dynamic URL params\n- `ip {String}` IP address\n- __`repo {Object}`__ a custom persistent repository object\n- __`model {Object}`__ an alias to `$.data`\n\n__Model/Data__:\n\n- `$.data {Object}` a message data\n- `$.repo {Object}` a message repository\n- `$.refs {Object}` a message references\n\n__Functions__:\n\n- `variable(key {String}) returns {String}` for reading variables\n- `cancel()` Cancels the processing without error and sending data next\n- `respond(data {Object})` Responds with data\n- `success(data {Object} optional)` Response with success object\n- `invalid(error {String})` Error handling`\n- `done(respond_value {Boolean/Object} optional)` return `function(err, response)` for handling callbacks\n\t- when it `fails` it calls `invalid()`\n\t- when it `done` it calls `success()`"
 	},
 	{
@@ -1031,6 +1124,7 @@
 		"icon": "fa fa-code",
 		"color": "",
 		"version": "1",
+		"kind": "",
 		"readme": "Parse XML from string.\n- __Input__: {String}\n- __Ouput__: {String}"
 	}
 ]
