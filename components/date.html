@@ -2,13 +2,14 @@
 
 	exports.id = 'date';
 	exports.name = 'Date';
-	exports.group = 'Common';
+	exports.group = 'Triggers';
 	exports.icon = 'ti ti-calendar';
 	exports.author = 'Total.js';
 	exports.version = '1';
 	exports.config = {};
 	exports.inputs = [{ id: 'input', name: 'Trigger' }];
 	exports.outputs = [{ id: 'output', name: 'Date/Time' }];
+	exports.kind = 'trigger';
 
 	exports.make = function(instance, config) {
 
@@ -18,7 +19,7 @@
 		};
 
 		instance.message = function($) {
-			$.send('output', dt);
+			$.send('output', makedate());
 		};
 
 		instance.trigger = function() {
