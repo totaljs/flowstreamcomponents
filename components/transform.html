@@ -9,6 +9,7 @@
 	exports.config = { path: '', assign: '' };
 	exports.inputs = [{ id: 'input', name: 'Input' }];
 	exports.outputs = [{ id: 'transform', name: 'Transform', type: 'transform' }, { id: 'output', name: 'Output' }];
+	exports.kind = 'action';
 
 	exports.make = function(instance, config) {
 		instance.message = function($) {

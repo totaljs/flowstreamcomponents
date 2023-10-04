@@ -1,0 +1,148 @@
+<script total>
+
+	exports.id = 'livestats';
+	exports.name = 'Live stats';
+	exports.icon = 'ti ti-chart-line';
+	exports.version = '1';
+	exports.config = { interval: 1000, color: '#E73CF7' };
+	exports.group = 'Common';
+	exports.author = 'Total.js';
+	exports.inputs = [{ id: 'input', name: 'Counter' }];
+
+	exports.make = function(instance, config) {
+
+		var status = { messages: 0, count: 0 };
+		var change = false;
+		var interval = null;
+
+		var refresh = function() {
+			interval && clearInterval(interval);
+			interval = setInterval(function() {
+				if (change) {
+					change = false;
+					instance.status(status);
+					status = { count: status.count, messages: 0 };
+				}
+			}, 1000);
+		};
+
+		instance.message = function($) {
+			var data = $.data;
+			status.messages++;
+			status.count++;
+			change = true;
+			$.destroy();
+		};
+
+		instance.close = function() {
+			interval && clearTimeout(interval);
+		};
+
+		instance.configure = refresh;
+
+		instance.trigger = function() {
+			status.messages = 0;
+			status.count = 0;
+			instance.status(status);
+		}
+
+		refresh();
+	};
+
+</script>
+
+<style>
+	.CLASS { width: 180px; }
+	.CLASS .count { padding: 6px; }
+	.CLASS .count ui-bind { float: right; font-weight: bold; }
+	.CLASS svg { border-left: 0 !important; border-right: 0 !important; border-bottom: 0 !important; }
+	.CLASS path { stroke-width: 5px !important; }
+	.CLASS button { float: right; height: 20px; font-size: 11px; border: 1px solid #E0E0E0; border-radius: var(--radius); color: #000; background-color: transparent; margin: 0; padding: 0 5px; }
+	.CLASS button:hover { background-color: #F8F8F8; }
+	.CLASS button:active { background-color: #E0E0E0; }
+
+	.ui-dark .CLASS button { border-color: #404040; color: #FFF; }
+	.ui-dark .CLASS button:hover { background-color: #303030; }
+	.ui-dark .CLASS button:active { background-color: #404040; }
+</style>
+
+<readme>
+# Live Stats Component
+
+Keep an eye on incoming messages in a snap!
+</readme>
+
+<settings>
+	<div class="padding">
+		<div class="row">
+			<div class="col-md-4 m">
+				<ui-component name="input" path="?.interval" config="type:number">Interval (ms)</ui-component>
+			</div>
+			<div class="col-md-4 m">
+				<ui-component name="input" path="?.color" config="type:color">Color</ui-component>
+			</div>
+		</div>
+	</div>
+</settings>
+
+<body>
+	<header>
+		<button class="exec" data-exec="FUNC.trigger">Clear</button>
+		<i class="ICON"></i>NAME
+	</header>
+	<ui-component name="livestats" path="livestats_UID"></ui-component>
+	<footer>
+		<div class="count">
+			<span>Total:</span>
+			<ui-bind path="STATUS.count" config="text:(value||0).format(0)"></ui-bind>
+		</div>
+	</footer>
+</body>
+
+<script>
+	TOUCH(function(exports, reinit) {
+
+		if (reinit)
+			return;
+
+		var stats = { messages: 0 };
+
+		var path = 'livestats_' + exports.id;
+		var interval = null;
+		var skip = false;
+
+		exports.status = function(value) {
+			if (value) {
+				stats.messages = value.messages;
+				SET(path, stats);
+				skip = true;
+			}
+		};
+
+		exports.configure = function(config) {
+
+			var el = exports.element.find('ui-component')[0];
+
+			WAIT(() => el.ui, () => el.ui.reconfigure({ colors: 'messages=' + config.color }));
+
+			interval && clearInterval(interval);
+			interval = setInterval(function() {
+
+				if (skip) {
+					skip = false;
+					return;
+				}
+
+				stats.messages = 0;
+				SET(path, stats);
+
+			}, (config.interval || 1000));
+		};
+
+		exports.close = function() {
+			delete W[path];
+			interval && clearInterval(interval);
+		};
+
+	});
+</script>

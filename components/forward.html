@@ -9,6 +9,7 @@
 	exports.config = {};
 	exports.inputs = [{ id: 'input', name: 'Input' }];
 	exports.outputs = [{ id: 'output', name: 'Output' }];
+	exports.kind = 'action';
 
 	exports.make = function(instance, config) {
 		instance.message = function($) {

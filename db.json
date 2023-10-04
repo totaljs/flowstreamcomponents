@@ -8,7 +8,7 @@
 		"icon": "ti ti-crosshairs",
 		"color": "",
 		"version": "3",
-		"kind": "",
+		"kind": "action",
 		"readme": "This component implements the [Total.js API Router](https://docs.totaljs.com/total4/cc674001rr51c/#total-js-routing) that allows you to provide only one endpoint (route) by adding multiple endpoints divided by keys. The component expects REST Route message or data in the form:\n\n```js\n{\n\t\"schema\": \"schema_name/{param_1}/{param_2}?query=arguments\",\n\t\"data\": {} // optional, request payload\n}\n```\n\n< __Good to know:__<br>Output data will be the same `data`, but extendend by adding new properties declared below.\n\n__Extended output data:__\n\n- `id {String}` first value from dynamic value\n- `params {Object}` dynamic values\n- `query {Object}` query arguments\n- `user {Object}` optional, inherited from the controller\n- `session {Object}` optional, inherited from the controller\n- `ip {String}` optional, inherited from the controller\n\nIf the controller is stored in the `message.refs.controller` property, then its properties like `controller.id`, `controller.params` and `controller.query` will be extendend by values from parsed schema."
 	},
 	{
@@ -236,7 +236,7 @@
 		"icon": "ti ti-ban",
 		"color": "",
 		"version": "1",
-		"kind": "",
+		"kind": "output",
 		"readme": "The component destroys the incoming message."
 	},
 	{
@@ -320,7 +320,7 @@
 		"icon": "ti ti-history",
 		"color": "",
 		"version": "4",
-		"kind": "",
+		"kind": "action",
 		"readme": "The component remembers the data for repeating the action."
 	},
 	{
@@ -344,7 +344,7 @@
 		"icon": "ti ti-arrow-right",
 		"color": "",
 		"version": "1",
-		"kind": "",
+		"kind": "action",
 		"readme": "The component send message next only. It's targeted for colorized connections to targeted to the same input.\n- The data will Flow only from input a specific color (except black)\n- The color black is a universal color and it will transport everything"
 	},
 	{
@@ -404,8 +404,20 @@
 		"icon": "ti ti-ban",
 		"color": "#E73323",
 		"version": "1",
-		"kind": "",
+		"kind": "output",
 		"readme": "Be careful because this component will kill the current Flow instance. It's targeted only for exceptional cases."
+	},
+	{
+		"id": "livestats",
+		"group": "Common",
+		"name": "Live stats",
+		"url": "https://cdn.totaljs.com/flowstream/webcomponents/livestats.html",
+		"author": "Total.js",
+		"icon": "ti ti-chart-line",
+		"color": "",
+		"version": "1",
+		"kind": "",
+		"readme": "# Live Stats Component\n\nKeep an eye on incoming messages in a snap!"
 	},
 	{
 		"id": "localstorage",
@@ -716,7 +728,7 @@
 		"icon": "ti ti-exchange",
 		"color": "",
 		"version": "1",
-		"kind": "",
+		"kind": "trigger",
 		"readme": "This component registers an HTTP Proxy route and sends request metadata next.\n\n< __IMPORTANT__:<br>The component works only with a defined Proxy endpoint in the Flow settings.\n< __URL__:<br>The URL must be relative to the defined Proxy endpoint. So if the endpoint is `/users/` and the desired address is `http://example.com/users/find` then the value must be `/find`\n\n__Output data__:\n\n```js\n{\n\t\"query\": Object,\n\t\"headers\": Object,\n\t\"url\": String,\n\t\"ip\": String\n}\n```"
 	},
 	{
@@ -776,7 +788,7 @@
 		"icon": "ti ti-filter",
 		"color": "",
 		"version": "3",
-		"kind": "",
+		"kind": "action",
 		"readme": "This component reads specific values according to the configured map."
 	},
 	{
@@ -800,7 +812,7 @@
 		"icon": "ti ti-save",
 		"color": "",
 		"version": "1",
-		"kind": "",
+		"kind": "action",
 		"readme": "The primary goal of this component is to remember data. The component contains two inputs:\n\n- Remember input for remembering data\n- Request input as a trigger for obtaining data, then remembered data would extend the request message (its data), and the component will send it to the Response output"
 	},
 	{
@@ -824,7 +836,7 @@
 		"icon": "ti ti-share",
 		"color": "",
 		"version": "3",
-		"kind": "",
+		"kind": "output",
 		"readme": "This component can respond on the REST Route component."
 	},
 	{
@@ -1064,7 +1076,7 @@
 		"icon": "ti ti-robot",
 		"color": "",
 		"version": "1",
-		"kind": "",
+		"kind": "action",
 		"readme": "This component can transform message data."
 	},
 	{
@@ -1076,8 +1088,8 @@
 		"icon": "ti ti-pulse",
 		"color": "",
 		"version": "1",
-		"kind": "",
-		"readme": "With this component you can easily modify incoming data. Then the `data` content is delivered.\n\n__Example 1__:\n\n```js\n// \"data\" is a reference to message data\ndata.name = data.name.toUpperCase();\n```\n\n__Example 2__:\n\n```js\ndata = data.toUpperCase();\n```\n\n__Example 3__:\n\n```js\nvar tmp = data;\ndata = {};\ndata.name = tmp.Name;\n```"
+		"kind": "action",
+		"readme": "With this component you can easily modify incoming data. Then the `data` content is delivered. For storing temporary/persistent data you can use `repo {Object}` variable.\n\n__Example 1__:\n\n```js\n// \"data\" is a reference to message data\ndata.name = data.name.toUpperCase();\n```\n\n__Example 2__:\n\n```js\ndata = data.toUpperCase();\n```\n\n__Example 3__:\n\n```js\nvar tmp = data;\ndata = {};\ndata.name = tmp.Name;\n```"
 	},
 	{
 		"id": "trigger",
@@ -1100,7 +1112,7 @@
 		"icon": "ti ti-plus",
 		"color": "",
 		"version": "1",
-		"kind": "",
+		"kind": "action",
 		"readme": "The component will generate a variable symbol according to a custom format."
 	},
 	{
