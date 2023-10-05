@@ -78,8 +78,12 @@
 							return;
 
 						var buf = Buffer.concat(buffer);
+
 						if (config.output === 'base64')
 							buf = buf.toString('base64');
+						else if (config.output === 'datauri')
+							buf = 'data:' + response.headers['content-type'] + ';base64,' + buf.toString('base64');
+
 						if (cfg.pathdot)
 							U.set(data, cfg.path, buf);
 						else
@@ -111,6 +115,8 @@
 </script>
 
 <readme>
+The component downloads the file from the URL address as it is.
+
 ## Input
 
 ```js
@@ -136,7 +142,7 @@ The file will be automaticaly deleted once the message is destroyed.
 		<p>This component supports variables in the form <span class="badge badge-medium badge-silver">{variable}</span>.</p>
 		<div class="grid-3">
 			<div class="m">
-				<ui-component name="input" path="?.output" config="dirsource:file|File,base64|BASE64,buffer|Buffer">Output</ui-component>
+				<ui-component name="input" path="?.output" config="dirsource:file|File,base64|BASE64,datauri|Data URI,buffer|Buffer">Output</ui-component>
 			</div>
 			<div class="m">
 				<ui-component name="input" path="?.urlpath" config="required:1;monospace:1">Path for reading URL address</ui-component>
