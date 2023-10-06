@@ -107,10 +107,10 @@
 			};
 		};
 
-		instance.configure = function() {
+		instance.vary = instance.configure = function() {
 			timers = [];
 			for (var m of config.timers)
-				timers.push(func.cronmake(m));
+				timers.push(func.cronmake(instance.replace(m)));
 		};
 
 		var send = function() {
