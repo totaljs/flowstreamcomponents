@@ -3,10 +3,10 @@
 	exports.id = 'code';
 	exports.name = 'Code';
 	exports.group = 'Common';
-	exports.version = '3';
+	exports.version = '4';
 	exports.icon = 'ti ti-code';
 	exports.author = 'Total.js';
-	exports.config = { outputs: 1, code: '// instance {FlowStreamInstance};\n// $ {FlowStreamMessage};\n// vars {Object};\n// repo {Object};\n// data {String/Number/Boolean/Date/Buffer/Object};\n// $.send(\'output\', data); // or simply send(data); which uses the first output\n// $.destroy();\n// $.throw(err);\n\n// IMPORTANT: If you do not perform re-send, you need to destroy this message via $.destroy() method\n// IMPORTANT: methods $.send(), $.destroy() and $.throw() can be executed only once\n\n// $.send(\'output\', data);\n$.destroy();' };
+	exports.config = { outputs: 1, name: 'Code', code: '// instance {FlowStreamInstance};\n// $ {FlowStreamMessage};\n// vars {Object};\n// repo {Object};\n// data {String/Number/Boolean/Date/Buffer/Object};\n// $.send(\'output\', data); // or simply send(data); which uses the first output\n// $.destroy();\n// $.throw(err);\n\n// IMPORTANT: If you do not perform re-send, you need to destroy this message via $.destroy() method\n// IMPORTANT: methods $.send(), $.destroy() and $.throw() can be executed only once\n\n// $.send(\'output\', data);\n$.destroy();' };
 	exports.inputs = [{ id: 'input', name: 'Input' }];
 	exports.outputs = [{ id: 'output', name: 'Output' }];
 	exports.meta = { settingswidth: 1200 };
@@ -71,6 +71,7 @@ To send data to specific output when number of outputs > 1 use `$.send('outputX'
 
 <settings>
 	<div class="padding">
+		<div data---="input__?.name" class="m">Name</div>
 		<ui-component name="input" path="?.outputs" config="type:number" class="m">Number of outputs</ui-component>
 		<div class="ui-input-label">Code:</div>
 		<ui-component name="codemirror" path="?.code" config="type:javascript;minheight:300;parent:auto;margin:60;tabs:true;trim:true" class="m"></ui-component>
@@ -95,6 +96,6 @@ To send data to specific output when number of outputs > 1 use `$.send('outputX'
 
 <body>
 	<header>
-		<i class="ICON"></i>NAME
+		<i class="ICON"></i><span data-bind="CONFIG.name__text"></span>
 	</header>
 </body>
