@@ -26,9 +26,9 @@
 				var flags = [config.timeout];
 
 				config.upload && flags.push('upload');
-				prev = ROUTE(config.method + ' ' + config.url, function() {
+				prev = ROUTE(config.method + ' ' + config.url, function($) {
 
-					var ctrl = this;
+					var ctrl = F.is5 ? $ : this;
 					var msg = instance.newmessage();
 					var data;
 
@@ -49,7 +49,7 @@
 							data = ctrl.headers;
 							break;
 						default:
-							data = { body: ctrl.body, query: ctrl.query, files: ctrl.files, user: ctrl.user, url: ctrl.url, headers: ctrl.headers, params: ctrl.params, ip: ctrl.ip };
+							data = { body: ctrl.body, query: ctrl.query, files: ctrl.files, user: ctrl.user, url: ctrl.url, headers: ctrl.headers, params: ctrl.params, ip: ctrl.ip, split: ctrl.split };
 							break;
 					}
 
