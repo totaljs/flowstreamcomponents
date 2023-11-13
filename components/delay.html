@@ -3,7 +3,7 @@
 	exports.id = 'delay';
 	exports.name = 'Delay';
 	exports.group = 'Common';
-	exports.version = '3';
+	exports.version = '4';
 	exports.icon = 'ti ti-hourglass';
 	exports.author = 'Total.js';
 	exports.config = { delay: 1000 };
@@ -49,7 +49,7 @@
 			!is && instance.trigger();
 		};
 
-		instance.destroy = function() {
+		instance.close = function() {
 			for (let $ of items)
 				$.destroy();
 			items = null;
