@@ -14,6 +14,11 @@
 
 		var prev = null;
 
+		instance.close = function() {
+			prev && prev.remove();
+			prev = null;
+		};
+
 		instance.configure = function() {
 
 			if (prev) {
@@ -23,9 +28,11 @@
 
 			if (config.url && config.method) {
 
-				var flags = [config.timeout];
+				var flags = [];
 
-				config.upload && flags.push('upload');
+				config.timeout && flags.push(F.is5 ? ('<' + Math.ceil(config.timeout / 1000) + 's') : config.timeout);
+				config.upload && flags.push((F.is5 ? '@' : '') + 'upload');
+
 				prev = ROUTE(config.method + ' ' + config.url, function($) {
 
 					var ctrl = F.is5 ? $ : this;
