@@ -50,6 +50,9 @@
 		};
 
 		instance.destroy = function() {
+			for (let $ of items)
+				$.destroy();
+			items = null;
 			timeout && clearTimeout(timeout);
 			timeout = null;
 		};
