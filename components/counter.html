@@ -3,7 +3,7 @@
 	exports.id = 'counter';
 	exports.name = 'Counter';
 	exports.group = 'Common';
-	exports.version = '2';
+	exports.version = '1';
 	exports.icon = 'ti ti-calculator';
 	exports.author = 'Total.js';
 	exports.config = {};
@@ -45,7 +45,7 @@ The component counts incoming messages.
 		<i class="ICON"></i>NAME
 	</header>
 	<footer>
-		<ui-bind path="STATUS" config="template" class="block">
+		<ui-bind path="!STATUS" config="template" class="block">
 			<script type="text/html">
 				<div class="status">{{ value.count }}</div>
 				<div class="ts">{{ if value.ts }}{{ value.ts | format('[ts]') }}{{ else }}---{{ fi }}</div>
