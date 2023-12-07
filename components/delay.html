@@ -15,9 +15,11 @@
 		var items = [];
 		var timeout;
 		var paused = false;
+		var status = { pending: 0 };
 
 		instance.checkstatus = function() {
-			instance.status({ pending: items.length });
+			status.pending = items.length;
+			instance.status(status, 1000);
 		};
 
 		instance.trigger = function() {
@@ -38,9 +40,8 @@
 
 		instance.message = function($) {
 			items.push($);
-			if (timeout)
-				instance.checkstatus();
-			else
+			instance.checkstatus();
+			if (!timeout)
 				timeout = setTimeout(instance.trigger, config.delay);
 		};
 
