@@ -72,7 +72,7 @@ To send data to specific output when number of outputs > 1 use `$.send('outputX'
 <settings>
 	<div class="padding">
 		<div data---="input__?.name" class="m">Name</div>
-		<ui-component name="input" path="?.outputs" config="type:number" class="m">Number of outputs</ui-component>
+		<ui-component name="input" path="?.outputs" config="type:number;format:" class="m">Number of outputs</ui-component>
 		<div class="ui-input-label">Code:</div>
 		<ui-component name="codemirror" path="?.code" config="type:javascript;minheight:300;parent:auto;margin:60;tabs:true;trim:true" class="m"></ui-component>
 	</div>

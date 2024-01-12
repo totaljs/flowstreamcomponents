@@ -207,10 +207,10 @@ __Verify output__:
 			<div>
 				<div class="grid-2">
 					<div class="m">
-						<ui-component name="input" path="?.length" config="type:number;min:1;max:500">Length</ui-component>
+						<ui-component name="input" path="?.length" config="type:number;min:1;max:500;format:">Length</ui-component>
 					</div>
 					<div class="m">
-						<ui-component name="input" path="?.count" config="type:number">Count of attempts</ui-component>
+						<ui-component name="input" path="?.count" config="type:number;format:">Count of attempts</ui-component>
 					</div>
 				</div>
 			</div>
@@ -224,7 +224,7 @@ __Verify output__:
 				<ui-component name="input" path="?.lock" config="align:1;placeholder:5 minutes">Lock</ui-component>
 			</div>
 			<div class="m">
-				<ui-component name="input" path="?.limit" config="type:number">Max. calls per lock</ui-component>
+				<ui-component name="input" path="?.limit" config="type:number;format:">Max. calls per lock</ui-component>
 			</div>
 		</div>
 	</div>
