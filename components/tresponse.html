@@ -1,0 +1,106 @@
+<script total>
+
+	exports.id = 'tresponse';
+	exports.name = 'Response';
+	exports.group = 'Total.js';
+	exports.icon = 'ti ti-bullhorn';
+	exports.version = '1';
+	exports.author = 'Total.js';
+	exports.config = { type: 'auto', code: 200, path: 'response' };
+	exports.inputs = [{ id: 'input', name: 'Response' }];
+	exports.outputs = [{ id: 'output', name: 'Log' }];
+	exports.kind = 'output';
+
+	exports.make = function(instance, config) {
+
+		var nested = false;
+
+		instance.message = function($) {
+			var ctrl = $.refs.controller;
+			if (ctrl) {
+
+				if (F.is5)
+					ctrl.response.status = config.code;
+				else
+					ctrl.status = config.code;
+
+				var value = config.path ? (nested ? U.get(config.path, $.data) : $.data[config.path]) : $.data;
+
+				switch (config.type) {
+					case 'auto':
+						if (value instanceof Array && value.length && value[0].error) {
+							if (F.is5)
+								ctrl.response.status = 400;
+							else
+								ctrl.status = 400;
+							ctrl.json(value);
+						} else
+							ctrl.json(value);
+						break;
+					case 'json':
+						ctrl.json(value);
+						break;
+					case 'success':
+						ctrl.success();
+						break;
+					case 'html':
+						ctrl.content(value, 'text/html');
+						break;
+					case 'plain':
+						ctrl.plain(value);
+						break;
+					case 'empty':
+					default:
+						ctrl.empty();
+						break;
+				}
+
+				$.send('output', value);
+			} else
+				$.destroy();
+		};
+
+		instance.configure = function() {
+			nested = config.path && config.path.includes('.') ? true : false;
+		};
+	};
+
+</script>
+
+<readme>
+This component can respond on the REST Route component.
+</readme>
+
+<settings>
+	<div class="padding">
+		<div class="grid-3">
+			<div class="m">
+				<ui-component name="input" path="?.type" config="required:1;dirsource:auto|Auto,json|JSON,success|Success,empty|Empty response,plain|Plain text,html|HTML">Type</ui-component>
+			</div>
+			<ui-bind path="?.type" config="disabled:value === 'auto'" class="m block">
+				<ui-component name="input" path="?.code" config="required:1;type:number;format:">Status code</ui-component>
+			</ui-bind>
+			<div class="m">
+				<ui-component name="input" path="?.path" config="monospace:1;align:1">Path for reading value</ui-component>
+			</div>
+		</div>
+	</div>
+</settings>
+
+<style>
+	.CLASS header { padding: 6px !important; }
+	.CLASS header ui-bind { font-family: var(--monospace); color: #FFF; margin-left: 4px; font-size: 12px; }
+	.CLASS header ui-bind code { border-radius: var(--radius) 0 0 var(--radius); padding: 2px 3px; }
+	.CLASS header ui-bind span { background-color: gray; border-radius: 0 var(--radius) var(--radius) 0; padding: 2px 3px; }
+</style>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+		<ui-bind path="CONFIG" config="template">
+			<script type="text/html">
+				<code style="background:{{ if value.code >= 400 }}#E73323{{ else }}#4285F4{{ fi }}">{{ value.code }}</code><span>{{ value.type }}</span>
+			</script>
+		</ui-bind>
+	</header>
+</body>

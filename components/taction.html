@@ -1,0 +1,420 @@
+<script total>
+
+	exports.id = 'taction';
+	exports.name = 'Action';
+	exports.icon = 'ti ti-totaljs';
+	exports.author = 'Total.js';
+	exports.version = '1';
+	exports.group = 'Total.js';
+	exports.config = { partial: false, name: 'Unknown', input: '', query: '', params: '', user: 1, permissions: '', code: '$.success();', strerr: false, path: 'response' };
+	exports.inputs = [{ id: 'input', name: 'Payload' }];
+	exports.outputs = [{ id: 'output', name: 'Response' }, { id: 'error', name: 'Error' }];
+
+	exports.install = function(com) {
+
+		MAIN.flowtaction = {};
+
+		const ARGS = /\{{1,2}[a-z0-9_.-\s]+\}{1,2}/gi;
+		const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
+		const Options = function($, config) {
+
+			var t = this;
+			var data = $.data;
+
+			if (!data || typeof(data) !== 'object')
+				data = {};
+
+			t.error = new ErrorBuilder();
+			t.controller = $.refs.controller;
+			t.payload = data.payload || data.model || data.body;
+
+			if (typeof(t.payload) !== 'object' || !t.payload)
+				t.payload = {};
+
+			t.message = $;
+			t.config = config;
+			t.user = data.user;
+			t.query = data.query || {};
+			t.params = data.params || {};
+			t.url = data.url;
+			t.language = data.language;
+			t.headers = data.headers || {};
+			t.files = data.files || [];
+			t.cookies = data.cookies || {};
+			t.ip = data.ip;
+			t.ua = data.ua;
+			t.request = data;
+		};
+
+		Options.prototype = {
+
+			get value() {
+				return this.payload;
+			},
+
+			get model() {
+				return this.payload;
+			},
+
+			set value(value) {
+				this.payload = value;
+			},
+
+			set model(value) {
+				this.payload = value;
+			}
+		};
+
+		Options.prototype.audit = function(message, type) {
+			F.audit(this, message ? this.variables(message) : '', type);
+		};
+
+		Options.prototype.success = function(value) {
+			var self = this;
+			self.request[self.config.path] = { success: true, value: value };
+			self.message.send('output', self.request);
+		};
+
+		Options.prototype.cancel = function() {
+			var self = this;
+			self.message.destroy();
+		};
+
+		Options.prototype.successful = function(callback) {
+			var self = this;
+			return function(err, a, b, c) {
+				if (err)
+					self.invalid(err);
+				else
+					callback.call(self, a, b, c);
+			};
+		};
+
+		Options.prototype.callback = function(value) {
+
+			var self = this;
+
+			if (arguments.length == 0) {
+				return function(err, response) {
+					err && self.error.push(err);
+					self.callback(response);
+				};
+			}
+
+			if (self.error.items.length) {
+				self.request[self.config.path] = self.config.strerr ? self.error.toString() : self.error.output();
+				self.message.send('error', self.request);
+			} else {
+				self.request[self.config.path] = value;
+				self.message.send('output', self.request);
+			}
+		};
+
+		Options.prototype.done = function(arg) {
+			var self = this;
+			return function(err, response) {
+				if (err) {
+					self.error.push(err);
+					self.callback(null);
+				} else
+					self.callback({ success: true, value: arg === true ? response : arg });
+			};
+		};
+
+		Options.prototype.invalid = function(error, path, index) {
+			var self = this;
+			self.error.push(error, path, index);
+			self.callback(null);
+		};
+
+		Options.prototype.cookie = function(name, value, expire, options) {
+			var self = this;
+			if (value === undefined)
+				return self.cookies[name];
+
+			if (value === null)
+				expire = '-1 day';
+
+			if (self.controller) {
+				self.controller.cookie(name, value, expire, options);
+				return true;
+			}
+
+			return false;
+		};
+
+		Options.prototype.variables = function(str, data) {
+
+			if (str.indexOf('{') === -1)
+				return str;
+
+			var $ = this;
+
+			return str.replace(ARGS, function(text) {
+				var l = text[1] === '{' ? 2 : 1;
+				var key = text.substring(l, text.length - l).trim();
+				var val = null;
+				var five = key.substring(0, 5);
+				if (five === 'user.') {
+					if ($.user) {
+						key = key.substring(5);
+						val = key.indexOf('.') === -1 ? $.user[key] : U.get($.user, key);
+					}
+				} else if (five === 'data.') {
+					if (data) {
+						key = key.substring(5);
+						val = key.indexOf('.') === -1 ? data[key] : U.get(data, key);
+					}
+				} else {
+					var six = key.substring(0, 6);
+					if (six === 'model.' || six === 'value.') {
+						if ($.model) {
+							key = key.substring(6);
+							val = key.indexOf('.') === -1 ? $.model[key] : U.get($.model, key);
+						}
+					} else if (six === 'query.')
+						val = $.query[key.substring(6)];
+					else if (key.substring(0, 7) === 'params.')
+						val = $.params[key.substring(7)];
+				}
+				return val == null ? text : val;
+			});
+
+		};
+
+		MAIN.flowtaction.Options = Options;
+		MAIN.flowtaction.AsyncFunction = AsyncFunction;
+	};
+
+	exports.uninstall = function() {
+		delete MAIN.flowtaction;
+	};
+
+	exports.make = function(instance, config) {
+
+		var cfg = {};
+		var fn;
+
+		instance.message = function($) {
+
+			var opt = new MAIN.flowtaction.Options($, cfg);
+			if (fn) {
+
+				// check user
+				if (cfg.user || cfg.permissions) {
+
+					if ((cfg.user === 2 && opt.user) || (cfg.user === 1 && !opt.user)) {
+						opt.invalid(401);
+						return;
+					}
+
+					if (cfg.user === 1 && cfg.permissions) {
+						let permissions = cfg.permissions.slice(0);
+						permissions.unshift(opt);
+						if (UNAUTHORIZED.apply(global, permissions))
+							return;
+					}
+				}
+
+				// check data
+				let tmp;
+
+				if (cfg.input) {
+					tmp = cfg.input.transform(opt.payload, cfg.partial, opt.error);
+					if (tmp.error) {
+						opt.callback(null);
+						return;
+					}
+					opt.payload = tmp.response;
+				}
+
+				if (cfg.query) {
+					opt.error.prefix = 'query.';
+					tmp = cfg.query.transform(opt.query, false, opt.error);
+					if (tmp.error) {
+						opt.callback(null);
+						return;
+					}
+					opt.query = tmp.response;
+				}
+
+				if (cfg.params) {
+					opt.error.prefix = 'params.';
+					tmp = cfg.params.transform(opt.params, false, opt.error);
+					if (tmp.error) {
+						opt.callback(null);
+						return;
+					}
+					opt.params = tmp.response;
+				}
+
+				opt.error.prefix = '';
+
+				try {
+					fn(opt, opt.payload);
+				} catch (e) {
+					opt.invalid(e);
+					instance.throw(e);
+				}
+			} else
+				opt.invalid(501);
+		};
+
+		instance.configure = function() {
+
+			fn = config.code.includes('await ') ? new AsyncFunction('$', 'model', 'data', 'value', config.code) : new Function('$', 'model', 'data', 'value', config.code);
+
+			cfg = {};
+			for (var key in config) {
+				if (key !== 'code')
+					cfg[key] = config[key];
+			}
+
+			cfg = instance.replace(cfg);
+			cfg.input = cfg.input ? cfg.input.toJSONSchema() : null;
+			cfg.query = cfg.query ? cfg.query.toJSONSchema() : null;
+			cfg.params = cfg.params ? cfg.params.toJSONSchema() : null;
+			cfg.permissions = cfg.permissions ? cfg.permissions.split(',').trim() : null;
+
+			if (cfg.permissions && !cfg.permissions.length)
+				cfg.permissions = null;
+		};
+
+		instance.configure();
+
+	};
+
+</script>
+
+<readme>
+This component creates similar functionality as Total.js Actions.
+
+__Payload__:
+
+```js
+{
+	ip: String, // optional, IP address
+	url: String, // optional
+	language: String, // optional
+	user: Object, // optional
+	headers: { key: String }, // optional, request headers
+	cookies: { key: String }, // optional, cookies
+	payload: {}, // optional, request payload
+	query: { key: String }, // optional
+	params: { key: String }, // optional
+	files: [{ type: String, filename: String, path: String, ext: String, size: Number, width: Number, height: Number }] // optional
+}
+```
+__Supported types__:
+
+- `string`
+- `number`
+- `boolean`
+- `date`
+- `object`
+- `email`
+- `phone`
+- `zip`
+- `base64`
+- `url`
+- `datauri`
+- `json`
+- `lower`
+- `upper`
+- `capitalize` all words
+- `capitalize2` only first word
+- `name` makes a name (capitalizes words and remove special characters)
+- `zip`
+- `uid`
+- `guid`
+- `color`
+- `icon`
+- `search` prepares string to a search string
+- `safestring` checks XSS and SQL Injections
+- `smallint`
+- `tinyint`
+- `{A|B|C}` enum type
+- `[type]` means array
+- `{ name:String, age:Number }` means nested object
+- `[ name:String, age:Number ]` means array with an object
+- `*something:type` is `required` field
+</readme>
+
+<settings>
+	<div class="padding">
+		<ui-component name="input" path="?.name" config="required:1">Action name</ui-component>
+	</div>
+	<div class="padding bg-smoke">
+		<div class="pull-left">
+			<div class="ui-input-label">Allow only:</div>
+			<ui-component name="choose" path="?.user" config="selector:div;type:number" class="iconmenu m">
+				<div data-id="1">
+					<i class="ti ti-lock"></i>
+					<span>Authorized</span>
+				</div>
+				<div data-id="2">
+					<i class="ti ti-unlock"></i>
+					<span>Unauthorized</span>
+				</div>
+				<div data-id="0">
+					<i class="ti ti-door-open"></i>
+					<span>Both</span>
+				</div>
+			</ui-component>
+		</div>
+		<div class="pull-left" style="margin-left:20px">
+			<div style="height:25px"></div>
+			<ui-component name="input" path="?.partial" config="type:checkbox">Allow partial data</ui-component>
+			<ui-component name="input" path="?.strerr" config="type:checkbox">Convert errors to a string</ui-component>
+		</div>
+		<div class="clearfix"></div>
+	</div>
+	<div class="padding">
+
+		<div class="m">
+			<ui-component name="input" path="?.input" config="monospace:1;placeholder:name\:Name, *email\:Email">Payload schema</ui-component>
+		</div>
+		<div class="m">
+			<ui-component name="input" path="?.query" config="monospace:1;placeholder:page\:Number">Query arguments schema</ui-component>
+		</div>
+		<div class="padding bg-smoke radius npb">
+			<div class="grid-3">
+				<div class="m">
+					<ui-component name="input" path="?.params" config="monospace:1;placeholder:*id\:String">Params schema</ui-component>
+				</div>
+				<div class="m">
+					<ui-component name="input" path="?.permissions" config="monospace:1;placeholder:admin, director">Permissions</ui-component>
+				</div>
+				<div class="m">
+					<ui-component name="input" path="?.path" config="monospace:1;required:1;placeholder:response">Path for storing a response</ui-component>
+				</div>
+			</div>
+		</div>
+		<div class="caption m">
+			<label><i class="ti ti-code"></i>Custom code</label>
+		</div>
+		<ui-component name="codemirror" path="?.code" config="required:1;type:javascript;height:300;tabs:true;trim:true"></ui-component>
+	</div>
+</settings>
+
+<style>
+	.CLASS .content { min-height: 0; height: auto; }
+	.CLASS .ti { color: #999; }
+</style>
+
+<body>
+	<header style="background:#68B25B;height:5px;border-top:3px solid #83C83C"></header>
+	<footer>
+		<ui-bind path="$CONFIG" config="template" class="block fs11" style="padding:10px">
+			<script type="text/html">
+				<div style="font-size:14px"><span class="badge badge-green b">{{ value.name }}</span></div>
+				<div class="mt5"><i class="ti ti-{{ if value.user }}check-square green{{ else }}square{{ fi }} mr5"></i>{{ if value.user === 1 }}Authorized only{{ else if value.user === 2 }}Unauthorized only{{ else }}Authorized{{ fi }}</div>
+				<div><i class="ti ti-{{ if value.partial }}check-square green{{ else }}square{{ fi }} mr5"></i>Partial data</div>
+				<div><i class="ti ti-{{ if value.input }}check-square green{{ else }}square{{ fi }} mr5"></i>Input data</div>
+				<div><i class="ti ti-{{ if value.query }}check-square green{{ else }}square{{ fi }} mr5"></i>URL Query arguments</div>
+				<div><i class="ti ti-{{ if value.params }}check-square green{{ else }}square{{ fi }} mr5"></i>Params</div>
+				<div><i class="ti ti-{{ if value.permissions }}check-square green{{ else }}square{{ fi }} mr5"></i>Permissions</div>
+			</script>
+		</ui-bind>
+	</footer>
+</body>

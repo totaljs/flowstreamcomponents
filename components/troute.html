@@ -1,0 +1,198 @@
+<script total>
+
+	exports.id = 'troute';
+	exports.name = 'Route';
+	exports.group = 'Total.js';
+	exports.icon = 'ti ti-exchange';
+	exports.version = '1';
+	exports.author = 'Total.js';
+	exports.config = { url: '/', method: 'GET', timeout: 5000, limit: 5120, upload: false, user: 0, send: 'all' };
+	exports.outputs = [{ id: 'output', name: 'Request' }];
+	exports.kind = 'trigger';
+
+	exports.make = function(instance, config) {
+
+		var prev = null;
+
+		instance.close = function() {
+			prev && prev.remove();
+			prev = null;
+		};
+
+		instance.configure = function() {
+
+			if (prev) {
+				prev && prev.remove();
+				prev = null;
+			}
+
+			if (config.url && config.method) {
+
+				var flags = [];
+
+				config.timeout && flags.push(F.is5 ? ('<' + Math.ceil(config.timeout / 1000) + 's') : config.timeout);
+
+				if (F.is5 && config.upload)
+					flags.push('<' + config.limit + 'MB');
+
+				config.upload && flags.push((F.is5 ? '@' : '') + 'upload');
+
+				var action = function($) {
+
+					var ctrl = F.is5 ? $ : this;
+					var msg = instance.newmessage();
+					var data;
+
+					// Parse cookies
+					var cookies = {};
+					var cookie = ctrl.headers.cookie;
+
+					if (cookie) {
+						let arr = cookie.split(';');
+						for (let c of arr) {
+							let line = c.trim();
+							let index = line.indexOf('=');
+							if (index !== -1)
+								cookies[line.substring(0, index)] = line.substring(index + 1);
+						}
+					}
+
+					var query = ctrl.query;
+					var body = ctrl.body;
+					var params = ctrl.params;
+
+					switch (config.send) {
+						case 'payload':
+							data = body;
+							break;
+						case 'query':
+							data = query;
+							break;
+						case 'files':
+							data = ctrl.files;
+							break;
+						case 'params':
+							data = params;
+							break;
+						case 'headers':
+							data = ctrl.headers;
+							break;
+						case 'user':
+							data = ctrl.user;
+							break;
+						case 'cookies':
+							data = cookies;
+							break;
+						default:
+							data = { body: body, query: query, user: ctrl.user, files: ctrl.files, user: ctrl.user, url: ctrl.url, headers: ctrl.headers, params: params, ip: ctrl.ip, split: ctrl.split, cookies: cookies };
+							break;
+					}
+
+					msg.refs.controller = ctrl;
+					msg.send('output', data);
+
+				};
+
+				var auth = config.user == 1 ? '+' : config.user == 2 ? '-' : '';
+				prev = F.is5 ? ROUTE(auth + config.method + ' ' + config.url + (config.action ? (' ' + config.action ) : '') + ' ' + flags.join(' '), action) : ROUTE(auth + config.method + ' ' + instance.replace(config.url) + (config.action ? (' ' + config.action ) : ''), action, flags, config.limit);
+			}
+		};
+
+		instance.configure();
+	};
+
+</script>
+
+<readme>
+This component registers an HTTP Route and sends request data next. It stores `controller` instance in the `message.refs.controller` property. You must respond to the REST response component.
+
+< __IMPORTANT__:<br>The component works only with a defined Proxy endpoint in the Flow settings.
+< __URL__:<br>The URL must be relative to the defined Proxy endpoint. So if the endpoint is `/users/` and the desired address is `http://example.com/users/find` then the value must be `/find`
+
+__Output data__:
+
+```js
+{
+	"route": String,
+	"params": Object,
+	"query": Object,
+	"body": Object,
+	"files": Array,
+	"headers": Object,
+	"url": String,
+	"ip": String
+}
+```
+</readme>
+
+<settings>
+	<div class="padding">
+		<ui-bind path="flow.head.worker" config="hide:!value || flow.head.origin.length < flow.head.proxyurl.length" class="block">
+			<div class="message message-error"><b><i class="ti ti-warning"></i>No proxy endpoint defined.</b><br>This component will not work until then. Please go to main screen, open settings of this FlowStream instance and set the Endpoint.</div>
+		</ui-bind>
+		<div class="row">
+			<div class="col-md-3 m">
+				<ui-component name="input" path="?.method" config="required:1;dirsource:GET|GET,POST|POST,PUT|PUT,PATCH|PATCH,DELETE|DELETE,API|API">Method</ui-component>
+				<div class="help">HTTP method</div>
+			</div>
+			<div class="col-md-9 m">
+				<ui-component name="input" path="?.url" config="monospace:1;required:1">Relative URL address</ui-component>
+				<div class="help">Relative path to: <ui-bind path="flow.head.proxyurl" config="text:value?value:window.location.origin"></ui-bind></div>
+			</div>
+		</div>
+
+		<ui-bind path="?.method" config="show:value === 'API'" class="block hidden m padding bg-smoke radius">
+			<ui-component name="input" path="?.action" config="monospace:1;required:1;placeholder:+users_read/{id}">API Action</ui-component>
+		</ui-bind>
+
+		<ui-component name="input" path="?.upload" config="type:checkbox">Allow uploading files</ui-component>
+		<hr />
+
+		<div class="ui-input-label mt10">Continue as:</div>
+		<ui-component name="choose" path="?.user" config="selector:div;type:number" class="iconmenu m">
+			<div data-id="1">
+				<i class="ti ti-lock"></i>
+				<span>Authorized</span>
+			</div>
+			<div data-id="2">
+				<i class="ti ti-unlock"></i>
+				<span>Unauthorized</span>
+			</div>
+			<div data-id="0">
+				<i class="ti ti-door-open"></i>
+				<span>Both</span>
+			</div>
+		</ui-component>
+
+		<div class="grid-3">
+			<div class="m">
+				<ui-component name="input" path="?.timeout" config="required:1;type:number;format:">Timeout</ui-component>
+			</div>
+			<div class="m">
+				<ui-component name="input" path="?.limit" config="required:1;type:number;ricon:!kB;align:1;format:">Request limit</ui-component>
+			</div>
+			<div class="m">
+				<ui-component name="input" path="?.send" config="required:1;dirsource:all|Everything,payload|Payload,query|Query arguments,files|Files,params|Dynamic params,headers|Headers,cookies|Cookies,user|User">Send to output</ui-component>
+			</div>
+		</div>
+	</div>
+</settings>
+
+<style>
+	.CLASS footer { padding: 10px; }
+	.CLASS footer ui-bind { font-family: var(--monospace); }
+	.CLASS footer .method { background-color: var(--color); color: #FFF; padding: 2px 3px; border-radius: var(--radius); }
+</style>
+
+<body>
+	<header>
+		<i class="$ICON"></i>$NAME
+	</header>
+	<footer>
+		<ui-bind path="$CONFIG" config="template">
+			<script type="text/html">
+				{{ if value.user == 1 }}<i class="ti ti-lock red"></i>{{ else if value.user == 2 }}<i class="ti ti-unlock blue"></i>{{ fi}}<span class="method ml10">{{ value.method }}</span>
+			</script>
+		</ui-bind> <a is="is-a" path="$CONFIG.url" config="text .a;href:flow.head.proxyurl + (value.charAt(0)=== '/' ? value.substring(1) : value)" target="_blank"><span class="a"></span><ui-bind path="$CONFIG.action" config="text;show" class="ml5"></ui-bind></a>
+	</footer>
+</body>
