@@ -94,7 +94,7 @@
 				};
 
 				var auth = config.user == 1 ? '+' : config.user == 2 ? '-' : '';
-				prev = F.is5 ? ROUTE(auth + config.method + ' ' + config.url + (config.action ? (' ' + config.action ) : '') + ' ' + flags.join(' '), action) : ROUTE(auth + config.method + ' ' + instance.replace(config.url) + (config.action ? (' ' + config.action ) : ''), action, flags, config.limit);
+				prev = F.is5 ? ROUTE(auth + config.method + ' ' + config.url + (config.action ? (' ' + config.action) : '') + ' ' + flags.join(' '), action) : ROUTE(auth + config.method + ' ' + instance.replace(config.url) + (config.action ? (' ' + config.action) : ''), action, flags, config.limit);
 			}
 		};
 
@@ -193,6 +193,6 @@ __Output data__:
 			<script type="text/html">
 				{{ if value.user == 1 }}<i class="ti ti-lock red mr10"></i>{{ else if value.user == 2 }}<i class="ti ti-unlock blue mr10"></i>{{ fi}}<span class="method">{{ value.method }}</span>
 			</script>
-		</ui-bind> <a is="is-a" path="$CONFIG.url" config="text .a;href:flow.head.proxyurl + (value.charAt(0)=== '/' ? value.substring(1) : value)" target="_blank"><span class="a"></span><ui-bind path="$CONFIG.action" config="text;show" class="ml5"></ui-bind></a>
+		</ui-bind> <a is="is-a" path="$CONFIG.url" config="text .a;href:flow.head.proxyurl + (value.charAt(0)=== '/' ? value.substring(1) : value)" target="_blank"><span class="a"></span><ui-bind path="$CONFIG" config="text:value.action;show:value.action && value.method=='API'" class="ml5"></ui-bind></a>
 	</footer>
 </body>
