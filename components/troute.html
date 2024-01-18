@@ -137,7 +137,7 @@ __Output data__:
 			</div>
 			<div class="col-md-9 m">
 				<ui-component name="input" path="?.url" config="monospace:1;required:1">Relative URL address</ui-component>
-				<div class="help">Relative path to: <ui-bind path="flow.head.proxyurl" config="text:value?value:window.location.origin"></ui-bind></div>
+				<div class="help">A relative path to: <ui-bind path="flow.head.proxyurl" config="text:value?value:window.location.origin"></ui-bind><br />It supports wildcard <code>/something/*</code> or dynamic arguments <code>/products/{category}/</code>.</div>
 			</div>
 		</div>
 
@@ -150,15 +150,15 @@ __Output data__:
 
 		<div class="ui-input-label mt10">Continue as:</div>
 		<ui-component name="choose" path="?.user" config="selector:div;type:number" class="iconmenu m">
-			<div data-id="1">
+			<div data-id="1" style="width:90px">
 				<i class="ti ti-lock"></i>
 				<span>Authorized</span>
 			</div>
-			<div data-id="2">
+			<div data-id="2" style="width:90px">
 				<i class="ti ti-unlock"></i>
 				<span>Unauthorized</span>
 			</div>
-			<div data-id="0">
+			<div data-id="0" style="width:90px">
 				<i class="ti ti-door-open"></i>
 				<span>Both</span>
 			</div>
@@ -179,8 +179,7 @@ __Output data__:
 </settings>
 
 <style>
-	.CLASS footer { padding: 10px; }
-	.CLASS footer ui-bind { font-family: var(--monospace); }
+	.CLASS footer { padding: 10px; color: #999; }
 	.CLASS footer .method { background-color: var(--color); color: #FFF; padding: 2px 3px; border-radius: var(--radius); }
 </style>
 
@@ -189,10 +188,10 @@ __Output data__:
 		<i class="$ICON"></i>$NAME
 	</header>
 	<footer>
-		<ui-bind path="$CONFIG" config="template">
+		<ui-bind path="$CONFIG" config="template" class="block monospace">
 			<script type="text/html">
-				{{ if value.user == 1 }}<i class="ti ti-lock red mr10"></i>{{ else if value.user == 2 }}<i class="ti ti-unlock blue mr10"></i>{{ fi}}<span class="method">{{ value.method }}</span>
+				{{ if value.user == 1 }}<i class="ti ti-lock red mr10"></i>{{ else if value.user == 2 }}<i class="ti ti-unlock blue mr10"></i>{{ fi}}<span class="method">{{ value.method }}</span> {{ value.url }} {{ if value.method === 'API' }}{{ value.action }}{{ fi }}
 			</script>
-		</ui-bind> <a is="is-a" path="$CONFIG.url" config="text .a;href:flow.head.proxyurl + (value.charAt(0)=== '/' ? value.substring(1) : value)" target="_blank"><span class="a"></span><ui-bind path="$CONFIG" config="text:value.action;show:value.action && value.method=='API'" class="ml5"></ui-bind></a>
+		</ui-bind>
 	</footer>
 </body>
