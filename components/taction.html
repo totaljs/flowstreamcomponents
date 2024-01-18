@@ -6,7 +6,7 @@
 	exports.author = 'Total.js';
 	exports.version = '1';
 	exports.group = 'Total.js';
-	exports.config = { partial: false, name: 'Unknown', input: '', query: '', params: '', user: 1, permissions: '', code: '$.success();', strerr: false, path: 'response' };
+	exports.config = { partial: false, name: 'Unknown', input: '', query: '', params: '', user: 0, permissions: '', code: '$.success();', strerr: false, path: 'response' };
 	exports.inputs = [{ id: 'input', name: 'Payload' }];
 	exports.outputs = [{ id: 'output', name: 'Response' }, { id: 'error', name: 'Error' }];
 
@@ -24,6 +24,7 @@
 			if (!data || typeof(data) !== 'object')
 				data = {};
 
+			t.id = config.name;
 			t.error = new ErrorBuilder();
 			t.controller = $.refs.controller;
 			t.payload = data.payload || data.model || data.body;
@@ -289,7 +290,7 @@
 <readme>
 This component creates similar functionality as Total.js Actions.
 
-__Payload__:
+## Payload
 
 ```js
 {
@@ -305,7 +306,37 @@ __Payload__:
 	files: [{ type: String, filename: String, path: String, ext: String, size: Number, width: Number, height: Number }] // optional
 }
 ```
-__Supported types__:
+
+## Custom scripting
+
+- supports `await`
+- supports Total.js global functions
+
+__Properties__:
+
+- `$.model {Object}` or `model` parsed payload
+- `$.query {Object}` parsed URL query arguments
+- `$.params {Object}` parsed URL params
+- `$.cookies {Object}` parsed cookies
+- `$.files [Object]` uploaded files
+- `$.user {Object}` user session (optional)
+- `$.headers {Object}` request headers
+- `$.ip {String}` IP address (optional)
+- `$.language {String}` optional
+- `$.ua {String}` parsed user agent (optional)
+- `$.url {String}` URL endpoint
+- `$.message {Object}` Flow message instance
+- `$.request {Object}` Flow message payload data
+
+__Methods__:
+
+- `$.invalid(error)` responds with an error and ends the action
+- `$.success([value])` responds with `{ success: true, value }` object and ends the action
+- `$.callback(value)` responds with `value` object and ends the action
+- `$.cancel()` ends the action without response
+- `$.audit(message, [type])` writes audit
+
+## Supported types
 
 - `string`
 - `number`
