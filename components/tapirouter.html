@@ -1,0 +1,312 @@
+<script total>
+
+	exports.id = 'tapirouter';
+	exports.name = 'API router';
+	exports.group = 'Total.js';
+	exports.icon = 'ti ti-crosshairs';
+	exports.version = '1';
+	exports.author = 'Total.js';
+	exports.config = { name: 'API Router', schema: [], color: '', icon: 'ti ti-crosshairs' };
+	exports.inputs = [{ id: 'input', name: 'Payload' }];
+	exports.outputs = [];
+	exports.kind = 'action';
+
+	exports.make = function(instance, config) {
+
+		var compiled = null;
+
+		instance.message = function($) {
+
+			var input = $.data;
+			var data = input.payload || input.body;
+
+			if (typeof(data.schema) === 'string') {
+
+				var schema = data.schema;
+				var index = schema.indexOf('/');
+				var key = index === -1 ? schema : schema.substring(0, index);
+
+				var queryindex = schema.indexOf('?');
+				if (index === -1 && queryindex !== -1)
+					key = key.substring(0, queryindex);
+
+				var meta = compiled[key];
+				if (meta) {
+
+					index = queryindex;
+
+					var query = index === -1 ? {} : DEF.parsers.urlencoded(schema.substring(index + 1));
+					var arr = (index === -1 ? schema : schema.substring(0, index)).split('/').trim();
+
+					arr.shift();
+
+					if (arr.length === meta.params.length) {
+
+						var params = {};
+						for (var i = 0; i < meta.params.length; i++)
+							params[meta.params[i]] = arr[i];
+
+						input.action = params[meta.params[0]];
+						input.params = params;
+						input.query = query;
+						input.payload = !data.data || typeof(data.data) !== 'object' ? {} : data.data;
+						input.body = undefined;
+
+						$.send(meta.id);
+						return;
+					}
+				}
+
+			}
+
+			$.data.response = [{ error: '404' }];
+			$.send('error');
+		};
+
+		instance.configure = function() {
+
+			var outputs = [];
+
+			compiled = {};
+
+			for (var item of config.schema) {
+
+				if (!item)
+					continue;
+
+				var params = item.name.split('/').trim();
+				var name = params.shift();
+
+				for (var i = 0; i < params.length; i++)
+					params[i] = params[i].replace(/\{|\}/g, '');
+
+				compiled[name] = { id: item.id, params: params };
+				outputs.push({ id: item.id, name: item.name });
+			}
+
+			outputs.push({ id: 'error', name: '404' });
+
+			var prev = JSON.stringify(instance.outputs);
+			var curr = JSON.stringify(outputs);
+
+			if (prev !== curr) {
+				instance.outputs = outputs;
+				instance.save();
+			}
+
+		};
+
+		instance.configure();
+	};
+
+</script>
+
+<readme>
+This component implements the [Total.js API Router](https://docs.totaljs.com/total4/cc674001rr51c/#total-js-routing) that allows you to provide only one endpoint (route) by adding multiple endpoints divided by keys. The component expects REST Route message or data in the form:
+
+## Payload
+
+```js
+{
+	// REQUIRED payload:
+	payload: {
+		schema: 'schema_name/{param_1}/{param_2}?query=arguments',
+		data: {} // optional, request payload
+	},
+	ip: String, // optional, IP address
+	url: String, // optional
+	language: String, // optional
+	user: Object, // optional
+	headers: { key: String }, // optional, request headers
+	cookies: { key: String }, // optional, cookies
+	query: { key: String }, // optional
+	params: { key: String }, // optional
+	files: [{ type: String, filename: String, path: String, ext: String, size: Number, width: Number, height: Number }] // optional
+}
+```
+
+## Output
+
+It will be the same as payload data, but it will be extended by the updated properties `params`, 'payload', and `query`.
+</readme>
+
+<style>
+	.CLASS-settings .fields { border: 1px solid #E0E0E0; border-radius: var(--radius); }
+	.CLASS-settings figure { height: 26px; border-top: 1px solid #E0E0E0; line-height: 25px; font-size: 13px; }
+	.CLASS-settings figure .edit-open { background-color: #F0F0F0; }
+	.CLASS-settings figure .name { line-height: 14px; margin-right: 30px; }
+	.CLASS-settings figure .name div { outline: 0; line-height: 23px; padding: 0 5px; min-height: 25px; font-weight: bold; }
+	.CLASS-settings figure .controls { float: right; width: 90px; padding: 0; margin: 0; border-left: 1px solid #E0E0E0; text-align: center; }
+	.CLASS-settings figure .controls span { cursor: pointer; margin-left: 5px; }
+	.CLASS-settings figure .controls span:first-child { margin-left: 0; }
+	.CLASS-settings figure:first-child { border-top: 0; line-height: 26px; }
+	.CLASS-settings figure:first-child div { line-height: 26px; }
+	.CLASS-settings figure.ismoved { background-color: rgba(92,29,196,0.3) !important; }
+	.CLASS footer { height: 40px; line-height: 40px; padding: 0 10px; font-size: 12px; }
+	.CLASS header div { border-radius: var(--radius); padding: 3px; background-color: #B92EC5; color: #FFF; }
+	.CLASS header div i { background-color: rgba(0,0,0,0.2); }
+
+	.ui-dark .CLASS header div i { background-color: rgba(255,255,255,0.2); }
+	.ui-dark .CLASS-settings .fields { border-color: #404040; }
+	.ui-dark .CLASS-settings figure { border-top-color: #404040; }
+	.ui-dark .CLASS-settings figure .controls { border-left-color: #404040; }
+</style>
+
+<body>
+	<header>
+		<ui-bind path="CONFIG" config="template">
+			<script type="text/html">
+				<div {{ if value.color }} style="background:{{ value.color }}"{{ fi }}>
+					<i class="{{ value.icon }}"></i><span>{{ value.name }}</span>
+				</div>
+			</script>
+		</ui-bind>
+	</header>
+</body>
+
+<settings>
+	<div class="CLASS-settings">
+		<div class="padding">
+			<div class="row">
+				<div class="col-md-6 m">
+					<ui-component name="input" path="?.name" config="required:1">Name</ui-component>
+				</div>
+				<div class="col-md-3 m">
+					<ui-component name="input" path="?.color" config="type:color">Color</ui-component>
+				</div>
+				<div class="col-md-3 m">
+					<ui-component name="input" path="?.icon" config="type:icon">Icon</ui-component>
+				</div>
+			</div>
+			<div class="caption m">
+				<div class="toolbar">
+					<nav>
+						<button class="exec" data-exec="tmptotalapirouter.add"><i class="ti ti-plus-circle"></i>Add</button>
+					</nav>
+				</div>
+				<label>Schema</label>
+			</div>
+			<div class="message message-alert"><i class="ti ti-exclamation-triangle"></i>Every name of identifier must be unique per Flow. You can use dynamic arguments in the form <code>{argument_name}</code></div>
+			<ui-bind path="?.schema" config="template:figure --> data-id;show:value && value.length" class="fields m block">
+				<script type="text/html">
+					{{ foreach m in value }}
+					<figure data-id="{{ m.id }}">
+						<div class="controls">
+							<span class="exec" data-exec="tmptotalapirouter.move" title="Up" data-type="up"><i class="ti ti-arrow-up"></i></span>
+							<span class="exec" data-exec="tmptotalapirouter.move" title="Down" data-type="down"><i class="ti ti-arrow-down"></i></span>
+							<span class="exec" data-exec="tmptotalapirouter.rem" title="Remove"><i class="ti ti-trash red"></i></span>
+						</div>
+						<div class="name">
+							<div class="monospace edit hellip" data-type="from" data-edit="exec:tmptotalapirouter.name;required:1">{{ m.name }}</div>
+						</div>
+					</figure>
+					{{ end }}
+				</script>
+			</ui-bind>
+			<div class="help">Use names in lower-case. We recommend to keep e.g. <code>users_read/{id}</code> or <code>products_read/{id}</code></div>
+		</div>
+	</div>
+</settings>
+
+<script>
+
+	TOUCH(function(exports, reinit) {
+
+		exports.settings = function(meta) {
+
+			if (!meta.config.schema.length) {
+				var obj = {};
+				obj.id = 'o' + Math.random().toString(36).substring(6);
+				obj.name = 'users_read/{id}';
+				meta.config.schema.push(obj);
+			}
+
+			var tmp = W.tmptotalapirouter;
+
+			if (!tmp) {
+
+				tmp = {};
+				tmp.add = function(el) {
+					var scope = el.scope();
+					var obj = {};
+					obj.id = 'o' + Math.random().toString(36).substring(6);
+					obj.name = 'users_read/{id}';
+					scope.push('schema', obj);
+					scope.change('*');
+				};
+
+				tmp.rem = function(el) {
+					var id = ATTRD(el);
+					var scope = el.scope();
+					var model = scope.get();
+					var index = model.schema.findIndex('id', id);
+					model.schema.splice(index, 1);
+					scope.update('schema');
+					scope.change('*');
+				};
+
+				tmp.move = function(el) {
+
+					var scope = el.scope();
+					var id = ATTRD(el);
+					var container = el.closest('figure');
+					var schema = scope.get().schema;
+					var index = schema.findIndex('id', id);
+					var is = false;
+					var isup = el.attrd('type') === 'up';
+
+					if (isup) {
+						if (index > 0) {
+							var a = schema[index];
+							schema[index] = schema[index - 1];
+							schema[index - 1] = a;
+							is = true;
+						}
+					} else {
+						if (index <= schema.length - 2) {
+							var a = schema[index];
+							schema[index] = schema[index + 1];
+							schema[index + 1] = a;
+							is = true;
+						}
+					}
+
+					if (is) {
+						NODEMOVE(container, isup);
+						scope.change('*');
+						container.aclass('ismoved').rclass('ismoved', 500);
+					}
+				};
+
+				tmp.name = function(opt, next) {
+					opt.value = opt.value.replace(/(;|\s|,)/g, '').trim();
+					var scope = opt.element.scope();
+					var id = ATTRD(opt.element);
+					var item = scope.get().schema.findItem('id', id);
+					item.name = opt.value.toLowerCase();
+					scope.change('*');
+					next(true);
+				};
+
+				W.tmptotalapirouter = tmp;
+			}
+		};
+
+		exports.configure = function() {
+
+			var changes = exports.instance.changes;
+
+			if (changes && changes.newbie) {
+				var outputs = [];
+				for (var item of exports.config.schema)
+					outputs.push({ id: item.id, name: item.name });
+				outputs.push({ id: 'error', name: '404' });
+				exports.instance.outputs = outputs;
+				UPD('flow.data');
+			}
+
+		};
+
+	});
+
+</script>
