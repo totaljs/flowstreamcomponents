@@ -1,0 +1,81 @@
+<script total>
+
+	exports.id = 'timeout';
+	exports.name = 'Timeout';
+	exports.icon = 'ti ti-stopwatch';
+	exports.author = 'Total.js / Pavol Danko';
+	exports.version = '1';
+	exports.group = 'Timers';
+	exports.config = { timeout: 5 };
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }];
+
+	exports.make = function(instance, config) {
+
+		var timeout = null;
+		var prev = null;
+
+		var resume = function() {
+			prev.send('output');
+			timeout = null;
+			prev = null;
+		};
+
+		instance.message = function($) {
+
+			if (prev)
+				prev.destroy();
+
+			prev = $;
+			timeout && clearTimeout(timeout);
+			timeout = setTimeout(resume, (config.timeout * 1000));
+		};
+
+		instance.configure = function() {
+			if (timeout) {
+				clearTimeout(timeout);
+				timeout = null;
+			}
+		};
+
+		instance.close = function() {
+			if (timeout) {
+				clearTimeout(timeout);
+				timeout = null;
+			}
+		};
+
+	};
+
+</script>
+
+<readme>
+The component starts a timeout and restarts it when a new message arrives.
+</readme>
+
+<style>
+	.CLASS .status { font-size: 12px; margin: 0; padding: 2px 5px; }
+	.CLASS .status ui-bind { color: #A0A0A0; }
+</style>
+
+<settings>
+	<div class="padding">
+		<div class="grid-4">
+			<div class="m">
+				<ui-component name="input" path="?.timeout" config="type:number">Timeout</ui-component>
+				<div class="help">In seconds</div>
+			</div>
+		</div>
+	</div>
+</settings>
+
+<body>
+	<header>
+		<i class="$ICON"></i>$NAME
+	</header>
+	<footer>
+		<div class="status">
+			<div>Timeout: <ui-bind path="CONFIG.timeout" config="text:(value?value:'0')+'s'"></ui-bind></div>
+		</div>
+	</footer>
+</body>
