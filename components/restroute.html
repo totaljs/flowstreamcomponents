@@ -14,6 +14,11 @@
 
 		var prev = null;
 
+		instance.close = function() {
+			prev && prev.remove();
+			prev = null;
+		};
+
 		instance.configure = function() {
 
 			if (prev) {
@@ -23,12 +28,14 @@
 
 			if (config.url && config.method) {
 
-				var flags = [config.timeout];
+				var flags = [];
 
-				config.upload && flags.push('upload');
-				prev = ROUTE(config.method + ' ' + config.url, function() {
+				config.timeout && flags.push(F.is5 ? ('<' + Math.ceil(config.timeout / 1000) + 's') : config.timeout);
+				config.upload && flags.push((F.is5 ? '@' : '') + 'upload');
 
-					var ctrl = this;
+				prev = ROUTE(config.method + ' ' + config.url, function($) {
+
+					var ctrl = F.is5 ? $ : this;
 					var msg = instance.newmessage();
 					var data;
 
@@ -49,7 +56,7 @@
 							data = ctrl.headers;
 							break;
 						default:
-							data = { body: ctrl.body, query: ctrl.query, files: ctrl.files, user: ctrl.user, url: ctrl.url, headers: ctrl.headers, params: ctrl.params, ip: ctrl.ip };
+							data = { body: ctrl.body, query: ctrl.query, files: ctrl.files, user: ctrl.user, url: ctrl.url, headers: ctrl.headers, params: ctrl.params, ip: ctrl.ip, split: ctrl.split };
 							break;
 					}
 
@@ -105,7 +112,7 @@ __Output data__:
 		</div>
 		<div class="row">
 			<div class="col-md-3 m">
-				<ui-component name="input" path="?.timeout" config="required:1;type:number">Timeout</ui-component>
+				<ui-component name="input" path="?.timeout" config="required:1;type:number;format:">Timeout</ui-component>
 			</div>
 			<div class="col-md-3 m">
 				<ui-component name="input" path="?.limit" config="required:1;type:number;ricon:!kB;align:1">Request limit</ui-component>

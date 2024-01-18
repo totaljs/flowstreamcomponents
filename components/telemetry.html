@@ -125,7 +125,7 @@ array.0.value // -> 3
 
 <settings>
 	<div class="padding">
-		<ui-component name="input" path="?.interval" config="type:number" default="500">Update interval (in ms)</ui-component>
+		<ui-component name="input" path="?.interval" config="type:number;format:" default="500">Update interval (in ms)</ui-component>
 		<div class="help m">Leave empty to update immediately when new data comes in.</div>
 		<ui-component name="keyvalue" path="?.paths" config="placeholderkey:Type a property name;placeholdervalue:Type a path and press enter">Properties to show in the template</ui-component>
 		<div class="help m">Path supports js dot notation like `data.arr.0.value`, following is not supported `data.arr[0].value`<br>Supports datatypes in the `path` column: `some.path | date`</div>

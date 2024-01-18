@@ -218,7 +218,7 @@ __Response__:
 	<div class="padding">
 		<div class="row">
 			<div class="col-md-3 m">
-				<ui-component name="input" path="?.timeout" config="type:number">Timeout</ui-component>
+				<ui-component name="input" path="?.timeout" config="type:number;format:">Timeout</ui-component>
 				<div class="help"><i class="ti ti-clock"></i><ui-bind path="?.timeout" config="text:((value||0)/1000).floor(2)+' sec.'"></ui-bind><br />Timeout <b>in milliseconds</b></div>
 			</div>
 			<div class="col-md-3 m">

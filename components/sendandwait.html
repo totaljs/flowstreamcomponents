@@ -1,0 +1,73 @@
+<script total>
+
+	exports.id = 'sendandwait';
+	exports.name = 'Send and wait';
+	exports.group = 'Common';
+	exports.version = '1';
+	exports.icon = 'ti ti-send';
+	exports.author = 'Total.js';
+	exports.config = { timeout: 1 };
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }];
+
+	exports.make = function(instance, config) {
+
+		var timeout = null;
+		var skip = false;
+		var close = function() {
+			timeout && cleartimeout(timeout);
+			timeout = null;
+			skip = false;
+		};
+
+		instance.message = function($) {
+
+			if (skip) {
+				$.destroy();
+				return;
+			}
+
+			skip = true;
+			timeout = setTimeout(close, config.timeout * 60 * 1000);
+			$.send('output');
+		};
+
+		instance.close = close;
+
+		instance.configure = function() {
+			timeout && clearTimeout(timeout);
+			timeout = null;
+			skip = false;
+		};
+
+	};
+
+</script>
+
+<style>
+	.CLASS footer { padding: 10px; font-size: 11px; }
+</style>
+
+<settings>
+	<div class="padding">
+		<div class="grid-3">
+			<div class="m">
+				<ui-component name="input" path="?.timeout" config="type:number;required:1;format:">Interval</ui-component>
+				<div class="help">In minutes</div>
+			</div>
+		</div>
+	</div>
+</settings>
+
+<readme>
+This component sends the data next, and then waits for a defined period.
+</readme>
+
+<body>
+	<header>
+		<i class="$ICON"></i>$NAME
+	</header>
+	<footer>
+		Timeout: <ui-bind path="$CONFIG.timeout" config="text;empty"></ui-bind> min.
+	</footer>
+</body>

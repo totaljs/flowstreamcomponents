@@ -3,7 +3,7 @@
 	exports.id = 'delay';
 	exports.name = 'Delay';
 	exports.group = 'Common';
-	exports.version = '3';
+	exports.version = '4';
 	exports.icon = 'ti ti-hourglass';
 	exports.author = 'Total.js';
 	exports.config = { delay: 1000 };
@@ -15,9 +15,11 @@
 		var items = [];
 		var timeout;
 		var paused = false;
+		var status = { pending: 0 };
 
 		instance.checkstatus = function() {
-			instance.status({ pending: items.length });
+			status.pending = items.length;
+			instance.status(status, 1000);
 		};
 
 		instance.trigger = function() {
@@ -38,9 +40,8 @@
 
 		instance.message = function($) {
 			items.push($);
-			if (timeout)
-				instance.checkstatus();
-			else
+			instance.checkstatus();
+			if (!timeout)
 				timeout = setTimeout(instance.trigger, config.delay);
 		};
 
@@ -49,7 +50,10 @@
 			!is && instance.trigger();
 		};
 
-		instance.destroy = function() {
+		instance.close = function() {
+			for (let $ of items)
+				$.destroy();
+			items = null;
 			timeout && clearTimeout(timeout);
 			timeout = null;
 		};
@@ -80,7 +84,7 @@
 	<div class="padding">
 		<div class="grid-4">
 			<div class="m">
-				<ui-component name="input" path="?.delay" config="type:number;required:1">Delay</ui-component>
+				<ui-component name="input" path="?.delay" config="type:number;required:1;format:">Delay</ui-component>
 				<div class="help">In milliseconds</div>
 			</div>
 		</div>

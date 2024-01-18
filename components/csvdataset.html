@@ -432,7 +432,7 @@
 				<ui-component name="input" path="?.unit" config="align:1">Unit</ui-component>
 			</div>
 			<div class="m">
-				<ui-component name="input" path="?.decimals" config="align:1;type:number" default="2">Decimals</ui-component>
+				<ui-component name="input" path="?.decimals" config="align:1;type:number;format:" default="2">Decimals</ui-component>
 			</div>
 			<div class="m">
 				<ui-component name="input" path="?.icon" config="type:icon">Icon</ui-component>
@@ -447,19 +447,19 @@
 		<p>Zero values will prevent statistics from being displayed for the selected period.</p>
 		<div class="grid-4">
 			<div class="m">
-				<ui-component name="input" path="?.hours" config="type:number">Hours</ui-component>
+				<ui-component name="input" path="?.hours" config="type:number;format:">Hours</ui-component>
 				<div class="help">How many hours to be returned?</div>
 			</div>
 			<div class="m">
-				<ui-component name="input" path="?.days" config="type:number">Days</ui-component>
+				<ui-component name="input" path="?.days" config="type:number;format:">Days</ui-component>
 				<div class="help">How many days to be returned?</div>
 			</div>
 			<div class="m">
-				<ui-component name="input" path="?.months" config="type:number">Months</ui-component>
+				<ui-component name="input" path="?.months" config="type:number;format:">Months</ui-component>
 				<div class="help">How many months to be returned?</div>
 			</div>
 			<div class="m">
-				<ui-component name="input" path="?.years" config="type:number">Years</ui-component>
+				<ui-component name="input" path="?.years" config="type:number;format:">Years</ui-component>
 				<div class="help">How many years to be returned?</div>
 			</div>
 		</div>

@@ -43,7 +43,7 @@
 		"author": "Total.js",
 		"icon": "ti ti-code",
 		"color": "",
-		"version": "3",
+		"version": "4",
 		"kind": "",
 		"readme": "This component executes a custom JavaScript code as it is.\n\nTo send data to the default output use `send(somedata);`\nTo send data to specific output when number of outputs > 1 use `$.send('outputX', somedata)` where `X` is output index, see example bellow:\n- first output--> `send(somedata)` or `$.send('output', somedata)`\n- second output --> `$.send('output2', somedata)`\n- ...\n- 5th output --> `$.send('output5', somedata)`\n- etc."
 	},
@@ -169,14 +169,14 @@
 	},
 	{
 		"id": "date",
-		"group": "Common",
+		"group": "Triggers",
 		"name": "Date",
 		"url": "https://cdn.totaljs.com/flowstream/webcomponents/date.html",
 		"author": "Total.js",
 		"icon": "ti ti-calendar",
 		"color": "",
 		"version": "1",
-		"kind": "",
+		"kind": "trigger",
 		"readme": "The component will return a Date/Time object (raw or formatted) according to its configuration."
 	},
 	{
@@ -199,7 +199,7 @@
 		"author": "Total.js",
 		"icon": "ti ti-hourglass",
 		"color": "",
-		"version": "3",
+		"version": "4",
 		"kind": "",
 		"readme": "The component delays processing of a message."
 	},
@@ -213,7 +213,7 @@
 		"color": "",
 		"version": "2",
 		"kind": "",
-		"readme": "## Input\n\n```js\n{\n\turl: 'https://example.com/file.jpg', // file url\n}\n```\n\n## Output\n\n```js\n{\n\tvalue: '/tmp/xyz.ext',\n\t...\n}\n```\n\nThe file will be automaticaly deleted once the message is destroyed."
+		"readme": "The component downloads the file from the URL address as it is.\n\n## Input\n\n```js\n{\n\turl: 'https://example.com/file.jpg', // file url\n}\n```\n\n## Output\n\n```js\n{\n\tvalue: '/tmp/xyz.bin',\n\t...\n}\n```\n\nThe file will be automaticaly deleted once the message is destroyed."
 	},
 	{
 		"id": "duration",
@@ -472,6 +472,18 @@
 		"group": "Common",
 		"name": "Merge",
 		"url": "https://cdn.totaljs.com/flowstream/webcomponents/merge.html",
+		"author": "Total.js",
+		"icon": "ti ti-cashregister",
+		"color": "",
+		"version": "1",
+		"kind": "",
+		"readme": "The component merges incoming data into an array."
+	},
+	{
+		"id": "merginputs",
+		"group": "Common",
+		"name": "Merge inputs",
+		"url": "https://cdn.totaljs.com/flowstream/webcomponents/merginputs.html",
 		"author": "Total.js",
 		"icon": "ti ti-filter",
 		"color": "",
@@ -816,6 +828,18 @@
 		"readme": "The primary goal of this component is to remember data. The component contains two inputs:\n\n- Remember input for remembering data\n- Request input as a trigger for obtaining data, then remembered data would extend the request message (its data), and the component will send it to the Response output"
 	},
 	{
+		"id": "renderer",
+		"group": "Common",
+		"name": "Renderer",
+		"url": "https://cdn.totaljs.com/flowstream/webcomponents/renderer.html",
+		"author": "Total.js",
+		"icon": "ti ti-paint-brush",
+		"color": "",
+		"version": "1",
+		"kind": "output",
+		"readme": "The component transforms data in HTML format in the component body. You can easily visualize any data. Data is rendered server-side."
+	},
+	{
 		"id": "request",
 		"group": "Common",
 		"name": "Request",
@@ -993,7 +1017,7 @@
 		"color": "",
 		"version": "1",
 		"kind": "",
-		"readme": "The component uses server-side implementation of [Tangular template engine](https://docs.totaljs.com/components/40d06002lm50c/).\n\n## Example\n\n__Incomming data__:\n\n```js\n{\n\tapp_name: 'Total.js Flow'\n}\n```\n\n__Template__:\n\n```html\nApp name: {{ app_name }}\n```\n\n- `$` type `{MessageInstance}` <https://docs.totaljs.com/total4/40844001ni51c/>\n\nIn the example bellow, the $.refs.controller is only available if the message was created by the Route component:\n\n```html\nURL: {{ $.refs.controller.url }}\n```"
+		"readme": "The component uses server-side implementation of [Tangular template engine](https://docs.totaljs.com/components/40d06002lm50c/).\n\n## Example\n\n__Incomming data__:\n\n```js\n{\n\tapp_name: 'Total.js Flow'\n}\n```\n\n__Template__:\n\n```html\nApp name: {{ value.app_name }}\n```\n\n- `$` type `{MessageInstance}` <https://docs.totaljs.com/total4/40844001ni51c/>\n\nIn the example bellow, the $.refs.controller is only available if the message was created by the Route component:\n\n```html\nURL: {{ $.refs.controller.url }}\n```"
 	},
 	{
 		"id": "telemetry",

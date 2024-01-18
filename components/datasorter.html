@@ -42,12 +42,14 @@
 
 			try {
 
-				fn = new Function('instance', '$', 'var value=$.data,data=$.data;' + builder.join('') + '$.send(\'error\');');
+				fn = new Function('instance', '$', 'var value=$.data,data=$.data,refs=$.refs,repo=$.repo;' + builder.join('') + '$.send(\'error\');');
 
 				if (JSON.stringify(outputs) !== old) {
 					instance.outputs = outputs;
 					instance.save();
 				}
+
+				instance.status('');
 
 			} catch (e) {
 				instance.status(e + '');
@@ -84,7 +86,7 @@ The component sorts data according to the custom defined conditions. You can def
 				<div class="padding">
 					<ui-component name="input" path="?.name" config="required:1;innerlabel:1__''" class="m">Name</ui-component>
 					<ui-component name="input" path="?.if" config="required:1;innerlabel:1;monospace:1" default="'value != null'">Condition</ui-component>
-					<div class="help m"><i class="ti ti-exclamation-triangle"></i><code>value</code> represents a message data. Example: <code>value.age > 18</code></div>
+					<div class="help m"><i class="ti ti-exclamation-triangle"></i><code>value</code> represents a message data and <code>refs</code> represents references. Example: <code>value.age > 18</code></div>
 					<ui-component name="validate" path="?" class="toolbar">
 						<button name="submit"><i class="ti ti-file-code"></i>Save</button>
 						<button name="remove">Remove</button>

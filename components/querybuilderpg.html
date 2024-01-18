@@ -4,7 +4,7 @@
 	exports.name = 'QueryBuilder PG';
 	exports.icon = 'ti ti-database';
 	exports.author = 'Total.js';
-	exports.group = 'REST API';
+	exports.group = 'Total.js';
 	exports.version = '1';
 	exports.config = { id: 'default', name: 'API PostgreSQL', url: '', pooling: 2 };
 	exports.outputs = [{ id: 'error', name: 'Error' }];
@@ -12,7 +12,7 @@
 
 	exports.make = function(instance, config) {
 
-		var QB = require('querybuilderpg');
+		const QB = require('querybuilderpg');
 		var init = false;
 		var conf;
 
@@ -22,17 +22,18 @@
 			conf = instance.replace(config);
 
 			if (conf.url) {
+
 				QB.init(conf.id, conf.url, conf.pooling, function(err, data) {
-					var msg = instance.newmessage([{ error: err + ' --> ' + data.query }]);
-					msg.send('error');
+					instance.newmessage([{ error: err + ' --> ' + data.query }]).send('error');
 				});
+
 				init = true;
 			}
 
 		};
 
 		instance.close = function() {
-			conf && require('querybuilderpg').init(conf.name);
+			conf && QB.init(conf.name, null);
 			conf = null;
 			init = false;
 		};
@@ -66,7 +67,7 @@ __Usage in API Database__:
 			</div>
 			<div class="col-md-3">
 				<ui-component name="input" path="?.pooling" config="required:1;type:number">Pooling</ui-component>
-				<div class="help">How many connections can it keep?</div>
+				<div class="help">How many connections should it keep?</div>
 			</div>
 		</div>
 	</div>
@@ -78,10 +79,10 @@ __Usage in API Database__:
 
 <body>
 	<header>
-		<i class="ICON"></i>QueryBuilder PG
+		<i class="$ICON"></i>$NAME
 	</header>
 	<footer>
-		<ui-bind path="CONFIG" config="template">
+		<ui-bind path="$CONFIG" config="template">
 			<script type="text/html">
 				<div class="help"><i class="ti ti-pencil-paintbrush"></i>{{ value.id }}</div>
 				<div class="b">{{ value.name }}</div>

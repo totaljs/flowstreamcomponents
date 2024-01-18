@@ -65,7 +65,7 @@ This component must be used only with REST Route component. It reads a token fro
 		<hr />
 		<div class="row">
 			<div class="col-md-3 m">
-				<ui-component name="input" path="?.code" config="required:1;type:number">Status code</ui-component>
+				<ui-component name="input" path="?.code" config="required:1;type:number;format:">Status code</ui-component>
 			</div>
 			<div class="col-md-3 m">
 				<ui-component name="input" path="?.header" config="required:1;type:lower">Header</ui-component>
@@ -79,7 +79,7 @@ This component must be used only with REST Route component. It reads a token fro
 			<div class="col-md-6 m">
 				<div class="row">
 					<div class="col-md-6">
-						<ui-component name="input" path="?.ddos" config="required:1;type:number">DDOS protection</ui-component>
+						<ui-component name="input" path="?.ddos" config="required:1;type:number;format:">DDOS protection</ui-component>
 					</div>
 				</div>
 				<div class="help">How many times can the client requested your API with a bad key? The internal IP database is cleared every 10 minutes. <code>0</code> disables DDOS protection.</div>
