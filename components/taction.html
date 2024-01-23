@@ -15,7 +15,6 @@
 		MAIN.flowtaction = {};
 
 		const ARGS = /\{{1,2}[a-z0-9_.-\s]+\}{1,2}/gi;
-		const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
 		const Options = function($, config) {
 
 			var t = this;
@@ -184,7 +183,7 @@
 		};
 
 		MAIN.flowtaction.Options = Options;
-		MAIN.flowtaction.AsyncFunction = AsyncFunction;
+		MAIN.flowtaction.AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
 	};
 
 	exports.uninstall = function() {
@@ -263,7 +262,7 @@
 
 		instance.configure = function() {
 
-			fn = config.code.includes('await ') ? new AsyncFunction('$', 'model', 'data', 'value', config.code) : new Function('$', 'model', 'data', 'value', config.code);
+			fn = config.code.includes('await ') ? new MAIN.flowtaction.AsyncFunction('$', 'model', 'data', 'value', config.code) : new Function('$', 'model', 'data', 'value', config.code);
 
 			cfg = {};
 			for (var key in config) {
