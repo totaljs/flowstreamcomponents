@@ -31,39 +31,70 @@
 				var flags = [];
 
 				config.timeout && flags.push(F.is5 ? ('<' + Math.ceil(config.timeout / 1000) + 's') : config.timeout);
+
+				if (F.is5 && config.upload)
+					flags.push('<' + config.limit + 'MB');
+
 				config.upload && flags.push((F.is5 ? '@' : '') + 'upload');
 
-				prev = ROUTE(config.method + ' ' + config.url, function($) {
+				var action = function($) {
 
 					var ctrl = F.is5 ? $ : this;
 					var msg = instance.newmessage();
 					var data;
 
+					// Parse cookies
+					var cookies = {};
+					var cookie = ctrl.headers.cookie;
+
+					if (cookie) {
+						let arr = cookie.split(';');
+						for (let c of arr) {
+							let line = c.trim();
+							let index = line.indexOf('=');
+							if (index !== -1)
+								cookies[line.substring(0, index)] = line.substring(index + 1);
+						}
+					}
+
+					var query = ctrl.query;
+					var body = ctrl.body;
+					var params = ctrl.params;
+
 					switch (config.send) {
 						case 'payload':
-							data = ctrl.body;
+							data = body;
 							break;
 						case 'query':
-							data = ctrl.query;
+							data = query;
 							break;
 						case 'files':
 							data = ctrl.files;
 							break;
 						case 'params':
-							data = ctrl.params;
+							data = params;
 							break;
 						case 'headers':
 							data = ctrl.headers;
 							break;
+						case 'user':
+							data = ctrl.user;
+							break;
+						case 'cookies':
+							data = cookies;
+							break;
 						default:
-							data = { body: ctrl.body, query: ctrl.query, files: ctrl.files, user: ctrl.user, url: ctrl.url, headers: ctrl.headers, params: ctrl.params, ip: ctrl.ip, split: ctrl.split };
+							data = { body: body, query: query, user: ctrl.user, files: ctrl.files, user: ctrl.user, url: ctrl.url, headers: ctrl.headers, params: params, ip: ctrl.ip, split: ctrl.split, cookies: cookies };
 							break;
 					}
 
 					msg.refs.controller = ctrl;
 					msg.send('output', data);
 
-				}, flags, config.limit);
+				};
+
+				var auth = config.user == 1 ? '+' : config.user == 2 ? '-' : '';
+				prev = F.is5 ? ROUTE(auth + config.method + ' ' + config.url + (config.action ? (' ' + config.action) : '') + ' ' + flags.join(' '), action) : ROUTE(auth + config.method + ' ' + instance.replace(config.url) + (config.action ? (' ' + config.action) : ''), action, flags, config.limit);
 			}
 		};
 
