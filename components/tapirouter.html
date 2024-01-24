@@ -1,15 +1,16 @@
 <script total>
 
 	exports.id = 'tapirouter';
-	exports.name = 'API router';
+	exports.name = 'API Router';
 	exports.group = 'Total.js';
 	exports.icon = 'ti ti-crosshairs';
 	exports.version = '1';
 	exports.author = 'Total.js';
-	exports.config = { name: 'API Router', schema: [], color: '', icon: 'ti ti-crosshairs' };
-	exports.inputs = [{ id: 'input', name: 'Payload' }];
+	exports.config = { path: 'response', schema: [{ id: 'o1984', name: 'users_read/{id}' }] };
 	exports.outputs = [];
 	exports.kind = 'action';
+	exports.inputs = [{ id: 'input', name: 'Payload' }];
+	exports.meta = { singleton: 1 };
 
 	exports.make = function(instance, config) {
 
@@ -17,49 +18,53 @@
 
 		instance.message = function($) {
 
-			var input = $.data;
-			var data = input.payload || input.body;
+			var data = $.data.payload || $.data.body;
+			if (data && typeof(data.schema) === 'string') {
 
-			if (typeof(data.schema) === 'string') {
+				var index;
+				var schema = $.refs.schema;
 
-				var schema = data.schema;
-				var index = schema.indexOf('/');
-				var key = index === -1 ? schema : schema.substring(0, index);
+				if (!schema) {
+					let tmp = {};
+					let meta = data.schema;
+					index = meta.indexOf('?');
+					tmp.query = index === -1 ? '' : meta.substring(index + 1);
 
-				var queryindex = schema.indexOf('?');
-				if (index === -1 && queryindex !== -1)
-					key = key.substring(0, queryindex);
+					if (index !== -1)
+						meta = meta.substring(0, index);
 
-				var meta = compiled[key];
+					index = meta.indexOf('/');
+					tmp.id = index === -1 ? meta : meta.substring(0, index);
+					tmp.params = index === -1 ? EMPTYARRAY : meta.substring(index + 1).split('/').trim();
+					$.refs.schema = tmp;
+					schema = tmp;
+				}
+
+				var meta = compiled[schema.id];
 				if (meta) {
 
-					index = queryindex;
-
-					var query = index === -1 ? {} : DEF.parsers.urlencoded(schema.substring(index + 1));
-					var arr = (index === -1 ? schema : schema.substring(0, index)).split('/').trim();
-
-					arr.shift();
-
-					if (arr.length === meta.params.length) {
+					if (schema.params.length === meta.params.length) {
 
 						var params = {};
 						for (var i = 0; i < meta.params.length; i++)
 							params[meta.params[i]] = arr[i];
 
-						input.action = params[meta.params[0]];
-						input.params = params;
-						input.query = query;
-						input.payload = !data.data || typeof(data.data) !== 'object' ? {} : data.data;
-						input.body = undefined;
+						let payload = $.data;
+						payload.query = schema.query ? DEF.parsers.urlencoded(schema.query) : {};
+						payload.payload = data.data;
+						payload.params = params;
 
 						$.send(meta.id);
 						return;
 					}
-				}
 
+					$.data[config.path] = [{ id: '400', error: 'Invalid schema data' }];
+					$.send('error');
+					return;
+				}
 			}
 
-			$.data.response = [{ error: '404' }];
+			$.data[config.path] = [{ id: '404', error: '404' }];
 			$.send('error');
 		};
 
@@ -102,9 +107,9 @@
 </script>
 
 <readme>
-This component implements the [Total.js API Router](https://docs.totaljs.com/total4/cc674001rr51c/#total-js-routing) that allows you to provide only one endpoint (route) by adding multiple endpoints divided by keys. The component expects REST Route message or data in the form:
+This component routes incoming Total.js API data according to the defined API schema. The component extends input data (query, payload and params) with parsed data.
 
-## Payload
+__Input & Output data__:
 
 ```js
 {
@@ -116,6 +121,7 @@ This component implements the [Total.js API Router](https://docs.totaljs.com/tot
 	ip: String, // optional, IP address
 	url: String, // optional
 	language: String, // optional
+	ua: String, // optional, parsed UA
 	user: Object, // optional
 	headers: { key: String }, // optional, request headers
 	cookies: { key: String }, // optional, cookies
@@ -125,9 +131,7 @@ This component implements the [Total.js API Router](https://docs.totaljs.com/tot
 }
 ```
 
-## Output
-
-It will be the same as payload data, but it will be extended by the updated properties `params`, 'payload', and `query`.
+In the case of  `error`, the input data is extended by the `response` property with an error.
 </readme>
 
 <style>
@@ -143,7 +147,7 @@ It will be the same as payload data, but it will be extended by the updated prop
 	.CLASS-settings figure:first-child div { line-height: 26px; }
 	.CLASS-settings figure.ismoved { background-color: rgba(92,29,196,0.3) !important; }
 	.CLASS footer { height: 40px; line-height: 40px; padding: 0 10px; font-size: 12px; }
-	.CLASS header div { border-radius: var(--radius); padding: 3px; background-color: #B92EC5; color: #FFF; }
+	.CLASS header div { border-radius: var(--radius); padding: 3px; background-color: #777; color: #FFF; }
 	.CLASS header div i { background-color: rgba(0,0,0,0.2); }
 
 	.ui-dark .CLASS header div i { background-color: rgba(255,255,255,0.2); }
@@ -154,34 +158,17 @@ It will be the same as payload data, but it will be extended by the updated prop
 
 <body>
 	<header>
-		<ui-bind path="CONFIG" config="template">
-			<script type="text/html">
-				<div {{ if value.color }} style="background:{{ value.color }}"{{ fi }}>
-					<i class="{{ value.icon }}"></i><span>{{ value.name }}</span>
-				</div>
-			</script>
-		</ui-bind>
+		<i class="$ICON"></i>$NAME
 	</header>
 </body>
 
 <settings>
 	<div class="CLASS-settings">
 		<div class="padding">
-			<div class="row">
-				<div class="col-md-6 m">
-					<ui-component name="input" path="?.name" config="required:1">Name</ui-component>
-				</div>
-				<div class="col-md-3 m">
-					<ui-component name="input" path="?.color" config="type:color">Color</ui-component>
-				</div>
-				<div class="col-md-3 m">
-					<ui-component name="input" path="?.icon" config="type:icon">Icon</ui-component>
-				</div>
-			</div>
 			<div class="caption m">
 				<div class="toolbar">
 					<nav>
-						<button class="exec" data-exec="tmptotalapirouter.add"><i class="ti ti-plus-circle"></i>Add</button>
+						<button class="exec" data-exec="tapirouter.add"><i class="ti ti-plus-circle"></i>Add</button>
 					</nav>
 				</div>
 				<label>Schema</label>
@@ -192,12 +179,12 @@ It will be the same as payload data, but it will be extended by the updated prop
 					{{ foreach m in value }}
 					<figure data-id="{{ m.id }}">
 						<div class="controls">
-							<span class="exec" data-exec="tmptotalapirouter.move" title="Up" data-type="up"><i class="ti ti-arrow-up"></i></span>
-							<span class="exec" data-exec="tmptotalapirouter.move" title="Down" data-type="down"><i class="ti ti-arrow-down"></i></span>
-							<span class="exec" data-exec="tmptotalapirouter.rem" title="Remove"><i class="ti ti-trash red"></i></span>
+							<span class="exec" data-exec="tapirouter.move" title="Up" data-type="up"><i class="ti ti-arrow-up"></i></span>
+							<span class="exec" data-exec="tapirouter.move" title="Down" data-type="down"><i class="ti ti-arrow-down"></i></span>
+							<span class="exec" data-exec="tapirouter.rem" title="Remove"><i class="ti ti-trash red"></i></span>
 						</div>
 						<div class="name">
-							<div class="monospace edit hellip" data-type="from" data-edit="exec:tmptotalapirouter.name;required:1">{{ m.name }}</div>
+							<div class="monospace edit hellip" data-type="from" data-edit="exec:tapirouter.name;required:1">{{ m.name }}</div>
 						</div>
 					</figure>
 					{{ end }}
@@ -221,7 +208,7 @@ It will be the same as payload data, but it will be extended by the updated prop
 				meta.config.schema.push(obj);
 			}
 
-			var tmp = W.tmptotalapirouter;
+			var tmp = W.tapirouter;
 
 			if (!tmp) {
 
@@ -288,7 +275,7 @@ It will be the same as payload data, but it will be extended by the updated prop
 					next(true);
 				};
 
-				W.tmptotalapirouter = tmp;
+				W.tapirouter = tmp;
 			}
 		};
 
