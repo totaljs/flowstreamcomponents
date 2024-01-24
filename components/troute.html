@@ -84,7 +84,7 @@
 							data = cookies;
 							break;
 						default:
-							data = { body: body, query: query, user: ctrl.user, files: ctrl.files, user: ctrl.user, url: ctrl.url, headers: ctrl.headers, params: params, ip: ctrl.ip, split: ctrl.split, cookies: cookies };
+							data = { body: body, query: query, user: ctrl.user, files: ctrl.files, user: ctrl.user, url: ctrl.url, headers: ctrl.headers, params: params, ip: ctrl.ip, split: ctrl.split, cookies: cookies, ua: ctrl.ua };
 							break;
 					}
 
@@ -94,7 +94,8 @@
 				};
 
 				var auth = config.user == 1 ? '+' : config.user == 2 ? '-' : '';
-				prev = F.is5 ? ROUTE(auth + config.method + ' ' + config.url + (config.action ? (' ' + config.action) : '') + ' ' + flags.join(' '), action) : ROUTE(auth + config.method + ' ' + instance.replace(config.url) + (config.action ? (' ' + config.action) : ''), action, flags, config.limit);
+				var url = config.url.replace(/#/g, instance.main.id);
+				prev = F.is5 ? ROUTE(auth + config.method + ' ' + url + (config.action && config.method === 'API' ? (' ' + config.action) : '') + ' ' + flags.join(' '), action) : ROUTE(auth + config.method + ' ' + instance.replace(url) + (config.action && config.method === 'API' ? (' ' + config.action) : ''), action, flags, config.limit);
 			}
 		};
 
@@ -106,21 +107,21 @@
 <readme>
 This component registers an HTTP Route and sends request data next. It stores `controller` instance in the `message.refs.controller` property. You must respond to the REST response component.
 
-< __IMPORTANT__:<br>The component works only with a defined Proxy endpoint in the Flow settings.
-< __URL__:<br>The URL must be relative to the defined Proxy endpoint. So if the endpoint is `/users/` and the desired address is `http://example.com/users/find` then the value must be `/find`
-
 __Output data__:
 
 ```js
 {
-	"route": String,
-	"params": Object,
-	"query": Object,
-	"body": Object,
-	"files": Array,
-	"headers": Object,
-	"url": String,
-	"ip": String
+	ip: String, // optional, IP address
+	url: String, // optional
+	language: String, // optional
+	ua: String, // optional, parsed user-agent
+	user: Object, // optional
+	headers: { key: String }, // optional, request headers
+	cookies: { key: String }, // optional, cookies
+	payload: {}, // optional, request payload
+	query: { key: String }, // optional
+	params: { key: String }, // optional
+	files: [{ type: String, filename: String, path: String, ext: String, size: Number, width: Number, height: Number }] // optional
 }
 ```
 </readme>
@@ -137,7 +138,7 @@ __Output data__:
 			</div>
 			<div class="col-md-9 m">
 				<ui-component name="input" path="?.url" config="monospace:1;required:1">Relative URL address</ui-component>
-				<div class="help">A relative path to: <ui-bind path="flow.head.proxyurl" config="text:value?value:window.location.origin"></ui-bind><br />It supports wildcard <code>/something/*</code> or dynamic arguments <code>/products/{category}/</code>.</div>
+				<div class="help">A relative path to: <ui-bind path="flow.head.proxyurl" config="text:value?value:window.location.origin"></ui-bind><br />It supports wildcard <code>/something/*</code> or dynamic arguments <code>/products/{category}/</code>.<br /><code>#</code> will be replaced with a FlowStream <code>id</code> identifier.</div>
 			</div>
 		</div>
 
@@ -187,11 +188,27 @@ __Output data__:
 	<header>
 		<i class="$ICON"></i>$NAME
 	</header>
-	<footer>
-		<ui-bind path="$CONFIG" config="template" class="block monospace">
-			<script type="text/html">
-				{{ if value.user == 1 }}<i class="ti ti-lock red mr10"></i>{{ else if value.user == 2 }}<i class="ti ti-unlock blue mr10"></i>{{ fi}}<span class="method">{{ value.method }}</span> {{ value.url }} {{ if value.method === 'API' }}{{ value.action }}{{ fi }}
-			</script>
-		</ui-bind>
-	</footer>
+	<footer class="monospace"></footer>
 </body>
+
+<script>
+	TOUCH(function(exports, reinit) {
+
+		var template = Tangular.compile('{{ if value.user == 1 }}<i class="ti ti-lock red mr10"></i>{{ else if value.user == 2 }}<i class="ti ti-unlock blue mr10"></i>{{ fi }}<span class="method">{{ value.method }}</span> <a href="{{ value.link }}" target="_blank">{{ value.url }}</a>{{ if value.method === \'API\' }} {{ value.action }}{{ fi }}');
+
+		var reload = function() {
+			var model = CLONE(exports.config);
+			model.link = model.url = model.url.replace(/#/g, flow.head.id);
+
+			if (flow.head.proxypath)
+				model.link = flow.head.origin + (flow.head.proxypath + model.link).replace(/\/{2,}/g, '/');
+			else
+				model.link = flow.head.origin + model.link;
+
+			exports.element.find('footer').html(template({ value: model }));
+		};
+
+		exports.configure = reload;
+		reload();
+	});
+</script>
