@@ -296,6 +296,7 @@ This component creates similar functionality as Total.js Actions.
 	ip: String, // optional, IP address
 	url: String, // optional
 	language: String, // optional
+	ua: String, // optional, parsed user-agent
 	user: Object, // optional
 	headers: { key: String }, // optional, request headers
 	cookies: { key: String }, // optional, cookies
@@ -437,13 +438,13 @@ __Methods__:
 	<footer>
 		<ui-bind path="$CONFIG" config="template" class="block fs11" style="padding:10px">
 			<script type="text/html">
-				<div style="font-size:14px"><span class="badge badge-green b">{{ value.name }}</span></div>
-				<div class="mt5"><i class="ti ti-{{ if value.user }}check-square green{{ else }}square{{ fi }} mr5"></i>{{ if value.user === 1 }}Authorized only{{ else if value.user === 2 }}Unauthorized only{{ else }}Authorized{{ fi }}</div>
-				<div><i class="ti ti-{{ if value.partial }}check-square green{{ else }}square{{ fi }} mr5"></i>Partial data</div>
-				<div><i class="ti ti-{{ if value.input }}check-square green{{ else }}square{{ fi }} mr5"></i>Input data</div>
-				<div><i class="ti ti-{{ if value.query }}check-square green{{ else }}square{{ fi }} mr5"></i>URL Query arguments</div>
-				<div><i class="ti ti-{{ if value.params }}check-square green{{ else }}square{{ fi }} mr5"></i>Params</div>
-				<div><i class="ti ti-{{ if value.permissions }}check-square green{{ else }}square{{ fi }} mr5"></i>Permissions</div>
+				<div style="font-size:14px" class="mb5"><span class="badge badge-green b">{{ value.name }}</span></div>
+				{{ if value.user }}<div><i class="ti ti-check-square mr5"></i>{{ if value.user === 1 }}Authorized only{{ else if value.user === 2 }}Unauthorized only{{ fi }}</div>{{ fi }}
+				{{ if value.partial }}<div><i class="ti ti-check-square green mr5"></i>Partial data</div>{{ fi }}
+				{{ if value.input }}<div><i class="ti ti-check-square green mr5"></i>Input data</div>{{ fi }}
+				{{ if value.query }}<div><i class="ti ti-check-square green mr5"></i>URL Query arguments</div>{{ fi }}
+				{{ if value.params }}<div><i class="ti ti-check-square green mr5"></i>Params</div>{{ fi }}
+				{{ if value.permissions }}<div><i class="ti ti-check-square green mr5"></i>Permissions</div>{{ fi }}
 			</script>
 		</ui-bind>
 	</footer>
