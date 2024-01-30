@@ -6,7 +6,7 @@
 	exports.author = 'Total.js';
 	exports.version = '1';
 	exports.group = 'Total.js';
-	exports.config = { partial: false, name: 'Unknown', input: '', query: '', params: '', user: 0, permissions: '', code: '$.success();', strerr: false, path: 'response' };
+	exports.config = { partial: false, name: 'Unknown', input: '', query: '', color: '#68B25B', params: '', user: 0, permissions: '', code: '$.success();', strerr: false, path: 'response' };
 	exports.inputs = [{ id: 'input', name: 'Payload' }];
 	exports.outputs = [{ id: 'output', name: 'Response' }, { id: 'error', name: 'Error' }];
 
@@ -372,8 +372,15 @@ __Methods__:
 </readme>
 
 <settings>
-	<div class="padding">
-		<ui-component name="input" path="?.name" config="required:1">Action name</ui-component>
+	<div class="padding" style="padding-bottom:5px">
+		<div class="row">
+			<div class="col-md-9 m">
+				<ui-component name="input" path="?.name" config="required:1">Action name</ui-component>
+			</div>
+			<div class="col-md-3 m">
+				<ui-component name="input" path="?.color" config="required:1;type:color">Color</ui-component>
+			</div>
+		</div>
 	</div>
 	<div class="padding bg-smoke">
 		<div class="pull-left">
@@ -429,16 +436,22 @@ __Methods__:
 </settings>
 
 <style>
-	.CLASS .content { min-height: 0; height: auto; }
+	.CLASS header { color: #FFF; padding: 5px; }
+	.CLASS header div { border-radius: var(--radius); padding: 3px 5px; }
 	.CLASS .ti { color: #999; }
 </style>
 
 <body>
-	<header style="background:#68B25B;height:5px;border-top:3px solid #83C83C"></header>
+	<header>
+		<ui-bind path="$CONFIG" config="template">
+			<script type="text/html">
+				<div style="background-color:{{ value.color }}">{{ value.name }}</div>
+			</script>
+		</ui-bind>
+	</header>
 	<footer>
 		<ui-bind path="$CONFIG" config="template" class="block fs11" style="padding:10px">
 			<script type="text/html">
-				<div style="font-size:14px" class="mb5"><span class="badge badge-green b">{{ value.name }}</span></div>
 				{{ if value.user }}<div><i class="ti ti-check-square mr5"></i>{{ if value.user === 1 }}Authorized only{{ else if value.user === 2 }}Unauthorized only{{ fi }}</div>{{ fi }}
 				{{ if value.partial }}<div><i class="ti ti-check-square green mr5"></i>Partial data</div>{{ fi }}
 				{{ if value.input }}<div><i class="ti ti-check-square green mr5"></i>Input data</div>{{ fi }}
