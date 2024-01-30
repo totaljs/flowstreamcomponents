@@ -46,13 +46,12 @@
 
 						var params = {};
 						for (var i = 0; i < meta.params.length; i++)
-							params[meta.params[i]] = arr[i];
+							params[meta.params[i]] = schema.params[i];
 
 						let payload = $.data;
 						payload.query = schema.query ? DEF.parsers.urlencoded(schema.query) : {};
 						payload.payload = data.data;
 						payload.params = params;
-
 						$.send(meta.id);
 						return;
 					}
