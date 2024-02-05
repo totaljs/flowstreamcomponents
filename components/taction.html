@@ -9,6 +9,7 @@
 	exports.config = { partial: false, name: 'Unknown', input: '', query: '', color: '#68B25B', params: '', user: 0, permissions: '', code: '$.success();', strerr: false, path: 'response' };
 	exports.inputs = [{ id: 'input', name: 'Payload' }];
 	exports.outputs = [{ id: 'output', name: 'Response' }, { id: 'error', name: 'Error' }];
+	exports.meta = { settingswidth: 1200 };
 
 	exports.install = function(com) {
 
@@ -452,7 +453,7 @@ __Methods__:
 	<footer>
 		<ui-bind path="$CONFIG" config="template" class="block fs11" style="padding:10px">
 			<script type="text/html">
-				{{ if value.user }}<div><i class="ti ti-check-square mr5"></i>{{ if value.user === 1 }}Authorized only{{ else if value.user === 2 }}Unauthorized only{{ fi }}</div>{{ fi }}
+				<div><i class="ti ti-check-square mr5"></i>{{ if value.user === 1 }}Authorized only{{ else if value.user === 2 }}Unauthorized only{{ else }}All allowed{{ fi }}</div>
 				{{ if value.partial }}<div><i class="ti ti-check-square green mr5"></i>Partial data</div>{{ fi }}
 				{{ if value.input }}<div><i class="ti ti-check-square green mr5"></i>Input data</div>{{ fi }}
 				{{ if value.query }}<div><i class="ti ti-check-square green mr5"></i>URL Query arguments</div>{{ fi }}
