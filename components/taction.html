@@ -6,10 +6,9 @@
 	exports.author = 'Total.js';
 	exports.version = '1';
 	exports.group = 'Total.js';
-	exports.config = { partial: false, name: 'Unknown', input: '', query: '', color: '#68B25B', params: '', user: 0, permissions: '', code: '$.success();', strerr: false, path: 'response' };
+	exports.config = { partial: false, name: 'Unknown', input: '', query: '', color: '#68B25B', params: '', user: 0, permissions: '', code: '$.success();', strerr: false, path: 'response', autoresponse: false };
 	exports.inputs = [{ id: 'input', name: 'Payload' }];
 	exports.outputs = [{ id: 'output', name: 'Response' }, { id: 'error', name: 'Error' }];
-	exports.meta = { settingswidth: 1200 };
 
 	exports.install = function(com) {
 
@@ -102,12 +101,34 @@
 				};
 			}
 
+			let msg = self.message;
+			let refs = msg.refs;
+			let cfg = self.config;
+
 			if (self.error.items.length) {
-				self.request[self.config.path] = self.config.strerr ? self.error.toString() : self.error.output();
-				self.message.send('error', self.request);
+				self.request[cfg.path] = cfg.strerr ? self.error.toString() : self.error.output();
+
+				if (cfg.autoresponse) {
+					if (refs.controller) {
+						refs.controller.invalid(self.error);
+						refs.controller = null;
+					}
+				}
+
+				msg.send('error', self.request);
+
 			} else {
-				self.request[self.config.path] = value;
-				self.message.send('output', self.request);
+
+				self.request[cfg.path] = value;
+
+				if (cfg.autoresponse) {
+					if (refs.controller) {
+						refs.controller.json(value);
+						refs.controller = null;
+					}
+				}
+
+				msg.send('output', self.request);
 			}
 		};
 
@@ -373,73 +394,88 @@ __Methods__:
 </readme>
 
 <settings>
-	<div class="padding" style="padding-bottom:5px">
-		<div class="row">
-			<div class="col-md-9 m">
-				<ui-component name="input" path="?.name" config="required:1">Action name</ui-component>
+	<div class="CLASS-settings">
+		<div class="padding" style="padding-bottom:5px">
+			<div class="row">
+				<div class="col-md-9 m">
+					<ui-component name="input" path="?.name" config="required:1">Action name</ui-component>
+				</div>
+				<div class="col-md-3 m">
+					<ui-component name="input" path="?.color" config="required:1;type:color">Color</ui-component>
+				</div>
 			</div>
-			<div class="col-md-3 m">
-				<ui-component name="input" path="?.color" config="required:1;type:color">Color</ui-component>
+		</div>
+		<div class="padding bg-smoke">
+			<div class="pull-left">
+				<div class="ui-input-label">Allow only:</div>
+				<ui-component name="choose" path="?.user" config="selector:div;type:number" class="iconmenu m">
+					<div data-id="1" style="width:90px">
+						<i class="ti ti-lock"></i>
+						<span>Authorized</span>
+					</div>
+					<div data-id="2" style="width:90px">
+						<i class="ti ti-unlock"></i>
+						<span>Unauthorized</span>
+					</div>
+					<div data-id="0" style="width:90px">
+						<i class="ti ti-door-open"></i>
+						<span>Both</span>
+					</div>
+				</ui-component>
 			</div>
+			<div class="pull-left" style="margin-left:20px">
+				<div style="height:25px"></div>
+				<ui-component name="input" path="?.autoresponse" config="type:checkbox">Auto HTTP response</ui-component>
+				<ui-component name="input" path="?.partial" config="type:checkbox">Allow partial data</ui-component>
+				<ui-component name="input" path="?.strerr" config="type:checkbox">Convert errors to a string</ui-component>
+			</div>
+			<div class="clearfix"></div>
 		</div>
-	</div>
-	<div class="padding bg-smoke">
-		<div class="pull-left">
-			<div class="ui-input-label">Allow only:</div>
-			<ui-component name="choose" path="?.user" config="selector:div;type:number" class="iconmenu m">
-				<div data-id="1" style="width:90px">
-					<i class="ti ti-lock"></i>
-					<span>Authorized</span>
-				</div>
-				<div data-id="2" style="width:90px">
-					<i class="ti ti-unlock"></i>
-					<span>Unauthorized</span>
-				</div>
-				<div data-id="0" style="width:90px">
-					<i class="ti ti-door-open"></i>
-					<span>Both</span>
-				</div>
-			</ui-component>
-		</div>
-		<div class="pull-left" style="margin-left:20px">
-			<div style="height:25px"></div>
-			<ui-component name="input" path="?.partial" config="type:checkbox">Allow partial data</ui-component>
-			<ui-component name="input" path="?.strerr" config="type:checkbox">Convert errors to a string</ui-component>
-		</div>
-		<div class="clearfix"></div>
-	</div>
-	<div class="padding">
+		<div class="padding">
 
-		<div class="m">
-			<ui-component name="input" path="?.input" config="monospace:1;placeholder:name\:Name, *email\:Email">Payload schema</ui-component>
-		</div>
-		<div class="m">
-			<ui-component name="input" path="?.query" config="monospace:1;placeholder:page\:Number">Query arguments schema</ui-component>
-		</div>
-		<div class="padding bg-smoke radius npb">
-			<div class="grid-3">
-				<div class="m">
-					<ui-component name="input" path="?.params" config="monospace:1;placeholder:*id\:String">Params schema</ui-component>
-				</div>
-				<div class="m">
-					<ui-component name="input" path="?.permissions" config="monospace:1;placeholder:admin, director">Permissions</ui-component>
-				</div>
-				<div class="m">
-					<ui-component name="input" path="?.path" config="monospace:1;required:1;placeholder:response">Path for storing a response</ui-component>
+			<div class="m">
+				<ui-component name="input" path="?.input" config="monospace:1;placeholder:name\:Name, *email\:Email">Payload schema</ui-component>
+			</div>
+
+			<div class="m">
+				<ui-component name="input" path="?.query" config="monospace:1;placeholder:page\:Number">Query arguments schema</ui-component>
+			</div>
+
+			<div class="padding bg-smoke radius npb">
+				<div class="grid-3">
+					<div class="m">
+						<ui-component name="input" path="?.params" config="monospace:1;placeholder:*id\:String">Params schema</ui-component>
+					</div>
+					<div class="m">
+						<ui-component name="input" path="?.permissions" config="monospace:1;placeholder:admin, director">Permissions</ui-component>
+					</div>
+					<div class="m">
+						<ui-component name="input" path="?.path" config="monospace:1;required:1;placeholder:response">Path for storing a response</ui-component>
+					</div>
 				</div>
 			</div>
 		</div>
-		<div class="caption m mt5">
-			<label><i class="ti ti-code"></i>Custom code</label>
-		</div>
-		<ui-component name="codemirror" path="?.code" config="required:1;type:javascript;minheight:300;parent:window;margin:750;tabs:true;trim:true"></ui-component>
 	</div>
 </settings>
 
 <style>
+	.CLASS .content { min-width: 200px; }
 	.CLASS header { color: #FFF; padding: 5px; }
 	.CLASS header div { border-radius: var(--radius); padding: 3px 5px; }
 	.CLASS .ti { color: #999; }
+	.CLASS footer > div { padding: 10px 10px 0; }
+	.CLASS-code .CodeMirror { border: 0; border-left: 1px solid #E0E0E0; border-radius: none; }
+	.CLASS-code-editor { margin-left: 200px; }
+	.CLASS-code-info { float: left; width: 200px; padding: 12px; font-size: 12px; }
+	.CLASS-code-info code { overflow-wrap: break-word; white-space: pre; display: block; padding: 0 3px; }
+	.CLASS-code-button { padding: 10px; border-top: 1px solid #E0E0E0; }
+	.CLASS-code-button button { font-size: 14px; height: 36px; font-weight: bold; }
+	.CLASS-settings .iconmenu { height: 80px; }
+	.CLASS-settings .iconmenu > div { height: 76px; }
+	.CLASS-settings .iconmenu span { padding-top: 8px; }
+	.CLASS-settings .iconmenu i { padding-top: 16px; }
+	.ui-dark .CLASS-code .CodeMirror { border-left-color: #404040; }
+	.ui-dark .CLASS-code-button { border-top-color: #404040; }
 </style>
 
 <body>
@@ -451,11 +487,13 @@ __Methods__:
 		</ui-bind>
 	</header>
 	<footer>
+		<div><button class="button exec" data-exec="=sourcecode"><i class="ti ti-js"></i>Script</button></div>
 		<ui-bind path="$CONFIG" config="template" class="block fs11" style="padding:10px">
 			<script type="text/html">
+				{{ if value.autoresponse }}<div class="b"><i class="ti ti-check-square green mr5"></i>Auto HTTP response</div>{{ fi }}
 				<div><i class="ti ti-check-square mr5"></i>{{ if value.user === 1 }}Authorized only{{ else if value.user === 2 }}Unauthorized only{{ else }}All allowed{{ fi }}</div>
 				{{ if value.partial }}<div><i class="ti ti-check-square green mr5"></i>Partial data</div>{{ fi }}
-				{{ if value.input }}<div><i class="ti ti-check-square green mr5"></i>Input data</div>{{ fi }}
+				{{ if value.input }}<div><i class="ti ti-check-square green mr5"></i>Payload</div>{{ fi }}
 				{{ if value.query }}<div><i class="ti ti-check-square green mr5"></i>URL Query arguments</div>{{ fi }}
 				{{ if value.params }}<div><i class="ti ti-check-square green mr5"></i>Params</div>{{ fi }}
 				{{ if value.permissions }}<div><i class="ti ti-check-square green mr5"></i>Permissions</div>{{ fi }}
@@ -463,3 +501,84 @@ __Methods__:
 		</ui-bind>
 	</footer>
 </body>
+
+
+<script>
+	TOUCH(function(exports, reinit) {
+
+		if (!common.codeactions) {
+			common.codeactions = {};
+			W.codeactionssubmit = function(el) {
+
+				if (BLOCKED('codeaction', 1000))
+					return;
+
+				var winid = ATTRD(el);
+				var id = winid.substring(4);
+				var code = common.codeactions[winid];
+				var instance = flowinstances.instances[id];
+				var config = instance.config;
+				config.code = code;
+				instance.reconfigure(config);
+			};
+			W.codeactionsinit = function(com) {
+				var save = () => W.codeactionssubmit(com.element);
+				var map = { 'Cmd-S': save, 'Ctrl-S': save };
+				com.editor.addKeyMap(map);
+			};
+		}
+
+		exports.renderschema = function() {
+
+			var builder = [];
+			var config = exports.config;
+
+			var write = function(name, label) {
+				if (config[name]) {
+					builder.push('<div class="b badge badge-gray" style="display:block">{0}</div>'.format(label));
+					var val = config[name].replace(/\,/g, '\n');
+					builder.push('<div class="m mt5"><code>{0}</code></div>'.format(val));
+				}
+			};
+
+			write('params', 'Dynamic parameters');
+			write('query', 'URL query arguments');
+			write('input', 'Payload');
+
+			return builder.join('');
+		};
+
+		exports.configure = function() {
+			var key = 'code' + exports.id;
+			var win = common.windows.findItem('id', key);
+			if (win) {
+				var path = '*codeactions.' + key;
+				var prev = GET(path);
+				if (prev !== exports.config.code)
+					SET(path, exports.config.code);
+				win.element.find('.CLASS-code-info').html(exports.renderschema());
+			}
+		};
+
+		exports.sourcecode = function() {
+
+			var config = exports.config;
+			var path = '*codeactions.code' + exports.id;
+			var winid = 'code' + exports.id;
+
+			if (common.windows.findItem('id', winid)) {
+				SETTER('windows/focus', winid);
+				return;
+			}
+
+			SET(path, config.code);
+
+			PUSH('common.windows', { id: winid, cachekey: 'codeaction', cache: 'readme', html: '<div class="CLASS-code invisible"><div class="CLASS-code-info noscrollbar">{1}</div><div class="CLASS-code-editor"><ui-component name="codemirror" path="{0}" config="type:javascript;parent:auto;margin:60;$init:codeactionsinit"></ui-component></div><div class="CLASS-code-button"><button class="button exec" data-exec="codeactionssubmit">Apply</button></div></div>'.format(path, exports.renderschema()), title: 'Action script: ' + config.name, actions: { move: true, autosave: true, close: true, maximize: true, minimize: false }, offset: { x: ((WW / 2) - 275) >> 0, y: ((WH / 2) - 250) >> 0, width: 750, height: 500, minwidth: 200, minheight: 300, maxwidth: 1200, maxheight: 1200 }, make: function(el) {
+				el.closest('.ui-windows-item').css('z-index', 50);
+				el.find('.CLASS-code').rclass('invisible', 500);
+			}});
+		};
+
+	});
+
+</script>
