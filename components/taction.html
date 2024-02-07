@@ -90,7 +90,7 @@
 			};
 		};
 
-		Options.prototype.callback = function(value) {
+		Options.prototype.send = Options.prototype.callback = function(value) {
 
 			var self = this;
 
@@ -354,7 +354,7 @@ __Methods__:
 
 - `$.invalid(error)` responds with an error and ends the action
 - `$.success([value])` responds with `{ success: true, value }` object and ends the action
-- `$.callback(value)` responds with `value` object and ends the action
+- `$.send(value)` responds with `value` object and ends the action
 - `$.cancel()` ends the action without response
 - `$.audit(message, [type])` writes audit
 
@@ -467,7 +467,7 @@ __Methods__:
 	.CLASS-code .CodeMirror { border: 0; border-left: 1px solid #E0E0E0; border-radius: none; }
 	.CLASS-code-editor { margin-left: 200px; }
 	.CLASS-code-info { float: left; width: 200px; padding: 12px; font-size: 12px; }
-	.CLASS-code-info code { overflow-wrap: break-word; white-space: pre; display: block; padding: 0 3px; }
+	.CLASS-code-info code { overflow-wrap: break-word; white-space: pre-wrap; display: block; padding: 0 3px; }
 	.CLASS-code-button { padding: 10px; border-top: 1px solid #E0E0E0; }
 	.CLASS-code-button button { font-size: 14px; height: 36px; font-weight: bold; }
 	.CLASS-settings .iconmenu { height: 80px; }
