@@ -434,20 +434,20 @@ __Methods__:
 		<div class="padding">
 
 			<div class="m">
-				<ui-component name="input" path="?.input" config="monospace:1;placeholder:name\:Name, *email\:Email">Payload schema</ui-component>
+				<ui-component name="input" path="?.input" config="monospace:1;maxlength:100000;placeholder:name\:Name, *email\:Email">Payload schema</ui-component>
 			</div>
 
 			<div class="m">
-				<ui-component name="input" path="?.query" config="monospace:1;placeholder:page\:Number">Query arguments schema</ui-component>
+				<ui-component name="input" path="?.query" config="monospace:1;maxlength:100000;placeholder:page\:Number">Query arguments schema</ui-component>
 			</div>
 
 			<div class="padding bg-smoke radius npb">
 				<div class="grid-3">
 					<div class="m">
-						<ui-component name="input" path="?.params" config="monospace:1;placeholder:*id\:String">Params schema</ui-component>
+						<ui-component name="input" path="?.params" config="monospace:1;maxlength:100000;placeholder:*id\:String">Params schema</ui-component>
 					</div>
 					<div class="m">
-						<ui-component name="input" path="?.permissions" config="monospace:1;placeholder:admin, director">Permissions</ui-component>
+						<ui-component name="input" path="?.permissions" config="monospace:1;maxlength:100000;placeholder:admin, director">Permissions</ui-component>
 					</div>
 					<div class="m">
 						<ui-component name="input" path="?.path" config="monospace:1;required:1;placeholder:response">Path for storing a response</ui-component>
