@@ -71,7 +71,17 @@
 
 		Options.prototype.success = function(value) {
 			var self = this;
+
 			self.request[self.config.path] = { success: true, value: value };
+
+			if (self.config.autoresponse) {
+				var refs = self.message.refs;
+				if (refs) {
+					refs.controller.json(self.request[self.config.path]);
+					refs.controller = null;
+				}
+			}
+
 			self.message.send('output', self.request);
 		};
 
