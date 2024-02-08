@@ -46,6 +46,9 @@
 					case 'success':
 						ctrl.success();
 						break;
+					case 'error':
+						ctrl.invalid(value);
+						break;
 					case 'html':
 						if (F.is5)
 							ctrl.html(value);
@@ -87,7 +90,7 @@ This component can respond to an HTTP request.
 	<div class="padding">
 		<div class="grid-3">
 			<div class="m">
-				<ui-component name="input" path="?.type" config="required:1;dirsource:auto|Auto,json|JSON,success|Success,empty|Empty response,plain|Plain text,html|HTML,xml|XML,buffer|Buffer">Type</ui-component>
+				<ui-component name="input" path="?.type" config="required:1;dirsource:auto|Auto,json|JSON,success|Success,error|Error,empty|Empty response,plain|Plain text,html|HTML,xml|XML,buffer|Buffer">Type</ui-component>
 			</div>
 			<ui-bind path="?.type" config="disabled:value === 'auto'" class="m block">
 				<ui-component name="input" path="?.code" config="required:1;type:number;format:">Status code</ui-component>
