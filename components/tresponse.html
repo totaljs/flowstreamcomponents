@@ -41,7 +41,7 @@
 						ctrl.json(value);
 						break;
 					case 'buffer':
-						ctrl.buffer(typeof(value) === 'string' ? Buffer.from(value, 'utf8') : value, config.ctype);
+						ctrl.binary(typeof(value) === 'string' ? Buffer.from(value, 'utf8') : value, config.ctype);
 						break;
 					case 'success':
 						ctrl.success();
