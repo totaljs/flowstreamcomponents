@@ -61,7 +61,7 @@
 					for (let i = 0; i < diff; i++)
 						text += text[0];
 				}
-				return NOW.format(text);
+				return NOW.format(text.toUpperCase());
 			}).replace(/#+/g, function(text) {
 				meta.index++;
 				return meta.index.padLeft(text.length, '0');
