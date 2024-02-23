@@ -25,12 +25,7 @@
 			}
 
 			var data = $.data;
-			JSONSCHEMA(schema, data, function(error, response){
-				if (error)
-					$.send('error', { msg: 'Invalid data', error });
-				else
-					$.send('output', data);
-			});
+			$.send('output', data);
 		};
 
 		instance.configure = function() {
