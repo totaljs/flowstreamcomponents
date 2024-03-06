@@ -4,9 +4,9 @@
 	exports.name = 'Route';
 	exports.group = 'Total.js';
 	exports.icon = 'ti ti-exchange';
-	exports.version = '1';
+	exports.version = '2';
 	exports.author = 'Total.js';
-	exports.config = { url: '/', method: 'GET', timeout: 5000, limit: 5120, upload: false, user: 0, send: 'all' };
+	exports.config = { url: '/', method: 'GET', timeout: 5000, limit: 5120, upload: false, user: 0, send: 'all', reader: '-' };
 	exports.outputs = [{ id: 'output', name: 'Request' }];
 	exports.kind = 'trigger';
 
@@ -89,7 +89,16 @@
 					}
 
 					msg.refs.controller = ctrl;
-					msg.send('output', data);
+
+					if (config.upload && config.reader && config.reader !== '-') {
+						ctrl.files.wait(function(file, next) {
+							file.read(function(err, buffer) {
+								file.data = config.reader === 'buffer' ? buffer : buffer.toString(config.reader);
+								next();
+							});
+						}, () => msg.send('output', data));
+					} else
+						msg.send('output', data);
 
 				};
 
@@ -121,7 +130,7 @@ __Output data__:
 	payload: {}, // optional, request payload
 	query: { key: String }, // optional
 	params: { key: String }, // optional
-	files: [{ type: String, filename: String, path: String, ext: String, size: Number, width: Number, height: Number }] // optional
+	files: [{ type: String, filename: String, path: String, ext: String, size: Number, width: Number, height: Number, data:Buffer|String }] // optional
 }
 ```
 </readme>
@@ -142,11 +151,16 @@ __Output data__:
 			</div>
 		</div>
 
+		<hr class="nmt" />
+
 		<ui-bind path="?.method" config="show:value === 'API'" class="block hidden m padding bg-smoke radius">
 			<ui-component name="input" path="?.action" config="monospace:1;required:1;placeholder:+users_read/{id}">API Action</ui-component>
 		</ui-bind>
 
-		<ui-component name="input" path="?.upload" config="type:checkbox">Allow uploading files</ui-component>
+		<ui-component name="input" path="?.upload" config="type:checkbox" class="m"><b>Allow uploading files (form data)</b></ui-component>
+		<ui-bind path="?.upload" config="enabled">
+			<ui-component name="input" path="?.reader" config="dirsource:-|Keep as files,buffer|Buffer,utf8|UTF-8,ascii|ASCII,base64|Base64,hex|Hex">Read files to</ui-component>
+		</ui-bind>
 		<hr />
 
 		<div class="ui-input-label mt10">Continue as:</div>
