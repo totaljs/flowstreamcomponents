@@ -1,0 +1,64 @@
+<script total>
+
+	exports.id = 'tredirect';
+	exports.name = 'Redirect';
+	exports.icon = 'ti ti-share';
+	exports.group = 'Total.js';
+	exports.author = 'Total.js';
+	exports.version = '2';
+	exports.config = { url: '', permanent: false };
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+
+	exports.make = function(instance, config) {
+
+		instance.message = function($) {
+			var data = $.data || EMPTYOBJECT;
+
+			if (typeof(data) !== 'object')
+				data = EMPTYOBJECT;
+
+			var url = $.variables(data.url || config.url, true);
+
+			if (url && $.refs.controller)
+				$.refs.controller.redirect(url, data.permanent === true || config.permanent === true);
+
+			$.destroy();
+		};
+
+	};
+
+</script>
+
+<readme>
+## Input
+
+Incomming data have higher priority than the values set in the Configuration form. Both the `url` and `permanent` are optional.
+
+```js
+{
+	url: 'https://example.com',
+	permanent: true|false
+}
+```
+</readme>
+
+<settings>
+	<div class="padding">
+		<div class="message message-alert">Redirect URL address supports dynamic variables in the form <code class="b">{key}</code> or <code class="b">{data.key}</code>. Variables are read from global variables <code class="b">{key}</code> and from the message data <code class="b">{data.key}</code>.</div>
+		<ui-component name="input" path="?.url" config="innerlabel:1;required:1;placeholder:Enter absolute URL address" class="m">Redirect URL</ui-component>
+		<ui-component name="input" path="?.permanent" config="type:checkbox">Permanent redirect</ui-component>
+	</div>
+</settings>
+
+<style>
+	.CLASS footer { padding: 10px; font-size: 11px; }
+</style>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+	<footer>
+		<i class="ti ti-globe mr5"></i><ui-bind path="CONFIG.url" config="text;empty"></ui-bind>
+	</footer>
+</body>

@@ -1,0 +1,65 @@
+<script total>
+
+	exports.id = 'tremember';
+	exports.name = 'Remember';
+	exports.group = 'Total.js';
+	exports.icon = 'ti ti-save';
+	exports.version = '1';
+	exports.author = 'Total.js';
+	exports.config = { path: '' };
+	exports.inputs = [{ id: 'remember', name: 'Remember' }, { id: 'request', name: 'Request' }];
+	exports.outputs = [{ id: 'response', name: 'Response' }];
+	exports.kind = 'action';
+
+	exports.make = function(instance, config) {
+
+		var cache;
+
+		instance.message = function($) {
+
+			if ($.input === 'remember') {
+				cache = $.data;
+				$.destroy();
+				return;
+			}
+
+			var val = cache;
+
+			if (val == null)
+				val = null;
+
+			if (config.path)
+				U.set($.data, config.path, val);
+			else
+				$.data = val;
+
+			$.send('response');
+		};
+
+		instance.close = function() {
+			cache = null;
+		};
+
+	};
+
+</script>
+
+<readme>
+The primary goal of this component is to remember data. The component contains two inputs:
+
+- Remember input for remembering data
+- Request input as a trigger for obtaining data, then remembered data would extend the request message (its data), and the component will send it to the Response output
+</readme>
+
+<body>
+	<header>
+		<i class="$ICON"></i>$NAME
+	</header>
+</body>
+
+<settings>
+	<div class="padding">
+		<ui-component name="input" path="?.path" config="placeholder:path.to.property">Set remembered data to the specific property/field</ui-component>
+		<div class="help">If you don't enter the property, the remembered data will replace data on the Request input.</div>
+	</div>
+</settings>
