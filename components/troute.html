@@ -93,7 +93,12 @@
 					if (config.upload && config.reader && config.reader !== '-') {
 						ctrl.files.wait(function(file, next) {
 							file.read(function(err, buffer) {
-								file.data = config.reader === 'buffer' ? buffer : buffer.toString(config.reader);
+								var type = config.reader;
+								if (type === 'datauri')
+									type = 'base64';
+								file.data = type === 'buffer' ? buffer : buffer.toString(type);
+								if (config.reader === 'datauri')
+									file.data = 'data:' + file.type + ';base64,' + file.data;
 								next();
 							});
 						}, () => msg.send('output', data));
@@ -159,7 +164,7 @@ __Output data__:
 
 		<ui-component name="input" path="?.upload" config="type:checkbox" class="m"><b>Allow uploading files (form data)</b></ui-component>
 		<ui-bind path="?.upload" config="enabled">
-			<ui-component name="input" path="?.reader" config="dirsource:-|Keep as files,buffer|Buffer,utf8|UTF-8,ascii|ASCII,base64|Base64,hex|Hex">Read files to</ui-component>
+			<ui-component name="input" path="?.reader" config="dirsource:-|Keep as files,buffer|Buffer,utf8|UTF-8,ascii|ASCII,datauri|Data URI,base64|Base64,hex|Hex">Read files to</ui-component>
 		</ui-bind>
 		<hr />
 
