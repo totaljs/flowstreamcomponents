@@ -24,11 +24,14 @@
 					data = cfg.path.includes('.') ? U.get(data, cfg.path) : data[cfg.path];
 			}
 
-			msg.body = data;
+			msg.body = data ? data.toString().toASCII() : '';
 			$.destroy();
 
-			var api = API('TotalAPI', 'sms', msg).callback(err => instance.status({ response: err ? err.toString() : '' }));
-			api.options.token = cfg.token;
+			if (msg.body) {
+				var api = API('TotalAPI', 'sms', msg).callback(err => instance.status({ response: err ? err.toString() : '' }));
+				api.options.token = cfg.token;
+			} else
+				instance.status({ response: 'Invalid message' });
 		};
 
 	};
@@ -36,7 +39,8 @@
 </script>
 
 <style>
-	.CLASS .error { font-size: 12px; padding: 10px; color: red; }
+	.CLASS .error { color: red; border-top: 1px solid #E0E0E0; padding-top: 8px; margin-top: 8px; }
+	.CLASS footer { padding: 10px; font-size: 12px; }
 </style>
 
 <readme>
@@ -80,9 +84,15 @@ The component sends a SMS message.
 
 <body>
 	<header>
-		<i class="ICON"></i>NAME
+		<i class="$ICON"></i>$NAME
 	</header>
 	<footer>
-		<ui-bind path="!STATUS.response" config="text;show" class="error hidden block"></ui-bind>
+		<ui-bind path="!$CONFIG" config="template" class="block">
+			<script type="text/html">
+				<div><span class="gray">From:</span> {{ value.from }}</div>
+				<div><span class="gray">To:</span> {{ value.to }}</div>
+			</script>
+		</ui-bind>
+		<ui-bind path="!$STATUS.response" config="text;show" class="error hidden block"></ui-bind>
 	</footer>
 </body>
