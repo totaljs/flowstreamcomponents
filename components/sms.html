@@ -3,7 +3,7 @@
 	exports.id = 'sms';
 	exports.name = 'SMS';
 	exports.group = 'Total.js API';
-	exports.version = '1';
+	exports.version = '2';
 	exports.icon = 'ti ti-tablet';
 	exports.author = 'Total.js';
 	exports.config = { token: '', to: '', from: '', body: '', isdata: false };
@@ -16,7 +16,15 @@
 			var msg = {};
 			msg.to = cfg.to;
 			msg.from = cfg.from;
-			msg.body = cfg.isdata ? $.data : cfg.body;
+
+			var data = cfg.isdata ? $.data : cfg.body;
+
+			if (cfg.isdata) {
+				if (cfg.path)
+					data = cfg.path.includes('.') ? U.get(data, cfg.path) : data[cfg.path];
+			}
+
+			msg.body = data;
 			$.destroy();
 			TotalAPI(cfg.token, 'sms', msg, function(err) {
 				instance.status({ response: err ? err.toString() : '' });
@@ -41,14 +49,14 @@ The component sends a SMS message.
 		<div class="help">Supports dynamic variables in the form <code>{key}</code>. Generate your token on <a href="https://platform.totaljs.com/?open=api" target="_blank">https://platform.totaljs.com</a> - Total.js API Services.</div>
 	</div>
 	<div class="padding">
-		<div class="row">
-			<div class="col-md-4 m">
-				<ui-component name="input" path="?.from">From</ui-component>
-				<div class="help"><b>International format</b>. Supports dynamic variables in the form <code>{key}</code></div>
+		<div class="grid-2">
+			<div class="m">
+				<ui-component name="input" path="?.from" config="required:1;monospace:1">From</ui-component>
+				<div class="help"><b>International format</b>. Supports dynamic variables in the form <code>{key}</code> or from the message data <code>{data.key}</code>.</div>
 			</div>
-			<div class="col-md-4 m">
-				<ui-component name="input" path="?.to">To</ui-component>
-				<div class="help"><b>International format</b>. Supports dynamic variables in the form <code>{key}</code></div>
+			<div class="m">
+				<ui-component name="input" path="?.to" config="required:1;monospace:1">To</ui-component>
+				<div class="help"><b>International format</b>. Supports dynamic variables in the form <code>{key}</code> or from the message data <code>{data.key}</code>.</div>
 			</div>
 		</div>
 	</div>
@@ -56,13 +64,18 @@ The component sends a SMS message.
 	<div class="padding">
 		<ui-component name="input" path="?.isdata" config="type:checkbox" class="b mt5">Send incoming message data only</ui-component>
 	</div>
-	<div data-bind="?.isdata__hide" class="hidden">
+	<ui-bind path="?.isdata" config="hide" class="hidden">
 		<hr class="nmt nmb" />
 		<div class="padding">
 			<ui-component name="input" path="?.body" config="maxlength:500;required:1">Message</ui-component>
-			<div class="help m">Supports dynamic variables in the form <code>{key}</code>. The component reads data from the message data and then from all defined variables.</div>
+			<div class="help m">Supports dynamic variables in the form <code>{key}</code> or from the message data <code>{data.key}</code>.</div>
 		</div>
-	</div>
+	</ui-bind>
+	<ui-bind path="?.isdata" config="show" class="hidden">
+		<div class="padding npt">
+			<ui-component name="input" path="?.path" config="maxlength:500;placeholder:e.g. message">Path for reading message</ui-component>
+		</div>
+	</ui-bind>
 </settings>
 
 <body>
