@@ -3,7 +3,7 @@
 	exports.id = 'sms';
 	exports.name = 'SMS';
 	exports.group = 'Total.js API';
-	exports.version = '2';
+	exports.version = '1';
 	exports.icon = 'ti ti-tablet';
 	exports.author = 'Total.js';
 	exports.config = { token: '', to: '', from: '', body: '', isdata: false };
@@ -26,9 +26,9 @@
 
 			msg.body = data;
 			$.destroy();
-			TotalAPI(cfg.token, 'sms', msg, function(err) {
-				instance.status({ response: err ? err.toString() : '' });
-			});
+
+			var api = API('TotalAPI', 'sms', msg).callback(err => instance.status({ response: err ? err.toString() : '' }));
+			api.options.token = cfg.token;
 		};
 
 	};
@@ -52,11 +52,11 @@ The component sends a SMS message.
 		<div class="grid-2">
 			<div class="m">
 				<ui-component name="input" path="?.from" config="required:1;monospace:1">From</ui-component>
-				<div class="help"><b>International format</b>. Supports dynamic variables in the form <code>{key}</code> or from the message data <code>{data.key}</code>.</div>
+				<div class="help"><b>International format</b>. Supports dynamic variables in the form <code>{key}</code>.</div>
 			</div>
 			<div class="m">
 				<ui-component name="input" path="?.to" config="required:1;monospace:1">To</ui-component>
-				<div class="help"><b>International format</b>. Supports dynamic variables in the form <code>{key}</code> or from the message data <code>{data.key}</code>.</div>
+				<div class="help"><b>International format</b>. Supports dynamic variables in the form <code>{key}</code>.</div>
 			</div>
 		</div>
 	</div>
@@ -68,7 +68,7 @@ The component sends a SMS message.
 		<hr class="nmt nmb" />
 		<div class="padding">
 			<ui-component name="input" path="?.body" config="maxlength:500;required:1">Message</ui-component>
-			<div class="help m">Supports dynamic variables in the form <code>{key}</code> or from the message data <code>{data.key}</code>.</div>
+			<div class="help m">Supports dynamic variables in the form <code>{key}</code>.</div>
 		</div>
 	</ui-bind>
 	<ui-bind path="?.isdata" config="show" class="hidden">
