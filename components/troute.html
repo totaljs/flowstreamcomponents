@@ -32,8 +32,8 @@
 
 				config.timeout && flags.push(F.is5 ? ('<' + Math.ceil(config.timeout / 1000) + 's') : config.timeout);
 
-				if (F.is5 && config.upload)
-					flags.push('<' + config.limit + 'MB');
+				if (F.is5)
+					flags.push('<' + Math.ceil(config.limit / 1024) + 'MB');
 
 				config.upload && flags.push((F.is5 ? '@' : '') + 'upload');
 
