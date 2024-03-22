@@ -98,15 +98,13 @@ The component triggers data into the Flow.
 		<i class="$ICON"></i>$NAME
 	</header>
 	<div class="padding">
-		<button class="exec" data-exec="=click">Run</button>
+		<button name="run">Run</button>
 	</div>
 </body>
 
 <script>
 	TOUCH(function(exports) {
-
 		exports.click = function(el) {
-
 			if (exports.config.prompt) {
 				var opt = {};
 				opt.name = exports.config.promptlabel || 'Enter a value';
