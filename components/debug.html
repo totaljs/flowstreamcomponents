@@ -3,11 +3,11 @@
 	exports.id = 'debug';
 	exports.name = 'Debug';
 	exports.group = 'Common';
-	exports.version = '3';
+	exports.version = '4';
 	exports.icon = 'ti ti-circle-alt';
 	exports.color = '#E73323';
 	exports.author = 'Total.js';
-	exports.config = { repo: false, data: true, watch: [] };
+	exports.config = { repo: false, debug: true, data: true, watch: [] };
 	exports.meta = { singleton: true };
 
 	exports.make = function(instance, config) {
@@ -18,9 +18,33 @@
 			return value && value.type === 'Buffer' && value.data ? ('<Buffer ' + value.data.splice(0, 10).map(n => n.toString(16).padLeft(2, '0')).join('') + '...') : value;
 		}
 
+		instance.main.ondebug = function(a, b, c, d) {
+
+			if (filter && !filter[this.id])
+				return;
+
+			NOW = new Date();
+
+			var output = [];
+
+			if (a !== undefined)
+				output.push(a);
+			if (b !== undefined)
+				output.push(b);
+			if (c !== undefined)
+				output.push(c);
+			if (d !== undefined)
+				output.push(d);
+
+			instance.status({ name: this.module.name, type: 'debug', date: NOW, data: JSON.stringify(output, serializer) });
+		};
+
 		instance.logger && instance.logger(function($) {
 
 			if (filter && !filter[$.fromid])
+				return;
+
+			if (!config.data && !config.repo)
 				return;
 
 			var data = $.data;
@@ -54,7 +78,7 @@
 			}
 
 			NOW = new Date();
-			output && instance.status({ name: $.from.module.name, date: NOW, data: JSON.stringify(output, serializer) });
+			output && instance.status({ name: $.from.module.name, type: 'message', date: NOW, data: JSON.stringify(output, serializer) });
 		});
 
 		instance.configure = function() {
@@ -99,18 +123,23 @@
 	.CLASS pre, .debugform pre { font-size: 10px; margin: 0; padding: 5px; background-color: #F0F0F0; border-radius: var(--radius); }
 	.debugform .date { font-size: 11px; margin-bottom: 5px; }
 	.debugform .name { float: right; font-size: 11px; font-weight: bold; }
+	.debugform pre:before { display: block; color: rgba(0, 0, 0, 0.3); margin-bottom: 5px; }
+	.debugform .type-debug pre { background: #e6f4f7; }
+	.debugform .type-debug pre:before { content: 'Debug'; }
+	.debugform .type-message pre:before { content: 'Message'; }
 	.ui-dark .CLASS .area { background: #7e4d4d; }
 	.ui-dark .CLASS pre, .ui-dark .debugform pre { background-color: #404040; }
 </style>
 
 <readme>
-The component prints incoming data into the JSON format.
+The component can print the payload of incoming messages and `instance.debug()` log messages in JSON format.
 </readme>
 
 <settings>
 	<div class="padding">
 		<ui-component name="input" path="?.repo" config="type:checkbox">Shows repository</ui-component>
 		<ui-component name="input" path="?.data" config="type:checkbox">Shows data</ui-component>
+		<ui-component name="input" path="?.debug" config="type:checkbox">Shows debug messages</ui-component>
 		<hr />
 		<ui-component name="input" path="%debugsearch" config="type:search;placeholder:Search components" class="m">Search</ui-component>
 		<ui-component name="search" path="%debugsearch" config="selector:figure">
@@ -183,7 +212,7 @@ The component prints incoming data into the JSON format.
 
 		exports.status = function(data) {
 			if (data && data.date)
-				$('#debugformbody').prepend('<div class="m"><div class="name">{0}</div><div class="date"><i class="ti ti-calendar mr5"></i>{1}</div><pre class="json">{2}</pre></div>'.format(data.name, data.date.format('[ts]'), Thelpers.jsonformat(JSON.stringify(JSON.parse(data.data), '\t'))));
+				$('#debugformbody').prepend('<div class="m type-{3}"><div class="name">{0}</div><div class="date"><i class="ti ti-calendar mr5"></i>{1}</div><pre class="json">{2}</pre></div>'.format(data.name, data.date.format('[ts]'), Thelpers.jsonformat(JSON.stringify(JSON.parse(data.data), '\t')), data.type || 'message'));
 		};
 
 	});
