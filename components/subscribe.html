@@ -3,7 +3,7 @@
 	exports.id = 'subscribe';
 	exports.name = 'Subscribe';
 	exports.group = 'FlowStream';
-	exports.version = '3';
+	exports.version = '4';
 	exports.icon = 'ti ti-wifi';
 	exports.author = 'Total.js';
 	exports.config = { name: '' };
@@ -18,7 +18,7 @@
 				for (var com of flow.items) {
 					if (com.type === 'output') {
 						com.id = flow.id + '_' + com.id;
-						com.name = '<b>' + flow.name.encode() + ':</b> ' + com.name.encode();
+						com.name = '<b>' + (flow.name || flow.id).encode() + ':</b> ' + (com.name || '').encode();
 						arr.push(com);
 					}
 				}
