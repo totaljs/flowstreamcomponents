@@ -4,9 +4,9 @@
 	exports.name = 'ChatGPT';
 	exports.icon = 'ti ti-robot-alt';
 	exports.author = 'Total.js';
-	exports.version = '2';
+	exports.version = '3';
 	exports.group = 'Services';
-	exports.config = { model: 'text-davinci-003', apikey: '' };
+	exports.config = { model: 'gpt-3.5-turbo-instruct', apikey: '', question: '' };
 	exports.inputs = [{ id: 'input', name: 'Question' }];
 	exports.outputs = [{ id: 'output', name: 'Answer' }, { id: 'error', name: 'Error' }];
 
@@ -27,11 +27,13 @@
 			}
 
 			switch (cfg.model) {
-				case 'text-curie-001':
-				case 'text-davinci-003':
-				case 'text-babbage-001':
-				case 'text-ada-001':
-					RESTBuilder.POST(URL, { model: cfg.model, prompt: data, temperature: 0, max_tokens: 220 }).header('Authorization', 'Bearer ' + cfg.apikey).timeout(60000).keepalive().callback(function (err, response, output) {
+				case 'gpt-3.5-turbo-instruct':
+
+					if (!data.isString()) {
+						$.send('error', 'Input text must be a string');
+						return;
+					}
+					RESTBuilder.POST(URL, { model: cfg.model, prompt: config.question ? (config.question + ' ' + data) : data, temperature: 0, max_tokens: 220, frequency_penalty: 2 }).header('Authorization', 'Bearer ' + cfg.apikey).timeout(60000).keepalive().callback(function (err, response, output) {
 
 						if (err) {
 							$.send('error', err);
@@ -46,6 +48,7 @@
 					});
 					break;
 				case 'gpt-3.5-turbo':
+				case 'gpt-4':
 
 					var messages = $.data.messages || $.data;
 
@@ -58,6 +61,8 @@
 						$.send('error', 'Error: Each message object must have message role attribute : user or assistant or system');
 						return;
 					}
+
+					config.question && messages.unshift({ role: 'user', content: config.question });
 
 
 					var url = 'https://api.openai.com/v1/chat/completions';
@@ -92,9 +97,7 @@
 
 					});
 
-					break
-
-
+					break;
 			}
 		};
 
@@ -113,7 +116,7 @@ This component can talk to ChatGPT.
 
 Input will depend on selected model
 
-- __CPT 3.5 Turbo__
+- __CPT 3.5 Turbo__ and __CPT 4__
 ```js
 
 // Object
@@ -143,17 +146,8 @@ path : 'path-to-file'
 'path-to-file'
 ```
 
-- __Other__
+- __CPT 3.5 Turbo instruct__
 ```js
-
-// Object
-{
-text : 'your question'
-}
-
-// or
-
-
 // String
 'your question'
 ```
@@ -162,7 +156,7 @@ text : 'your question'
 ## Output
 
 Output also depends on selected model
-- __CPT 3.5 Turbo__
+- __CPT 3.5 Turbo__ and __CPT 4__
 ```js
 'Response from assistant'
 ```
@@ -175,19 +169,27 @@ Output also depends on selected model
 text : 'transcipted text'
 }
 ```
-- __Other__
+- __CPT 3.5 Turbo instruct__
 ```js
 
 // String
-'your question'
+'Response from assistant'
 ```
 </readme>
 
 <settings>
 	<div class="padding">
-		<ui-component name="input" path="?.apikey" config="camouflage:1;required:1">API key</ui-component>
-		<div class="help m"><a href="https://platform.openai.com/account/api-keys" target="_blank"><i class="ti ti-external"></i>Generate API key</a></div>
-		<ui-component name="input" path="?.model" config="type:select;dirsource:gpt-3.5-turbo|GPT 3.5 Turbo,Whisper|whisper-1,text-davinci-003|Davinci,text-curie-001|Curie,text-babbage-001|Babbage,text-ada-001|ADA">Model</ui-component>
+		<div class="m">
+			<ui-component name="input" path="?.apikey" config="camouflage:1;required:1">API key</ui-component>
+			<div class="help"><a href="https://platform.openai.com/account/api-keys" target="_blank"><i class="ti ti-external"></i>Generate API key</a></div>
+		</div>
+		<div class="m">
+			<ui-component name="input" path="?.model" config="type:select;dirsource:gpt-4|GPT 4,gpt-3.5-turbo|GPT 3.5 Turbo,gpt-3.5-turbo-instruct|GPT 3.5 Turbo instruct,Whisper|whisper-1">Model</ui-component>
+		</div>
+		<div class="m">
+			<ui-component name="input" path="?.question" config="type:multiline">Question</ui-component>
+			<div class="help">This question will be added before your messages</div>
+		</div>
 	</div>
 </settings>
 
