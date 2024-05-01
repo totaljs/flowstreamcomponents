@@ -29,10 +29,14 @@
 			switch (cfg.model) {
 				case 'gpt-3.5-turbo-instruct':
 
-					if (!data.isString()) {
-						$.send('error', 'Input text must be a string');
+					if (data.text)
+						data = data.text;
+
+					if (typeof data !== 'string') {
+						$.send('error', 'Error: Wrong input format');
 						return;
 					}
+
 					RESTBuilder.POST(URL, { model: cfg.model, prompt: config.question ? (config.question + ' ' + data) : data, temperature: 0, max_tokens: 220, frequency_penalty: 2 }).header('Authorization', 'Bearer ' + cfg.apikey).timeout(60000).keepalive().callback(function (err, response, output) {
 
 						if (err) {
@@ -148,6 +152,15 @@ path : 'path-to-file'
 
 - __CPT 3.5 Turbo instruct__
 ```js
+
+// Object
+{
+text : 'your question'
+}
+
+// or
+
+
 // String
 'your question'
 ```
