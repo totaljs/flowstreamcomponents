@@ -1,0 +1,120 @@
+<script total>
+
+	exports.id = 'tapiconvertapi';
+	exports.name = 'File converter';
+	exports.icon = 'ti ti-file-import';
+	exports.author = 'Total.js';
+	exports.version = '1';
+	exports.group = 'Total.js API Services';
+	exports.config = { token: '', path: '', to: 'pdf', output: 'buffer' };
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }, { id: 'error', name: 'Error' }];
+
+	exports.make = function(instance, config) {
+
+		var cfg;
+
+		instance.message = function($) {
+
+			if (!cfg.token) {
+				$.send('error', 'Invalid token');
+				return;
+			}
+
+			var payload = cfg.path ? cfg.path.includes('.') ? U.get(cfg.path, $.data) : $.data[cfg.path] : $.data;
+
+			if (!payload) {
+				$.send('error', 'Invalid data');
+				return;
+			}
+
+			var data = {};
+
+			data.data = payload;
+			data.to = cfg.to;
+
+			var api = API('TAPI', 'convert', data).callback(function(err, response) {
+				if (err)
+					$.send('error', err);
+				else
+					switch (cfg.output) {
+						case 'buffer':
+							$.send('output', response);
+							break;
+						case 'base64':
+							$.send('output', response.toString('base64'));
+							break;
+						case 'datauri':
+							var datatype = '';
+
+							switch (cfg.to) {
+								case 'jpg':
+									datatype = 'image/jpeg';
+									break;
+								case 'png':
+									datatype = 'image/png';
+									break;
+								case 'pdf':
+									datatype = 'application/pdf';
+									break;
+							}
+
+							$.send('output', 'data:' + datatype + ';base64,' + response.toString('base64'));
+							break;
+					}
+			});
+
+			api.options.token = cfg.token;
+		};
+
+		instance.configure = function() {
+			cfg = instance.replace(config);
+		};
+
+		instance.vary = instance.configure;
+		instance.configure();
+
+	};
+
+</script>
+
+<readme>
+It converts file to another type of file. It utilizes the [Total.js Convert API](https://docs.totaljs.com/totalapi/6c221003eo51c/#13ff8001db51d).
+
+__Input data:__
+
+```js
+// {String} dataURI of a file
+"data:application/pdf;base64,JVBERi0xLjcN..."
+```
+
+__Output data__:
+Returns data according to the component configuration `Response type`. It can be `Buffer`, `Base64` or `DataURI`.
+</readme>
+
+<settings>
+	<div class="padding bg-smoke">
+		<div class="m">
+			<p><a href="https://docs.totaljs.com/totalapi/6c221002eo50c/" target="_blank"><i class="ti ti-caret-right mr5"></i>Get Total.js API token</a>.<br>The token field supports variables in the form <span class="badge badge-medium badge-silver">{variable}</span>.</p>
+			<ui-component name="input" path="?.token" config="camouflage:1;required:1;monospace:1"><b>API token</b></ui-component>
+		</div>
+		<div class="m">
+			<ui-component name="input" path="?.path" config="monospace:1;placeholder:path.to.property">Path for reading input data</ui-component>
+			<div class="help">Optional. This component will load input data from a specific property/field according to the path.</div>
+		</div>
+	</div>
+	<div class="padding grid-2">
+		<div class="m">
+			<ui-component name="input" path="?.to" config="type:select;dirsource:pdf|PDF,jpg|JPG,png|PNG">Convert to</ui-component>
+		</div>
+		<div class="m response">
+			<ui-component name="input" path="?.output" config="type:select;dirsource:buffer|Buffer,base64|Base64,datauri|DataURI">Response type</ui-component>
+		</div>
+	</div>
+</settings>
+
+<body>
+	<header>
+		<i class="$ICON"></i>$NAME
+	</header>
+</body>

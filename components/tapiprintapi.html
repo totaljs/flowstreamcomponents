@@ -1,0 +1,206 @@
+<script total>
+
+	exports.id = 'tapiprintapi';
+	exports.name = 'Print PDF';
+	exports.icon = 'ti ti-print';
+	exports.author = 'Total.js';
+	exports.version = '1';
+	exports.group = 'Total.js API Services';
+	exports.config = { token: '', path: '', type: 'pdf', page: 'A4', width: 0, height: 0, dpi: 96, top: 0, right: 0, bottom: 0, left: 0, viewport: '', quality: 80, orientation: 'portrait', grayscale: false, lowquality: false, zoom: 100, output: 'buffer' };
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }, { id: 'error', name: 'Error' }];
+
+	exports.make = function(instance, config) {
+
+		var cfg;
+
+		instance.message = async function($) {
+
+			if (!cfg.token) {
+				$.send('error', 'Invalid token');
+				return;
+			}
+
+			var payload = cfg.path ? cfg.path.includes('.') ? U.get(cfg.path, $.data) : $.data[cfg.path] : $.data;
+
+			if (!payload) {
+				$.send('error', 'Invalid data');
+				return;
+			}
+
+			var data = {};
+
+			data.type = cfg.type;
+			data.page = cfg.page;
+			data.margin = cfg.top + ' ' + cfg.right + ' ' + cfg.bottom + ' ' + cfg.left;
+
+			payload.isURL() ? data.url = payload : data.html = payload;
+
+			if (cfg.width)
+				data.width = cfg.width;
+
+			if (cfg.height)
+				data.height = cfg.height;
+
+			data.dpi = cfg.dpi;
+
+			if (cfg.viewport)
+				data.viewport = cfg.viewport;
+
+			data.quality = cfg.quality;
+			data.orientation = cfg.orientation;
+			data.grayscale = cfg.grayscale;
+			data.lowquality = cfg.lowquality;
+			data.zoom = cfg.zoom;
+
+			var api = API('TAPI', 'print', data).callback(function(err, response) {
+				if (err)
+					$.send('error', err);
+				else {
+					switch (cfg.output) {
+						case 'buffer':
+							$.send('output', response);
+							break;
+						case 'base64':
+							$.send('output', response.toString('base64'));
+							break;
+						case 'datauri':
+							var datatype = '';
+
+							switch (cfg.type) {
+								case 'jpg':
+									datatype = 'image/jpeg';
+									break;
+								case 'png':
+									datatype = 'image/png';
+									break;
+								case 'pdf':
+									datatype = 'application/pdf';
+									break;
+								case 'docx':
+									datatype = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+									break;
+							}
+
+							$.send('output', 'data:' + datatype + ';base64,' + response.toString('base64'));
+							break;
+					}
+				}
+			});
+
+			api.options.token = cfg.token;
+		};
+
+		instance.configure = function() {
+			cfg = instance.replace(config);
+		};
+
+		instance.vary = instance.configure;
+		instance.configure();
+
+	};
+
+</script>
+
+<readme>
+Prints HTML or URL address to PDF, JPG, PNG or DOCX file. It utilizes the [Total.js Print API](https://docs.totaljs.com/totalapi/6c221003eo51c/#6c225001ga51c).
+
+__Input data:__
+```js
+// {String} HTML content or URL address
+'<h1>HTML content</h1>'
+```
+
+__Output data:__
+Returns data according to the component configuration `Response type`. It can be `Buffer`, `Base64` or `DataURI`.
+</readme>
+
+<settings>
+	<div class="CLASS-settings">
+		<div class="padding bg-smoke">
+			<div class="m">
+				<p><a href="https://docs.totaljs.com/totalapi/6c221002eo50c/" target="_blank"><i class="ti ti-caret-right mr5"></i>Get Total.js API token</a>.<br>The token field supports variables in the form <span class="badge badge-medium badge-silver">{variable}</span>.</p>
+				<ui-component name="input" path="?.token" config="camouflage:1;required:1;monospace:1"><b>API token</b></ui-component>
+			</div>
+			<div class="m">
+				<ui-component name="input" path="?.path" config="monospace:1;placeholder:path.to.property">Path for reading input data</ui-component>
+				<div class="help">Optional. This component will load input data from a specific property/field according to the path.</div>
+			</div>
+		</div>
+		<div class="padding">
+			<div class="grid-3">
+				<div class="m">
+					<ui-component name="input" path="?.type" config="type:select;required:1;dirsource:pdf|PDF,jpg|JPG,png|PNG,docx|DOCX">Type</ui-component>
+				</div>
+				<div class="m">
+					<ui-component name="input" path="?.page" config="type:select;dirsource:A3,A4,A5,Letter">Page</ui-component>
+				</div>
+				<div class="m">
+					<ui-component name="input" path="?.viewport" config="type:select;dirsource:xs|XS,sm|SM,md|MD,lg|LG">Viewport</ui-component>
+				</div>
+			</div>
+			<div>
+				<ui-component name="input" path="?.grayscale" config="type:checkbox">Grayscale</ui-component>
+				<ui-component name="input" path="?.lowquality" config="type:checkbox">Lowquality</ui-component>
+			</div>
+			<hr />
+			<div class="grid-3">
+				<div class="m">
+					<ui-component name="input" path="?.width" config="type:number">Width</ui-component>
+				</div>
+				<div class="m">
+					<ui-component name="input" path="?.height" config="type:number">Height</ui-component>
+				</div>
+				<div class="m">
+					<ui-component name="input" path="?.orientation" config="type:select;dirsource:portrait|Portrait,landscape|Landscape">Orientation</ui-component>
+				</div>
+			</div>
+			<div class="grid-3">
+				<div class="m">
+					<ui-component name="input" path="?.dpi" config="type:number">DPI</ui-component>
+				</div>
+				<div class="m">
+					<ui-component name="input" path="?.quality" config="type:number">Quality</ui-component>
+				</div>
+				<div class="m">
+					<ui-component name="input" path="?.zoom" config="type:number">Zoom</ui-component>
+				</div>
+			</div>
+			<p class="title">Margin:</p>
+			<div class="grid-4 margin-container">
+				<div class="m">
+					<ui-component name="input" path="?.top" config="type:number">Top</ui-component>
+				</div>
+				<div class="m">
+					<ui-component name="input" path="?.right" config="type:number">Right</ui-component>
+				</div>
+				<div class="m">
+					<ui-component name="input" path="?.bottom" config="type:number">Bottom</ui-component>
+				</div>
+				<div class="m">
+					<ui-component name="input" path="?.left" config="type:number">Left</ui-component>
+				</div>
+			</div>
+			<div class="m response">
+				<ui-component name="input" path="?.output" config="type:select;dirsource:buffer|Buffer,base64|Base64,datauri|DataURI">Response type</ui-component>
+			</div>
+		</div>
+	</div>
+</settings>
+
+<style>
+	.CLASS footer { padding: 10px; font-size: 12px; }
+	.CLASS-settings .margin-container { border: 1px solid #e1e0e0; padding: 16px; border-radius: 6px; }
+	.CLASS-settings .title { margin-bottom: 3px; }
+	.CLASS-settings .response { margin-top: 16px; }
+	.ui-dark .CLASS-settings .margin-container { border: 1px solid #505050; padding: 16px; border-radius: 6px; }
+</style>
+
+<body>
+	<header>
+		<i class="$ICON"></i>$NAME
+	</header>
+	<footer>
+		<ui-bind path="$CONFIG.type" config="text span"><b>Type: </b><span></span></ui-bind>
+	</footer>
+</body>

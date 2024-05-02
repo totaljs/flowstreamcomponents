@@ -1,0 +1,95 @@
+<script total>
+
+	exports.id = 'tapismsapi';
+	exports.name = 'SMS';
+	exports.icon = 'ti ti-sms';
+	exports.author = 'Total.js';
+	exports.version = '1';
+	exports.group = 'Total.js API Services';
+	exports.config = { token: '', from: '' };
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }, { id: 'error', name: 'Error' }];
+
+	exports.make = function(instance, config) {
+
+		var cfg;
+
+		instance.message = function($) {
+
+			if (!cfg.token) {
+				$.send('error', 'Invalid token');
+				return;
+			}
+
+			var payload = $.data;
+
+			if (!payload.to && !payload.body) {
+				$.send('error', 'Invalid data');
+				return;
+			}
+
+			var data = {};
+
+			data.body = payload.body;
+			data.to = payload.to;
+			data.from = cfg.from;
+
+			var api = API('TAPI', 'sms', data).callback(function(err, response) {
+				if (err)
+					$.send('error', err);
+				else
+					$.send('output', response);
+			});
+
+			api.options.token = cfg.token;
+		};
+
+		instance.configure = function() {
+			cfg = instance.replace(config);
+		};
+
+		instance.vary = instance.configure;
+		instance.configure();
+
+	};
+
+</script>
+
+<readme>
+By using this component, you can send SMS. It utilizes the [Total.js SMS API](https://docs.totaljs.com/totalapi/6c221003eo51c/#6d220001ni51c).
+
+__Input data:__
+
+```js
+{
+	to: "+421903163302",
+	body: "Your message ..."
+}
+```
+
+__Output data__:
+
+```js
+{ success: true }
+```
+</readme>
+
+<settings>
+	<div class="padding bg-smoke">
+		<div class="m">
+			<p><a href="https://docs.totaljs.com/totalapi/6c221002eo50c/" target="_blank"><i class="ti ti-caret-right mr5"></i>Get Total.js API token</a>.<br>The token field supports variables in the form <span class="badge badge-medium badge-silver">{variable}</span>.</p>
+			<ui-component name="input" path="?.token" config="camouflage:1;required:1;monospace:1"><b>API token</b></ui-component>
+		</div>
+	</div>
+	<div class="padding">
+		<div class="m">
+			<ui-component name="input" path="?.from" config="required:1;placeholder:Sender name">From</ui-component>
+		</div>
+	</div>
+</settings>
+
+<body>
+	<header>
+		<i class="$ICON"></i>$NAME
+	</header>
+</body>

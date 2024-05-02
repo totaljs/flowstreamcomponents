@@ -1,0 +1,121 @@
+<script total>
+
+	exports.id = 'tapiplatenumber';
+	exports.name = 'Plate number parser';
+	exports.icon = 'ti ti-car';
+	exports.author = 'Total.js';
+	exports.version = '1';
+	exports.group = 'Total.js API Services';
+	exports.config = { token: '', path: '', code: 'eu', first: false };
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }, { id: 'error', name: 'Error' }];
+
+	exports.make = function(instance, config) {
+
+		var cfg;
+
+		instance.message = async function($) {
+
+			if (!cfg.token) {
+				$.send('error', 'Invalid token');
+				return;
+			}
+
+			var payload = cfg.path ? cfg.path.includes('.') ? U.get(cfg.path, $.data) : $.data[cfg.path] : $.data;
+
+			if (!payload) {
+				$.send('error', 'Invalid data');
+				return;
+			}
+
+			var data = {};
+
+			payload.isURL() ? data.url = payload : data.data = payload;
+			data.code = cfg.code;
+
+			var api = API('TAPI', 'platenumber', data).callback(function(err, response) {
+				if (err)
+					$.send('error', err);
+				else {
+					if (cfg.first) {
+						var first = response[0];
+
+						if (!first) {
+							$.send('error', 'No plate number found');
+							return;
+						}
+
+						$.send('output', first.value);
+					} else
+						$.send('output', response);
+				}
+			});
+
+			api.options.token = cfg.token;
+		};
+
+		instance.configure = function() {
+			cfg = instance.replace(config);
+		};
+
+		instance.vary = instance.configure;
+		instance.configure();
+
+	};
+
+</script>
+
+<readme>
+It parses a plate number from the JPG/PNG picture. It utilizes the [Total.js Platenumber API](https://docs.totaljs.com/totalapi/6c221003eo51c/#13ffb001db51d).
+
+__Input data:__
+```js
+// {String} dataURI of an image
+'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEB....'
+```
+
+__Output data:__
+```js
+[
+  {
+    "value": "H786P0J",
+    "confidence": 89.8356
+  },
+  {
+    "value": "H786POJ",
+    "confidence": 87.6114
+  },
+  {
+    "value": "HN786P0J",
+    "confidence": 85.2152
+  }
+]
+```
+</readme>
+
+<settings>
+	<div class="padding bg-smoke">
+		<div class="m">
+			<p><a href="https://docs.totaljs.com/totalapi/6c221002eo50c/" target="_blank"><i class="ti ti-caret-right mr5"></i>Get Total.js API token</a>.<br>The token field supports variables in the form <span class="badge badge-medium badge-silver">{variable}</span>.</p>
+			<ui-component name="input" path="?.token" config="camouflage:1;required:1;monospace:1"><b>API token</b></ui-component>
+		</div>
+		<div class="m">
+			<ui-component name="input" path="?.path" config="monospace:1;placeholder:path.to.property">Path for reading input data</ui-component>
+			<div class="help">Optional. This component will load input data from a specific property/field according to the path.</div>
+		</div>
+	</div>
+	<div class="padding">
+		<div class="m">
+			<ui-component name="input" path="?.code" config="type:select;required:1;dirsource:eu|EU,us|US">Country code</ui-component>
+		</div>
+		<div class="m">
+			<ui-component name="input" path="?.first" config="type:checkbox;">Return only the first value</ui-component>
+		</div>
+	</div>
+</settings>
+
+<body>
+	<header>
+		<i class="$ICON"></i>$NAME
+	</header>
+</body>

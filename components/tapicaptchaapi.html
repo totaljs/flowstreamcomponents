@@ -1,0 +1,108 @@
+<script total>
+
+	exports.id = 'tapicaptchaapi';
+	exports.name = 'Captcha';
+	exports.icon = 'ti ti-game-board';
+	exports.author = 'Total.js';
+	exports.version = '1';
+	exports.group = 'Total.js API Services';
+	exports.config = { token: '', path: '', width: 200, height: 80, dark: false };
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }, { id: 'error', name: 'Error' }];
+
+	exports.make = function(instance, config) {
+
+		var cfg;
+
+		instance.message = function($) {
+
+			if (!cfg.token) {
+				$.send('error', 'Invalid token');
+				return;
+			}
+
+			var payload = cfg.path ? cfg.path.includes('.') ? U.get(cfg.path, $.data) : $.data[cfg.path] : $.data;
+
+			if (!payload) {
+				$.send('error', 'Invalid data');
+				return;
+			}
+
+			var data = {};
+
+			data.value = payload;
+			data.width = cfg.width;
+			data.height = cfg.height;
+			data.dark = cfg.dark;
+
+			var api = API('TAPI', 'captcha', data).callback(function(err, response) {
+				if (err)
+					$.send('error', err);
+				else
+					$.send('output', response);
+			});
+
+			api.options.token = cfg.token;
+		};
+
+		instance.configure = function() {
+			cfg = instance.replace(config);
+		};
+
+		instance.vary = instance.configure;
+		instance.configure();
+
+	};
+
+</script>
+
+<readme>
+Captcha image generator generates a simple JPEG image. It utilizes the [Total.js Weather API](https://docs.totaljs.com/totalapi/6c221003eo51c/#Ii6INR1cR61f).
+
+__Input data:__
+
+```js
+// {String} Captcha text
+'123456'
+```
+
+__Output data__:
+
+```js
+// Returns DataURI
+'data:image/jpeg;base64,/9j/4AAQSkZ...''
+
+```
+</readme>
+
+<settings>
+	<div class="padding bg-smoke">
+		<div class="m">
+			<p><a href="https://docs.totaljs.com/totalapi/6c221002eo50c/" target="_blank"><i class="ti ti-caret-right mr5"></i>Get Total.js API token</a>.<br>The token field supports variables in the form <span class="badge badge-medium badge-silver">{variable}</span>.</p>
+			<ui-component name="input" path="?.token" config="camouflage:1;required:1;monospace:1"><b>API token</b></ui-component>
+		</div>
+		<div class="m">
+			<ui-component name="input" path="?.path" config="monospace:1;placeholder:path.to.property">Path for reading input data</ui-component>
+			<div class="help">Optional. This component will load input data from a specific property/field according to the path.</div>
+		</div>
+	</div>
+	<div class="padding">
+		<div class="grid-4">
+			<div class="m">
+				<ui-component name="input" path="?.width" config="type:number;required:1;maxvalue:500;">Width</ui-component>
+			</div>
+			<div class="m">
+				<ui-component name="input" path="?.height" config="type:number;required:1;maxvalue:500;">Height</ui-component>
+			</div>
+		</div>
+		<div class="m">
+			<ui-component name="input" path="?.dark" config="type:checkbox;">Dark mode</ui-component>
+		</div>
+	</div>
+</settings>
+
+<body>
+	<header>
+		<i class="$ICON"></i>$NAME
+	</header>
+</body>

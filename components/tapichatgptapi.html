@@ -1,0 +1,127 @@
+<script total>
+
+	exports.id = 'tapichatgptapi';
+	exports.name = 'ChatGPT';
+	exports.icon = 'ti ti-robot';
+	exports.author = 'Total.js';
+	exports.version = '1';
+	exports.group = 'Total.js API Services';
+	exports.config = { token: '', path: '', output: 'text', size: 'small', response: 'buffer' };
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }, { id: 'error', name: 'Error' }];
+
+	exports.make = function(instance, config) {
+		var cfg;
+
+		instance.message = function($) {
+
+			if (!cfg.token) {
+				$.send('error', 'Invalid token');
+				return;
+			}
+
+			var payload = cfg.path ? cfg.path.includes('.') ? U.get(cfg.path, $.data) : $.data[cfg.path] : $.data;
+
+			if (!payload) {
+				$.send('error', 'Invalid data');
+				return;
+			}
+
+			var data = {};
+
+			data.value = payload;
+			data.output = cfg.output;
+			data.size = cfg.size;
+
+			var api = API('TAPI', 'chatgpt', data).callback(function(err, response) {
+				if (err)
+					$.send('error', err);
+				else {
+					if (cfg.output === 'text') {
+						$.send('output', response);
+					} else {
+						switch (cfg.response) {
+							case 'buffer':
+								$.send('output', response);
+								break;
+							case 'base64':
+								$.send('output', response.toString('base64'));
+								break;
+							case 'datauri':
+								$.send('output', 'data:image/png;base64,' + response.toString('base64'));
+								break;
+						}
+					}
+				}
+			});
+
+			api.options.token = cfg.token;
+		};
+
+		instance.configure = function() {
+			cfg = instance.replace(config);
+		};
+
+		instance.vary = instance.configure;
+		instance.configure();
+
+	};
+
+</script>
+
+<readme>
+By using this component you can asks ChatGPT / OpenAPI. It utilizes the [Total.js ChatGPT API](https://docs.totaljs.com/totalapi/6c221003eo51c/#128fm001kc51d).
+
+__Input data:__
+
+```js
+// {String} a question for ChatGPT
+'What is Total.js Platform'
+```
+
+__Output data__:
+
+If `output` is set as Text:
+```js
+{
+    text: 'Total.js Platform is a web development platform that provides a comprehensive set of tools and modules for building modern, scalable, and high-performance web applications. It is based on the Node.js runtime and offers a seamless development experience with a powerful, intuitive, and easy-to-use framework. Total.js Platform includes features such as database integration, real-time communication, server-side rendering, RESTful API support, and more. It also supports various front-end technologies and integrates seamlessly with popular third-party libraries and services, making it a great choice for building full-stack web applications.'
+}
+```
+
+If `output` is set as Image:
+Returns data according to the component configuration Response type. It can be `Buffer`, `Base64` or `DataURI`.
+</readme>
+
+<settings>
+	<div class="padding bg-smoke">
+		<div class="m">
+			<p><a href="https://docs.totaljs.com/totalapi/6c221002eo50c/" target="_blank"><i class="ti ti-caret-right mr5"></i>Get Total.js API token</a>.<br>The token field supports variables in the form <span class="badge badge-medium badge-silver">{variable}</span>.</p>
+			<ui-component name="input" path="?.token" config="camouflage:1;required:1;monospace:1"><b>API token</b></ui-component>
+		</div>
+		<div class="m">
+			<ui-component name="input" path="?.path" config="monospace:1;placeholder:path.to.property">Path for reading input data</ui-component>
+			<div class="help">Optional. This component will load input data from a specific property/field according to the path.</div>
+		</div>
+	</div>
+	<div class="padding">
+		<div class="m">
+			<ui-component name="input" path="?.output" config="type:select;required:1;dirsource:text|Text,image|Image">Output</ui-component>
+		</div>
+		<ui-bind path="?.output" config="hide:value !== 'image'">
+			<div class="grid-2">
+				<div class="m">
+					<ui-component name="input" path="?.size" config="type:select;dirsource:small|Small,medium|Medium,large|Large">Size</ui-component>
+				</div>
+				<div class="m">
+					<ui-component name="input" path="?.response" config="type:select;dirsource:buffer|Buffer,base64|Base64,datauri|DataURI">Response type</ui-component>
+				</div>
+			</div>
+		</ui-bind>
+	</div>
+</settings>
+
+<body>
+	<header>
+		<i class="$ICON"></i>$NAME
+	</header>
+</body>

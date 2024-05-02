@@ -1,0 +1,103 @@
+<script total>
+
+	exports.id = 'tapigeoipapi';
+	exports.name = 'Geo IP';
+	exports.icon = 'ti ti-earth';
+	exports.author = 'Total.js';
+	exports.version = '1';
+	exports.group = 'Total.js API Services';
+	exports.config = { token: '', path: '' };
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }, { id: 'error', name: 'Error' }];
+
+	exports.make = function(instance, config) {
+
+		var cfg;
+
+		instance.message = function($) {
+
+			if (!cfg.token) {
+				$.send('error', 'Invalid token');
+				return;
+			}
+
+			var payload = cfg.path ? cfg.path.includes('.') ? U.get(cfg.path, $.data) : $.data[cfg.path] : $.data;
+
+			if (!payload) {
+				$.send('error', 'Invalid data');
+				return;
+			}
+
+			var data = {};
+			data.value = payload;
+
+			var api = API('TAPI', 'geoip', data).callback(function(err, response) {
+				if (err)
+					$.send('error', err);
+				else
+					$.send('output', response);
+			});
+
+			api.options.token = cfg.token;
+		};
+
+		instance.configure = function() {
+			cfg = instance.replace(config);
+		};
+
+		instance.vary = instance.configure;
+		instance.configure();
+
+	};
+
+</script>
+
+<readme>
+Reads GEO information from IP address. It utilizes the [Total.js GEO IP API](https://docs.totaljs.com/totalapi/6c221003eo51c/#6d381001hc51c).
+
+__Input data:__
+
+```js
+// {String} IP address
+"78.98.116.204"
+```
+
+__Output data__:
+
+```js
+{
+	ip: '78.98.95.176',
+	isp: 'Slovak Telekom, a.s.',
+	country: 'Slovakia',
+	country_code: 'SK',
+	region: 'Banska Bystrica',
+	region_code: 'BC',
+	city: 'Banská Bystrica',
+	zip: '974 01',
+	continent: 'Europe',
+	continent_code: 'EU',
+	lat: 48.804,
+	lng: 19.1363,
+	timezone: 'Europe/Bratislava'
+}
+```
+</readme>
+
+<settings>
+	<div class="padding bg-smoke">
+		<div class="m">
+			<p><a href="https://docs.totaljs.com/totalapi/6c221002eo50c/" target="_blank"><i class="ti ti-caret-right mr5"></i>Get Total.js API token</a>.<br>The token field supports variables in the form <span class="badge badge-medium badge-silver">{variable}</span>.</p>
+			<ui-component name="input" path="?.token" config="camouflage:1;required:1;monospace:1"><b>API token</b></ui-component>
+		</div>
+		<div class="m">
+			<ui-component name="input" path="?.path" config="monospace:1;placeholder:path.to.property">Path for reading input data</ui-component>
+			<div class="help">Optional. This component will load input data from a specific property/field according to the path.</div>
+		</div>
+	</div>
+</settings>
+
+<body>
+	<header>
+		<i class="$ICON"></i>$NAME
+	</header>
+</body>

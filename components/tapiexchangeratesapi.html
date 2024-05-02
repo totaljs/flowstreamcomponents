@@ -1,0 +1,126 @@
+<script total>
+
+	exports.id = 'tapiexchangeratesapi';
+	exports.name = 'Exchange rates';
+	exports.icon = 'ti ti-money-check-alt';
+	exports.author = 'Total.js';
+	exports.version = '1';
+	exports.group = 'Total.js API Services';
+	exports.config = { token: '', currency: 'EUR', path: '' };
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }, { id: 'error', name: 'Error' }];
+
+	exports.make = function(instance, config) {
+		var cfg;
+
+		instance.message = function($) {
+
+			if (!cfg.token) {
+				$.send('error', 'Invalid token');
+				return;
+			}
+			var payload = cfg.path ? cfg.path.includes('.') ? U.get(cfg.path, $.data) : $.data[cfg.path] : $.data;
+
+			var data = {};
+
+			data.currency = cfg.currency;
+
+			if (payload) {
+				var date = new Date(payload);
+				if (!isNaN(date.getTime()))
+					data.date = cfg.date;
+			}
+
+			var api = API('TAPI', 'exchangerates', data).callback(function(err, response) {
+				if (err)
+					$.send('error', err);
+				else
+					$.send('output', response);
+			});
+
+			api.options.token = cfg.token;
+		};
+
+		instance.configure = function() {
+			cfg = instance.replace(config);
+		};
+
+		instance.vary = instance.configure;
+		instance.configure();
+
+	};
+
+</script>
+
+<readme>
+Reads exchange rates. It utilizes the [Total.js Exchangerates API](https://docs.totaljs.com/totalapi/6c221003eo51c/#6e2f4001dt51c).
+
+__Input data__:
+
+```js
+// {String} Date, optional input default is current date
+"2020-12-12"
+```
+__Output data__:
+
+```js
+{
+    USD: 1.2109,
+    JPY: 126.05,
+    BGN: 1.9558,
+    CZK: 26.239,
+    DKK: 7.4429,
+    GBP: 0.9,
+    HUF: 356.64,
+    PLN: 4.4246,
+    RON: 4.8685,
+    SEK: 10.2745,
+    CHF: 1.0764,
+    ISK: 153.5,
+    NOK: 10.5763,
+    HRK: 7.549,
+    RUB: 89.167,
+    TRY: 9.4762,
+    AUD: 1.6185,
+    BRL: 6.1993,
+    CAD: 1.5472,
+    CNY: 7.9167,
+    HKD: 9.3866,
+    IDR: 17078,
+    ILS: 3.9406,
+    INR: 89.212,
+    KRW: 1314.27,
+    MXN: 23.9187,
+    MYR: 4.9196,
+    NZD: 1.7103,
+    PHP: 58.298,
+    SGD: 1.6174,
+    THB: 36.388,
+    ZAR: 18.0756
+}
+```
+</readme>
+
+<settings>
+	<div class="padding bg-smoke">
+		<div class="m">
+			<p><a href="https://docs.totaljs.com/totalapi/6c221002eo50c/" target="_blank"><i class="ti ti-caret-right mr5"></i>Get Total.js API token</a>.<br>The token field supports variables in the form <span class="badge badge-medium badge-silver">{variable}</span>.</p>
+			<ui-component name="input" path="?.token" config="camouflage:1;required:1;monospace:1"><b>API token</b></ui-component>
+		</div>
+		<div class="m">
+			<ui-component name="input" path="?.path" config="monospace:1;placeholder:path.to.property">Path for reading input data</ui-component>
+			<div class="help">Optional. This component will load input data from a specific property/field according to the path.</div>
+		</div>
+	</div>
+	<div class="padding">
+		<div class="m">
+			<ui-component name="input" path="?.currency" config="type:select;required:1;dirsource:EUR,USD,CZK,GBP">Currency</ui-component>
+		</div>
+	</div>
+</settings>
+
+<body>
+	<header>
+		<i class="$ICON"></i>$NAME
+	</header>
+</body>
