@@ -193,20 +193,20 @@ each of the Map properties will be pushed to a new array, see example bellow
 			<label>Map</label>
 			<!--<ui-component name="keyvalue" path="?.map" config="placeholderkey:Type a path to property;placeholdervalue:Type a new path to a property" class="maparray-keyvalue"></ui-component>-->
 
-			<div data-bind="?.map__template:.maparray-item -> data-index">
+			<ui-bind path="?.map" config="template:.maparray-item -> data-index">
 				<script type="text/html">
 					{{ foreach item in value }}
 					<div class="maparray-item" data-index="{{ $index }}">
 						<div class="row">
-							<ui-bind path="?.array" config=".col-md-11:value__.col-md-5:!value" class="block">
+							<ui-bind path="?.array" config=".col-md-11:value;.col-md-5:!value" class="block">
 								<ui-component name="input" path="?.map[{{ $index }}].source" class="m"></ui-component>
 							</ui-bind>
-							<div class="col-md-1" data-bind="?.array__hide">
+							<ui-bind path="?.array" config="hide" class="col-md-1">
 								<div class="m" style="line-height: 35px;">--&gt;</div>
-							</div>
-							<div class="col-md-5" data-bind="?.array__hide">
+							</ui-bind>
+							<ui-bind path="?.array" config="hide" class="col-md-5">
 								<ui-component name="input" path="?.map[{{ $index }}].target"></ui-component>
-							</div>
+							</ui-bind>
 							<div class="col-md-1">
 								<i class="ti ti-trash red exec" data-exec="FUNC.maparray_remove_item" data-index="{{ $index }}"></i>
 							</div>
@@ -214,7 +214,7 @@ each of the Map properties will be pushed to a new array, see example bellow
 					</div>
 					{{ end }}
 				</script>
-			</div>
+			</ui-bind>
 			<ui-bind path="?.array" config="hide" class="help block m">You can use 3 dots(...) in the right field to keep the same path.</ui-bind>
 			<button class="button-add exec" data-exec="FUNC.maparray_add_item">ADD</button>
 		</section>
