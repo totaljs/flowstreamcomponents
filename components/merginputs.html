@@ -13,6 +13,7 @@
 	exports.make = function(instance, config) {
 
 		var compiled = null;
+		var refs = {};
 		var checktimeout;
 		var values = {};
 		var value = {};
@@ -48,7 +49,12 @@
 					delete values[input.id];
 			}
 
-			instance.newmessage(value).send('output');
+			var msg = instance.newmessage(value);			
+
+			for (var key in refs)
+				msg.refs[key] = refs[key];
+
+			msg.send('output');
 		};
 
 		var check = function() {
@@ -58,10 +64,13 @@
 
 		instance.message = function($) {
 			var data = $.data;
-			var input = compiled[$.input];
-			if (input) {
-				values[$.input] = input.path ? U.get(data, input.path) : data;
-				check();
+
+			for (var key in $.refs)
+				refs[key] = $.refs[key];
+
+			if (compiled[$.input]) {
+				values[$.input] = compiled[$.input].path ? U.get(data, compiled[$.input].path) : data;
+				checkforce();
 			}
 			$.destroy();
 		};
@@ -76,6 +85,7 @@
 			}
 
 			compiled = {};
+			refs = {};
 
 			for (var item of config.inputs) {
 				if (item) {
