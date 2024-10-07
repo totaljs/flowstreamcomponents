@@ -4,7 +4,7 @@
 	exports.name = 'Merge inputs';
 	exports.icon = 'ti ti-filter';
 	exports.author = 'Total.js';
-	exports.version = '1';
+	exports.version = '1.0.1';
 	exports.group = 'Common';
 	exports.config = { inputs: [] };
 	exports.inputs = [];
@@ -53,7 +53,7 @@
 
 		var check = function() {
 			checktimeout && clearTimeout(checktimeout);
-			checktimeout = setTimeout(checkforce, 100);
+			checktimeout = setTimeout(checkforce, 1);
 		};
 
 		instance.message = function($) {
@@ -113,7 +113,15 @@ This component merges multiple inputs into one object.
 	<div class="CLASS-settings">
 		<div class="padding">
 			<ui-component name="input" path="?.clear" config="type:checkbox" class="m">Clear cache</ui-component>
-			<ui-component name="listform" path="?.inputs" config="autofocus:1;empty:You do not have defined any inputs;create:tmpmerge.add">
+			<div class="caption m">
+				<div class="toolbar">
+					<nav>
+						<button class="exec" data-exec="tmpmerge.add"><i class="ti ti-plus-circle"></i>Add input</button>
+					</nav>
+				</div>
+				<label>Inputs</label>
+			</div>
+			<ui-component name="listform" path="?.inputs" config="autofocus:1;empty:You do not have defined any inputs;">
 
 				<script type="text/html">
 					<div class="item"><i class="ti ti-arrow-right"></i>{{ if required }}<b>{{fi}}{{ name }}{{ if required }}</b>{{fi}}{{ if assign }}<span class="fs11 gray ml5">{{ assign }}</span>{{ fi }}</div>
@@ -142,11 +150,6 @@ This component merges multiple inputs into one object.
 						</ui-component>
 					</div>
 				</script>
-
-				<script type="text/html">
-					<div style="margin-top:10px"><button class="button button-inline" name="create"><i class="ti ti-plus-circle green"></i>Add input</button></div>
-				</script>
-
 			</ui-component>
 		</div>
 	</div>
@@ -172,14 +175,17 @@ This component merges multiple inputs into one object.
 			if (!tmp) {
 
 				tmp = {};
-				tmp.add = function(callback) {
+				tmp.add = function(el) {
 					var obj = {};
 					obj.id = 'i' + Math.random().toString(36).substring(6);
-					obj.name = 'Name';
+					obj.name = 'Name of input';
 					obj.path = '';
 					obj.clear = false;
 					obj.required = false;
-					callback(obj);
+
+					var scope = el.scope();
+					scope.push('inputs', obj);
+					scope.change('*');
 				};
 
 				W.tmpmerge = tmp;
