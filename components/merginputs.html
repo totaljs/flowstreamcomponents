@@ -4,7 +4,7 @@
 	exports.name = 'Merge inputs';
 	exports.icon = 'ti ti-filter';
 	exports.author = 'Total.js';
-	exports.version = '1.0.1';
+	exports.version = '1.1.0';
 	exports.group = 'Common';
 	exports.config = { inputs: [] };
 	exports.inputs = [];
@@ -13,18 +13,22 @@
 	exports.make = function(instance, config) {
 
 		var compiled = null;
-		var checktimeout;
+		var refs = {};
 		var values = {};
-		var value = {};
+		var value = {};		
+		var status = { filled: 0 }
+
+		var updateFilled = () => {
+			status.filled = Object.values(values).filter((v) => !!v).length;
+			instance.status(status, 500);
+		}
 
 		var checkforce = function() {
 
-			checktimeout = null;
 
 			var skip = false;
-
+			updateFilled();
 			for (var input of config.inputs) {
-
 				var val = values[input.id];
 				if (val === undefined) {
 					if (input.required) {
@@ -37,7 +41,6 @@
 					U.set(value, input.assign, val);
 				else
 					U.extend(value, val);
-
 			}
 
 			if (skip)
@@ -48,20 +51,24 @@
 					delete values[input.id];
 			}
 
-			instance.newmessage(value).send('output');
-		};
+			var msg = instance.newmessage(value);			
 
-		var check = function() {
-			checktimeout && clearTimeout(checktimeout);
-			checktimeout = setTimeout(checkforce, 1);
+			for (var key in refs)
+				msg.refs[key] = refs[key];
+
+			updateFilled()
+			msg.send('output');
 		};
 
 		instance.message = function($) {
 			var data = $.data;
-			var input = compiled[$.input];
-			if (input) {
-				values[$.input] = input.path ? U.get(data, input.path) : data;
-				check();
+
+			for (var key in $.refs)
+				refs[key] = $.refs[key];
+
+			if (compiled[$.input]) {
+				values[$.input] = compiled[$.input].path ? U.get(data, compiled[$.input].path) : data;
+				checkforce();
 			}
 			$.destroy();
 		};
@@ -72,10 +79,12 @@
 
 			if (config.clear) {
 				values = {};
+				updateFilled();
 				delete config.clear;
 			}
 
 			compiled = {};
+			refs = {};
 
 			for (var item of config.inputs) {
 				if (item) {
@@ -88,6 +97,8 @@
 				if (!compiled[key])
 					delete values[key];
 			}
+
+			instance.status(status, 500);
 
 			var prev = JSON.stringify(instance.inputs);
 			var curr = JSON.stringify(inputs);
@@ -211,4 +222,7 @@ This component merges multiple inputs into one object.
 	<header>
 		<i class="ICON"></i>NAME
 	</header>
+    <footer>
+		Filled: <ui-bind path="STATUS" config="text:value?value.filled:0" class="b"></ui-bind>
+	</footer>
 </body>
