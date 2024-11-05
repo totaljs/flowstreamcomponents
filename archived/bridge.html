@@ -1,0 +1,164 @@
+<script total>
+
+	exports.id = 'bridge';
+	exports.name = 'Bridge';
+	exports.group = 'Objects';
+	exports.version = '1';
+	exports.icon = 'ti ti-exchange';
+	exports.author = 'Total.js';
+	exports.config = { map: {} };
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }];
+
+	exports.make = function(instance) {
+
+		// map.raw {Boolean}
+		// map.value {String}
+
+		instance.message = function($) {
+
+			let data = {};
+
+			for (let key in config.map) {
+				let map = config.map[key];
+				// map.raw {Boolean}
+				// map.value {String}
+				data[key] = map.raw ? map.value : msg.data[map.value];
+			}
+
+			$.send('output', data);
+		};
+	};
+
+</script>
+
+<readme>
+The component transforms incoming input data with a defined schema into output data with a specific schema.
+</readme>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+</body>
+
+<settings>
+
+	<div class="padding">
+		<p>Map keys between input and output:</p>
+		<ui-bind path="#bridgeoutputs" config="template" class="block">
+			<script type="text/html">
+				<table class="table monospace fs12">
+					<tbody>
+						{{ foreach m in value }}
+							<tr data-id="{{ m.path }}">
+								<td style="width:50%" class="exec" data-exec="FUNC.bridgetype">{{ m.htmlvalue | raw }}</td>
+								<td class="bg-smoke">{{ if m.required }}<span class="pull-right badge badge-red">required</span>{{ fi }}{{ m.template | raw }}</td>
+							</tr>
+						{{ end }}
+					</tbody>
+				</table>
+			</script>
+		</ui-bind>
+		<ui-component name="changer" path="?.map"></ui-component>
+	</div>
+
+</settings>
+
+<script>
+
+	TOUCH(function(exports, reinit) {
+
+		if (!FUNC.bridgetype) {
+			FUNC.bridgetype = function(el) {
+				var opt = {};
+				opt.element = el;
+				opt.items = '#bridgeinputs';
+				opt.custom = true;
+				opt.callback = function(selected) {
+					let path = ATTRD(el);
+					let obj = {};
+					obj.raw = typeof(selected) === 'string';
+					obj.value = obj.raw ? selected : selected.path;
+					let config = GET(W.bridgesettings.path);
+					if (!config.map)
+						config.map = {};
+					config.map[path] = obj;
+					UPD(W.bridgesettings.path + ' @change');
+					if (obj.raw) {
+						el.text(selected);
+					} else
+						el.html(selected.template);
+				};
+				SETTER('directory/show', opt);
+			};
+		}
+
+		exports.settings = function(meta) {
+
+			// Triggered when the user opens settings
+			let instance = meta.instance;
+			let conn = flow.data[instance.id].connections;
+			let inputs = [];
+			let outputs = [];
+
+			// Find input connections
+			for (let key in flow.data) {
+				if (key !== instance.id) {
+					let tmp = flow.data[key];
+					for (let key2 in tmp.connections) {
+						let output = tmp.connections[key2].findItem('id', instance.id);
+						if (output) {
+							let tmp2 = tmp.outputs.findItem('id', key2);
+							if (tmp2 && tmp2.schema)
+								inputs.push(tmp2.schema);
+						}
+					}
+				}
+			}
+
+			for (let output of conn.output) {
+				let tmp = flow.data[output.id];
+				let input = tmp.inputs.findItem('id', output.index);
+				if (input && input.schema)
+					outputs.push(input.schema);
+			}
+
+			var parse = function(val) {
+				let types = val.split(',');
+				let response = [];
+				for (let type of types) {
+					type = type.split(':');
+					type[1] = type[1] ? type[1].toLowerCase() : 'string';
+					let required = type[0].charAt(0) === '*';
+					let path = required ? type[0].substring(1) : type[0];
+					response.push({ path: path, type: type[1], required: required, template: '<span class="monospace">{0} <span class="badge" style="background-color:{2}">{1}</span></span>'.format(path.encode(), type[1], Thelpers.color(type[1])) });
+				}
+				return response;
+			};
+
+			inputs = parse(inputs.join(','));
+			outputs = parse(outputs.join(','));
+
+			let config = meta.config;
+
+			for (let output of outputs) {
+				let map = config.map[output.path];
+				if (map) {
+					if (map.raw)
+						output.htmlvalue = (map.value || '').encode();
+					else
+						output.htmlvalue = inputs.findValue('path', map.value, 'template');
+				} else
+					output.htmlvalue = DEF.empty;
+			}
+
+			W.bridgesettings = meta;
+
+			SET('#bridgeinputs', inputs);
+			SET('#bridgeoutputs', outputs);
+		};
+
+	});
+
+</script>
