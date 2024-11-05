@@ -2,7 +2,7 @@
 
 	exports.id = 'read';
 	exports.name = 'Read';
-	exports.group = 'Common';
+	exports.group = 'Objects';
 	exports.version = '3';
 	exports.icon = 'ti ti-filter';
 	exports.author = 'Total.js';
@@ -123,7 +123,8 @@ This component reads specific values according to the configured map.
 	.CLASS-settings figure .controls span:first-child { margin-left: 0; }
 	.CLASS-settings figure:first-child { border-top: 0; line-height: 24px; }
 	.CLASS-settings figure:first-child div { line-height: 24px; }
-	.CLASS footer { height: 40px; line-height: 40px; padding: 0 10px; font-size: 12px; }
+	.CLASS footer { padding: 10px; font-size: 12px; }
+	.CLASS footer hr { margin: 10px 0; }
 
 	.ui-dark .CLASS-settings .fields { border-color: #404040; }
 	.ui-dark .CLASS-settings figure { border-top-color: #404040; }
@@ -133,10 +134,20 @@ This component reads specific values according to the configured map.
 
 <body>
 	<header>
-		<i class="ICON"></i>NAME
+		<i class="$ICON"></i>$NAME
 	</header>
-	<footer is="is-footer" path="CONFIG.path" config="show;text span">
-		Path: <span class="b"></span>
+	<footer>
+		<ui-bind path="CONFIG" config="template" class="block">
+			<script type="text/html">
+				{{ if value.path }}
+				Path: <span class="b">{{ value.path }}</span>
+				<hr />
+				{{ fi }}
+				{{ foreach m in value.schema }}
+				<div class="monospace"><i class="ti ti-bull mr5 gray"></i>{{ m.pathfrom }} <i class="ti ti-long-arrow-right"></i> {{ m.pathto }}</div>
+				{{ end }}
+			</script>
+		</ui-bind>
 	</footer>
 </body>
 

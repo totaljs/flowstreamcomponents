@@ -1,12 +1,12 @@
 <script total>
 
-	exports.id = 'logger';
-	exports.name = 'Logger';
-	exports.group = 'Common';
+	exports.id = 'snapshot';
+	exports.name = 'Snapshot';
+	exports.group = 'Objects';
 	exports.version = '1';
-	exports.icon = 'ti ti-history';
+	exports.icon = 'ti ti-save';
 	exports.author = 'Total.js';
-	exports.config = { id: 'id', name: '{{ data.name }}', status: 'Step 1' };
+	exports.config = { id: 'id', name: '{{ data.name }}', status: 'Initial data' };
 	exports.inputs = [{ id: 'input', name: 'Input' }];
 	exports.outputs = [{ id: 'output', name: 'Output' }];
 
@@ -19,26 +19,39 @@
 		};
 
 		instance.call = function(data, callback) {
-			let db = 'nosql/logs';
+			let db = 'nosql/snapshots';
 			switch (data.TYPE) {
 				case 'items':
-					DATA.list(db).autoquery(data, 'id,name,messageid,status,dtcreated:Date', 'dtcreated_desc', 100).callback((err, response) => callback(response));
+					DATA.list(db).autoquery(data, 'id,messageid,name,status,dtcreated:Date', 'dtcreated_desc', 100).where('snapshotid', instance.id).callback((err, response) => callback(response));
+					break;
+				case 'resend':
+					DATA.read(db).id(data.id).where('snapshotid', instance.id).callback(function(err, response) {
+						if (response) {
+							instance.send('output', response.data);
+							instance.status({ date: new Date(), id: response.messageid });
+						}
+						callback(SUCCESS(response ? true : false));
+					});
 					break;
 				case 'remove':
-					DATA.remove(db).id(data.id).callback((err, response) => callback(SUCCESS(response ? true : false)));
+					DATA.remove(db).id(data.id).where('snapshotid', instance.id).callback((err, response) => callback(SUCCESS(response ? true : false)));
 					break;
 				case 'clear':
-					DATA.remove(db).callback(() => callback(SUCCESS(true)));
+					DATA.remove(db).where('snapshotid', instance.id).callback(() => callback(SUCCESS(true)));
 					break;
 			}
 		};
 
 		instance.message = function($) {
+
 			let id = $.data[config.id];
 			let name = Tname($);
-			DATA.insert('nosql/logs', { id: UID(), messageid: id, instanceid: instance.id, name: name, status: config.status, dtcreated: new Date() });
+			let data = CLONE($.data);
+
+			DATA.insert('nosql/snapshots', { id: UID(), messageid: id, snapshotid: instance.id, name: name, data: data, status: config.status, dtcreated: new Date() });
+
 			instance.status({ date: new Date(), id: id });
-			$.send('output');
+			$.send('output', data);
 		};
 
 		instance.configure();
@@ -47,7 +60,7 @@
 </script>
 
 <readme>
-The component logs information about incoming data.
+The component takes a snapshot of the incoming data and the user can reuse saved snapshots in the future.
 </readme>
 
 <style>
@@ -92,7 +105,7 @@ The component logs information about incoming data.
 	TOUCH(function(exports, reinit) {
 
 		var services = [];
-		var Path = 'loggerbox';
+		var Path = 'snapshotbox';
 
 		if (!PLUGINS[Path]) {
 
@@ -118,20 +131,20 @@ The component logs information about incoming data.
 				};
 
 				exports.button = function(name, row) {
-					SETTER('approve/show', 'Are you sure you want to remove selected log?', ':remove: Remove', function() {
+					SETTER('approve/show', 'Are you sure you want to remove selected snapshot?', ':remove: Remove', function() {
 						var model = GET(Path);
 						model.instance.call({ TYPE: 'remove', id: ATTRD(row) }, function(response) {
 							if (response.success) {
 								SETTER('notify/success', 'Removed.');
 								exports.refresh();
 							} else
-								SETTER('notify/warning', 'Log not found in database.');
+								SETTER('notify/warning', 'Snapshot not found in database.');
 						});
 					});
 				};
 
 				exports.clear = function() {
-					SETTER('approve/show', 'Are you sure you want to clear all logs?', ':remove: Clear', function() {
+					SETTER('approve/show', 'Are you sure you want to clear all snapshots?', ':remove: Clear', function() {
 						var model = GET(Path);
 						model.instance.call({ TYPE: 'clear' }, function(response) {
 							SETTER('notify/success', 'Cleared.');
@@ -139,6 +152,20 @@ The component logs information about incoming data.
 						});
 					});
 				};
+
+				exports.click = function(row) {
+					row && SETTER('approve/show', 'Are you sure you want to resend selected snapshot?', ':send: Resend', function() {
+						var model = GET(Path);
+						model.instance.call({ TYPE: 'resend', id: ATTRD(row) }, function(response) {
+							if (response.success) {
+								SETTER('notify/success', 'Done.');
+								NUL('*form');
+							} else
+								SETTER('notify/warning', 'Snapshot not found in database.');
+						});
+					});
+				};
+
 			});
 
 			$('body').append(('<ui-component name="box" path="*form" config="if:{0};width:940;scrollbar:0;title:Snapshots;icon:ti ti-save;reload:?/reload" plugin="{0}"><nav><button class="exec" data-exec="?/clear"><i class="ti ti-clean red"></i>Clear</button></nav><div><ui-component name="datagrid" path="?.data" config="height:.ui-box-body;margin:1;checkbox:0;click:?/click;exec:?/filter;noborder:1;button:?/button"><scri' + 'pt type="text/plain">[{ name: "messageid", text: "Message", width: 150, monospace: 1 },{ name: "status", text: "Status", width: 200 },{ name: "name", text: "Name", width: 300 },{ name: "dtcreated", text: "Created", type: "date", format: "[ts]" }, { type: "controls", template: "<button name=\\\"remove\\\"><i class=\\\"ti ti-trash red\\\"></i></button>" }]</scr' + 'ipt></ui-component></div><nav><button name="cancel" style="width:100%">Close</button></nav></ui-component>').format(Path));
