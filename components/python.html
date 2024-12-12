@@ -1,0 +1,62 @@
+<script total>
+
+	exports.id = 'python';
+	exports.name = 'Python';
+	exports.group = 'Common';
+	exports.version = '1';
+	exports.icon = 'ti ti-script';
+	exports.author = 'Total.js';
+	exports.config = { code: '# Python code\nimport json\n\ndata = json.loads(sys.argv[1])\n\nprint(data)' };
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }, { id: 'error', name: 'Error' }];
+	exports.meta = { settingswidth: 1200 };
+
+	exports.install = function() {
+		PATH.mkdir(PATH.temp('python'));
+	};
+
+	exports.make = function(instance, config) {
+
+		var filename = PATH.temp(instance.id + '.py');
+
+		instance.message = function($) {
+
+			if (!config.code) {
+				$.send('error', 'No code defined');
+				return;
+			}
+
+			F.Child.execFile('python3', [filename, JSON.stringify($.data)], function(err, response, error) {
+				if (err)
+					$.send('error', error || err);
+				else
+					$.send('output', response);
+			});
+		};
+
+		instance.configure = function() {
+			if (config.code)
+				F.Fs.writeFile(filename, config.code, err => err && instance.throw(err));
+		};
+
+		instance.configure();
+
+	};
+
+</script>
+
+<readme>
+This component executes a custom Python code as it is.
+</readme>
+
+<settings>
+	<div class="padding">
+		<ui-component name="codemirror" path="?.code" config="type:python;minheight:300;parent:auto;margin:60;tabs:true;trim:true"></ui-component>
+	</div>
+</settings>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+</body>
