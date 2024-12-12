@@ -3,10 +3,10 @@
 	exports.id = 'print';
 	exports.name = 'Print';
 	exports.group = 'Common';
-	exports.version = '5';
+	exports.version = '6';
 	exports.icon = 'ti ti-print';
 	exports.author = 'Total.js';
-	exports.config = { repo: false, data: true };
+	exports.config = { repo: false, data: true, text: false };
 	exports.inputs = [{ id: 'input', name: 'Input' }];
 
 	exports.make = function(instance, config) {
@@ -89,7 +89,7 @@ The component prints incoming data in a JSON format.
 		<i class="ICON"></i>NAME
 	</header>
 	<footer>
-		<ui-bind path="!STATUS" config="html pre:Thelpers.jsonformat(JSON.stringify(JSON.parse(value), null, '\t'));show:value && value.length > 0" class="hidden selectable block">
+		<ui-bind path="!STATUS" config="html pre:debugprinter;show" class="hidden selectable block">
 			<span class="readme" title="Open in new window"><i class="ti ti-window"></i></span>
 			<div class="noscrollbar mt5">
 				<pre class="json"></pre>
@@ -99,6 +99,17 @@ The component prints incoming data in a JSON format.
 </body>
 
 <script>
+
+	W.debugprinter = function(value) {
+		if (value) {
+			value = JSON.parse(value);
+			if (typeof(value) === 'string')
+				return Thelpers.encode(value);
+			else
+				return Thelpers.jsonformat(JSON.stringify(value, null, '\t'));
+		}
+	};
+
 	TOUCH(function(exports, reinit) {
 
 		if (reinit)
@@ -111,7 +122,10 @@ The component prints incoming data in a JSON format.
 		};
 
 		exports.element.on('click', '.readme', function() {
-			FUNC.readme('Debug', '```json\n' + JSON.stringify(JSON.parse(laststatus), null, '  ') + '\n```');
+			var status = laststatus ? JSON.parse(laststatus) : null;
+			if (typeof(status) !== 'string')
+				status = JSON.stringify(JSON.parse(status), null, '  ');
+			FUNC.readme('Debug', '```json\n' + status + '\n```');
 		});
 
 	});
