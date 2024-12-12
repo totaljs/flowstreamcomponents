@@ -3,7 +3,7 @@
 	exports.id = 'trigger';
 	exports.name = 'Trigger';
 	exports.group = 'Triggers';
-	exports.version = '4';
+	exports.version = '5';
 	exports.icon = 'ti ti-start';
 	exports.author = 'Total.js';
 	exports.config = { random: true, type: 'string', data: '', restart: false, prompt: false };
@@ -81,7 +81,7 @@
 				<ui-component name="input" path="?.promptlabel" config="placeholder:Enter a value"><b>Prompt label</b></ui-component>
 			</ui-bind>
 		</div>
-		<ui-bind path="?" config="hide:value.hide && !value.prompt" class="hidden">
+		<ui-bind path="?" config="hide:value.hide && !value.prompt || (value.random && !value.prompt)" class="hidden">
 			<hr />
 			<ui-component name="input" path="?.data" config="required:1;height:250;type:multiline;maxlength:100000;monospace:1">Data</ui-component>
 			<ui-bind path="?.prompt" config="show" class="help hidden">The prompt value will be assigned to the <code>{prompt}</code> keyword in the code.</ui-bind>
@@ -109,9 +109,7 @@ The component triggers data into the Flow.
 				var opt = {};
 				opt.name = exports.config.promptlabel || 'Enter a value';
 				opt.value = '';
-				opt.callback = function(val) {
-					exports.trigger({ value: val });
-				};
+				opt.callback = val => exports.trigger({ value: val });
 				SETTER('prompt/show', opt);
 			} else
 				exports.trigger();
