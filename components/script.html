@@ -1,0 +1,70 @@
+<script total>
+
+	exports.id = 'script';
+	exports.name = 'Script';
+	exports.group = 'Common';
+	exports.version = '1';
+	exports.icon = 'ti ti-script';
+	exports.author = 'Total.js';
+	exports.config = { code: '// data {Object}\n// send(data) {Function}\n\n' };
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }];
+	exports.meta = { settingswidth: 1200 };
+
+	exports.make = function(instance, config) {
+
+		var AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
+		var fn;
+
+		instance.message = function($) {
+			if (fn) {
+				try {
+					var send = data => $.send('output', data);
+					fn($, $.data, F.require, send);
+				} catch (e) {
+					$.throw(e);
+					$.destroy();
+				}
+			}
+		};
+
+		instance.configure = function() {
+			try {
+				if (config.code) {
+					instance.status(1);
+					fn = config.code.includes('await ') ? (new AsyncFunction('$', 'data', 'require', 'send', 'var next=send;\n' + config.code)) : (new Function('$', 'data', 'require', 'send', 'var next=send;\n' + config.code));
+				} else {
+					instance.status(0);
+					fn = null;
+				}
+			} catch (e) {
+				fn = null;
+				instance.throw('Script: ' + e.message);
+			}
+		};
+
+		instance.close = function() {
+			fn = null;
+		};
+
+		instance.configure();
+
+	};
+
+</script>
+
+<readme>
+This component executes a custom JavaScript code as it is. To send data to the default output use `send(data);`
+</readme>
+
+<settings>
+	<div class="padding">
+		<ui-component name="codemirror" path="?.code" config="type:javascript;minheight:300;parent:auto;margin:60;tabs:true;trim:true"></ui-component>
+	</div>
+</settings>
+
+<body>
+	<header>
+		<i class="ICON"></i>NAME
+	</header>
+</body>
