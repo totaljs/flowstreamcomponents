@@ -52,9 +52,7 @@
 				$.send('output', { err, data });
 			});
 
-			!builder && $.send('error', 'Your function must return query!');
-
-			
+			!builder && $.send('output', { err: 'Your function must return query!' });
 		};
 
 		instance.close = function(callback) {
@@ -167,7 +165,7 @@ Example
 // query; mquery instance
 // data; data from the incomming object
 
-query.find(); // return all documents
+return query.find(); // return all documents
 ```
 
 ## Important
