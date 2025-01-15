@@ -51,7 +51,15 @@
 			} catch(e) {
 				result = { error: e };
 			}
+			
+			if (result.data instanceof Array) {
+				for (var Id in result.response.insertedIds) {
+					result.response.insertedIds[Id] = result.data[parseInt(Id)]._id = result.response.insertedIds[Id].toString();
+				}
+			} else
+				result.response.insertedId = result.data._id = result.response.insertedId.toString();
 
+			
 			$.send('output', result);
 		};
 
