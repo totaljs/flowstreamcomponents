@@ -9,7 +9,7 @@
 	exports.config = {};
 	exports.inputs = [{ id: 'input', name: 'Input' }];
 	exports.outputs = [{ id: 'output', name: 'Output' }];
-	exports.npm = ['mongodb'];
+	exports.npm = ['mongodb@4.0.0'];
 
 	exports.make = function(instance, config) {
 
@@ -51,7 +51,15 @@
 			} catch(e) {
 				result = { error: e };
 			}
+			
+			if (result.data instanceof Array) {
+				for (var Id in result.response.insertedIds) {
+					result.response.insertedIds[Id] = result.data[parseInt(Id)]._id = result.response.insertedIds[Id].toString();
+				}
+			} else
+				result.response.insertedId = result.data._id = result.response.insertedId.toString();
 
+			
 			$.send('output', result);
 		};
 

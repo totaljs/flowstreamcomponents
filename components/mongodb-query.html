@@ -6,10 +6,10 @@
 	exports.icon = 'ti ti-database';
 	exports.author = 'Martin Smola';
 	exports.version = '2';
-	exports.config = {};
+	exports.config = { fn: 'return query.find();' };
 	exports.inputs = [{ id: 'input', name: 'Input' }];
 	exports.outputs = [{ id: 'output', name: 'Output' }];
-	exports.npm = ['mongodb', 'mquery'];
+	exports.npm = ['mongodb@4.0.0', 'mquery'];
 
 	exports.make = function(instance, config) {
 
@@ -39,14 +39,20 @@
 				COLS[id] = collection;
 			}
 
-			var query = mquery(COLS[id]);
+			var query = mquery();
+			query.collection(COLS[id]);
 			query.$useProjection = true;
 
 			const builder = fn(query, data.data);
 
-			builder.exec(function(err, data){
+			builder && builder.then(function(data, err) {
+				for (var d of data)
+					d._id = d._id.toString();
+
 				$.send('output', { err, data });
 			});
+
+			!builder && $.send('output', { err: 'Your function must return query!' });
 		};
 
 		instance.close = function(callback) {
@@ -159,7 +165,7 @@ Example
 // query; mquery instance
 // data; data from the incomming object
 
-query.find(); // return all documents
+return query.find(); // return all documents
 ```
 
 ## Important
@@ -202,10 +208,6 @@ Valid inclusion: `.select('name email')` or `.select('email lastname')` etc.
 <style>
 	.CLASS footer { padding: 10px; font-size: 12px; }
 </style>
-
-<script>
-
-</script>
 
 <body>
 	<header>
