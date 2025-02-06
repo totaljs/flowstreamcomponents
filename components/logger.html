@@ -6,12 +6,13 @@
 	exports.version = '1';
 	exports.icon = 'ti ti-history';
 	exports.author = 'Total.js';
-	exports.config = { id: 'id', name: '{{ data.name }}', status: 'Step 1' };
-	exports.inputs = [{ id: 'input', name: 'Input' }];
-	exports.outputs = [{ id: 'output', name: 'Output' }];
+	exports.config = { id: 'id', name: '{{ data.name }}', status: 'Step 1', remove: '1 year' };
+	exports.inputs = [{ id: 'input', name: 'Input' }, { id: 'error', name: 'Error' }];
+	exports.outputs = [{ id: 'error', name: 'Error' }, { id: 'output', name: 'Output' }];
 
 	exports.make = function(instance, config) {
 
+		var Dname = 'nosql/logs';
 		var Tname;
 
 		instance.configure = function() {
@@ -19,26 +20,39 @@
 		};
 
 		instance.call = function(data, callback) {
-			let db = 'nosql/logs';
 			switch (data.TYPE) {
 				case 'items':
-					DATA.list(db).autoquery(data, 'id,name,messageid,status,dtcreated:Date', 'dtcreated_desc', 100).callback((err, response) => callback(response));
+					DATA.list(Dname).autoquery(data, 'id,name,messageid,status,error,iserror:Boolean,dtcreated:Date', 'dtcreated_desc', 100).callback((err, response) => callback(response));
 					break;
 				case 'remove':
-					DATA.remove(db).id(data.id).callback((err, response) => callback(SUCCESS(response ? true : false)));
+					DATA.remove(Dname).id(data.id).callback((err, response) => callback(SUCCESS(response ? true : false)));
 					break;
 				case 'clear':
-					DATA.remove(db).callback(() => callback(SUCCESS(true)));
+					DATA.remove(Dname).callback(() => callback(SUCCESS(true)));
 					break;
 			}
 		};
 
 		instance.message = function($) {
-			let id = $.data[config.id];
+			let data = $.data;
+			let id = data[config.id];
 			let name = Tname($);
-			DATA.insert('nosql/logs', { id: UID(), messageid: id, instanceid: instance.id, name: name, status: config.status, dtcreated: new Date() });
+			let error = null;
+
+			if ($.input === 'error') {
+				if (data instanceof Array)
+					data = data[0];
+				error = data instanceof ErrorBuilder || data instanceof Error ? data.toString() : (data ? (data.error || data.err) : 'Unexpected error');
+			}
+
+			DATA.insert(Dname, { id: UID(), messageid: id, instanceid: instance.id, name: name, status: config.status, iserror: !!error, error: error, dtcreated: new Date() });
 			instance.status({ date: new Date(), id: id });
-			$.send('output');
+			$.send($.input === 'error' ? 'error' : 'output');
+		};
+
+		instance.service = function(counter) {
+			if (config.remove && (counter % 1440) === 0)
+				DATA.remove(Dname).where('dtcreated', '<', NOW.add('-' + config.remove));
 		};
 
 		instance.configure();
@@ -73,15 +87,18 @@ The component logs information about incoming data.
 
 <settings>
 	<div class="padding">
-		<div class="grid-3">
+		<div class="grid-2">
 			<div class="m">
 				<ui-component name="input" path="?.id" config="required:1;monospace:1">Message ID</ui-component>
 			</div>
 			<div class="m">
-				<ui-component name="input" path="?.name" config="required:1;monospace:1">Snapshot name</ui-component>
+				<ui-component name="input" path="?.name" config="required:1;monospace:1">Log name</ui-component>
 			</div>
 			<div class="m">
-				<ui-component name="input" path="?.status" config="required:1">Snapshot status</ui-component>
+				<ui-component name="input" path="?.status" config="required:1">Log step</ui-component>
+			</div>
+			<div class="m">
+				<ui-component name="input" path="?.remove">Remove logs older than</ui-component>
 			</div>
 		</div>
 	</div>
@@ -94,7 +111,9 @@ The component logs information about incoming data.
 		var services = [];
 		var Path = 'loggerbox';
 
-		if (!PLUGINS[Path]) {
+		if (!W.loggerboxinit) {
+
+			W.loggerboxinit = true;
 
 			PLUGIN(Path, function(exports) {
 
@@ -141,7 +160,7 @@ The component logs information about incoming data.
 				};
 			});
 
-			$('body').append(('<ui-component name="box" path="*form" config="if:{0};width:940;scrollbar:0;title:Snapshots;icon:ti ti-save;reload:?/reload" plugin="{0}"><nav><button class="exec" data-exec="?/clear"><i class="ti ti-clean red"></i>Clear</button></nav><div><ui-component name="datagrid" path="?.data" config="height:.ui-box-body;margin:1;checkbox:0;click:?/click;exec:?/filter;noborder:1;button:?/button"><scri' + 'pt type="text/plain">[{ name: "messageid", text: "Message", width: 150, monospace: 1 },{ name: "status", text: "Status", width: 200 },{ name: "name", text: "Name", width: 300 },{ name: "dtcreated", text: "Created", type: "date", format: "[ts]" }, { type: "controls", template: "<button name=\\\"remove\\\"><i class=\\\"ti ti-trash red\\\"></i></button>" }]</scr' + 'ipt></ui-component></div><nav><button name="cancel" style="width:100%">Close</button></nav></ui-component>').format(Path));
+			$('body').append(('<ui-component name="box" path="*form" config="if:{0};width:1400;scrollbar:0;title:Logs;icon:ti ti-history;reload:?/reload" plugin="{0}"><nav><button class="exec" data-exec="?/clear"><i class="ti ti-clean red"></i>Clear</button></nav><div><ui-component name="datagrid" path="?.data" config="height:.ui-box-body;margin:1;checkbox:0;click:?/click;exec:?/filter;noborder:1;button:?/button"><scri' + 'pt type="text/plain">[{ name: "messageid", text: "Message", width: 150, monospace: 1 },{ name: "status", text: "Status", width: 200 },{ name: "name", text: "Name", width: 300 },{ name: "error", text: "Error message", width: 250 },{ name: "iserror", text: "Error", type: "boolean", align: 1, width: 130 },{ name: "dtcreated", text: "Created", type: "date", format: "[ts]" }, { type: "controls", template: "<button name=\\\"remove\\\"><i class=\\\"ti ti-trash red\\\"></i></button>" }]</scr' + 'ipt></ui-component></div><nav><button name="cancel" style="width:100%">Close</button></nav></ui-component>').format(Path));
 		}
 
 		exports.element.on('click', 'button', function() {

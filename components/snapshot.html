@@ -6,12 +6,13 @@
 	exports.version = '1';
 	exports.icon = 'ti ti-save';
 	exports.author = 'Total.js';
-	exports.config = { id: 'id', name: '{{ data.name }}', status: 'Initial data' };
+	exports.config = { id: 'id', name: '{{ data.name }}', status: 'Initial data', remove: '1 year' };
 	exports.inputs = [{ id: 'input', name: 'Input' }];
 	exports.outputs = [{ id: 'output', name: 'Output' }];
 
 	exports.make = function(instance, config) {
 
+		var Dname = 'nosql/snapshots';
 		var Tname;
 
 		instance.configure = function() {
@@ -19,13 +20,12 @@
 		};
 
 		instance.call = function(data, callback) {
-			let db = 'nosql/snapshots';
 			switch (data.TYPE) {
 				case 'items':
-					DATA.list(db).autoquery(data, 'id,messageid,name,status,dtcreated:Date', 'dtcreated_desc', 100).where('snapshotid', instance.id).callback((err, response) => callback(response));
+					DATA.list(Dname).autoquery(data, 'id,messageid,name,status,dtcreated:Date', 'dtcreated_desc', 100).where('instanceid', instance.id).callback((err, response) => callback(response));
 					break;
 				case 'resend':
-					DATA.read(db).id(data.id).where('snapshotid', instance.id).callback(function(err, response) {
+					DATA.read(Dname).id(data.id).where('instanceid', instance.id).callback(function(err, response) {
 						if (response) {
 							instance.send('output', response.data);
 							instance.status({ date: new Date(), id: response.messageid });
@@ -34,24 +34,33 @@
 					});
 					break;
 				case 'remove':
-					DATA.remove(db).id(data.id).where('snapshotid', instance.id).callback((err, response) => callback(SUCCESS(response ? true : false)));
+					DATA.remove(Dname).id(data.id).where('instanceid', instance.id).callback((err, response) => callback(SUCCESS(response ? true : false)));
 					break;
 				case 'clear':
-					DATA.remove(db).where('snapshotid', instance.id).callback(() => callback(SUCCESS(true)));
+					DATA.remove(Dname).where('instanceid', instance.id).callback(() => callback(SUCCESS(true)));
 					break;
 			}
 		};
 
 		instance.message = function($) {
-
 			let id = $.data[config.id];
 			let name = Tname($);
 			let data = CLONE($.data);
-
-			DATA.insert('nosql/snapshots', { id: UID(), messageid: id, snapshotid: instance.id, name: name, data: data, status: config.status, dtcreated: new Date() });
-
+			DATA.insert(Dname, { id: UID(), messageid: id, instanceid: instance.id, name: name, data: data, status: config.status, dtcreated: new Date() });
 			instance.status({ date: new Date(), id: id });
 			$.send('output', data);
+		};
+
+		instance.service = function(counter) {
+
+			if (counter % 1441 === 0) {
+				NOSQL(Dname.split('/')[1]).clean();
+				return;
+			}
+
+			if (config.remove && (counter % 1440) === 0)
+				DATA.remove(Dname).where('dtcreated', '<', NOW.add('-' + config.remove));
+
 		};
 
 		instance.configure();
@@ -86,7 +95,7 @@ The component takes a snapshot of the incoming data and the user can reuse saved
 
 <settings>
 	<div class="padding">
-		<div class="grid-3">
+		<div class="grid-2">
 			<div class="m">
 				<ui-component name="input" path="?.id" config="required:1;monospace:1">Message ID</ui-component>
 			</div>
@@ -95,6 +104,9 @@ The component takes a snapshot of the incoming data and the user can reuse saved
 			</div>
 			<div class="m">
 				<ui-component name="input" path="?.status" config="required:1">Snapshot status</ui-component>
+			</div>
+			<div class="m">
+				<ui-component name="input" path="?.remove">Remove snapshots older than</ui-component>
 			</div>
 		</div>
 	</div>
@@ -107,7 +119,9 @@ The component takes a snapshot of the incoming data and the user can reuse saved
 		var services = [];
 		var Path = 'snapshotbox';
 
-		if (!PLUGINS[Path]) {
+		if (!W.snapshotboxinit) {
+
+			W.snapshotboxinit = true;
 
 			PLUGIN(Path, function(exports) {
 
