@@ -132,6 +132,10 @@ The persistent mode can include an HTTP server or an infinite loop. Input data i
 		<i class="$ICON"></i>$NAME
 	</header>
 	<footer style="padding:10px" class="fs12">
-		<ui-bind path="$STATUS" config="text;empty" child="b" class="block">Status: <b></b></ui-bind>
+		<ui-bind path="$STATUS" config="template" class="block">
+			<script type="text/html">
+				{{ if value === 'Running' }}<i class="ti ti-spinner ti-spin color mr5"></i>{{ else if value === 'Ready' }}<i class="ti ti-check-circle green mr5"></i>{{ else if value }}<i class="ti ti-warning red mr5"></i>{{ fi }}{{ value | empty('Not configured') }}
+			</script>
+		</ui-bind>
 	</footer>
 </body>
