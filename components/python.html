@@ -6,7 +6,22 @@
 	exports.version = '2';
 	exports.icon = 'ti ti-script';
 	exports.author = 'Total.js';
-	exports.config = { code: '# Python code\nimport sys\nimport json\n\ndata = json.loads(sys.argv[1])\n\nprint(data)', json: true };
+	exports.config = { code: `# Python code
+import sys
+import json
+
+# For non-persistent data:
+data = json.loads(sys.argv[1])
+print(data)
+
+# Or for persistent data:
+while True:
+\tline = sys.stdin.readline().strip()
+\tif not line:
+\t\tbreak
+\tprint(line)
+\tsys.stdout.flush()
+`, json: true, persistent: false };
 	exports.inputs = [{ id: 'input', name: 'Input' }];
 	exports.outputs = [{ id: 'output', name: 'Output' }, { id: 'error', name: 'Error' }];
 	exports.meta = { settingswidth: 1200 };
@@ -18,6 +33,7 @@
 	exports.make = function(instance, config) {
 
 		var filename = PATH.temp(instance.id + '.py');
+		var spawned = null;
 
 		instance.message = function($) {
 
@@ -26,18 +42,67 @@
 				return;
 			}
 
-			F.Child.execFile('python3', [filename, JSON.stringify($.data)], function(err, response, error) {
-				if (err) {
-					$.send('error', error || err);
-				} else {
-					$.send('output', config.json ? response.parseJSON(true) : response);
-				}
-			});
+			if (config.persistent) {
+				if (spawned)
+					spawned.stdin.write(JSON.stringify($.data) + '\n');
+				$.destroy();
+			} else {
+				F.Child.execFile('python3', [filename, JSON.stringify($.data)], function(err, response, error) {
+					if (err) {
+						$.send('error', error || err);
+					} else {
+						$.send('output', config.json ? response.parseJSON(true) : response);
+					}
+				});
+			}
 		};
 
 		instance.configure = function() {
+
 			if (config.code)
 				F.Fs.writeFile(filename, config.code, err => err && instance.throw(err));
+
+			let ready = false;
+			let prev = spawned;
+
+			if (spawned) {
+				spawned.removeAllListeners('close');
+				spawned.removeAllListeners('error');
+				spawned.kill(9);
+			}
+
+			if (config.persistent && config.code) {
+
+				spawned = F.Child.spawn('python3', [filename], { stdio: ['pipe', 'pipe', process.stderr] });//, { stdio: 'inherit' }
+
+				spawned.on('error', function(err) {
+					instance.newmessage(err.toString()).send('error');
+				});
+
+				spawned.stdout.on('data', function(chunk) {
+					let text = chunk.toString('utf8');
+					if (config.json)
+						instance.newmessage(text.parseJSON(true)).send('output');
+					else
+						instance.newmessage(text).send('output');
+				});
+
+				spawned.on('close', function(code) {
+					if (this == spawned)
+						spawned = null;
+					instance.status('Exited: ' + code);
+				});
+
+				instance.status('Running');
+
+			} else if (spawned) {
+				spawned.kill(9);
+				spawned = null;
+				ready = true;
+			} else
+				ready = true;
+
+			ready && instance.status('Ready');
 		};
 
 		instance.configure();
@@ -47,18 +112,26 @@
 </script>
 
 <readme>
-This component executes a custom Python code as it is.
+This component executes custom Python code as is. The input data must be a serializable JSON object. Non-persistent mode evaluates the Python code for each input.
+
+The persistent mode can include an HTTP server or an infinite loop. Input data is sent to the `stdin` stream in serialized JSON format.
+
+> __Good to know__: The output message in persistent mode doesn't container the previous message reference.
 </readme>
 
 <settings>
 	<div class="padding">
-		<ui-component name="codemirror" path="?.code" config="type:python;minheight:300;parent:auto;margin:80;tabs:true;trim:true" class="m"></ui-component>
+		<ui-component name="codemirror" path="?.code" config="type:python;minheight:300;parent:auto;margin:100;tabs:true;trim:true" class="m"></ui-component>
 		<ui-component name="input" path="?.json" config="type:checkbox">Parse output to JSON</ui-component>
+		<ui-component name="input" path="?.persistent" config="type:checkbox">Run the script as a persistent process</ui-component>
 	</div>
 </settings>
 
 <body>
 	<header>
-		<i class="ICON"></i>NAME
+		<i class="$ICON"></i>$NAME
 	</header>
+	<footer style="padding:10px" class="fs12">
+		<ui-bind path="$STATUS" config="text;empty" child="b" class="block">Status: <b></b></ui-bind>
+	</footer>
 </body>
