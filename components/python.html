@@ -3,10 +3,10 @@
 	exports.id = 'python';
 	exports.name = 'Python';
 	exports.group = 'Common';
-	exports.version = '1';
+	exports.version = '2';
 	exports.icon = 'ti ti-script';
 	exports.author = 'Total.js';
-	exports.config = { code: '# Python code\nimport json\n\ndata = json.loads(sys.argv[1])\n\nprint(data)' };
+	exports.config = { code: '# Python code\nimport sys\nimport json\n\ndata = json.loads(sys.argv[1])\n\nprint(data)', json: true };
 	exports.inputs = [{ id: 'input', name: 'Input' }];
 	exports.outputs = [{ id: 'output', name: 'Output' }, { id: 'error', name: 'Error' }];
 	exports.meta = { settingswidth: 1200 };
@@ -27,10 +27,11 @@
 			}
 
 			F.Child.execFile('python3', [filename, JSON.stringify($.data)], function(err, response, error) {
-				if (err)
+				if (err) {
 					$.send('error', error || err);
-				else
-					$.send('output', response);
+				} else {
+					$.send('output', config.json ? response.parseJSON(true) : response);
+				}
 			});
 		};
 
@@ -51,7 +52,8 @@ This component executes a custom Python code as it is.
 
 <settings>
 	<div class="padding">
-		<ui-component name="codemirror" path="?.code" config="type:python;minheight:300;parent:auto;margin:60;tabs:true;trim:true"></ui-component>
+		<ui-component name="codemirror" path="?.code" config="type:python;minheight:300;parent:auto;margin:80;tabs:true;trim:true" class="m"></ui-component>
+		<ui-component name="input" path="?.json" config="type:checkbox">Parse output to JSON</ui-component>
 	</div>
 </settings>
 
