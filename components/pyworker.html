@@ -99,11 +99,7 @@ while True:
 </script>
 
 <readme>
-This component executes custom Python code as is. The input data must be a serializable JSON object. Non-persistent mode evaluates the Python code for each input.
-
-The persistent mode can include an HTTP server or an infinite loop. Input data is sent to the `stdin` stream in serialized JSON format.
-
-> __Good to know__: The output message in persistent mode doesn't container the previous message reference.
+This component runs the Python code as a separate process. The process can handle its own HTTP server or do other things.
 </readme>
 
 <style>
