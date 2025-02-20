@@ -20,10 +20,6 @@ while True:
 	exports.outputs = [];
 	exports.meta = { settingswidth: 1200 };
 
-	exports.install = function() {
-		PATH.mkdir(PATH.temp('python'));
-	};
-
 	exports.make = function(instance, config) {
 
 		var filename = PATH.temp(instance.id + '.py');
