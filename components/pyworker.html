@@ -15,9 +15,9 @@ while True:
 \tprint(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 \tsys.stdout.flush()
 \ttime.sleep(1)
-`, limit: 10, restart: false };
+`, limit: 10, restart: false, json: false };
 	exports.inputs = [];
-	exports.outputs = [];
+	exports.outputs = [{ id: 'output', name: 'Console' }, { id: 'error', name: 'Error' }];
 	exports.meta = { settingswidth: 1200 };
 
 	exports.make = function(instance, config) {
@@ -59,7 +59,9 @@ while True:
 				spawned = F.Child.spawn('python3', [filename], { stdio: ['pipe', 'pipe', process.stderr] });
 
 				spawned.on('error', function(err) {
-					let count = logs.unshift({ type: 'Error', name: err.toString(), date: new Date() });
+					err = err.toString();
+					instance.newmessage(err).send('error');
+					let count = logs.unshift({ type: 'Error', name: err, date: new Date() });
 					if (count > config.limit)
 						logs.pop();
 					instance.status(logs, delay);
@@ -67,6 +69,7 @@ while True:
 
 				spawned.stdout.on('data', function(chunk) {
 					let text = chunk.toString('utf8');
+					instance.newmessage(config.json ? text.parseJSON(true) : text).send('output');
 					let count = logs.unshift({ type: 'Log', name: text, date: new Date() });
 					if (count > config.limit)
 						logs.pop();
