@@ -73,13 +73,13 @@ __Output data__:
 
 <body>
 	<header>
-		<i class="ICON"></i>NAME
+		<i class="$ICON"></i>$NAME
 	</header>
 	<footer>
 		<div><span class="exec mr5 pointer" data-exec="tmpnotifycopy"><i class="ti ti-copy"></i></span>Endpoint:</div>
 		<ui-bind path="flow.head" config="template">
 			<script type="text/html">
-				<a href="{{ value.proxyurl }}/notify/{{ value.id }}-UID/" target="_blank">/notify/{{ value.id }}-UID/</a>
+				<a href="/notify/{{ value.id }}-$UID/" target="_blank">/notify/{{ value.id }}-$UID/</a>
 			</script>
 		</ui-bind>
 	</footer>
