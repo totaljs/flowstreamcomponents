@@ -89,7 +89,7 @@ The component prints incoming data in a JSON format.
 		<i class="ICON"></i>NAME
 	</header>
 	<footer>
-		<ui-bind path="!STATUS" config="html pre:debugprinter;show" class="hidden selectable block">
+		<ui-bind path="!STATUS" config="html pre:debugprinter(value);show" class="hidden selectable block">
 			<span class="readme" title="Open in new window"><i class="ti ti-window"></i></span>
 			<div class="noscrollbar mt5">
 				<pre class="json"></pre>
@@ -107,7 +107,8 @@ The component prints incoming data in a JSON format.
 				return Thelpers.encode(value);
 			else
 				return Thelpers.jsonformat(JSON.stringify(value, null, '\t'));
-		}
+		} else
+			return '';
 	};
 
 	TOUCH(function(exports, reinit) {
@@ -123,8 +124,13 @@ The component prints incoming data in a JSON format.
 
 		exports.element.on('click', '.readme', function() {
 			var status = laststatus ? JSON.parse(laststatus) : null;
-			if (typeof(status) !== 'string')
-				status = JSON.stringify(JSON.parse(status), null, '  ');
+
+			if (status != null) {
+				if (typeof(status) !== 'string')
+					status = JSON.stringify(status, null, '  ');
+			} else
+				status = '';
+
 			FUNC.readme('Debug', '```json\n' + status + '\n```');
 		});
 
