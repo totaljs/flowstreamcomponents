@@ -3,7 +3,7 @@
 	exports.id = 'print';
 	exports.name = 'Print';
 	exports.group = 'Common';
-	exports.version = '6';
+	exports.version = '7';
 	exports.icon = 'ti ti-print';
 	exports.author = 'Total.js';
 	exports.config = { repo: false, data: true, text: false };
@@ -86,10 +86,10 @@ The component prints incoming data in a JSON format.
 <body>
 	<header>
 		<button class="exec button" data-exec="FUNC.trigger">Clear</button>
-		<i class="ICON"></i>NAME
+		<i class="$ICON"></i>$NAME
 	</header>
 	<footer>
-		<ui-bind path="!STATUS" config="html pre:debugprinter(value);show" class="hidden selectable block">
+		<ui-bind path="!$STATUS" config="html pre:debugprinter(value);show" class="hidden selectable block">
 			<span class="readme" title="Open in new window"><i class="ti ti-window"></i></span>
 			<div class="noscrollbar mt5">
 				<pre class="json"></pre>
