@@ -170,6 +170,10 @@ The component can teleport (input) message to another teleport (output) componen
 				if (value.target) {
 					var target = 'flow.config.' + value.target;
 					component.watch(target, function(path, config) {
+
+						if (M.is20)
+							config = path;
+
 						var conf = config || EMPTYOBJECT;
 						el.find('.content').css('background', conf.color || defcolor);
 						el.find('.inputs span').text(conf.name || deftext);
