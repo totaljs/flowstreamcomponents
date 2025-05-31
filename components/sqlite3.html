@@ -5,7 +5,7 @@
 	exports.group = 'Databases';
 	exports.icon = 'ti ti-database';
 	exports.author = 'Total.js';
-	exports.version = '1';
+	exports.version = '2';
 	exports.config = {};
 	exports.inputs = [{ id: 'input', name: 'Input' }];
 	exports.outputs = [{ id: 'output', name: 'Output' }, { id: 'error', name: 'Error' }];
@@ -48,7 +48,7 @@
 
 		instance.configure = function() {
 
-			let newfile = PATH.databases(config.filename || `${instance.id}.sqlite`);
+			let newfile = PATH.databases(instance.replace(config.filename) || `${instance.id}.sqlite`);
 			if (file === newfile)
 				return;
 
