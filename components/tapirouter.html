@@ -4,7 +4,7 @@
 	exports.name = 'API Router';
 	exports.group = 'Total.js';
 	exports.icon = 'ti ti-crosshairs';
-	exports.version = '1';
+	exports.version = '2';
 	exports.author = 'Total.js';
 	exports.config = { path: 'response', schema: [{ id: 'o1984', name: 'users_read/{id}' }] };
 	exports.outputs = [];
@@ -189,6 +189,7 @@ In the case of  `error`, the input data is extended by the `response` property w
 				</script>
 			</ui-bind>
 			<div class="help">Use names in lower-case. We recommend to keep e.g. <code>users_read/{id}</code> or <code>products_read/{id}</code></div>
+			<ui-component name="changer" path="?.schema"></ui-component>
 		</div>
 	</div>
 </settings>
@@ -212,27 +213,25 @@ In the case of  `error`, the input data is extended by the `response` property w
 
 				tmp = {};
 				tmp.add = function(el) {
-					var scope = el.scope();
+					var scope = M.is20 ? el.plugin() : el.scope();
 					var obj = {};
 					obj.id = 'o' + Math.random().toString(36).substring(6);
 					obj.name = 'users_read/{id}';
-					scope.push('schema', obj);
-					scope.change('*');
+					scope.push('schema @change', obj);
 				};
 
 				tmp.rem = function(el) {
 					var id = ATTRD(el);
-					var scope = el.scope();
+					var scope = M.is20 ? el.plugin() : el.scope();
 					var model = scope.get();
 					var index = model.schema.findIndex('id', id);
 					model.schema.splice(index, 1);
-					scope.update('schema');
-					scope.change('*');
+					scope.update('schema @change');
 				};
 
 				tmp.move = function(el) {
 
-					var scope = el.scope();
+					var scope = M.is20 ? el.plugin() : el.scope();
 					var id = ATTRD(el);
 					var container = el.closest('figure');
 					var schema = scope.get().schema;
@@ -258,18 +257,18 @@ In the case of  `error`, the input data is extended by the `response` property w
 
 					if (is) {
 						NODEMOVE(container, isup);
-						scope.change('*');
+						scope.update('schema @change');
 						container.aclass('ismoved').rclass('ismoved', 500);
 					}
 				};
 
 				tmp.name = function(opt, next) {
 					opt.value = opt.value.replace(/(;|\s|,)/g, '').trim();
-					var scope = opt.element.scope();
+					var scope = M.is20 ? opt.element.plugin() : opt.element.scope();
 					var id = ATTRD(opt.element);
 					var item = scope.get().schema.findItem('id', id);
 					item.name = opt.value.toLowerCase();
-					scope.change('*');
+					scope.update('schema @change');
 					next(true);
 				};
 
