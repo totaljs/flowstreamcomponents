@@ -119,7 +119,7 @@
 					return;
 				}
 
-				body = response.body;
+				var body = response.body;
 
 				if (secret && response.headers['x-encryption'])
 					body = U.decrypt_data(body, secret);
