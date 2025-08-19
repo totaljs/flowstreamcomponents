@@ -1,0 +1,96 @@
+<script total>
+
+	exports.id = 'iplimiter';
+	exports.name = 'IP limiter';
+	exports.icon = 'ti ti-traffic-light';
+	exports.author = 'Total.js';
+	exports.version = '1';
+	exports.group = 'Security';
+	exports.config = { count: 1, timeout: 5, path: 'ip' };
+	exports.inputs = [{ id: 'input', name: 'Request' }];
+	exports.outputs = [{ id: 'output', name: 'Allowed' }, { id: 'error', name: 'Blocked' }];
+
+	exports.make = function(instance, config) {
+
+		let now = Date.now();
+		let cache = null;
+		let interval = null;
+
+		instance.message = function($) {
+
+			let ip = $.controller ? $.controller.ip : $.data[config.path];
+
+			if (!ip) {
+				$.send('error');
+				return;
+			}
+
+
+			let mem = cache[ip];
+
+			if (mem)
+				mem.count++;
+			else
+				mem = { expire: now + 1000 + (config.timeout * 1000), count: 0 };
+
+			if (mem.count >= config.count) {
+				$.send('error');
+			} else {
+				mem.count++;
+				cache[ip] = mem;
+				$.send('output');
+			}
+		};
+
+		let clean = function() {
+			now = Date.now();
+			let pending = 0;
+			for (let key in cache) {
+				if (cache[key].expire < now)
+					delete cache[key];
+				else
+					pending++;
+			}
+			instance.status({ pending: pending });
+		};
+
+		instance.close = function() {
+			clearInterval(interval);
+			interval = null;
+			cache = null;
+		};
+
+		instance.configure = function() {
+			cache = {};
+			interval && clearInterval(interval);
+			interval = setInterval(clean, 1000);
+		};
+
+		instance.configure();
+
+	};
+
+</script>
+
+<readme>
+This component limits the number of requests per IP address. The component first tries to obtain the IP address from the `$.controller`. If that doesn't work, it tries to load the IP address from the payload.
+</readme>
+
+<settings>
+	<div class="padding">
+		<div class="grid-3">
+			<ui-component name="input" path="?.count" config="type:number;required:1" class="m">Max. limit</ui-component>
+			<ui-component name="input" path="?.timeout" config="type:number;required:1" class="m">Timeout in seconds</ui-component>
+			<ui-component name="input" path="?.path" config="required:1;monospace:1;align:1" class="m">Path to the IP address</ui-component>
+		</div>
+	</div>
+</settings>
+
+<body>
+	<header>
+		<i class="$ICON"></i>$NAME
+	</header>
+	<footer class="fs12" style="padding:5px 10px">
+		<i class="ti ti-monitor-heart-rate mr5"></i>Monitored: <ui-bind class="b" path="$STATUS.pending" config="text:(value||0).format(0);empty"></ui-bind>
+	</footer>
+</body>
