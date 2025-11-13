@@ -1,0 +1,68 @@
+<script total>
+
+	exports.id = 'norepeat';
+	exports.name = 'No repeat';
+	exports.icon = 'ti ti-retweet';
+	exports.author = 'Peter Širka | Total.js';
+	exports.version = '1';
+	exports.group = 'Checks';
+	exports.config = { expire: 1 };
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }];
+
+	exports.make = function(instance, config) {
+
+		let cache = {};
+
+		instance.service = function() {
+			if (cache) {
+				for (let key in cache) {
+					if (cache[key] < NOW)
+						delete cache[key];
+				}
+			}
+		};
+
+		instance.message = function($) {
+
+			let id = HASH(JSON.stringify($.data)).toString(36);
+			let is = cache[id];
+
+			if (is && is > NOW) {
+				$.destroy();
+				return;
+			}
+
+			if (config.expire > 0)
+				cache[id] = NOW.add(config.expire * 60000);
+
+			$.send('output');
+		};
+
+		instance.close = function() {
+			cache = null;
+		};
+
+	};
+
+</script>
+
+<readme>
+This component prevents the same content from being sent again in a short amount of time.
+</readme>
+
+<settings>
+	<div class="padding">
+		<div class="grid-3">
+			<div>
+				<ui-component name="input" path="?.expire" config="type:number">Expire in minutes</ui-component>
+			</div>
+		</div>
+	</div>
+</settings>
+
+<body>
+	<header>
+		<i class="$ICON"></i>$NAME
+	</header>
+</body>
