@@ -6,7 +6,7 @@
 	exports.version = '1';
 	exports.icon = 'ti ti-script';
 	exports.author = 'Total.js';
-	exports.config = { code: '// data {Object}\n// send(data) {Function}\n\n' };
+	exports.config = { code: '// $; {Message}\n// data; {Object}\n// send(data); {Function}\n\n' };
 	exports.inputs = [{ id: 'input', name: 'Input' }];
 	exports.outputs = [{ id: 'output', name: 'Output' }];
 	exports.meta = { settingswidth: 1200 };
@@ -19,8 +19,8 @@
 		instance.message = function($) {
 			if (fn) {
 				try {
-					var send = data => $.send('output', data);
-					fn($, $.data, F.require, send);
+					const send = data => $.send('output', data);
+					fn.call(instance, $, $.data, F.require, send);
 				} catch (e) {
 					$.throw(e);
 					$.destroy();
