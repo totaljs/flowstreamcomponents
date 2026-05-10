@@ -28,7 +28,7 @@
 
 			if (!data.prepare || !data.fn) {
 				instance.throw('No `prepare` or `op` provided');
-				return $.send('error', { error: 'invalid input data' });;
+				return $.send('error', { error: 'invalid input data' });
 			}
 
 			if (fns.indexOf(data.fn) < 0) {
