@@ -1,0 +1,72 @@
+<script total>
+
+	exports.id = 'meausertime';
+	exports.name = 'Measure time';
+	exports.icon = 'ti ti-stopwatch';
+	exports.author = 'Peter Širka | Total.js';
+	exports.version = '1';
+	exports.group = 'Stats';
+	exports.config = {};
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }];
+
+	exports.make = function(instance, config) {
+
+		let history = [];
+
+		function onend(msg) {
+			let ts = msg.repo[instance.id];
+			if (ts) {
+				if (history.unshift({ date: new Date(ts), ts: ((Date.now() - ts) / 1000) }) > 5)
+					history.pop();
+				instance.status(history, 500);
+			}
+		}
+
+		instance.message = function($) {
+			$.repo[instance.id] = Date.now();
+			$.on('end', onend);
+			// $.on('end_measuretime', onend);
+			$.send('output');
+		};
+
+		instance.trigger = function() {
+			history.length = 0;
+			instance.status(history, 500);
+		};
+
+	};
+
+</script>
+
+<readme>
+This component measures the time taken to create and send a message.
+</readme>
+
+<style>
+	.CLASS footer { width: 150px; }
+	.CLASS footer > div { padding: 8px; }
+	.CLASS .result { height: 24px; font-size: 11px; border-top: 1px solid #E0E0E0; line-height: 24px; padding: 0 8px; }
+	.CLASS .result:first-child { border-top: 0; }
+	.CLASS .result .date { margin-right: 100px; }
+	.CLASS .result .ts { float: right; width: 100px; text-align: right; }
+</style>
+
+<body>
+	<header>
+		<i class="$ICON"></i>$NAME
+	</header>
+	<footer>
+		<div><button name="trigger" class="button" data-trigger="reset"><i class="ti ti-refresh"></i>Reset</button></div>
+		<ui-bind path="$STATUS" config="template;show:value && value.length" class="block">
+			<script type="text/html">
+				{{ foreach m in value }}
+				<div class="result">
+					<span class="ts">{{ m.ts | format(3) }} sec</span>
+					<div class="date">{{ m.date | format('HH:mm:ss') }}</div>
+				</div>
+				{{ end }}
+			</script>
+		</ui-bind>
+	</footer>
+</body>
