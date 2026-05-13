@@ -107,9 +107,15 @@ The component triggers data into the Flow.
 		exports.click = function(el) {
 			if (exports.config.prompt) {
 				var opt = {};
+				let key = 'trigger_' + exports.id;
 				opt.name = exports.config.promptlabel || 'Enter a value';
-				opt.value = '';
-				opt.callback = val => exports.trigger({ value: val });
+				opt.value = CACHE(key) || '';
+				opt.centered = true;
+				opt.newbie = true;
+				opt.callback = function(val) {
+					exports.trigger({ value: val });
+					CACHE(key, val, '1 month');
+				};
 				SETTER('prompt/show', opt);
 			} else
 				exports.trigger();
