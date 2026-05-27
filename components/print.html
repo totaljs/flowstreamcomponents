@@ -77,7 +77,8 @@
 	.CLASS pre { font-size: 10px; margin: 0; padding: 5px; background-color: #F0F0F0; border-radius: var(--radius); }
 	.CLASS .json { white-space: pre; }
 	.CLASS .noscrollbar { max-height: 250px; }
-	.CLASS .readme { position: absolute; position: absolute; font-size: 11px; right: 5px; margin-top: -5px; cursor: pointer; }
+	.CLASS .readme { position: absolute; font-size: 11px; right: 5px; margin-top: -5px; cursor: pointer; }
+	.CLASS .copy { position: absolute; font-size: 11px; right: 20px; margin-top: -5px; cursor: pointer; }
 	.ui-dark .CLASS pre { background-color: #404040; tab-size: 2; }
 </style>
 
@@ -101,7 +102,8 @@ The component prints incoming data in a JSON format.
 	</header>
 	<footer>
 		<ui-bind path="!$STATUS" config="html pre:debugprinter(value);show" class="hidden selectable block">
-			<span class="readme" title="Open in new window"><i class="ti ti-window"></i></span>
+			<span class="readme exec" data-exec="=readme" title="Open in new window"><i class="ti ti-window"></i></span>
+			<span class="copy exec" data-exec="=copy" title="Copy"><i class="ti ti-copy"></i></span>
 			<div class="noscrollbar mt5">
 				<pre class="json"></pre>
 			</div>
@@ -137,17 +139,19 @@ The component prints incoming data in a JSON format.
 			laststatus = status;
 		};
 
-		exports.element.on('click', '.readme', function() {
-			let status = laststatus ? JSON.parse(laststatus) : null;
+		exports.copy = function() {
+			SETTER('clipboard/copy @copied', laststatus);
+		};
 
+		exports.readme = function() {
+			let status = laststatus ? JSON.parse(laststatus) : null;
 			if (status != null) {
 				if (typeof(status) !== 'string')
 					status = JSON.stringify(status, null, '  ');
 			} else
 				status = '';
-
 			FUNC.readme('Debug', '```json\n' + status + '\n```');
-		});
+		};
 
 	});
 
