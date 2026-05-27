@@ -6,7 +6,7 @@
 	exports.version = '8';
 	exports.icon = 'ti ti-print';
 	exports.author = 'Peter Širka | Total.js';
-	exports.config = { repo: false, data: true, text: false, once: false };
+	exports.config = { repo: false, data: true, once: false };
 	exports.inputs = [{ id: 'input', name: 'Input' }];
 
 	exports.make = function(instance, config) {
@@ -31,14 +31,7 @@
 					data = '<Buffer ' + data.toString('hex').substring(0, 10) + '...';
 			}
 
-			let count = 0;
-
-			for (let key in config) {
-				if (config[key])
-					count++;
-			}
-
-			let output = count > 1 ? {} : null;
+			let output = config.data && config.repo ? {} : null;
 
 			if (config.repo) {
 				if (output)
