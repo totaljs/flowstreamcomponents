@@ -1,0 +1,183 @@
+<script total>
+
+	exports.id = 'datamapper';
+	exports.name = 'Data mapper';
+	exports.group = 'Common';
+	exports.version = '1';
+	exports.icon = 'ti ti-project-diagram';
+	exports.author = 'Peter Širka | Total.js';
+	exports.config = { schema: [], extend: false };
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }];
+
+	exports.make = function(instance, config) {
+
+		instance.message = function($) {
+
+			let data = $.data;
+			let payload = config.extend ? data : {};
+
+			if (data) {
+				for (let item of config.schema) {
+					if (item.b)
+						Utils.set(payload, item.b, U.get(data, item.a));
+					else
+						payload = U.get(data, item.a);
+				}
+			}
+
+			$.send('output', payload);
+		};
+	};
+
+</script>
+
+<readme>
+This component remaps payload properties.
+</readme>
+
+<style>
+	.CLASS-settings .fields { border: 1px solid #E0E0E0; border-radius: var(--radius); }
+	.CLASS-settings figure { height: 24px; border-top: 1px solid #E0E0E0; line-height: 23px; font-size: 11px; }
+	.CLASS-settings figure .edit-open { background-color: #F0F0F0; }
+	.CLASS-settings figure .a { width: 250px; line-height: 14px; float: left; }
+	.CLASS-settings figure .a span { float: left; width: 50px; line-height: 23px; text-align: center; }
+	.CLASS-settings figure .a div { outline: 0; margin-left: 50px; line-height: 23px; padding: 0 5px; min-height: 23px; color: #B92EC5; }
+	.CLASS-settings figure .b { width: 250px; line-height: 14px; float: left; }
+	.CLASS-settings figure .b span { float: left; width: 50px; line-height: 23px; text-align: center; }
+	.CLASS-settings figure .b div { outline: 0; margin-left: 50px; line-height: 23px; padding: 0 5px; min-height: 23px; color: #4285F4; }
+	.CLASS-settings figure .controls { float: right; width: 30px; padding: 0; margin: 0; border-left: 1px solid #E0E0E0; text-align: center; }
+	.CLASS-settings figure .controls span { cursor: pointer; margin-left: 5px; }
+	.CLASS-settings figure .controls span:first-child { margin-left: 0; }
+	.CLASS-settings figure:first-child { border-top: 0; line-height: 24px; }
+	.CLASS-settings figure:first-child div { line-height: 24px; }
+	.CLASS footer { height: 40px; line-height: 40px; padding: 0 10px; font-size: 12px; }
+
+	.ui-dark .CLASS-settings .fields { border-color: #404040; }
+	.ui-dark .CLASS-settings figure { border-top-color: #404040; }
+	.ui-dark .CLASS-settings figure .edit-open { background-color: #404040; }
+	.ui-dark .CLASS-settings figure .controls { border-left-color: #404040; }
+</style>
+
+<body>
+	<header>
+		<i class="$ICON"></i>$NAME
+	</header>
+</body>
+
+<settings>
+	<div class="CLASS-settings">
+		<div class="padding">
+
+			<ui-component name="input" path="?.extend" config="type:checkbox">Only extend the incoming payload</ui-component>
+
+			<hr />
+
+			<div class="caption m">
+				<div class="toolbar">
+					<nav>
+						<button class="exec" data-exec="tmpmapper.add"><i class="ti ti-plus-circle"></i>Add</button>
+					</nav>
+				</div>
+				<label>Paths</label>
+			</div>
+			<ui-bind path="?.schema" config="template:figure --> data-id;show:value && value.length" class="fields m block">
+				<script type="text/html">
+					{{ foreach m in value }}
+					<figure data-id="{{ m.id }}">
+						<div class="controls">
+							<span class="exec" data-exec="tmpmapper.rem" title="Remove"><i class="ti ti-trash red"></i></span>
+						</div>
+						<div class="a">
+							<span>Read</span><div class="monospace edit hellip" data-edit="exec:tmpmapper.a;required:1">{{ m.a }}</div>
+						</div>
+						<div class="b">
+							<span>Write</span><div class="edit monospace hellip" data-type="to" data-edit="exec:tmpmapper.b;selectall:1">{{ m.b }}</div>
+						</div>
+					</figure>
+					{{ end }}
+				</script>
+			</ui-bind>
+		</div>
+	</div>
+</settings>
+
+<script>
+
+	TOUCH(function(exports, reinit) {
+
+		exports.settings = function(meta) {
+
+			let defitem = { a: 'user.name', b: 'user' };
+
+			if (!meta.config.schema.length) {
+				let obj = CLONE(defitem);
+				obj.id = Math.random().toString(36).substring(4);
+				meta.config.schema.push(obj);
+			}
+
+			let tmp = W.tmpmapper;
+
+			if (!tmp) {
+
+				tmp = {};
+				tmp.add = function(el) {
+					let scope = M.is20 ? el.plugin(): el.scope();
+					let obj = CLONE(defitem);
+					obj.id = Math.random().toString(36).substring(4);
+
+					if (M.is20) {
+						scope.push('schema @change', obj);
+					} else {
+						scope.push('schema', obj);
+						scope.change('*');
+					}
+				};
+
+				tmp.rem = function(el) {
+					let scope = M.is20 ? el.plugin(): el.scope();
+					let id = ATTRD(el);
+					let model = scope.get();
+					let index = model.schema.findIndex('id', id);
+					model.schema.splice(index, 1);
+					if (M.is20) {
+						scope.update('schema @change');
+					} else {
+						scope.update('schema');
+						scope.change('*');
+					}
+				};
+
+				tmp.a = function(opt, next) {
+					opt.value = opt.value.replace(/(;|\s|,)/g, '').trim();
+					let scope = M.is20 ? opt.element.plugin(): opt.element.scope();
+					let id = ATTRD(opt.element);
+					let item = scope.get().schema.findItem('id', id);
+					item.a = opt.value;
+					if (M.is20)
+						scope.update('@change');
+					else
+						scope.change('*');
+					next(true);
+				};
+
+				tmp.b = function(opt, next) {
+					opt.value = opt.value.replace(/(;|\s|,)/g, '').trim();
+					let scope = M.is20 ? opt.element.plugin(): opt.element.scope();
+					let id = ATTRD(opt.element);
+					let item = scope.get().schema.findItem('id', id);
+					item.b = opt.value;
+					if (M.is20)
+						scope.update('@change');
+					else
+						scope.change('*');
+					next(true);
+				};
+
+				W.tmpmapper = tmp;
+			}
+		};
+
+	});
+
+</script>
