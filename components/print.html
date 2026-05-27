@@ -74,11 +74,13 @@
 
 <style>
 	.CLASS footer > ui-bind { margin: 10px; }
+	.component.CLASS_example { background-color: #ffffed; }
 	.CLASS pre { font-size: 10px; margin: 0; padding: 5px; background-color: #F0F0F0; border-radius: var(--radius); }
 	.CLASS .json { white-space: pre; }
 	.CLASS .noscrollbar { max-height: 250px; }
 	.CLASS .readme { position: absolute; font-size: 11px; right: 5px; margin-top: -5px; cursor: pointer; }
 	.CLASS .copy { position: absolute; font-size: 11px; right: 20px; margin-top: -5px; cursor: pointer; }
+	.ui-dark .component.CLASS_example { background-color: #585845; }
 	.ui-dark .CLASS pre { background-color: #404040; tab-size: 2; }
 </style>
 
@@ -137,6 +139,10 @@ The component prints incoming data in a JSON format.
 
 		exports.status = function(status, isinit) {
 			laststatus = status;
+		};
+
+		exports.configure = function() {
+			exports.element.tclass('CLASS_example', exports.config.once);
 		};
 
 		exports.copy = function() {
