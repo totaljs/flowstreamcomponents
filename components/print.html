@@ -96,8 +96,8 @@ The component prints incoming data in a JSON format.
 
 <body>
 	<header>
-		<button class="exec button" data-exec="FUNC.trigger">Clear</button>
-		<i class="$ICON"></i>$NAME
+		<button class="exec button" data-exec="=clear">Clear</button>
+		<i class="$ICON"></i><ui-bind path="$CONFIG.once" config="text:value?'Example':'Print'"></ui-bind>
 	</header>
 	<footer>
 		<ui-bind path="!$STATUS" config="html pre:debugprinter(value);show" class="hidden selectable block">
@@ -124,14 +124,21 @@ The component prints incoming data in a JSON format.
 		if (reinit)
 			return;
 
-		var laststatus;
+		let laststatus;
+
+		exports.clear = function() {
+			if (exports.config.once)
+				SETTER('approve/show', 'Are you sure you want to clear data?', ':check-circle: Clear', () => exports.trigger());
+			else
+				exports.trigger();
+		};
 
 		exports.status = function(status, isinit) {
 			laststatus = status;
 		};
 
 		exports.element.on('click', '.readme', function() {
-			var status = laststatus ? JSON.parse(laststatus) : null;
+			let status = laststatus ? JSON.parse(laststatus) : null;
 
 			if (status != null) {
 				if (typeof(status) !== 'string')
