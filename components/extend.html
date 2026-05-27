@@ -3,7 +3,7 @@
 	exports.id = 'extend';
 	exports.name = 'Extend';
 	exports.group = 'Common';
-	exports.version = '1';
+	exports.version = '2';
 	exports.icon = 'ti ti-expand';
 	exports.author = 'Total.js';
 	exports.config = { path: '', schema: [] };
@@ -167,40 +167,55 @@ This component extends the current message by adding new properties.
 
 				tmp = {};
 				tmp.add = function(el) {
-					var scope = el.scope();
-					var obj = CLONE(defitem);
+					let scope = M.is20 ? el.plugin(): el.scope();
+					let obj = CLONE(defitem);
 					obj.id = Math.random().toString(36).substring(4);
-					scope.push('schema', obj);
-					scope.change('*');
+
+					if (M.is20) {
+						scope.push('schema @change', obj);
+					} else {
+						scope.push('schema', obj);
+						scope.change('*');
+					}
 				};
 
 				tmp.rem = function(el) {
-					var id = ATTRD(el);
-					var scope = el.scope();
-					var model = scope.get();
-					var index = model.schema.findIndex('id', id);
+					let scope = M.is20 ? el.plugin(): el.scope();
+					let id = ATTRD(el);
+					let model = scope.get();
+					let index = model.schema.findIndex('id', id);
 					model.schema.splice(index, 1);
-					scope.update('schema');
-					scope.change('*');
+					if (M.is20) {
+						scope.update('schema @change');
+					} else {
+						scope.update('schema');
+						scope.change('*');
+					}
 				};
 
 				tmp.path = function(opt, next) {
 					opt.value = opt.value.replace(/(;|\s|,)/g, '').trim();
-					var scope = opt.element.scope();
-					var id = ATTRD(opt.element);
-					var item = scope.get().schema.findItem('id', id);
+					let scope = M.is20 ? opt.element.plugin(): opt.element.scope();
+					let id = ATTRD(opt.element);
+					let item = scope.get().schema.findItem('id', id);
 					item.path = opt.value;
-					scope.change('*');
+					if (M.is20)
+						scope.update('@change');
+					else
+						scope.change('*');
 					next(true);
 				};
 
 				tmp.value = function(opt, next) {
 					opt.value = opt.value.replace(/(;|\s|,)/g, '').trim();
-					var scope = opt.element.scope();
-					var id = ATTRD(opt.element);
-					var item = scope.get().schema.findItem('id', id);
+					let scope = M.is20 ? opt.element.plugin(): opt.element.scope();
+					let id = ATTRD(opt.element);
+					let item = scope.get().schema.findItem('id', id);
 					item.value = opt.value;
-					scope.change('*');
+					if (M.is20)
+						scope.update('@change');
+					else
+						scope.change('*');
 					next(true);
 				};
 
@@ -211,13 +226,16 @@ This component extends the current message by adding new properties.
 					opt.raw = true;
 					opt.items = tmp.convertors;
 					opt.callback = function(selected) {
-						var scope = el.scope();
-						var id = ATTRD(el);
-						var item = scope.get().schema.findItem('id', id);
+						let scope = M.is20 ? opt.element.plugin(): opt.element.scope();
+						let id = ATTRD(el);
+						let item = scope.get().schema.findItem('id', id);
 						if (item)
 							item.convert = selected.id;
 						el.html(selected.name);
-						scope.change('*');
+						if (M.is20)
+							scope.update('@change');
+						else
+							scope.change('*');
 					};
 					SETTER('directory/show', opt);
 				};
