@@ -3,10 +3,10 @@
 	exports.id = 'print';
 	exports.name = 'Print';
 	exports.group = 'Common';
-	exports.version = '7';
+	exports.version = '8';
 	exports.icon = 'ti ti-print';
-	exports.author = 'Total.js';
-	exports.config = { repo: false, data: true, text: false };
+	exports.author = 'Peter Širka | Total.js';
+	exports.config = { repo: false, data: true, text: false, once: false };
 	exports.inputs = [{ id: 'input', name: 'Input' }];
 
 	exports.make = function(instance, config) {
@@ -15,23 +15,30 @@
 			return value && value.type === 'Buffer' && value.data ? ('<Buffer ' + value.data.splice(0, 10).map(n => n.toString(16).padLeft(2, '0')).join('') + '...') : value;
 		}
 
+		let is = false;
+
 		instance.message = function($) {
 
-			var data = $.data;
+			if (config.once && is) {
+				$.destroy();
+				return;
+			}
+
+			let data = $.data;
 
 			if (config.data !== false) {
 				if (data instanceof Buffer)
 					data = '<Buffer ' + data.toString('hex').substring(0, 10) + '...';
 			}
 
-			var count = 0;
+			let count = 0;
 
-			for (var key in config) {
+			for (let key in config) {
 				if (config[key])
 					count++;
 			}
 
-			var output = count > 1 ? {} : null;
+			let output = count > 1 ? {} : null;
 
 			if (config.repo) {
 				if (output)
@@ -52,10 +59,12 @@
 				instance.status(output, 200);
 			}
 
+			is = true;
 			$.destroy();
 		};
 
 		instance.trigger = function() {
+			is = false;
 			instance.status('');
 		};
 
@@ -80,6 +89,8 @@ The component prints incoming data in a JSON format.
 	<div class="padding">
 		<ui-component name="input" path="?.repo" config="type:checkbox">Shows repository</ui-component>
 		<ui-component name="input" path="?.data" config="type:checkbox">Shows data</ui-component>
+		<hr />
+		<ui-component name="input" path="?.once" config="type:checkbox">Print the data once as an example</ui-component>
 	</div>
 </settings>
 
@@ -103,10 +114,7 @@ The component prints incoming data in a JSON format.
 	W.debugprinter = function(value) {
 		if (value) {
 			value = JSON.parse(value);
-			if (typeof(value) === 'string')
-				return Thelpers.encode(value);
-			else
-				return Thelpers.jsonformat(JSON.stringify(value, null, '\t'));
+			return typeof(value) === 'string' ? Thelpers.encode(value) : Thelpers.jsonformat(JSON.stringify(value, null, '\t'));
 		} else
 			return '';
 	};
@@ -135,4 +143,5 @@ The component prints incoming data in a JSON format.
 		});
 
 	});
+
 </script>
