@@ -1,0 +1,70 @@
+<script total>
+
+	exports.id = 'duplicator';
+	exports.name = 'Duplicator';
+	exports.icon = 'ti ti-clone';
+	exports.author = 'Peter Širka | Total.js';
+	exports.version = '1';
+	exports.group = 'Common';
+	exports.config = { count: 1, repo: true, refs: true, vars: true, data: true };
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }];
+
+
+	exports.make = function(instance, config) {
+
+		instance.message = function($) {
+
+			let messages = [$];
+
+			for (let i = 0; i < config.count; i++) {
+				let msg = instance.newmessage();
+				if (config.data)
+					msg.data = CLONE($.data);
+				if (config.repo)
+					msg.repo = $.repo;
+				if (config.refs)
+					msg.refs = $.refs;
+				if (config.vars)
+					msg.vars = $.vars;
+				msg.refs.pending = 1;
+				msg.$events = $.$events;
+				messages.push(msg);
+			}
+
+			for (let m of messages)
+				m.send('output');
+		};
+
+	};
+
+</script>
+
+<readme>
+This component duplicates incoming messages according to the configuration settings.
+</readme>
+
+<settings>
+	<div class="padding">
+		<div class="grid-3">
+			<ui-component name="input" path="?.count" config="type:number;min:1" class="m">Count</ui-component>
+		</div>
+		<ui-component name="input" path="?.data" config="type:checkbox">Duplicate data</ui-component>
+		<ui-component name="input" path="?.repo" config="type:checkbox">Duplicate repository</ui-component>
+		<ui-component name="input" path="?.vars" config="type:checkbox">Duplicate variables</ui-component>
+		<ui-component name="input" path="?.refs" config="type:checkbox">Duplicate references</ui-component>
+	</div>
+</settings>
+
+<style>
+	.CLASS footer { padding: 10px; font-size: 12px; }
+</style>
+
+<body>
+	<header>
+		<i class="$ICON"></i>$NAME
+	</header>
+	<footer>
+		Duplicate: <ui-bind path="$CONFIG.count" config="text" class="b"></ui-bind>x
+	</footer>
+</body>
