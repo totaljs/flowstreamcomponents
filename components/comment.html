@@ -5,7 +5,7 @@
 	exports.icon = 'ti ti-comment';
 	exports.author = 'Total.js';
 	exports.version = '1';
-	exports.config = { text: 'Comment' };
+	exports.config = { text: 'Add a custom comment...' };
 	exports.meta = { settingswidth: 1100 };
 
 	exports.make = function(instance, config) {
@@ -14,16 +14,15 @@
 </script>
 
 <settings>
-	<div class="padding">
-		<ui-component name="codemirror" path="?.text" config="type:markdown;parent:auto;minheight:300;margin:65;linenumbers:0"></ui-component>
-		<div class="help">Supports Markdown</div>
-	</div>
+	<ui-component name="code" path="?.text" config="type:markdown;minheight:300;parent:auto;margin:0"></ui-component>
 </settings>
 
 <style>
-	.CLASS { max-width: 500px !important; }
-	.CLASS header button { margin-left: 10px; }
-	.CLASS footer .markdown { padding: 10px; font-size: 12px; border-top: 0 !important; color: #000; }
+	.CLASS { max-width: 500px !important; background: transparent !important; box-shadow: none !important; outline: 0 !important; }
+	.CLASS header { font-size: 11px; color: rgba(0,0,0,0.5); padding: 2px 8px; }
+	.CLASS footer { border-top: 0 !important; }
+	.CLASS footer .markdown { padding: 0 8px 8px; font-size: 12px; border-top: 0 !important; color: #000; }
+	.ui-dark .CLASS header { color: rgba(255,255,255,0.5); }
 	.ui-dark .CLASS footer .markdown { color: #F0F0F0; }
 </style>
 
@@ -33,10 +32,9 @@ This component renders a small markdown comment inside the body.
 
 <body>
 	<header>
-		<button class="button">Open in window</button>
-		<i class="ICON"></i>NAME
+		<b class="$ICON mr5"></b>$NAME:
 	</header>
-	<footer><ui-bind path="!CONFIG.text" config="html div:value.markdown(value, { element: el })" class="markdown-small selectable"><div class="markdown"></div></ui-bind></footer>
+	<footer><ui-bind path="!$CONFIG.text" config="html div:value.markdown(value, { element: el })" class="markdown-small selectable"><div class="markdown"></div></ui-bind></footer>
 </body>
 
 <script>
