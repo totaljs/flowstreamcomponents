@@ -1,123 +1,50 @@
 <script total>
-
-	exports.id = 'queue';
-	exports.name = 'Queue';
+	exports.id = 'comment';
+	exports.name = 'Comment';
 	exports.group = 'Common';
-	exports.version = '3';
-	exports.icon = 'ti ti-list';
+	exports.icon = 'ti ti-comment';
 	exports.author = 'Total.js';
-	exports.config = {};
-	exports.inputs = [{ id: 'input', name: 'Input' }];
-	exports.outputs = [{ id: 'output', name: 'Output' }];
+	exports.version = '2';
+	exports.config = { text: 'Add a custom comment...' };
+	exports.meta = { settingswidth: 1100 };
 
-	exports.make = function(instance) {
-
-		var filename = PATH.databases('queue_' + instance.id + '.json');
-		var isready = false;
-		var current = null;
-		var queue = [];
-		var timeout;
-
-		instance.queue_snapshot_force = function() {
-			timeout = null;
-			PATH.fs.writeFile(filename, JSON.stringify(queue), NOOP);
-		};
-
-		instance.queue_snapshot = function() {
-			timeout && clearTimeout(timeout);
-			timeout = setTimeout(instance.queue_snapshot_force, 500);
-			PATH.fs.writeFile(filename, JSON.stringify(queue), NOOP);
-		};
-
-		instance.trigger = function() {
-			current = null;
-			instance.queue_next();
-		};
-
-		instance.queue_next = function() {
-
-			if (current)
-				return;
-
-			current = queue[0];
-
-			if (current) {
-				var msg = instance.newmessage(current.type === 'buffer' ? Buffer.from(current.data, 'Base64') : current.data && typeof(current.data) === 'object' ? CLONE(current.data) : current.data);
-				msg.once('something', instance.queue_end);
-				instance.send('output', msg);
-			}
-
-			instance.status({ pending: queue.length });
-		};
-
-		instance.queue_end = function() {
-			queue.shift();
-			current = null;
-			instance.queue_next();
-			instance.queue_snapshot();
-		};
-
-		instance.destroy = function() {
-			PATH.fs.unlink(filename, NOOP);
-		};
-
-		instance.message = function($) {
-
-			var isbuffer = $.data instanceof Buffer;
-			var data = isbuffer ? $.data.toString('base64') : $.data;
-
-			queue.push({ ts: Date.now(), fromid: $.fromid, data: data, type: isbuffer ? 'buffer' : 'object' });
-			isready && instance.queue_snapshot();
-			instance.status({ pending: queue.length });
-			$.end();
-
-			if (isready && !current)
-				setImmediate(instance.queue_next);
-		};
-
-		PATH.fs.readFile(filename, function(err, response) {
-			if (response) {
-				var arr = response.toString('utf8').parseJSON(true);
-				if (arr instanceof Array) {
-					if (queue.length)
-						arr.push.apply(arr, queue);
-					else
-						queue = arr;
-				}
-				instance.queue_next();
-			}
-			isready = true;
-		});
+	exports.make = function(instance, config) {
 	};
 
 </script>
+
+<settings>
+	<ui-component name="code" path="?.text" config="type:markdown;minheight:300;parent:auto;margin:0"></ui-component>
+</settings>
 
 <style>
-	.CLASS .status { font-size: 12px; margin: 0; padding: 10px; }
-	.CLASS button { float: right; height: 20px; font-size: 11px; border: 1px solid #E0E0E0; border-radius: var(--radius); color: #000; background-color: transparent; margin: 0; padding: 0 5px; }
-	.CLASS button:hover { background-color: #F8F8F8; }
-	.CLASS button:active { background-color: #E0E0E0; }
-	.ui-dark .CLASS button { border-color: #404040; color: #FFF; }
-	.ui-dark .CLASS button:hover { background-color: #303030; }
-	.ui-dark .CLASS button:active { background-color: #404040; }
+	.CLASS { max-width: 500px !important; background: transparent !important; box-shadow: none !important; outline: 0 !important; }
+	.CLASS header { font-size: 11px; color: rgba(0,0,0,0.5); padding: 2px 8px; }
+	.CLASS footer { border-top: 0 !important; }
+	.CLASS footer .markdown { padding: 0 8px 8px; border-top: 0 !important; color: #000; }
+	.ui-dark .CLASS header { color: rgba(255,255,255,0.5); }
+	.ui-dark .CLASS footer .markdown { color: #F0F0F0; }
 </style>
 
-<script>
-	FUNC.fqueue_trigger = function(el) {
-		SETTER('websocket/send', { TYPE: 'trigger', id: el.attrd2('id') });
-	};
-</script>
-
 <readme>
-A simple persistent queue for the incomming messages.
+This component renders a small markdown comment inside the body.
 </readme>
 
 <body>
 	<header>
-		<button class="exec" data-exec="FUNC.fqueue_trigger">Run</button>
-		<i class="ICON"></i>NAME
+		<b class="$ICON mr5"></b>$NAME
 	</header>
-	<footer>
-		<div class="status">Delayed messages: <b><ui-bind path="STATUS.pending" config="text:value?value.format(0):'0'"></ui-bind></b></div>
-	</footer>
+	<footer><ui-bind path="!$CONFIG.text" config="html div:value.markdown(value, { element: el })" class="markdown-small selectable"><div class="markdown"></div></ui-bind></footer>
 </body>
+
+<script>
+
+	TOUCH(function(exports, reinit) {
+		if (!reinit) {
+			exports.element.on('click', 'button', function() {
+				FUNC.readme('Comment', exports.config.text || '');
+			});
+		}
+	});
+
+</script>
