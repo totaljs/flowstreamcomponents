@@ -1,0 +1,33 @@
+<script total>
+
+	exports.id = 'insecuressl';
+	exports.name = 'Insecure SSL';
+	exports.icon = 'ti ti-unlock';
+	exports.author = 'Peter Širka | Total.js';
+	exports.version = '1';
+	exports.group = 'Total.js';
+	exports.config = {};
+	exports.inputs = [];
+	exports.outputs = [];
+	exports.meta = { singleton: 1 };
+
+	exports.make = function(instance, config) {
+		process.env.NODE_TLS_REJECT_UNAUTHORIZED = '1';
+	};
+
+</script>
+
+<readme>
+Disables SSL verification.
+</readme>
+
+<style>
+	.CLASS { border-color: #EF9D4B !important; }
+	.CLASS .area { background: #FAE6CF; }
+</style>
+
+<body>
+	<header>
+		<i class="$ICON"></i>$NAME
+	</header>
+</body>
