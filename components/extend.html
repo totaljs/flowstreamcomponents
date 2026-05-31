@@ -3,9 +3,9 @@
 	exports.id = 'extend';
 	exports.name = 'Extend';
 	exports.group = 'Common';
-	exports.version = '2';
+	exports.version = '3';
 	exports.icon = 'ti ti-expand';
-	exports.author = 'Total.js';
+	exports.author = 'Peter Širka | Total.js';
 	exports.config = { path: '', schema: [] };
 	exports.inputs = [{ id: 'input', name: 'Input' }];
 	exports.outputs = [{ id: 'output', name: 'Output' }];
@@ -13,22 +13,26 @@
 	exports.make = function(instance, config) {
 
 		var convert = function(item) {
-			var max;
+			let max;
+			let tmp;
 			switch (item.convert) {
 				case 'string':
-					return item.value;
+					return instance.replace(item.value);
 				case 'boolean':
-					return item.value == 'true' || item.value === 'on' || item.value === '1';
+					tmp = instance.replace(item.value);
+					return tmp == 'true' || tmp === 'on' || tmp === '1';
 				case 'number':
-					return +item.value;
+					return +instance.replace(item.value);
 				case 'object':
 					try {
 						return new Function('return ' + item.value)();
 					} catch (e) {}
 				case 'date':
-					return item.value.parseDate();
+					return instance.replace(item.value).parseDate();
 				case 'now':
 					return new Date();
+				case 'expire':
+					return new Date().add(item.value);
 				case 'uid':
 					return UID();
 				case 'time':
@@ -41,6 +45,9 @@
 				case 'random_string':
 					max = item.value ? +item.value : 20;
 					return U.random_string(max);
+				case 'random_text':
+					max = item.value ? +item.value : 20;
+					return U.random_text(max);
 			}
 
 			return item.value;
@@ -76,44 +83,46 @@ This component extends the current message by adding new properties.
 </readme>
 
 <style>
-	.CLASS-settings .fields { border: 1px solid #E0E0E0; border-radius: var(--radius); }
-	.CLASS-settings figure { height: 24px; border-top: 1px solid #E0E0E0; line-height: 23px; font-size: 11px; }
-	.CLASS-settings figure .edit-open { background-color: #F0F0F0; }
-	.CLASS-settings figure .convert { line-height: 23px; margin-left: 400px; margin-right: 30px; padding: 0 8px; cursor: pointer; background-color: rgba(0,0,0,0.2); }
-	.CLASS-settings figure .path { width: 150px; line-height: 14px; float: left; }
-	.CLASS-settings figure .path span { float: left; width: 50px; line-height: 23px; text-align: center; }
-	.CLASS-settings figure .path div { outline: 0; margin-left: 50px; line-height: 23px; padding: 0 5px; min-height: 23px; color: #B92EC5; }
-	.CLASS-settings figure .value { width: 250px; line-height: 14px; float: left; }
-	.CLASS-settings figure .value span { float: left; width: 50px; line-height: 23px; text-align: center; }
-	.CLASS-settings figure .value div { outline: 0; margin-left: 50px; line-height: 23px; padding: 0 5px; min-height: 23px; color: #4285F4; }
-	.CLASS-settings figure .controls { float: right; width: 30px; padding: 0; margin: 0; border-left: 1px solid #E0E0E0; text-align: center; }
-	.CLASS-settings figure .controls span { cursor: pointer; margin-left: 5px; }
-	.CLASS-settings figure .controls span:first-child { margin-left: 0; }
-	.CLASS-settings figure:first-child { border-top: 0; line-height: 24px; }
-	.CLASS-settings figure:first-child div { line-height: 24px; }
-	.CLASS footer { height: 40px; line-height: 40px; padding: 0 10px; font-size: 12px; }
 
-	.ui-dark .CLASS-settings .fields { border-color: #404040; }
-	.ui-dark .CLASS-settings figure { border-top-color: #404040; }
-	.ui-dark .CLASS-settings figure .edit-open { background-color: #404040; }
-	.ui-dark .CLASS-settings figure .controls { border-left-color: #404040; }
+	.CLASS-settings .tablecustom .tablerow { display: flex; width: 100%; border-bottom: 1px solid #E0E0E0; font-size: 12px;}
+	.CLASS-settings .tablecustom .tablerow:first-child { border-top: 1px solid #E0E0E0; }
+	.CLASS-settings .tablecustom .tablerow > div { border-right: 1px solid #E0E0E0; }
+	.CLASS-settings .tablecustom .tablerow > div:first-child { border-left: 1px solid #E0E0E0; }
+	.CLASS-settings .tablecustom .static { flex: 0 0 auto; white-space: nowrap; padding: 5px 8px; }
+	.CLASS-settings .tablecustom .dynamic { flex: 1 1 0; min-width: 0; }
+	.CLASS-settings .tablecustom .dynamic .edit { padding: 5px 8px; outline: 0; }
+	.CLASS-settings .tablecustom .edit-open { background-color: #F0F0F0; }
+	.CLASS-settings .type { background-color: #F0F0F0; }
+
+	.ui-dark .CLASS-settings .tablecustom .tablerow { border-bottom-color: #404040; }
+	.ui-dark .CLASS-settings .tablecustom .tablerow:first-child { border-top-color: #404040; }
+	.ui-dark .CLASS-settings .tablecustom .tablerow > div { border-right-color: #404040; }
+	.ui-dark .CLASS-settings .tablecustom .tablerow > div:first-child { border-left-color: #404040; }
+	.ui-dark .CLASS-settings .tablecustom .edit-open { background-color: #282828; }
+	.ui-dark .CLASS-settings .type { background-color: #282828; }
+
+	.CLASS footer ui-bind { height: 40px; line-height: 40px; padding: 0 10px; font-size: 12px; display: block; }
+
 </style>
 
 <body>
 	<header>
-		<i class="ICON"></i>NAME
+		<i class="$ICON"></i>$NAME
 	</header>
-	<footer is="is-footer" path="CONFIG.path" config="show;text span">
-		Path: <span class="b"></span>
+	<footer>
+		<ui-bind path="$CONFIG.path" config="show;text .b" class="hidden">
+			Path: <span class="b"></span>
+		</ui-bind>
 	</footer>
 </body>
 
 <settings>
 	<div class="CLASS-settings">
-		<div class="padding bg-smoke">
+		<div class="padding">
 			<ui-component name="input" path="?.path" config="placeholder:path.to.property;monospace:1">Load data from the specific property/field</ui-component>
 			<div class="help">Optional. The data for the extending will be loaded from the specific property/field.</div>
 		</div>
+		<hr class="nmt nmb" />
 		<div class="padding">
 			<div class="caption m">
 				<div class="toolbar">
@@ -123,23 +132,23 @@ This component extends the current message by adding new properties.
 				</div>
 				<label>Paths</label>
 			</div>
-			<ui-bind path="?.schema" config="template:figure --> data-id;show:value && value.length" class="fields m block">
+			<ui-bind path="?.schema" config="template:.tablerow --> data-id;show:value && value.length" class="tablecustom m block">
 				<script type="text/html">
 					{{ foreach m in value }}
-					<figure data-id="{{ m.id }}">
-						<div class="controls">
-							<span class="exec" data-exec="tmpextend.rem" title="Remove"><i class="ti ti-trash red"></i></span>
+					<div data-id="{{ m.id }}" class="tablerow">
+						<div class="static"><span class="exec controll" data-exec="tmpextend.rem" title="Remove"><i class="ti ti-trash red"></i></span></div>
+						<div class="static silver">path</div>
+						<div class="dynamic">
+							<div class="monospace edit hellip" data-edit="exec:tmpextend.path;required:1">{{ m.path }}</div>
 						</div>
-						<div class="path">
-							<span>Path</span><div class="monospace edit hellip" data-edit="exec:tmpextend.path;required:1">{{ m.path }}</div>
+						<div class="static silver">value</div>
+						<div class="dynamic">
+							<div class="edit monospace hellip" data-type="to" data-edit="exec:tmpextend.value;selectall:1">{{ m.value }}</div>
 						</div>
-						<div class="value">
-							<span>Value</span><div class="edit monospace hellip" data-type="to" data-edit="exec:tmpextend.value;selectall:1">{{ m.value }}</div>
-						</div>
-						<div class="convert">
+						<div class="static type" style="width:180px">
 							<div class="exec hellip" data-exec="tmpextend.convert">{{ m.convert | tmpextendconvert }}</div>
 						</div>
-					</figure>
+					</div>
 					{{ end }}
 				</script>
 			</ui-bind>
@@ -248,10 +257,12 @@ This component extends the current message by adding new properties.
 				tmp.convertors.push({ id: 'date', name: 'Date' });
 				tmp.convertors.push({ id: 'time', name: 'Time' });
 				tmp.convertors.push({ id: 'now', name: 'Current date/time' });
+				tmp.convertors.push({ id: 'expire', name: 'Expiration' });
 				tmp.convertors.push({ id: 'uid', name: 'UI' + 'D' });
 				tmp.convertors.push({ id: 'guid', name: 'Guid' });
 				tmp.convertors.push({ id: 'random_number', name: 'Random number' });
 				tmp.convertors.push({ id: 'random_string', name: 'Random string' });
+				tmp.convertors.push({ id: 'random_text', name: 'Random string and numbers' });
 
 				Thelpers.tmpextendconvert = function(val) {
 					return tmp.convertors.findValue('id', val, 'name', DEF.empty);
