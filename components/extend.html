@@ -216,7 +216,7 @@ This component extends the current message by adding new properties.
 				};
 
 				tmp.value = function(opt, next) {
-					opt.value = opt.value.replace(/(;|\s|,)/g, '').trim();
+					opt.value = opt.value.trim(); // .replace(/(;|\s|,)/g, '')
 					let scope = M.is20 ? opt.element.plugin(): opt.element.scope();
 					let id = ATTRD(opt.element);
 					let item = scope.get().schema.findItem('id', id);
@@ -257,7 +257,7 @@ This component extends the current message by adding new properties.
 				tmp.convertors.push({ id: 'date', name: 'Date' });
 				tmp.convertors.push({ id: 'time', name: 'Time' });
 				tmp.convertors.push({ id: 'now', name: 'Current date/time' });
-				tmp.convertors.push({ id: 'expire', name: 'Expiration' });
+				tmp.convertors.push({ id: 'expire', name: 'Date expiration' });
 				tmp.convertors.push({ id: 'uid', name: 'UI' + 'D' });
 				tmp.convertors.push({ id: 'guid', name: 'Guid' });
 				tmp.convertors.push({ id: 'random_number', name: 'Random number' });
