@@ -1,0 +1,227 @@
+<script total>
+
+	exports.id = 'tapicreator';
+	exports.name = 'API Creator';
+	exports.group = 'Total.js';
+	exports.icon = 'ti ti-crosshairs';
+	exports.version = '1';
+	exports.author = 'Peter Širka | Total.js';
+	exports.config = { path: 'response', schema: [{ id: 'i1984', name: 'Users|read' }] };
+	exports.outputs = [{ id: 'output', name: 'Output' }];
+	exports.inputs = [{ id: 'input', name: 'Payload' }];
+	exports.kind = 'action';
+
+	exports.make = function(instance, config) {
+
+		let inputs = {};
+
+		instance.message = function($) {
+			let payload = {};
+			payload.schema = inputs[$.input] || 'Unknown';
+			payload.data = $.data;
+			$.send('output', payload);
+		};
+
+		instance.configure = function() {
+
+			const input = [];
+
+			for (let item of config.schema) {
+
+				if (!item)
+					continue;
+
+				let params = item.name.split('/').trim();
+				const name = params.shift();
+
+				for (let i = 0; i < params.length; i++)
+					params[i] = params[i].replace(/\{|\}/g, '');
+
+				inputs[item.id] = item.name;
+				input.push({ id: item.id, name: item.name });
+			}
+
+			const prev = JSON.stringify(instance.input);
+			const curr = JSON.stringify(input);
+
+			if (prev !== curr) {
+				instance.input = input;
+				instance.save();
+			}
+
+		};
+
+		instance.configure();
+	};
+
+</script>
+
+<readme>
+This component creates Total.js API payload.
+
+Output data__:
+
+```js
+{
+	schema: 'input_name',
+	data: input_data
+}
+```
+</readme>
+
+<style>
+	.CLASS-settings .fields { border: 1px solid #E0E0E0; border-radius: var(--radius); }
+	.CLASS-settings figure { height: 26px; border-top: 1px solid #E0E0E0; line-height: 25px; font-size: 13px; }
+	.CLASS-settings figure .edit-open { background-color: #F0F0F0; }
+	.CLASS-settings figure .name { line-height: 14px; margin-right: 30px; }
+	.CLASS-settings figure .name div { outline: 0; line-height: 23px; padding: 0 5px; min-height: 25px; font-weight: bold; }
+	.CLASS-settings figure .controls { float: right; width: 90px; padding: 0; margin: 0; border-left: 1px solid #E0E0E0; text-align: center; }
+	.CLASS-settings figure .controls span { cursor: pointer; margin-left: 5px; }
+	.CLASS-settings figure .controls span:first-child { margin-left: 0; }
+	.CLASS-settings figure:first-child { border-top: 0; line-height: 26px; }
+	.CLASS-settings figure:first-child div { line-height: 26px; }
+	.CLASS-settings figure.ismoved { background-color: rgba(92,29,196,0.3) !important; }
+	.CLASS footer { height: 40px; line-height: 40px; padding: 0 10px; font-size: 12px; }
+	.CLASS header div { border-radius: var(--radius); padding: 3px; background-color: #777; color: #FFF; }
+	.CLASS header div i { background-color: rgba(0,0,0,0.2); }
+
+	.ui-dark .CLASS header div i { background-color: rgba(255,255,255,0.2); }
+	.ui-dark .CLASS-settings .fields { border-color: #404040; }
+	.ui-dark .CLASS-settings figure { border-top-color: #404040; }
+	.ui-dark .CLASS-settings figure .controls { border-left-color: #404040; }
+</style>
+
+<body>
+	<header>
+		<i class="$ICON"></i>$NAME
+	</header>
+</body>
+
+<settings>
+	<div class="CLASS-settings">
+		<div class="padding">
+			<div class="caption m">
+				<div class="toolbar">
+					<nav>
+						<button class="exec" data-exec="tapicreator.add"><i class="ti ti-plus-circle"></i>Add</button>
+					</nav>
+				</div>
+				<label>Schema</label>
+			</div>
+			<ui-bind path="?.schema" config="template:figure --> data-id;show:value && value.length" class="fields m block">
+				<script type="text/html">
+					{{ foreach m in value }}
+					<figure data-id="{{ m.id }}">
+						<div class="controls">
+							<span class="exec" data-exec="tapicreator.move" title="Up" data-type="up"><i class="ti ti-arrow-up"></i></span>
+							<span class="exec" data-exec="tapicreator.move" title="Down" data-type="down"><i class="ti ti-arrow-down"></i></span>
+							<span class="exec" data-exec="tapicreator.rem" title="Remove"><i class="ti ti-trash red"></i></span>
+						</div>
+						<div class="name">
+							<div class="monospace edit hellip" data-type="from" data-edit="exec:tapicreator.name;required:1">{{ m.name }}</div>
+						</div>
+					</figure>
+					{{ end }}
+				</script>
+			</ui-bind>
+			<ui-component name="changer" path="?.schema"></ui-component>
+		</div>
+	</div>
+</settings>
+
+<script>
+
+	TOUCH(function(exports, reinit) {
+
+		exports.settings = function(meta) {
+
+			if (!meta.config.schema.length) {
+				var obj = {};
+				obj.id = 'o' + Math.random().toString(36).substring(6);
+				obj.name = 'users_read/{id}';
+				meta.config.schema.push(obj);
+			}
+
+			var tmp = W.tapicreator;
+
+			if (!tmp) {
+
+				tmp = {};
+				tmp.add = function(el) {
+					var scope = M.is20 ? el.plugin() : el.scope();
+					var obj = {};
+					obj.id = 'i' + Math.random().toString(36).substring(6);
+					obj.name = 'Users|read';
+					scope.push('schema @change', obj);
+				};
+
+				tmp.rem = function(el) {
+					var id = ATTRD(el);
+					var scope = M.is20 ? el.plugin() : el.scope();
+					var model = scope.get();
+					var index = model.schema.findIndex('id', id);
+					model.schema.splice(index, 1);
+					scope.update('schema @change');
+				};
+
+				tmp.move = function(el) {
+
+					var scope = M.is20 ? el.plugin() : el.scope();
+					var id = ATTRD(el);
+					var container = el.closest('figure');
+					var schema = scope.get().schema;
+					var index = schema.findIndex('id', id);
+					var is = false;
+					var isup = el.attrd('type') === 'up';
+
+					if (isup) {
+						if (index > 0) {
+							var a = schema[index];
+							schema[index] = schema[index - 1];
+							schema[index - 1] = a;
+							is = true;
+						}
+					} else {
+						if (index <= schema.length - 2) {
+							var a = schema[index];
+							schema[index] = schema[index + 1];
+							schema[index + 1] = a;
+							is = true;
+						}
+					}
+
+					if (is) {
+						NODEMOVE(container, isup);
+						scope.update('schema @change');
+						container.aclass('ismoved').rclass('ismoved', 500);
+					}
+				};
+
+				tmp.name = function(opt, next) {
+					opt.value = opt.value.replace(/(;|\s|,)/g, '').trim();
+					var scope = M.is20 ? opt.element.plugin() : opt.element.scope();
+					var id = ATTRD(opt.element);
+					var item = scope.get().schema.findItem('id', id);
+					item.name = opt.value;
+					scope.update('schema @change');
+					next(true);
+				};
+
+				W.tapicreator = tmp;
+			}
+		};
+
+		exports.configure = function() {
+			let changes = exports.instance.changes;
+			if (changes && changes.newbie) {
+				let inputs = [];
+				for (let item of exports.config.schema)
+					inputs.push({ id: item.id, name: item.name });
+				exports.instance.inputs = inputs;
+				UPD('flow.data');
+			}
+		};
+
+	});
+
+</script>
