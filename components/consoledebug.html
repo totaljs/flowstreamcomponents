@@ -3,7 +3,7 @@
 	exports.id = 'consoledebug';
 	exports.name = 'Console debug';
 	exports.group = 'Flow';
-	exports.version = '1';
+	exports.version = '2';
 	exports.icon = 'ti ti-circle-alt';
 	exports.color = '#E73323';
 	exports.author = 'Peter Širka | Total.js';
@@ -12,12 +12,18 @@
 
 	exports.make = function(instance, config) {
 
-		var filter = null;
+		let filter = null;
+		let cache = {
+			log: console.log,
+			error: console.error,
+			warn: console.warn
+		};
 
 		function ondebug(meta, ...args) {
 			if (filter && !filter[meta.id])
 				return;
-			instance.status({ type: 'debug', date: NOW, data: meta.module.name + ' - ' + Total.Util.format(...args.filter(value => value !== undefined)) });
+			NOW = new Date();
+			instance.status({ date: new Date(), data: meta.module.name + ' - ' + Total.Util.format(...args.filter(value => value !== undefined)) });
 		};
 
 		instance.main.on('debug', ondebug);
@@ -33,6 +39,17 @@
 					filter[id] = 1;
 			} else
 				filter = null;
+
+			if (config.console) {
+				console.log = (...args) => instance.status({ date: NOW = new Date(), data: Total.Util.format(...args.filter(value => value !== undefined)) });
+				console.error = (...args) => instance.status({ type: 'error', date: NOW = new Date(), data: Total.Util.format(...args.filter(value => value !== undefined)) });
+				console.warn = (...args) => instance.status({ type: 'warning', date: NOW = new Date(), data: Total.Util.format(...args.filter(value => value !== undefined)) });
+			} else {
+				console.log = cache.log;
+				console.warn = cache.warn;
+				console.error = cache.error;
+			}
+
 		};
 
 		instance.configure();
@@ -53,6 +70,8 @@ The component can print the payload of incoming messages and `instance.debug()` 
 
 <settings>
 	<div class="padding">
+		<ui-component name="input" path="?.console" config="type:checkbox" class="m">Capture all <code>console.log()</code></ui-component>
+		<hr />
 		<ui-component name="input" path="%debugsearch" config="type:search;placeholder:Search components" class="m">Search</ui-component>
 		<ui-component name="search" path="%debugsearch" config="selector:figure">
 			<ui-component name="selection" path="?.watch" config="datasource:flow.instances;click:figure">
@@ -62,7 +81,7 @@ The component can print the payload of incoming messages and `instance.debug()` 
 						{{ if m.Component.id !== 'consoledebug' }}
 						<figure data-search="{{ m.id }} {{ m.Component.name }}{{ if m.note }} {{ m.note }}{{ fi }}">
 							<section>
-								<span class="selection" data-id="{{ m.id }}"><i class="ti ti-eye"></i></span>{{ m.Component.name }}{{ if m.note }}<span class="gray ml10">{{ m.note }}</span>{{ fi }}
+								<span class="selection" data-id="{{ m.id }}"><i class="ti ti-eye mr5"></i></span>{{ m.Component.name }}{{ if m.note }}<span class="gray ml10">{{ m.note }}</span>{{ fi }}
 							</section>
 						</figure>
 						{{ fi }}
@@ -84,7 +103,7 @@ The component can print the payload of incoming messages and `instance.debug()` 
 	TOUCH(function(exports, reinit) {
 		exports.status = function(data) {
 			if (data && data.date)
-				EXEC('flow/log', 'info', data.date.format('[ts]') + ': ' + data.data);
+				EXEC('flow/log', data.type || 'info', data.date.format('[ts]') + ': ' + data.data);
 		};
 	});
 </script>
