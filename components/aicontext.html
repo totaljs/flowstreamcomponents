@@ -1,0 +1,189 @@
+<script total>
+
+	exports.id = 'aicontext';
+	exports.name = 'Context';
+	exports.icon = 'ti ti-file';
+	exports.author = 'Peter Širka | Total.js';
+	exports.version = '1';
+	exports.group = 'AI';
+	exports.config = { path: 'content' };
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }];
+
+	exports.make = function(instance, config) {
+
+		let content = [];
+
+		let reparse = function() {
+			content = (instance.repo.context || '').parseContext();
+			let arr = [];
+			for (let m of content)
+				arr.push({ name: m.name });
+			instance.status(arr);
+		};
+
+		instance.message = function($) {
+
+			let data = $.data;
+			let istext = typeof(data) === 'string';
+			let text = istext ? data : (data[config.path] || '');
+
+			text = text.replace(/\[.*?\]/g, function(text) {
+				let name = text.substring(1, text.length - 1);
+				let item = content.findItem('name', name);
+				return item ? item.body : text;
+			});
+
+			if (istext) {
+				$.send('output', text);
+				return;
+			}
+
+			$.data[config.path] = text;
+			$.send('output');
+		};
+
+		instance.call = function(data, next) {
+			if (data.type === 'load')
+				next(instance.repo.context || '');
+			else if (data.type === 'save') {
+				instance.repo.context = data.content;
+				instance.save();
+				reparse();
+			}
+		};
+
+		reparse();
+
+	};
+
+</script>
+
+<readme>
+This component can load multiple Markdown contexts for the LLM. It replaces text phrases defined in the header, such as `[filename_defined_in_the_header]` with the content defined in the context.
+
+__Context example__:
+
+```md
+----------------------------------------------------------------
+Name: document1.md
+----------------------------------------------------------------
+
+MARKDOWN 1
+
+----------------------------------------------------------------
+Name: document2.md
+----------------------------------------------------------------
+
+MARKDOWN 2
+```
+
+## Usage
+
+```
+[document1.md]
+```
+
+__Output__:
+
+```
+MARKDOWN 1
+```
+</readme>
+
+<style>
+	.CLASS { max-width: 220px; }
+	.CLASS footer div { font-size: 11px; padding: 2px 8px; border-top: 1px solid #E0E0E0; }
+	.CLASS footer div:first-child { border-top: 0; }
+</style>
+
+<body>
+	<header>
+		<button class="exec button" data-exec="/context">Edit context</button>
+		<i class="$ICON"></i>$NAME
+	</header>
+	<footer>
+		<ui-bind path="$STATUS" config="template" class="block selectable">
+			<script type="text/html">
+				{{ foreach m in value }}
+				<div class="monospace hellip"><i class="ti ti-markdown mr5"></i><span class="exec" data-exec="?/clipboard">[{{ m.name }}]</span></div>
+				{{ end }}
+			</script>
+		</ui-bind>
+	</footer>
+</body>
+
+<settings>
+	<div class="CLASS-settings">
+		<div class="padding">
+			<div class="grid-3">
+				<div class="m">
+					<ui-component name="input" path="?.path" config="required:1;monospace:1">Content property</ui-component>
+				</div>
+			</div>
+		</div>
+	</div>
+</settings>
+
+<script>
+	TOUCH(function(exports, reinit) {
+
+		exports.context = function() {
+
+			if (!PLUGINS.aicontextform) {
+				$(document.body).append(`<ui-component name="box" path="*form" config="if:aicontextform;scrollbar:0;autofocus:1;title:Custom AI context;width:1200;submit:?/submit;icon:ti ti-robot" plugin="aicontextform">
+<div>
+	<ui-component name="code" path="?.body" config="required:1;parent:auto;monospace:1;type:markdown"></ui-component>
+</div>
+<nav>
+	<ui-component name="validate" path="?">
+		<button name="submit" disabled><i class="ti ti-check-circle"></i>SUBMIT</button>
+		<button name="cancel">Cancel</button>
+	</ui-component>
+</nav>
+</ui-component>
+<SCR>
+PLUGIN('aicontextform', function(exports) {
+	exports.submit = function() {
+		let model = exports.form;
+		model.callback(model);
+	};
+});
+</SCR>`.replace(/SCR/g, 'scr' + 'ipt'));
+			}
+
+			let callback = function(response) {
+
+				let model = {};
+
+				model.callback = function(model) {
+					exports.call({ type: 'save', content: model.body }, NOOP);
+					NUL('*form');
+				};
+
+				model.body = response || `----------------------------------------------------------------
+Name: document1.md
+----------------------------------------------------------------
+
+MARKDOWN
+
+----------------------------------------------------------------
+Name: document2.md
+----------------------------------------------------------------
+
+MARKDOWN`;
+
+				SET('aicontextform @default', model);
+				SET('*form', 'aicontextform');
+			};
+
+			let instance = exports.instance;
+
+			if (instance.changes && instance.changes.newbie)
+				SETTER('message/warning', 'You can edit the context after attaching the component to the FlowStream.');
+			else
+				exports.call({ type: 'load' }, callback);
+		};
+
+	});
+</script>
