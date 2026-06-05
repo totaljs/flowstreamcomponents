@@ -1,0 +1,135 @@
+<script total>
+
+	exports.id = 'fileswatcher';
+	exports.name = 'Files watcher';
+	exports.icon = 'ti ti-file-search';
+	exports.author = 'Peter Širka | Total.js';
+	exports.version = '1';
+	exports.group = 'Files';
+	exports.config = { path: '/www/', ext: '.mp4', interval: 5000, expire: '10 minutes' };
+	exports.inputs = [];
+	exports.outputs = [{ id: 'output', name: 'Output' }];
+	exports.kind = 'trigger';
+
+	exports.make = function(instance, config) {
+
+		let memorize = MEMORIZE('watcher_' + instance.id);
+		let interval = null;
+
+		if (!memorize.cache)
+			memorize.cache = {};
+
+		let cache = memorize.cache;
+
+		let check = function() {
+			let ext = config.ext ? config.ext.split(/,|\|/).trim() : null;
+			Utils.ls2(config.path, function(files) {
+				for (let file of files) {
+					let meta = cache[file.filename];
+					if (meta) {
+						// This is because the file is still being written
+						if (file.stats.size === meta.stats.size) {
+							meta.expire = NOW.add(config.expire);
+							instance.newmessage({ filename: meta.filename, size: meta.stats.size, atime: meta.stats.atime, ctime: meta.stats.ctime, mtime: meta.stats.mtime }).send('output');
+						} else
+							meta.stats = file.stats;
+					} else {
+						cache[file.filename] = file;
+						memorize.save();
+					}
+				}
+
+			// Nepáči sa mi tá podmienka na toLowerCase(), ale zažmúril som oči
+			}, (filename, dir) => dir ? true : ext ? ext.filter(n => filename.toLowerCase().endsWith(n)).length > 0 : true);
+		};
+
+		instance.service = function() {
+			let expire = NOW;
+			for (let key in cache) {
+				if (cache[key].expire && cache[key].expire < NOW)
+					delete cache[key];
+			}
+			memorize.save();
+		};
+
+		instance.trigger = function() {
+
+			for (let key in cache)
+				delete cache[key];
+
+			memorize.save();
+			instance.configure();
+			check();
+		};
+
+		instance.close = function() {
+			interval && clearInterval(interval);
+		};
+
+		instance.configure = function() {
+			interval && clearInterval(interval);
+			interval = setInterval(check, config.interval);
+		};
+
+		instance.configure();
+
+	};
+
+</script>
+
+<readme>
+This component watches new files.
+
+__Output__:
+
+```js
+{
+	"filename": "filename.mp4",
+	"size": 10785133,
+	"atime": "2026-04-30T06:53:00.501Z",
+	"ctime": "2026-05-27T16:44:08.217Z",
+	"mtime": "2026-04-30T06:53:00.501Z",
+}
+```
+</readme>
+
+<settings>
+	<div class="padding">
+		<ui-component name="input" path="?.path" config="requried:1" class="m">Path</ui-component>
+		<div style="max-width:500px">
+			<div class="grid-3">
+				<ui-component name="input" path="?.ext" class="m">Extension</ui-component>
+				<ui-component name="input" path="?.interval" config="type:number;ricon:!ms" class="m">Interval</ui-component>
+				<ui-component name="input" path="?.expire" config="required:1" class="m">Expire</ui-component>
+			</div>
+		</div>
+	</div>
+</settings>
+
+<style>
+	.CLASS ui-bind { padding: 10px; font-size: 12px; overflow-wrap: break-word; border-top: 1px solid #E0E0E0; }
+	.CLASS .info { color: #777; }
+</style>
+
+<body>
+	<header>
+		<button class="button ml5" name="trigger">Clear cache</button>
+		<i class="$ICON"></i>$NAME
+	</header>
+	<footer>
+		<ui-bind path="$CONFIG" config="template" class="block">
+			<script type="text/html">
+				<div class="monospace">{{ value.path }}</div>
+				<div class="info mt5">
+					<span>Interval</span>: {{ value.interval }} ms
+				</div>
+				<div class="info">
+					<span>Expire</span>: {{ value.expire }}
+				</div>
+				<div class="info">
+					<span>Watch</span>: {{ value.ext | empty }}
+				</div>
+			</script>
+		</ui-bind>
+	</footer>
+</body>
