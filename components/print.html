@@ -3,10 +3,10 @@
 	exports.id = 'print';
 	exports.name = 'Print';
 	exports.group = 'Common';
-	exports.version = '8';
+	exports.version = '9';
 	exports.icon = 'ti ti-print';
 	exports.author = 'Peter Širka | Total.js';
-	exports.config = { repo: false, data: true, once: false, length: 0 };
+	exports.config = { repo: false, data: true, once: false, length: 0, color: '' };
 	exports.inputs = [{ id: 'input', name: 'Input' }];
 
 	exports.make = function(instance, config) {
@@ -49,7 +49,8 @@
 
 			if (output) {
 				output = JSON.stringify(output, serializer);
-				instance.status(output, 200);
+				NOW = new Date();
+				instance.status({ ts: NOW, data: output }, 200);
 			}
 
 			is = true;
@@ -66,15 +67,15 @@
 </script>
 
 <style>
-	.CLASS footer > ui-bind { margin: 10px; }
+	.CLASS footer { border-radius: 0 0 var(--radius) var(--radius); }
+	.CLASS footer > ui-bind { padding: 10px; }
 	.component.CLASS_example { background-color: #ffffed; }
-	.CLASS pre { font-size: 10px; margin: 0; padding: 5px; background-color: #F0F0F0; border-radius: var(--radius); }
+	.CLASS pre { font-size: 10px; margin: 0; padding: 5px; background-color: rgba(0,0,0,0.1); border-radius: var(--radius); tab-size: 2; }
 	.CLASS .json { white-space: pre; }
 	.CLASS .noscrollbar { max-height: 250px; }
-	.CLASS .readme { position: absolute; font-size: 11px; right: 5px; margin-top: -5px; cursor: pointer; }
-	.CLASS .copy { position: absolute; font-size: 11px; right: 20px; margin-top: -5px; cursor: pointer; }
+	.CLASS .actions { font-size: 11px; cursor: pointer; }
 	.ui-dark .component.CLASS_example { background-color: #585845; }
-	.ui-dark .CLASS pre { background-color: #404040; tab-size: 2; }
+	.ui-dark .CLASS pre { background-color: rgba(100,100,100,0.1); }
 </style>
 
 <readme>
@@ -87,12 +88,14 @@ The component prints incoming data in a JSON format.
 		<hr />
 		<ui-component name="input" path="?.repo" config="type:checkbox">Shows repository</ui-component>
 		<ui-component name="input" path="?.data" config="type:checkbox">Shows data</ui-component>
-		<br />
 		<hr />
 		<p><i class="ti ti-lightbulb-on mr5"></i>The value below defines the maximum number of characters allowed for string values. A value of <b>0</b> will keep the original string length unchanged.</p>
-		<div class="grid-3">
+		<div class="grid-4">
 			<div class="m">
 				<ui-component name="input" path="?.length" config="type:number;min:0">Max. length</ui-component>
+			</div>
+			<div class="m">
+				<ui-component name="input" path="?.color" config="type:color">Color</ui-component>
 			</div>
 		</div>
 	</div>
@@ -104,19 +107,28 @@ The component prints incoming data in a JSON format.
 		<i class="$ICON"></i><ui-bind path="$CONFIG.once" config="text:value?'Example':'Print'"></ui-bind>
 	</header>
 	<footer>
-		<ui-bind path="!$STATUS" config="html pre:debugprinter(value);show" class="hidden selectable block">
-			<span class="readme exec" data-exec="=readme" title="Open in new window"><i class="ti ti-window"></i></span>
-			<span class="copy exec" data-exec="=copy" title="Copy"><i class="ti ti-copy"></i></span>
-			<div class="noscrollbar mt5">
-				<pre class="json"></pre>
+		<ui-bind path="!$STATUS" config="show" class="hidden selectable block">
+			<div class="actions">
+				<span class="exec" data-exec="=copy" title="Copy"><i class="ti ti-copy"></i></span>
+				<span class="exec" data-exec="=readme" title="Open in new window"><i class="ti ti-window"></i></span>
 			</div>
+			<ui-bind path="!$STATUS" config="template" class="block">
+				<script type="text/html">
+				{{ if value.ts }}
+				<div class="fs11"><b>Date:</b> {{ value.ts | format('[ts]') }} <i>({{ value.ts | time2 }})</i></div>
+				<div class="noscrollbar mt5">
+					<pre class="json">{{ value.data | debugprinter }}</pre>
+				</div>
+				{{ fi }}
+				</script>
+			</ui-bind>
 		</ui-bind>
 	</footer>
 </body>
 
 <script>
 
-	W.debugprinter = function(value) {
+	Thelpers.debugprinter = function(value) {
 		if (value) {
 			value = JSON.parse(value);
 			return typeof(value) === 'string' ? Thelpers.encode(value) : Thelpers.jsonformat(JSON.stringify(value, null, '\t'));
@@ -130,6 +142,14 @@ The component prints incoming data in a JSON format.
 			return;
 
 		let laststatus;
+		let lastcolor;
+
+		let autocolor = function() {
+			if (lastcolor === exports.config.color)
+				return;
+			lastcolor = exports.config.color;
+			exports.element.find('footer').css('background', exports.config.color ? FUNC.hex2rgba(exports.config.color, 0.3) : '');
+		};
 
 		exports.clear = function() {
 			if (exports.config.once)
@@ -140,24 +160,27 @@ The component prints incoming data in a JSON format.
 
 		exports.status = function(status, isinit) {
 			laststatus = status;
+			autocolor();
 		};
 
 		exports.configure = function() {
 			exports.element.tclass('CLASS_example', exports.config.once);
+			autocolor();
 		};
 
 		exports.copy = function() {
-			SETTER('clipboard/copy @copied', laststatus);
+			SETTER('clipboard/copy @copied', laststatus.data);
 		};
 
 		exports.readme = function() {
-			let status = laststatus ? JSON.parse(laststatus) : null;
+			let ts = laststatus ? laststatus.ts : null;
+			let status = laststatus ? JSON.parse(laststatus.data) : null;
 			if (status != null) {
 				if (typeof(status) !== 'string')
 					status = JSON.stringify(status, null, '  ');
 			} else
 				status = '';
-			FUNC.readme('Debug', '```json\n' + status + '\n```');
+			FUNC.readme('Debug', '__Date:__ ' + (ts ? (ts.format('[ts]') + ' *(' + Thelpers.time(ts) + ')*\n\n') : '') + '```json\n' + status + '\n```');
 		};
 
 	});
