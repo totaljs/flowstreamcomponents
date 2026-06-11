@@ -12,6 +12,18 @@
 		"readme": "This component creates similar functionality as Total.js Actions.\n\n## Payload\n\n```js\n{\n\tip: String, // optional, IP address\n\turl: String, // optional\n\tlanguage: String, // optional\n\tua: String, // optional, parsed user-agent\n\tuser: Object, // optional\n\theaders: { key: String }, // optional, request headers\n\tcookies: { key: String }, // optional, cookies\n\tpayload: {}, // optional, request payload\n\tquery: { key: String }, // optional\n\tparams: { key: String }, // optional\n\tfiles: [{ type: String, filename: String, path: String, ext: String, size: Number, width: Number, height: Number }] // optional\n}\n```\n\n## Custom scripting\n\n- supports `await`\n- supports Total.js global functions\n\n__Properties__:\n\n- `$.model {Object}` or `model` parsed payload\n- `$.query {Object}` parsed URL query arguments\n- `$.params {Object}` parsed URL params\n- `$.cookies {Object}` parsed cookies\n- `$.files [Object]` uploaded files\n- `$.user {Object}` user session (optional)\n- `$.headers {Object}` request headers\n- `$.ip {String}` IP address (optional)\n- `$.language {String}` optional\n- `$.ua {String}` parsed user agent (optional)\n- `$.url {String}` URL endpoint\n- `$.message {Object}` Flow message instance\n- `$.request {Object}` Flow message payload data\n\n__Methods__:\n\n- `$.invalid(error)` responds with an error and ends the action\n- `$.success([value])` responds with `{ success: true, value }` object and ends the action\n- `$.callback(value)` responds with `value` object and ends the action\n- `$.cancel()` ends the action without response\n- `$.audit(message, [type])` writes audit\n\n## Supported types\n\n- `string`\n- `number`\n- `boolean`\n- `date`\n- `object`\n- `email`\n- `phone`\n- `zip`\n- `base64`\n- `url`\n- `datauri`\n- `json`\n- `lower`\n- `upper`\n- `capitalize` all words\n- `capitalize2` only first word\n- `name` makes a name (capitalizes words and remove special characters)\n- `zip`\n- `uid`\n- `guid`\n- `color`\n- `icon`\n- `search` prepares string to a search string\n- `safestring` checks XSS and SQL Injections\n- `smallint`\n- `tinyint`\n- `{A|B|C}` enum type\n- `[type]` means array\n- `{ name:String, age:Number }` means nested object\n- `[ name:String, age:Number ]` means array with an object\n- `*something:type` is `required` field"
 	},
 	{
+		"id": "tapicreator",
+		"group": "Total.js",
+		"name": "API Creator",
+		"url": "https://cdn.totaljs.com/flowstream/webcomponents/tapicreator.html",
+		"author": "Peter Širka | Total.js",
+		"icon": "ti ti-crosshairs",
+		"color": "",
+		"version": "1",
+		"kind": "action",
+		"readme": "This component creates Total.js API payload.\n\nOutput data__:\n\n```js\n{\n\tschema: 'input_name',\n\tdata: input_data\n}\n```"
+	},
+	{
 		"id": "tapirouter",
 		"group": "Total.js",
 		"name": "API Router",
@@ -84,6 +96,54 @@
 		"readme": "Returns a current status for your token. It utilizes the [Total.js Check API](https://docs.totaljs.com/totalapi/6c221003eo51c/#6d397001td51c).\n\n__Output data__:\n\n```js\n{\n    credits: 34.49\n}\n```"
 	},
 	{
+		"id": "checkfreespace",
+		"group": "Checks",
+		"name": "Check Free space",
+		"url": "https://cdn.totaljs.com/flowstream/webcomponents/checkfreespace.html",
+		"author": "Peter Širka | Total.js",
+		"icon": "ti ti-hdd",
+		"color": "",
+		"version": "1",
+		"kind": "",
+		"readme": "This component checks a freespace on HDD."
+	},
+	{
+		"id": "checklog",
+		"group": "Checks",
+		"name": "Check log",
+		"url": "https://cdn.totaljs.com/flowstream/webcomponents/checklog.html",
+		"author": "Peter Širka | Total.js",
+		"icon": "ti ti-bug",
+		"color": "",
+		"version": "1",
+		"kind": "",
+		"readme": "This component checks a file and tries to find a"
+	},
+	{
+		"id": "checkpg",
+		"group": "Checks",
+		"name": "Check PostgreSQL",
+		"url": "https://cdn.totaljs.com/flowstream/webcomponents/checkpg.html",
+		"author": "Peter Širka | Total.js",
+		"icon": "ti ti-database",
+		"color": "",
+		"version": "1",
+		"kind": "",
+		"readme": "This component checks PostgreSQL database connection."
+	},
+	{
+		"id": "checkurl",
+		"group": "Checks",
+		"name": "Check URL",
+		"url": "https://cdn.totaljs.com/flowstream/webcomponents/checkurl.html",
+		"author": "Peter Širka | Total.js",
+		"icon": "ti ti-globe",
+		"color": "",
+		"version": "1",
+		"kind": "",
+		"readme": "This component checks URL address."
+	},
+	{
 		"id": "tapicheckvatapi",
 		"group": "Total.js API Services",
 		"name": "Check VAT",
@@ -132,6 +192,18 @@
 		"readme": "This component renders a small markdown comment inside the body."
 	},
 	{
+		"id": "queue",
+		"group": "Common",
+		"name": "Comment",
+		"url": "https://cdn.totaljs.com/flowstream/webcomponents/queue.html",
+		"author": "Total.js",
+		"icon": "ti ti-comment",
+		"color": "",
+		"version": "2",
+		"kind": "",
+		"readme": "This component renders a small markdown comment inside the body."
+	},
+	{
 		"id": "confirmation-code",
 		"group": "Security",
 		"name": "Confirmation code",
@@ -144,16 +216,40 @@
 		"readme": "This component can help you with generating confirmation codes. Keep data structure for inputs according to the documentation below.\n\n### `create` input/output\n\n__Create input__:\n\n- `id {String}` identifier (email, phone number, identifier, etc.)\n- `param {String}` a custom parameter\n\n__Create output__:\n\n- `success {Boolean}` determines if the code is verified or not accroding to its identifier\n- `value {String}` a pin/code/token\n- `param {String}` a custom parameter (it sends only if the value is true)\n- `error {String}` (optional) a simple error identifier, it can contain:\n\t- `locked` the identifier is locked by the previous call\n\n### `verify` input/output\n\n__Verify input__:\n\n- `id {String}` identifier (email, phone number, identifier, etc.)\n- `value {String}` a pin/code/token\n\n__Verify output__:\n\n- `success {Boolean}` determines if the code is verified or not accroding to its identifier\n- `slots {Number}` free slots/attempts\n- `error {String}` (optional) a simple error identifier, it can contain:\n\t- `invalid` the code is invalid\n\t- `404` identifier not found\n\n---\n\n### Settings\n\n- __Lock__ prevents overwriting of the code according to the identifier"
 	},
 	{
+		"id": "consoledebug",
+		"group": "Flow",
+		"name": "Console debug",
+		"url": "https://cdn.totaljs.com/flowstream/webcomponents/consoledebug.html",
+		"author": "Peter Širka | Total.js",
+		"icon": "ti ti-circle-alt",
+		"color": "#E73323",
+		"version": "2",
+		"kind": "",
+		"readme": "The component can print the payload of incoming messages and `instance.debug()` log messages in JSON format."
+	},
+	{
 		"id": "consolelog",
-		"group": "Common",
+		"group": "Flow",
 		"name": "console.log()",
 		"url": "https://cdn.totaljs.com/flowstream/webcomponents/consolelog.html",
-		"author": "Total.js",
+		"author": "Peter Širka | Total.js",
 		"icon": "ti ti-print",
 		"color": "",
 		"version": "1",
 		"kind": "",
 		"readme": "This component prints a message into the console."
+	},
+	{
+		"id": "aicontext",
+		"group": "AI",
+		"name": "Context",
+		"url": "https://cdn.totaljs.com/flowstream/webcomponents/aicontext.html",
+		"author": "Peter Širka | Total.js",
+		"icon": "ti ti-file",
+		"color": "",
+		"version": "1",
+		"kind": "",
+		"readme": "This component can load multiple Markdown contexts for the LLM. It replaces text phrases defined in the header, such as `[filename_defined_in_the_header]` with the content defined in the context.\n\n__Context example__:\n\n```md\n----------------------------------------------------------------\nName: document1.md\n----------------------------------------------------------------\n\nMARKDOWN 1\n\n----------------------------------------------------------------\nName: document2.md\n----------------------------------------------------------------\n\nMARKDOWN 2\n```\n\n## Usage\n\n```\n[document1.md]\n```\n\n__Output__:\n\n```\nMARKDOWN 1\n```"
 	},
 	{
 		"id": "tcors",
@@ -202,6 +298,18 @@
 		"version": "2",
 		"kind": "",
 		"readme": "The component stores data as CSV Dataset for e.g. Dashboard application. Dataset is stored in `/private/` path that is available with the help of the Flow access token.\n\nCSV file contains only processed values (according to the period) and the `.meta` file contains meta data + last value.\n\n__Input for data processing__:\n\n```js\n{\n\tkey: String,    // optional, e.g. device_id | device_name\n\tvalue: Number   // measured value\n}\n```\n\n### CSV columns\n\n- `a` = `key {String}`\n- `b` = `value {Number}`\n- `c` = `min {Number}`\n- `d` = `max {Number}`\n- `e` = `sum {Number}`\n- `f` = `count {Number}`\n- `g` = `tshour {Number}`in the form `yyyyMMddhh`\n- `h` = `tsday {Number}` in the form `yyyyMMdd`\n- `i` = `tsweek {Number}` in the form `yyyyww`\n- `j` = `tsmonth {Number}` in the form `yyyyMM`\n- `k` = `tsyear {Number}` in the form `yyyy`"
+	},
+	{
+		"id": "datamapper",
+		"group": "Common",
+		"name": "Data mapper",
+		"url": "https://cdn.totaljs.com/flowstream/webcomponents/datamapper.html",
+		"author": "Peter Širka | Total.js",
+		"icon": "ti ti-project-diagram",
+		"color": "",
+		"version": "1",
+		"kind": "",
+		"readme": "This component remaps payload properties."
 	},
 	{
 		"id": "dataparser",
@@ -253,10 +361,10 @@
 	},
 	{
 		"id": "debug",
-		"group": "Common",
+		"group": "Flow",
 		"name": "Debug",
 		"url": "https://cdn.totaljs.com/flowstream/webcomponents/debug.html",
-		"author": "Total.js",
+		"author": "Peter Širka | Total.js",
 		"icon": "ti ti-circle-alt",
 		"color": "#E73323",
 		"version": "4",
@@ -286,6 +394,18 @@
 		"version": "2",
 		"kind": "",
 		"readme": "The component downloads the file from the URL address as it is.\n\n## Input\n\n```js\n{\n\turl: 'https://example.com/file.jpg', // file url\n}\n```\n\n## Output\n\n```js\n{\n\tvalue: '/tmp/xyz.bin',\n\t...\n}\n```\n\nThe file will be automaticaly deleted once the message is destroyed."
+	},
+	{
+		"id": "duplicator",
+		"group": "Common",
+		"name": "Duplicator",
+		"url": "https://cdn.totaljs.com/flowstream/webcomponents/duplicator.html",
+		"author": "Peter Širka | Total.js",
+		"icon": "ti ti-clone",
+		"color": "",
+		"version": "1",
+		"kind": "",
+		"readme": "This component duplicates incoming messages according to the configuration settings."
 	},
 	{
 		"id": "duration",
@@ -352,10 +472,10 @@
 		"group": "Common",
 		"name": "Extend",
 		"url": "https://cdn.totaljs.com/flowstream/webcomponents/extend.html",
-		"author": "Total.js",
+		"author": "Peter Širka | Total.js",
 		"icon": "ti ti-expand",
 		"color": "",
-		"version": "1",
+		"version": "3",
 		"kind": "",
 		"readme": "This component extends the current message by adding new properties."
 	},
@@ -388,7 +508,7 @@
 		"group": "Files",
 		"name": "File Watcher",
 		"url": "https://cdn.totaljs.com/flowstream/webcomponents/filewatcher.html",
-		"author": "Total.js",
+		"author": "Peter Širka | Total.js",
 		"icon": "ti ti-recycle",
 		"color": "",
 		"version": "1",
@@ -406,6 +526,18 @@
 		"version": "1",
 		"kind": "",
 		"readme": "The component writes incoming data into the file."
+	},
+	{
+		"id": "fileswatcher",
+		"group": "Files",
+		"name": "Files watcher",
+		"url": "https://cdn.totaljs.com/flowstream/webcomponents/fileswatcher.html",
+		"author": "Peter Širka | Total.js",
+		"icon": "ti ti-file-search",
+		"color": "",
+		"version": "1",
+		"kind": "trigger",
+		"readme": "This component watches new files.\n\n__Output__:\n\n```js\n{\n\t\"filename\": \"filename.mp4\",\n\t\"size\": 10785133,\n\t\"atime\": \"2026-04-30T06:53:00.501Z\",\n\t\"ctime\": \"2026-05-27T16:44:08.217Z\",\n\t\"mtime\": \"2026-04-30T06:53:00.501Z\",\n}\n```"
 	},
 	{
 		"id": "flashback",
@@ -502,6 +634,18 @@
 		"version": "2",
 		"kind": "",
 		"readme": "The component receives data in an encapsulated FlowStream."
+	},
+	{
+		"id": "insecuressl",
+		"group": "Total.js",
+		"name": "Insecure SSL",
+		"url": "https://cdn.totaljs.com/flowstream/webcomponents/insecuressl.html",
+		"author": "Peter Širka | Total.js",
+		"icon": "ti ti-unlock",
+		"color": "",
+		"version": "1",
+		"kind": "",
+		"readme": "Disables SSL verification."
 	},
 	{
 		"id": "tapiinvoiceparserapi",
@@ -622,6 +766,18 @@
 		"version": "1",
 		"kind": "",
 		"readme": "This component can iterate over an array and only take properties listed in the configuration. __The input must be an array of objects!__\n\n### Example data\n\n```js\n[\n\t{ sensor: { temperature: 25, humidity: 50, ... some more properties }},\n\t{ sensor: { temperature: 24, humidity: 55, ... some more properties }},\n\t{ sensor: { temperature: 23, humidity: 60, ... some more properties }}\n]\n```\n### Example configuration\n\n- `sensor.temperature` -> `temp`\n- `sensor.humidity` -> `hum`\n\n### Example output\n\n```js\n[\n\t{ temp: 25, hum: 50 },\n\t{ temp: 24, hum: 55 },\n\t{ temp: 23, hum: 60 }\n]\n```\n\nIf `Return an Array of Arrays` is checked then\neach of the Map properties will be pushed to a new array, see example bellow\n\n### Example given the data above and this configuration:\n\n`Return an Array of Arrays` -> **checked**\n\n**Map**:\n\n- `sensor.temperature`\n- `sensor.humidity`\n\n### Example output:\n\n```js\n[\n\t[25, 50],\n\t[24, 55],\n\t[23, 60],\n]\n```"
+	},
+	{
+		"id": "measuretime",
+		"group": "Stats",
+		"name": "Measure time",
+		"url": "https://cdn.totaljs.com/flowstream/webcomponents/measuretime.html",
+		"author": "Peter Širka | Total.js",
+		"icon": "ti ti-stopwatch",
+		"color": "",
+		"version": "1",
+		"kind": "",
+		"readme": "This component measures the time taken to create and send a message."
 	},
 	{
 		"id": "merge",
@@ -768,6 +924,18 @@
 		"readme": "## Input\n\nExpected data:\n\n```javascript\n{\n\tquery: 'SELECT * FROM tblname;'\n}\n```"
 	},
 	{
+		"id": "norepeat",
+		"group": "Checks",
+		"name": "No repeat",
+		"url": "https://cdn.totaljs.com/flowstream/webcomponents/norepeat.html",
+		"author": "Peter Širka | Total.js",
+		"icon": "ti ti-retweet",
+		"color": "",
+		"version": "1",
+		"kind": "",
+		"readme": "This component prevents the same content from being sent again in a short amount of time."
+	},
+	{
 		"id": "nosql",
 		"group": "Databases",
 		"name": "NoSQL",
@@ -876,18 +1044,6 @@
 		"readme": "It parses a plate number from the JPG/PNG picture. It utilizes the [Total.js Platenumber API](https://docs.totaljs.com/totalapi/6c221003eo51c/#13ffb001db51d).\n\n__Input data:__\n```js\n// {String} dataURI of an image\n'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEB....'\n```\n\n__Output data:__\n```js\n[\n  {\n    \"value\": \"H786P0J\",\n    \"confidence\": 89.8356\n  },\n  {\n    \"value\": \"H786POJ\",\n    \"confidence\": 87.6114\n  },\n  {\n    \"value\": \"HN786P0J\",\n    \"confidence\": 85.2152\n  }\n]\n```"
 	},
 	{
-		"id": "pgtest",
-		"group": "Checks",
-		"name": "PostgreSQL",
-		"url": "https://cdn.totaljs.com/flowstream/webcomponents/pgtest.html",
-		"author": "Peter Širka | Total.js",
-		"icon": "ti ti-database",
-		"color": "",
-		"version": "1",
-		"kind": "",
-		"readme": "This component checks PostgreSQL database connection."
-	},
-	{
 		"id": "postgresql",
 		"group": "Databases",
 		"name": "PostgreSQL",
@@ -900,16 +1056,40 @@
 		"readme": "PostgreSQL\n\n## Input\nExpected data:\n```javascript\n{\n\tquery: 'SELECT * FROM tblname;'\n}\n```\nOutput:\n```javascript\n{\n\tcommand: 'INSERT', // SELECT, etc.\n\trows: [], // \n\trowCount: 1\n}\n```"
 	},
 	{
+		"id": "pgtest",
+		"group": "Checks",
+		"name": "PostgreSQL",
+		"url": "https://cdn.totaljs.com/flowstream/webcomponents/pgtest.html",
+		"author": "Peter Širka | Total.js",
+		"icon": "ti ti-database",
+		"color": "",
+		"version": "1",
+		"kind": "",
+		"readme": "This component checks PostgreSQL database connection."
+	},
+	{
 		"id": "print",
 		"group": "Common",
 		"name": "Print",
 		"url": "https://cdn.totaljs.com/flowstream/webcomponents/print.html",
-		"author": "Total.js",
+		"author": "Peter Širka | Total.js",
 		"icon": "ti ti-print",
 		"color": "",
-		"version": "7",
+		"version": "9",
 		"kind": "",
 		"readme": "The component prints incoming data in a JSON format."
+	},
+	{
+		"id": "printhtml",
+		"group": "Common",
+		"name": "Print HTML",
+		"url": "https://cdn.totaljs.com/flowstream/webcomponents/printhtml.html",
+		"author": "Peter Širka | Total.js",
+		"icon": "ti ti-paint-brush",
+		"color": "",
+		"version": "2",
+		"kind": "output",
+		"readme": "The component converts HTML-formatted data in the component body. You can easily visualise any data. The data is rendered on the server."
 	},
 	{
 		"id": "printjson",
@@ -934,6 +1114,18 @@
 		"version": "1",
 		"kind": "",
 		"readme": "Prints HTML or URL address to PDF, JPG, PNG or DOCX file. It utilizes the [Total.js Print API](https://docs.totaljs.com/totalapi/6c221003eo51c/#6c225001ga51c).\n\n__Input data:__\n```js\n// {String} HTML content or URL address\n'<h1>HTML content</h1>'\n```\n\n__Output data:__\nReturns data according to the component configuration `Response type`. It can be `Buffer`, `Base64` or `DataURI`."
+	},
+	{
+		"id": "printtext",
+		"group": "Common",
+		"name": "Print text",
+		"url": "https://cdn.totaljs.com/flowstream/webcomponents/printtext.html",
+		"author": "Peter Širka | Total.js",
+		"icon": "ti ti-print",
+		"color": "",
+		"version": "1",
+		"kind": "",
+		"readme": "The component prints text as plain text format."
 	},
 	{
 		"id": "publish",
@@ -964,24 +1156,12 @@
 		"group": "Total.js",
 		"name": "QueryBuilder PG",
 		"url": "https://cdn.totaljs.com/flowstream/webcomponents/querybuilderpg.html",
-		"author": "Total.js",
+		"author": "Peter Širka | Total.js",
 		"icon": "ti ti-database",
 		"color": "",
 		"version": "1",
 		"kind": "",
 		"readme": "The component initializes QueryBuilder for the PostgreSQL database. So you can use the 'API Database` component. Each connection must be separated by an alias.\n\n__Usage in API Database__:\n\n- `tbl_user` is targeted to the `default/tbl_user` alias connection\n- `anotherserver/tbl_user` will use `anotherserver` alias connection"
-	},
-	{
-		"id": "queue",
-		"group": "Common",
-		"name": "Queue",
-		"url": "https://cdn.totaljs.com/flowstream/webcomponents/queue.html",
-		"author": "Total.js",
-		"icon": "ti ti-list",
-		"color": "",
-		"version": "3",
-		"kind": "",
-		"readme": "A simple persistent queue for the incomming messages."
 	},
 	{
 		"id": "read",
@@ -1020,26 +1200,38 @@
 		"readme": "The primary goal of this component is to remember the data. The component contains two inputs:\n\n- Remember input for remembering data.\n- Request input as a trigger for obtaining data, then remembered data would extend the request message (its data), and the component would send it to the response output."
 	},
 	{
-		"id": "renderer",
-		"group": "Common",
-		"name": "Renderer",
-		"url": "https://cdn.totaljs.com/flowstream/webcomponents/renderer.html",
-		"author": "Total.js",
-		"icon": "ti ti-paint-brush",
+		"id": "fsunlink",
+		"group": "Files",
+		"name": "Remove file",
+		"url": "https://cdn.totaljs.com/flowstream/webcomponents/fsunlink.html",
+		"author": "Peter Širka | Total.js",
+		"icon": "ti ti-remove",
 		"color": "",
 		"version": "1",
-		"kind": "output",
-		"readme": "The component transforms data in HTML format in the component body. You can easily visualize any data. Data is rendered server-side."
+		"kind": "",
+		"readme": "This component removes file according to the configuration path.\n\n__Payload__:\n\n```js\nString\n\n// or\n\n{\n\tfilename: 'String'\n}\n```\n\n__Output__:\n\nIncoming payload."
+	},
+	{
+		"id": "fsrename",
+		"group": "Files",
+		"name": "Rename file",
+		"url": "https://cdn.totaljs.com/flowstream/webcomponents/fsrename.html",
+		"author": "Peter Širka | Total.js",
+		"icon": "ti ti-input",
+		"color": "",
+		"version": "1",
+		"kind": "",
+		"readme": "This component renames file according to the input values.\n\n__Payload__:\n\n```js\n{\n\tfilename: 'String',\n\trename: 'String'\n}\n```\n\n__Output__:\n\nIncoming payload."
 	},
 	{
 		"id": "tresponse",
 		"group": "Total.js",
 		"name": "Response",
 		"url": "https://cdn.totaljs.com/flowstream/webcomponents/tresponse.html",
-		"author": "Total.js",
+		"author": "Peter Širka | Total.js",
 		"icon": "ti ti-bullhorn",
 		"color": "",
-		"version": "1",
+		"version": "2",
 		"kind": "output",
 		"readme": "This component can respond to an HTTP request."
 	},
@@ -1105,10 +1297,10 @@
 	},
 	{
 		"id": "serverextension",
-		"group": "Common",
+		"group": "Flow",
 		"name": "Server extension",
 		"url": "https://cdn.totaljs.com/flowstream/webcomponents/serverextension.html",
-		"author": "Total.js",
+		"author": "Peter Širka | Total.js",
 		"icon": "ti ti-check-square",
 		"color": "",
 		"version": "1",
@@ -1209,7 +1401,7 @@
 		"color": "",
 		"version": "3",
 		"kind": "",
-		"readme": "The component runs a simple stopwatch for incomming messages."
+		"readme": "This component measures the time taken to create and send a message."
 	},
 	{
 		"id": "stringoperations",
@@ -1360,7 +1552,7 @@
 		"group": "Triggers",
 		"name": "Trigger",
 		"url": "https://cdn.totaljs.com/flowstream/webcomponents/trigger.html",
-		"author": "Total.js",
+		"author": "Peter Širka | Total.js",
 		"icon": "ti ti-start",
 		"color": "",
 		"version": "5",
@@ -1433,7 +1625,7 @@
 		"name": "XML parser",
 		"url": "https://cdn.totaljs.com/flowstream/webcomponents/xmlparser.html",
 		"author": "Total.js",
-		"icon": "fa fa-code",
+		"icon": "ti ti-code",
 		"color": "",
 		"version": "1",
 		"kind": "",
