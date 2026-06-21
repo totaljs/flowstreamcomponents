@@ -1,0 +1,62 @@
+<script total>
+
+	exports.id = 'timezonedt';
+	exports.name = 'Time zone';
+	exports.icon = 'ti ti-clock';
+	exports.author = 'Peter Širka | Total.js';
+	exports.version = '1';
+	exports.group = 'Date & Time';
+	exports.config = { ts: 'Europe/Bratislava', input: 'ts', output: 'ts' };
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }];
+
+	exports.make = function(instance, config) {
+		instance.message = function($) {
+			let data = $.data;
+			let ts = Utils.get(data, config.input);
+			if (ts instanceof Date) {
+				let diff = new Date().setTimeZone(config.ts) - new Date();
+				Utils.set(data, config.output, new Date(ts.getTime() - diff));
+			}
+			$.send('output');
+		};
+
+	};
+
+</script>
+
+<readme>
+This component converts a date and time to a specified timezone and returns the corresponding UTC date.
+</readme>
+
+<settings>
+	<div class="padding">
+		<div class="grid-3">
+			<ui-component name="input" path="?.ts" config="dirsource:#timezones;monospace:1;required:1">Timezone</ui-component>
+			<ui-component name="input" path="?.input" config="monospace:1;required:1">Input property</ui-component>
+			<ui-component name="input" path="?.output" config="monospace:1;required:1">Output property</ui-component>
+		</div>
+	</div>
+</settings>
+
+<style>
+	.CLASS footer { padding: 10px; font-size: 12px; }
+</style>
+
+<body>
+	<header>
+		<i class="$ICON"></i>$NAME
+	</header>
+	<footer>
+		Timezone: <ui-bind path="$CONFIG.ts" config="text" class="b"></ui-bind>
+	</footer>
+</body>
+
+<script>
+	TOUCH(function(exports, reinit) {
+		exports.settings = function(meta) {
+			if (!DEF.cl.timezones)
+				SET('#timezones', Intl.supportedValuesOf('timeZone'));
+		};
+	});
+</script>
