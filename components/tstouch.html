@@ -1,0 +1,59 @@
+<script total>
+
+	exports.id = 'fstouch';
+	exports.name = 'Touch file';
+	exports.icon = 'ti ti-pointer';
+	exports.author = 'Peter Širka | Total.js';
+	exports.version = '1';
+	exports.group = 'Files';
+	exports.config = { path: 'filename' };
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }];
+
+	exports.make = function(instance, config) {
+		instance.message = function($) {
+			const filename = Utils.get($.data, config.path);
+			if (filename) {
+				NOW = new Date();
+				Total.Fs.utimes(filename, NOW, NOW, () => $.send('output'));
+			} else
+				$.send('output');
+		};
+	};
+
+</script>
+
+<readme>
+This component updates a file's modification timestamp if the file exists.
+
+__Input__:
+
+```js
+{
+	filename: '/absolute/path/to/file.txt'
+}
+```
+
+__Output__:
+
+```js
+{
+	filename: '/absolute/path/to/file.txt'
+}
+```
+</readme>
+
+<settings>
+	<div class="padding">
+		<p>Specifies the property name from which the file path will be read.</p>
+		<div class="grid-3">
+			<ui-component name="input" path="?.path" config="required:1;monospace:1">Property</ui-component>
+		</div>
+	</div>
+</settings>
+
+<body>
+	<header>
+		<i class="$ICON"></i>$NAME
+	</header>
+</body>
