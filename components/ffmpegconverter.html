@@ -1,0 +1,185 @@
+<script total>
+
+	exports.id = 'ffmpegconverter';
+	exports.name = 'Video converter';
+	exports.icon = 'ti ti-video';
+	exports.author = 'Peter Širka | Total.js';
+	exports.version = '1';
+	exports.group = 'Video';
+	exports.config = { width: 400, fps: 0, path: '/', prop: 'response', prop2: 'preview', prop3: 'duration', limit: 5 };
+	exports.inputs = [{ id: 'input', name: 'File' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }, { id: 'error', name: 'Error' }];
+
+	exports.make = function(instance, config) {
+
+		let pending = {};
+		let queue = [];
+		let running = [];
+
+		instance.message = function($) {
+			queue.push($);
+			check();
+		};
+
+		instance.close = function() {
+			queue.length = 0;
+		};
+
+		let status_force = function() {
+			instance.status({ processing: Object.keys(pending), queue: queue.length });
+		};
+
+		let status = function() {
+			setTimeout2(instance.id, status_force, 500, 3);
+		};
+
+		let check = function() {
+
+			if (running.length >= config.limit) {
+				status();
+				return;
+			}
+
+			let $ = queue.shift();
+			if (!$)
+				return;
+
+			running.push($);
+
+			let data = $.data;
+			let filename = data.filename;
+			let name = Utils.getName(data.filename);
+			let ext = Total.Path.extname(data.filename);
+			let output = Total.Path.join(config.path, name.replace(new RegExp(ext + '$'), '') + '.mp4');
+			let cmd = (`ffmpeg -y -i "{0}" -vf "scale='if(gt(iw,ih),{width},-2)':'if(gt(iw,ih),-2,{width})'` + (config.fps ? `,fps={fps}` : ``) + `" -c:v libx264 -crf 23 -preset medium -c:a aac -b:a 128k "{1}"`).args(config).format(filename, output);
+
+			pending[name] = Date.now();
+			setTimeout2(instance.id, status, 500, 3);
+
+			SHELL(cmd, function(err, response, text) {
+
+				delete pending[name];
+
+				if (err) {
+					data.error = text;
+					$.send('error', data);
+					let index = running.indexOf($);
+					if (index !== -1)
+						running.splice(index, 1);
+					check();
+					status();
+					return;
+				}
+
+				Utils.set(data, config.prop, output);
+
+				let fn = [];
+
+				// Preview
+				fn.push(function(next) {
+					if (config.prop2) {
+						SHELL(`ffmpeg -ss 00:00:03 -i "{0}" -frames:v 1 -vf "scale=400:-1" -f image2pipe -vcodec png - 2>/dev/null | base64 | tr -d '\\n'`.format(output), function(err, response) {
+							if (response)
+								Utils.set(data, config.prop2, response);
+							next();
+						});
+					} else
+						next();
+				});
+
+				// Duration
+				fn.push(function(next) {
+					if (config.prop3) {
+						SHELL(`ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "{0}"`.format(output), function(err, response) {
+							if (response)
+								Utils.set(data, config.prop3, response.parseFloat());
+							next();
+						});
+					} else
+						next();
+				});
+
+				fn.async(function() {
+					$.send('output', data);
+					let index = running.indexOf($);
+					if (index !== -1)
+						running.splice(index, 1);
+					check();
+					status();
+				});
+
+			});
+		};
+
+	};
+
+</script>
+
+<readme>
+This component resizes video and change framerate according to the component settings. The component extends the output by adding an __Output property__ with a containing the file name.
+
+__Output__:
+
+```js
+{
+	// incoming payload
+	...
+	output_property: String
+}
+```
+</readme>
+
+<settings>
+	<div class="padding">
+		<ui-component name="input" path="?.path" config="required:1" class="m">Path</ui-component>
+		<hr />
+		<div class="grid-4 grid-sm-2">
+			<ui-component name="input" path="?.width" config="type:number;required:1" class="m">Width</ui-component>
+			<ui-component name="input" path="?.fps" config="type:number;min:0" class="m">FPS</ui-component>
+			<ui-component name="input" path="?.prop" config="required:1;monospace:1;align:1" class="m">Output property</ui-component>
+		</div>
+		<div class="caption m">
+			<label><i class="ti ti-adjust mr5"></i>Optional settings</label>
+		</div>
+		<div class="grid-4 grid-sm-2">
+			<ui-component name="input" path="?.prop2" config="monospace:1;align:1" class="m">Output preview</ui-component>
+			<ui-component name="input" path="?.prop3" config="monospace:1;align:1" class="m">Output duration</ui-component>
+		</div>
+	</div>
+</settings>
+
+<style>
+	.CLASS { max-width: 200px; width: 100%; }
+	.CLASS ui-bind { padding: 10px; font-size: 12px; overflow-wrap: break-word; border-top: 1px solid #E0E0E0; }
+	.CLASS .info { color: #777; }
+	.ui-dark .CLASS ui-bind { border-top-color: #E0E0E0; }
+</style>
+
+<body>
+	<header>
+		<i class="$ICON"></i>$NAME
+	</header>
+	<footer>
+		<ui-bind path="$CONFIG" config="template" class="block">
+			<script type="text/html">
+				<div class="monospace">{{ value.path }}</div>
+				{{ if value.fps }}
+				<div class="info mt5">
+					<span>FPS</span>: {{ value.fps }}
+				</div>
+				{{ fi }}
+				<div class="info">
+					<span>Width</span>: {{ value.width }}
+				</div>
+			</script>
+		</ui-bind>
+		<ui-bind path="$STATUS" config="template:div;show" class="block fs11 status">
+			<script type="text/html">
+			<div style="margin-bottom:5px" class="b"><i class="ti ti-hourglass red"></i>Queue: {{ value.queue }}</div>
+			{{ foreach m in value.processing }}
+				<div class="hellip"><i class="ti ti-spinner ti-spin mr5 color"></i>{{ m }}</div>
+			{{ end }}
+			</script>
+		</ui-bind>
+	</footer>
+</body>
