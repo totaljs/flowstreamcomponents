@@ -1,0 +1,136 @@
+<script total>
+
+	exports.id = 'nvidiasmi';
+	exports.name = 'NVIDIA Monitor';
+	exports.icon = 'ti ti-chart-line';
+	exports.author = 'Peter Širka | Total.js';
+	exports.version = '1';
+	exports.group = 'Linux';
+	exports.config = {};
+	exports.outputs = [{ id: 'output', name: 'Stats' }];
+	exports.meta = { singleton: true };
+
+	exports.make = function(instance, config) {
+
+		const STATS = {
+			cpu: 0,
+			gpu: 0,
+			memory: 0,
+			updated: null
+		};
+
+		let timeout = null;
+		let lastcpu = null;
+
+		function exec(cmd, args) {
+			return new Promise(resolve => Total.Child.execFile(cmd, args, { timeout: 3000 }, (err, stdout) => resolve(err ? null : stdout.trim())));
+		}
+
+		function getCpuSnapshot() {
+			let idle = 0;
+			let total = 0;
+
+			for (const cpu of Total.Os.cpus()) {
+				const times = cpu.times;
+				idle += times.idle;
+				total += times.user;
+				total += times.nice;
+				total += times.sys;
+				total += times.idle;
+				total += times.irq;
+			}
+
+			return { idle, total };
+		}
+
+		function updateCpu() {
+
+			const current = getCpuSnapshot();
+
+			if (!lastcpu) {
+				lastcpu = current;
+				return;
+			}
+
+			const idleDiff = current.idle - lastcpu.idle;
+			const totalDiff = current.total - lastcpu.total;
+
+			lastcpu = current;
+
+			if (totalDiff > 0)
+				STATS.cpu = Math.round((1 - idleDiff / totalDiff) * 100);
+		}
+
+		function updateMemory() {
+			const total = Total.Os.totalmem();
+			const free = Total.Os.freemem();
+			const used = total - free;
+
+			STATS.memory = Math.round((used / total) * 100);
+		}
+
+		async function updateGpu() {
+
+			const output = await exec('nvidia-smi', ['--query-gpu=utilization.gpu', '--format=csv,noheader,nounits']);
+
+			if (!output)
+				return;
+
+			// Ak je viac GPU, berie prvú
+			const value = parseInt(output.split('\n')[0].trim(), 10);
+
+			if (!Number.isNaN(value))
+				STATS.gpu = value;
+		}
+
+		async function updateStats() {
+			updateCpu();
+			updateMemory();
+			await updateGpu();
+			STATS.updated = new Date().toISOString();
+			instance.status(STATS);
+			instance.send('output', STATS);
+			clearTimeout(timeout);
+			timeout = setTimeout(updateStats, 2000);
+		}
+
+		instance.close = function() {
+			timeout && clearTimeout(timeout);
+			timeout = null;
+		};
+
+		updateStats();
+
+	};
+
+</script>
+
+<readme>
+This component periodically collects hardware statistics.
+</readme>
+
+<style>
+	.CLASS footer { padding: 10px; font-size: 11px; color: #777; }
+	.CLASS .bar { height: 12px; padding: 3px 5px 0; border-radius:var(--radius); background-color: #F0F0F0; margin-bottom: 5px; }
+	.CLASS .bar div { height: 6px; border-radius:var(--radius); }
+	.ui-dark .CLASS footer { color: #777; }
+	.ui-dark .CLASS .bar { background-color: #282828; }
+</style>
+
+<body>
+	<header>
+		<i class="$ICON"></i>$NAME
+	</header>
+	<footer>
+		<ui-bind path="$STATUS" config="template;show" class="block">
+			<script type="text/html">
+				<div>CPU: {{ value.cpu }}%</div>
+				<div class="bar"><div style="width:{{ value.cpu }}%;background:{{ if value.cpu < 30 }}#68B25B{{ else if value.cpu < 60 }}#EC8632{{ else }}#E73323{{ fi }}"></div></div>
+				<div>GPU: {{ value.gpu }}%</div>
+				<div class="bar"><div style="width:{{ value.gpu }}%;background:{{ if value.gpu < 30 }}#68B25B{{ else if value.gpu < 60 }}#EC8632{{ else }}#E73323{{ fi }}"></div></div>
+				<div>MEM: {{ value.memory }}%</div>
+				<div class="bar"><div style="width:{{ value.memory }}%;background:{{ if value.memory < 30 }}#68B25B{{ else if value.memory < 60 }}#EC8632{{ else }}#E73323{{ fi }}"></div></div>
+			</script>
+		</ui-bind>
+	</footer>
+</body>

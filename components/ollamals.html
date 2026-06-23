@@ -1,0 +1,401 @@
+<script total>
+
+	exports.id = 'ollamals';
+	exports.name = 'Ollama models';
+	exports.icon = 'ti ti-robot';
+	exports.author = 'Peter Širka | Total.js';
+	exports.version = '1';
+	exports.group = 'Ollama';
+	exports.config = { url: 'http://localhost:11434' };
+	exports.inputs = [];
+	exports.outputs = [];
+	exports.meta = { singleton: true };
+
+	exports.make = function(instance, config) {
+
+		let cfg = {};
+		let arr = [];
+		let status = { models: [], stats: [] };
+		let interval = null;
+
+		function parseOllamaModelfile(name, body) {
+
+			const lines = body.replace(/\r\n/g, '\n').split('\n');
+			const json = {};
+
+			if (name)
+				json.model = name;
+
+			let index = 0;
+
+			while (index < lines.length) {
+				let line = lines[index].trim();
+
+				if (!line || line.startsWith('#')) {
+					index++;
+					continue;
+				}
+
+				let match = line.match(/^([A-Z_]+)\s*(.*)$/);
+
+				if (!match) {
+					index++;
+					continue;
+				}
+
+				let type = match[1];
+				let value = match[2] || '';
+
+				if (value.startsWith('"""')) {
+					let result = readBlock(lines, index, value);
+					value = result.value;
+					index = result.index;
+				} else {
+					value = unquote(value.trim());
+					index++;
+				}
+
+				switch (type) {
+					case 'FROM':
+						json.from = value;
+						break;
+
+					case 'SYSTEM':
+						json.system = value;
+						break;
+
+					case 'TEMPLATE':
+						json.template = value;
+						break;
+
+					case 'PARAMETER': {
+						let parameter = parseParameter(value);
+
+						if (parameter) {
+							if (!json.parameters)
+								json.parameters = {};
+
+							// Ollama supports repeated stop parameters.
+							if (parameter.name === 'stop') {
+								if (!json.parameters.stop)
+									json.parameters.stop = [];
+
+								json.parameters.stop.push(parameter.value);
+							} else
+								json.parameters[parameter.name] = parameter.value;
+						}
+
+						break;
+					}
+
+					case 'MESSAGE': {
+						let message = parseMessage(value);
+
+						if (message) {
+							if (!json.messages)
+								json.messages = [];
+
+							json.messages.push(message);
+						}
+
+						break;
+					}
+
+					case 'ADAPTER':
+						if (!json.adapters)
+							json.adapters = [];
+
+						json.adapters.push(value);
+						break;
+
+					case 'LICENSE':
+						json.license = value;
+						break;
+
+					case 'REQUIRES':
+						if (!json.requires)
+							json.requires = [];
+
+						json.requires.push(value);
+						break;
+				}
+			}
+
+			return json;
+
+			function readBlock(lines, start, firstValue) {
+				let value = firstValue.substring(3);
+				let buffer = [];
+
+				let end = value.indexOf('"""');
+
+				if (end !== -1) {
+					return {
+						value: value.substring(0, end),
+						index: start + 1
+					};
+				}
+
+				if (value)
+					buffer.push(value);
+
+				let i = start + 1;
+
+				while (i < lines.length) {
+					let line = lines[i];
+					let end = line.indexOf('"""');
+
+					if (end !== -1) {
+						buffer.push(line.substring(0, end));
+
+						return {
+							value: buffer.join('\n').trim(),
+							index: i + 1
+						};
+					}
+
+					buffer.push(line);
+					i++;
+				}
+
+				throw new Error('Unclosed triple quoted block');
+			}
+
+			function parseParameter(value) {
+				let match = value.match(/^([^\s]+)\s+([\s\S]+)$/);
+
+				if (!match)
+					return null;
+
+				return {
+					name: match[1],
+					value: cast(unquote(match[2].trim()))
+				};
+			}
+
+			function parseMessage(value) {
+				let match = value.match(/^(system|user|assistant)\s+([\s\S]+)$/i);
+
+				if (!match)
+					return null;
+
+				return {
+					role: match[1].toLowerCase(),
+					content: unquote(match[2].trim())
+				};
+			}
+
+			function unquote(value) {
+				if (!value)
+					return value;
+
+				if ((value[0] === '"' && value[value.length - 1] === '"') || (value[0] === '\'' && value[value.length - 1] === '\''))
+					return value.substring(1, value.length - 1);
+
+				return value;
+			}
+
+			function cast(value) {
+				if (value === 'true')
+					return true;
+
+				if (value === 'false')
+					return false;
+
+				if (value === 'null')
+					return null;
+
+				if (/^-?\d+$/.test(value))
+					return Number(value);
+
+				if (/^-?\d+\.\d+$/.test(value))
+					return Number(value);
+
+				return value;
+			}
+		}
+
+		function stats() {
+			cfg.url && RESTBuilder.GET(Utils.link(cfg.url, '/api/ps')).callback(function(err, response) {
+
+				if (err || !response || !response.models)
+					return;
+
+				let models = [];
+
+				for (let model of response.models) {
+					let details = model.details || {};
+					models.push({
+						name: model.name || model.model || '',
+						size: model.size ? +model.size : 0,
+						vram: model.size_vram ? +model.size_vram : 0,
+						ctxlength: model.context_length || 0,
+						parameters: details.parameter_size || ''
+					});
+				}
+
+				status.stats = models;
+				instance.status(status);
+			});
+		}
+
+		instance.configure = instance.vary = function() {
+			cfg = instance.replace(config);
+			setTimeout(instance.trigger, 1000);
+		};
+
+		instance.close = function() {
+			interval && clearInterval(interval);
+			interval = null;
+		};
+
+		instance.trigger = function(data) {
+
+			if (!cfg.url)
+				return;
+
+			if (data) {
+
+				if (data.type === 'remove') {
+					RESTBuilder.DELETE(Utils.link(cfg.url, '/api/delete'), { model: data.name }).callback(function(err) {
+						instance.debug('Remove model: ' + data.name, err ? err.toString() : undefined);
+						if (!err)
+							instance.trigger();
+					});
+					return;
+				}
+
+				if (data.type === 'create') {
+					RESTBuilder.POST(Utils.link(cfg.url, '/api/create'), parseOllamaModelfile(data.name, data.body)).callback(function(err) {
+						instance.debug('Create model: ' + data.name, err ? err.toString() : undefined);
+						if (!err)
+							instance.trigger();
+					});
+					return;
+				}
+
+			}
+
+			RESTBuilder.GET(Utils.link(cfg.url, '/api/tags')).callback(function(err, response) {
+				instance.debug('Refresh models', err ? err.toString() : undefined);
+				arr = [];
+				if (response && response.models instanceof Array) {
+					for (let m of response.models)
+						arr.push({ name: m.name, size: m.size });
+					arr.quicksort('name');
+					status.models = arr;
+					instance.status(status);
+				}
+			});
+
+		};
+
+		instance.call = function(name, callback) {
+			RESTBuilder.POST(Utils.link(cfg.url, '/api/show'), { model: name }).callback(function(err, response) {
+				if (err)
+					callback('');
+				else
+					callback(response.modelfile);
+			});
+		};
+
+		interval = setInterval(stats, 3000);
+		instance.service = () => instance.trigger();
+		instance.configure();
+
+	};
+
+</script>
+
+<readme>
+	This component list all OLLAMA models.
+</readme>
+
+<settings>
+	<div class="padding">
+		<ui-component name="input" path="?.url" config="required:1">OLLAMA endpoint</ui-component>
+	</div>
+</settings>
+
+<style>
+	.CLASS .item { font-size: 11px; border-top: 1px solid #E0E0E0; padding: 2px 5px; }
+	.CLASS .item:first-child { border-top: 0; }
+	.CLASS .stats { padding: 5px 3px; background-color: #F0F0F0; margin-top: 5px; display: block; border-radius: 0 0 var(--radius) var(--radius); }
+</style>
+
+<body>
+	<header>
+		<button name="trigger" class="button">Refresh</button>
+		<button class="button exec mr5 ml5" data-exec="/rmcreate">Create</button>
+		<i class="$ICON"></i>$NAME
+	</header>
+	<footer>
+		<ui-bind path="$STATUS.models" config="template:.item;show" class="block selectable">
+			<script type="text/html">
+				{{ foreach m in value }}
+					<div class="item hellip" data-id="{{ m.name }}"><span class="exec red mr5" data-exec="/rmmodel"><i class="ti ti-remove"></i></span><span class="exec mr5" data-exec="/rmcopy"><i class="ti ti-copy"></i></span><span class="exec monospace" data-exec="?/clipboard">{{ m.name }}</span> <span class="gray">{{ m.size | filesize }}</span></div>
+				{{ end }}
+			</script>
+		</ui-bind>
+		<ui-bind path="$STATUS.stats" config="template:.item;show:value && value.length" class="stats selectable">
+			<script type="text/html">
+				{{ foreach m in value }}
+					<div class="item hellip"><i class="ti ti-hourglass ti-spin mr5"></i><span>{{ m.name }}</span> <b>{{ m.parameters }}</b> <span class="gray">{{ m.vram | filesize }}</span></div>
+				{{ end }}
+			</script>
+		</ui-bind>
+	</footer>
+</body>
+
+<script>
+	TOUCH(function(exports, reinit) {
+
+		exports.rmcopy = function(el) {
+			let id = ATTRD(el);
+			exports.call(id, function(response) {
+				if (response) {
+					SETTER('clipboard/copy', response);
+					SETTER('notify/success', 'The content of the model file has been copied to the clipboard.');
+				}
+			});
+		};
+
+		exports.rmcreate = function() {
+			if (!PLUGINS.ollamacreateform) {
+				$(document.body).append(`<ui-component name="box" path="*form" config="if:ollamacreateform;autofocus:1;title:Create OLLAMA model;width:700;submit:?/submit;icon:ti ti-robot" plugin="ollamacreateform">
+<div class="padding">
+	<ui-component name="input" path="?.name" config="required:1;placeholder:extractor;type:lowercase" class="m">Model name</ui-component>
+	<ui-component name="input" path="?.body" config="required:1;type:multiline;height:300;monospace:1">Model declaration</ui-component>
+</div>
+<nav>
+	<ui-component name="validate" path="?">
+		<button name="submit" disabled><i class="ti ti-check-circle"></i>SUBMIT</button>
+		<button name="cancel">Cancel</button>
+	</ui-component>
+</nav>
+</ui-component>
+<SCR>
+PLUGIN('ollamacreateform', function(exports) {
+	exports.submit = function() {
+		let model = exports.form;
+		model.callback(model);
+	};
+});
+</SCR>`.replace(/SCR/g, 'scr' + 'ipt'));
+			}
+			let model = {};
+			model.body = atob('RlJPTSBxd2VuMy41OjliCgpQQVJBTUVURVIgdGVtcGVyYXR1cmUgMApQQVJBTUVURVIgdG9wX3AgMC44ClBBUkFNRVRFUiByZXBlYXRfcGVuYWx0eSAxLjA1ClBBUkFNRVRFUiBudW1fY3R4IDgxOTIKClNZU1RFTSAiIiIKWW91IGFyZSBhIHN0cmljdCBpbmZvcm1hdGlvbiBleHRyYWN0aW9uIGVuZ2luZSBzcGVjaWFsaXplZCBmb3IgU2xvdmFrLCBDemVjaCwgRW5nbGlzaCwgYW5kIG1peGVkLWxhbmd1YWdlIHRleHQuCgpZb3VyIHRhc2sgaXMgdG8gZXh0cmFjdCBzdHJ1Y3R1cmVkIGRhdGEgZnJvbSBpbnB1dCB0ZXh0IGFjY29yZGluZyB0byB0aGUgc2NoZW1hIHByb3ZpZGVkIGJ5IHRoZSB1c2VyLgoKUnVsZXM6Ci0gUmV0dXJuIG9ubHkgdmFsaWQgSlNPTi4KLSBEbyBub3QgdXNlIE1hcmtkb3duLgotIERvIG5vdCBhZGQgZXhwbGFuYXRpb25zLCBjb21tZW50cywgbm90ZXMsIG9yIGV4dHJhIHRleHQuCi0gRG8gbm90IHdyYXAgSlNPTiBpbiBjb2RlIGJsb2Nrcy4KLSBEbyBub3QgaW52ZW50IG1pc3NpbmcgdmFsdWVzLgotIElmIGEgdmFsdWUgaXMgbWlzc2luZywgdW5rbm93biwgdW5jZXJ0YWluLCBvciBub3QgZGlyZWN0bHkgc3VwcG9ydGVkIGJ5IHRoZSBpbnB1dCB0ZXh0LCB1c2UgbnVsbC4KLSBFeHRyYWN0IG9ubHkgZmllbGRzIHRoYXQgYXJlIHJlcXVlc3RlZCBpbiB0aGUgc2NoZW1hLgotIERvIG5vdCBhZGQgZXh0cmEgZmllbGRzLgotIEZvbGxvdyBmaWVsZCBkZXNjcmlwdGlvbnMgY2FyZWZ1bGx5LgotIElmIGFsbG93ZWQgdmFsdWVzIGFyZSBwcm92aWRlZCwgY2hvb3NlIG9ubHkgZnJvbSB0aG9zZSBhbGxvd2VkIHZhbHVlcy4KLSBJZiBubyBhbGxvd2VkIHZhbHVlIG1hdGNoZXMsIHVzZSBudWxsLgotIFByZXNlcnZlIHRoZSBvcmlnaW5hbCBtZWFuaW5nIG9mIHRoZSB0ZXh0LgotIE5vcm1hbGl6ZSBvYnZpb3VzIGZvcm1hdHRpbmcgaXNzdWVzLgotIENvbnZlcnQgZGVjaW1hbCBjb21tYSB0byBkZWNpbWFsIHBvaW50IGluIG51bWVyaWMgdmFsdWVzLgotIEtlZXAgbnVtYmVycyBhcyBudW1iZXJzIHdoZW4gdGhlIHNjaGVtYSBleHBlY3RzIG51bWJlcnMuCi0gS2VlcCBib29sZWFucyBhcyB0cnVlIG9yIGZhbHNlLgotIEtlZXAgYXJyYXlzIGFzIGFycmF5cy4KLSBDb252ZXJ0IHVuaXRzIG9ubHkgd2hlbiB0aGUgY29udmVyc2lvbiBpcyBvYnZpb3VzIGFuZCBzYWZlLgotIERhdGVzIHNob3VsZCBiZSByZXR1cm5lZCBpbiBJU08gZm9ybWF0IFlZWVktTU0tREQgd2hlbiBwb3NzaWJsZS4KLSBJZiB0aGUgaW5wdXQgdGV4dCBpcyBhbWJpZ3VvdXMsIHJldHVybiBudWxsIGluc3RlYWQgb2YgZ3Vlc3NpbmcuCi0gT3V0cHV0IG11c3QgYmUgcGFyc2VhYmxlIGJ5IEpTT04ucGFyc2UoKS4KIiIi');
+			model.callback = function(model) {
+				exports.trigger({ type: 'create', name: model.name, body: model.body });
+				NUL('*form');
+			};
+			SET('ollamacreateform @default', model);
+			SET('*form', 'ollamacreateform');
+		};
+
+		exports.rmmodel = function(el) {
+			SETTER('approve/show', 'Are you sure you want to remove selected model?', ':remove: Remove', () => exports.trigger({ type: 'remove', name: ATTRD(el) }));
+		};
+
+	});
+</script>

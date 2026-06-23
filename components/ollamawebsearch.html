@@ -1,0 +1,89 @@
+<script total>
+
+	exports.id = 'ollamawebsearch';
+	exports.name = 'Ollama Web Search';
+	exports.icon = 'ti ti-file-search';
+	exports.author = 'Peter Širka | Total.js';
+	exports.version = '1';
+	exports.group = 'Ollama';
+	exports.config = { token: '', path: 'response', prop: 'search', merge: false };
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }, { id: 'error', name: 'Error' }];
+
+	exports.make = function(instance, config) {
+
+		let cfg = null;
+
+		instance.message = function($) {
+
+			let data = $.data;
+			let search = typeof(data) === 'string' ? data : data[cfg.prop];
+
+			RESTBuilder.POST('https://ollama.com/api/web_search', { query: search, max_results: 5 }).header('Authorization', 'Bearer ' + cfg.token).callback(function(err, response) {
+				if (typeof(data) === 'string')
+					$.data = data = { search: search };
+				if (config.merge) {
+					let builder = [];
+					for (let m of response.results)
+						builder.push(m.title + '\n\n' + m.content);
+					data[cfg.path] = builder.join('\n');
+				} else
+					data[cfg.path] = response.results;
+				$.send('output');
+			});
+		};
+
+		instance.configure = function() {
+			cfg = instance.replace(config);
+		};
+
+		instance.vary = function() {
+			instance.configure();
+		};
+
+		instance.configure();
+
+	};
+
+</script>
+
+<readme>
+This component uses the Ollama Web Search API to perform web searches. A valid Ollama API token is required for authentication and access to the service.
+
+__Payload__:
+
+```js
+{
+	search: 'Total.js Platform'
+}
+```
+
+__Response__:
+
+```json
+[
+	{
+		"title": "...",
+		"url": "https://www.totaljs.com",
+		"content": "..."
+	}
+]
+```
+</readme>
+
+<settings>
+	<div class="padding">
+		<ui-component name="input" path="?.token" config="required:1;monospace:1;camouflage:1" class="m">Ollama API Token</ui-component>
+		<ui-component name="input" path="?.merge" config="type:checkbox" class="m">Merge content together</ui-component>
+		<div class="grid-3">
+			<ui-component name="input" path="?.prop" config="required:1;monospace:1" class="m">Read search query</ui-component>
+			<ui-component name="input" path="?.path" config="required:1;monospace:1" class="m">Path to response</ui-component>
+		</div>
+	</div>
+</settings>
+
+<body>
+	<header>
+		<i class="$ICON"></i>$NAME
+	</header>
+</body>

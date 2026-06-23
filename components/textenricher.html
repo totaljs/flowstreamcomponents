@@ -1,0 +1,44 @@
+<script total>
+
+	exports.id = 'textenricher';
+	exports.name = 'Text enricher';
+	exports.icon = 'ti ti-font';
+	exports.author = 'Peter Širka | Total.js';
+	exports.version = '1';
+	exports.group = 'Common';
+	exports.config = { prop: 'content', text: '{value}', path: 'content' };
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }];
+
+	exports.make = function(instance, config) {
+		instance.message = function($) {
+			let data = $.data;
+			let text = data[config.prop];
+			if (text && typeof(text) === 'object')
+				text = JSON.stringify(text, null, '  ');
+			data[config.path] = config.text.replace(/\{value\}/g, (text || '').toString());
+			$.send('output', data);
+		};
+	};
+
+</script>
+
+<readme>
+This component enriches a text property according to the template defined in the configuration. The `{value}` placeholder is replaced with the corresponding value from the payload.
+</readme>
+
+<settings>
+	<div class="padding">
+		<div class="grid-3">
+			<ui-component name="input" path="?.prop" config="required:1;monospace:1" class="m">Read</ui-component>
+			<ui-component name="input" path="?.path" config="required:1;monospace:1" class="m">Write</ui-component>
+		</div>
+		<ui-component name="input" path="?.text" config="type:multiline;height:300;monospace:1" class="m">Text</ui-component>
+	</div>
+</settings>
+
+<body>
+	<header>
+		<i class="$ICON"></i>$NAME
+	</header>
+</body>
