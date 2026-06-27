@@ -27,7 +27,7 @@
 			RESTBuilder.GET(config.url).callback(function(err) {
 				if (err) {
 					status.online = false;
-					status.error = err.stack;
+					status.error = err.stack ? err.stack : err.toString();
 					instance.status(status);
 					$.send('error', config.error.format(status.error));
 				} else {
