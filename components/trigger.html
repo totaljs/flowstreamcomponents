@@ -3,10 +3,10 @@
 	exports.id = 'trigger';
 	exports.name = 'Trigger';
 	exports.group = 'Triggers';
-	exports.version = '5';
+	exports.version = '6';
 	exports.icon = 'ti ti-start';
 	exports.author = 'Peter Širka | Total.js';
-	exports.config = { random: true, type: 'string', data: '', restart: false, prompt: false };
+	exports.config = { random: true, type: 'string', data: '', restart: false, prompt: false, prop: '' };
 	exports.outputs = [{ id: 'output', name: 'Output' }];
 	exports.kind = 'trigger';
 
@@ -50,6 +50,12 @@
 					break;
 			}
 
+			if (config.prop) {
+				let tmp = {};
+				Utils.set(tmp, config.prop, val);
+				val = tmp;
+			}
+
 			instance.send('output', val);
 		};
 
@@ -70,7 +76,10 @@
 
 <settings>
 	<div class="padding">
-		<ui-component name="input" path="?.type" config="dirsource:string|String,number|Number,boolean|Boolean,date|Date,object|Object,buffer|Buffer as Base64;required:1">Type</ui-component>
+		<div class="grid-2">
+			<ui-component name="input" path="?.type" config="dirsource:string|String,number|Number,boolean|Boolean,date|Date,object|Object,buffer|Buffer as Base64;required:1" class="m">Type</ui-component>
+			<ui-component name="input" path="?.prop" config="monospace:1;placeholder:property.path" class="m">Write to</ui-component>
+		</div>
 		<div class="mt10 m">
 			<ui-component name="input" path="?.restart" config="type:checkbox">Trigger 5s after initialization.</ui-component>
 			<ui-component name="input" path="?.prompt" config="type:checkbox">Prompt</ui-component>
@@ -110,6 +119,7 @@ The component triggers data into the Flow.
 				let key = 'trigger_' + exports.id;
 				opt.name = exports.config.promptlabel || 'Enter a value';
 				opt.value = CACHE(key) || '';
+				opt.multiline = true;
 				opt.centered = true;
 				opt.newbie = true;
 				opt.callback = function(val) {
