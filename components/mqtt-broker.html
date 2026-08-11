@@ -6,8 +6,8 @@
 	exports.group = 'MQTT';
 	exports.config = { host: 'localhost', port: 1883, secure: false };
 	exports.outputs = [{ id: 'output', name: 'Messages' }];
-	exports.author = 'Martin Smola';
-	exports.version = '3';
+	exports.author = 'Martin Smola | Total.js';
+	exports.version = '4';
 	exports.npm = ['mqtt'];
 	exports.flags = ['mqttbroker'];
 
@@ -189,59 +189,65 @@
 
 </script>
 
-<readme>
-
-</readme>
+<readme></readme>
 
 <style>
-	.CLASS footer { padding: 10px; font-size: 11px; }
+	.CLASS footer > ui-bind { padding: 10px; font-size: 11px; }
 	.CLASS footer > ui-bind > div { height: 16px; }
 	.CLASS footer b { float: right; }
 </style>
 
 <settings>
 	<div class="padding">
-		<div class="row m">
-			<div class="col-md-4">
-				<ui-component name="input" path="?.host" config="placeholder:test.mosquitto.org;required:1">Hostname or IP address</ui-component>
-			</div>
-			<div class="col-md-4">
-				<ui-component name="input" path="?.port" config="type:number;placeholder:1883;required:1;format:">Port</ui-component>
-			</div>
-		</div>
 		<div class="row">
-			<div class="col-md-6">
-				<ui-component name="input" path="?.clientid">Client id</ui-component>
-				<div class="help m">Supports variables, example: \`client_{device-id}\`</div>
-				<ui-component name="checkbox" path="?.secure" class="m">Secure (ssl)</ui-component>
+			<div class="col-md-8 m">
+				<ui-component name="input" path="?.host" config="placeholder:test.mosquitto.org;required:1;monospace:1" >Hostname or IP address</ui-component>
+			</div>
+			<div class="col-md-4">
+				<ui-component name="input" path="?.port" config="type:number;placeholder:1883;required:1;monospace:1;format:">Port</ui-component>
 			</div>
 		</div>
-		<div class="row">
-			<div class="col-md-6">
-				<ui-component name="checkbox" path="?.auth" class="m">Require Authorization</ui-component>
-			</div>
+		<div>
+			<ui-component name="input" path="?.clientid" config="monospace:1">Client ID</ui-component>
+			<div class="help m">Supports variables, example: <code>client_{device-id}</code></div>
+			<ui-component name="input" path="?.secure" config="type:checkbox">Secure (SSL)</ui-component>
 		</div>
-		<ui-bind path="?.auth" config="show:value" class="row block">
-			<div class="col-md-6">
-				<ui-component name="input" path="?.username" class="m">Username</ui-component>
-			</div>
-			<div class="col-md-6">
-				<ui-component name="input" path="?.password" data-jc-config="type:password" class="m">Password</ui-component>
+
+		<ui-component name="input" path="?.auth" config="type:checkbox">Require Authorization</ui-component>
+
+		<ui-bind path="?.auth" config="show" class="block hidden">
+			<div class="panel" style="margin:15px 0">
+				<label>Authorization</label>
+				<div class="padding">
+					<div>
+						<div class="grid-2">
+							<ui-component name="input" path="?.username" config="required:1" class="m">Username</ui-component>
+							<ui-component name="input" path="?.password" config="type:password;required:1" class="m">Password</ui-component>
+						</div>
+					</div>
+				</div>
 			</div>
 		</ui-bind>
-		<div class="row">
-			<div class="col-md-6">
-				<ui-component name="checkbox" path="?.lwt" class="m">LWT</ui-component>
-			</div>
-		</div>
-		<ui-bind path="?.lwt" config="show:value" class="row block">
-			<div class="col-md-6">
-				<ui-component name="input" path="?.lwttopic">Last will topic</ui-component>
-				<div class="help m">Supports variables, example: \`lwt/{device-id}\`</div>
-			</div>
-			<div class="col-md-6">
-				<ui-component name="input" path="?.lwtmessage">Last will message</ui-component>
-				<div class="help m">Supports variables, example: \`{device-id} is offline\`</div>
+
+		<ui-component name="input" path="?.lwt" config="type:checkbox" class="m">Last will topic (LWT)</ui-component>
+
+		<ui-bind path="?.lwt" config="show" class="block hidden">
+			<div class="panel" style="margin:15px 0">
+				<label>Last will topic</label>
+				<div class="padding">
+					<div>
+						<div class="grid-2">
+							<div class="m">
+								<ui-component name="input" path="?.lwttopic">Last will topic</ui-component>
+								<div class="help">Supports variables, example: <code>lwt/{device-id}</code></div>
+							</div>
+							<div class="m">
+								<ui-component name="input" path="?.lwtmessage">Last will message</ui-component>
+								<div class="help">Supports variables, example: <code>{device-id} is offline</code></div>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
 		</ui-bind>
 	</div>
@@ -249,10 +255,10 @@
 
 <body>
 	<header>
-		<i class="ICON"></i>NAME
+		<i class="$ICON"></i>$NAME
 	</header>
 	<footer>
-		<ui-bind path="!STATUS" config="template;show" class="block">
+		<ui-bind path="!$STATUS" config="template;show" class="block hidden">
 			<script type="text/html">
 				<div><b>{{ value.name }}</b>Name</div>
 				<div><b>{{ value.status }}</b>Status</div>
