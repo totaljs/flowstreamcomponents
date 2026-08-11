@@ -102,10 +102,10 @@ MQTT Subscribe
 
 <body>
 	<header>
-		<i class="ICON"></i>NAME
+		<i class="$ICON"></i>$NAME
 	</header>
 	<footer>
-		<ui-bind path="!STATUS" config="template;show">
+		<ui-bind path="!$STATUS" config="template;show">
 			<script type="text/html">
 				<div><b>{{ value.status }}</b>Status</div>
 				<div><b>{{ value.topic }}</b>Topic</div>
