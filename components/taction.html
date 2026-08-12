@@ -3,7 +3,7 @@
 	exports.id = 'taction';
 	exports.name = 'Action';
 	exports.icon = 'ti ti-totaljs';
-	exports.author = 'Total.js';
+	exports.author = 'Peter Širka | Total.js';
 	exports.version = '1';
 	exports.group = 'Total.js';
 	exports.config = { partial: false, name: 'Unknown', input: '', query: '', color: '#68B25B', params: '', user: 0, permissions: '', code: '// model\n// $.query\n// $.params\n// $.headers\n// $.user\n\n$.success();', strerr: false, path: 'response', autoresponse: false };
@@ -477,7 +477,7 @@ __Methods__:
 	.CLASS-code .CodeMirror { border: 0; border-left: 1px solid #E0E0E0; border-radius: none; }
 	.CLASS-code-editor { margin-left: 200px; }
 	.CLASS-code-info { float: left; width: 200px; padding: 12px; font-size: 12px; }
-	.CLASS-code-info code { overflow-wrap: break-word; white-space: pre-wrap; display: block; padding: 0 3px; }
+	.CLASS-code-info code { overflow-wrap: break-word; /* white-space: pre-wrap; */ display: block; padding: 0 3px; }
 	.CLASS-code-button { padding: 10px; border-top: 1px solid #E0E0E0; }
 	.CLASS-code-button button { font-size: 14px; height: 36px; font-weight: bold; }
 	.CLASS-settings .iconmenu { height: 80px; }
@@ -532,9 +532,10 @@ __Methods__:
 				instance.reconfigure(config);
 			};
 			W.codeactionsinit = function(com) {
+				/*
 				var save = () => W.codeactionssubmit(com.element);
 				var map = { 'Cmd-S': save, 'Ctrl-S': save };
-				com.editor.addKeyMap(map);
+				com.save.addKeyMap(map);*/
 			};
 		}
 
@@ -546,7 +547,7 @@ __Methods__:
 			var write = function(name, label) {
 				if (config[name]) {
 					builder.push('<div class="b badge badge-gray" style="display:block">{0}</div>'.format(label));
-					var val = config[name].replace(/\,/g, '\n');
+					var val = config[name].replace(/\,/g, '\n').trim();
 					builder.push('<div class="m mt5"><code>{0}</code></div>'.format(val));
 				}
 			};
@@ -583,7 +584,7 @@ __Methods__:
 
 			SET(path, config.code);
 
-			PUSH('common.windows', { id: winid, cachekey: 'codeaction', cache: 'readme', html: '<div class="CLASS-code invisible"><div class="CLASS-code-info noscrollbar">{1}</div><div class="CLASS-code-editor"><ui-component name="codemirror" path="{0}" config="type:javascript;parent:auto;margin:60;$init:codeactionsinit"></ui-component></div><div class="CLASS-code-button"><button class="button exec" data-exec="codeactionssubmit">Apply</button></div></div>'.format(path, exports.renderschema()), title: 'Action script: ' + config.name, actions: { move: true, autosave: true, close: true, maximize: true, minimize: false }, offset: { x: ((WW / 2) - 275) >> 0, y: ((WH / 2) - 250) >> 0, width: 750, height: 500, minwidth: 200, minheight: 300, maxwidth: 1200, maxheight: 1200 }, make: function(el) {
+			PUSH('*windows', { id: winid, cachekey: 'codeaction', cache: 'readme', html: '<div class="CLASS-code invisible"><div class="CLASS-code-info noscrollbar">{1}</div><div class="CLASS-code-editor"><ui-component name="code" path="{0}" config="type:serverside;parent:auto;margin:60;$init:codeactionsinit"></ui-component></div><div class="CLASS-code-button"><button class="button exec" data-exec="codeactionssubmit">Apply</button></div></div>'.format(path, exports.renderschema()), title: 'Action script: ' + config.name, actions: { move: true, autosave: true, close: true, maximize: true, minimize: false }, offset: { x: ((WW / 2) - 275) >> 0, y: ((WH / 2) - 250) >> 0, width: 750, height: 500, minwidth: 200, minheight: 300, maxwidth: 1200, maxheight: 1200 }, make: function(el) {
 				el.closest('.ui-windows-item').css('z-index', 50);
 				el.find('.CLASS-code').rclass('invisible', 500);
 			}});
