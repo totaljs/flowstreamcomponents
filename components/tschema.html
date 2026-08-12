@@ -64,14 +64,12 @@ __Supported types__:
 - `tinyint`
 - `{A|B|C}` enum type
 - `[type]` means array
-- `{ name:String, age:Number }` means nested object
-- `[ name:String, age:Number ]` means array with an object
 - `*something:type` is `required` field
 </readme>
 
 <settings>
 	<div class="padding">
-		<ui-component name="input" path="?.schema" config="placeholder:name\:Name, *email\:Email">Schema</ui-component>
+		<ui-component name="input" path="?.schema" config="placeholder:name\:Name, *email\:Email;monospace:1;required:1">Schema</ui-component>
 		<hr />
 		<ui-component name="input" path="?.partial" config="type:checkbox">Allow partial data</ui-component>
 		<ui-component name="input" path="?.strerr" config="type:checkbox">Convert errors to a string</ui-component>
@@ -80,6 +78,7 @@ __Supported types__:
 
 <style>
 	.CLASS footer { padding: 10px; font-size: 12px; }
+	.CLASS footer ui-bind { white-space: pre-line; overflow-wrap: break-word; }
 </style>
 
 <body>
@@ -87,6 +86,20 @@ __Supported types__:
 		<i class="$ICON"></i>$NAME
 	</header>
 	<footer>
-		<ui-bind path="CONFIG.schema" config="text" class="block monospacce"></ui-bind>
+		<ui-bind path="CONFIG.schema" config="html:Thelpers.tschema(value)" class="block monospace"></ui-bind>
 	</footer>
 </body>
+
+<script>
+	Thelpers.tschema = function(val) {
+		if (!val)
+			return '';
+		let arr = val.split(',').trim();
+		let builder = [];
+		for (let m of arr) {
+			let tmp = m.split(':').trim();
+			builder.push('{0}: <b>{1}</b>'.format(tmp[0].replace('*', '<span class="red">*</span>'), tmp[1]));
+		}
+		return builder.join('<br>');
+	};
+</script>
