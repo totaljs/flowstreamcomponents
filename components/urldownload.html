@@ -4,7 +4,7 @@
 	exports.name = 'URL download';
 	exports.icon = 'ti ti-download';
 	exports.author = 'Peter Širka | Total.js';
-	exports.version = '1';
+	exports.version = '2';
 	exports.group = 'Common';
 	exports.config = { prop: 'url', path: 'response' };
 	exports.inputs = [{ id: 'input', name: 'Input' }];
@@ -49,20 +49,18 @@ The component downloads content from the given URL.
 
 __Payload__:
 
-```js
-{
-	url: "https://www.totaljs.com"
-}
+```html
+https://www.totaljs.com
 ```
 
-__Response__:
+or
 
 ```js
 {
-	url: "https://www.totaljs.com",
-	response: "<!html .... >"
+	url: 'https://www.totaljs.com'
 }
 ```
+
 </readme>
 
 <settings>
