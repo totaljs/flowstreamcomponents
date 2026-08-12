@@ -1,0 +1,32 @@
+<script total>
+
+	exports.id = 'trestart';
+	exports.name = 'Restart';
+	exports.icon = 'ti ti-recycle';
+	exports.author = 'Peter Širka | Total.js';
+	exports.version = '1';
+	exports.group = 'Total.js';
+	exports.config = {};
+	exports.inputs = [{ id: 'input', name: 'Restart' }];
+	exports.outputs = [];
+
+	exports.make = function(instance, config) {
+		instance.message = instance.trigger = function($) {
+			if ($ && $.destroy)
+				$.destroy();
+			instance.main.restart();
+		};
+	};
+
+</script>
+
+<readme>
+This component restarts the current FlowStream.
+</readme>
+
+<body>
+	<header>
+		<button name="trigger" class="button">Restart</button>
+		<i class="$ICON"></i>$NAME
+	</header>
+</body>
