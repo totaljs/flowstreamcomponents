@@ -3,10 +3,10 @@
 	exports.id = 'request';
 	exports.name = 'HTTP Request';
 	exports.group = 'Common';
-	exports.version = '7';
+	exports.version = '8';
 	exports.icon = 'ti ti-cloud-download';
-	exports.author = 'Total.js';
-	exports.config = { url: '', method: 'GET', dnscache: true, insecure: false, secret: '', nocookies: true, xhr: false, parse: true, timeout: 10000, limit: 1024 * 500, responsebody: true, headers: {}, cookies: {}, serialize: null, send: 'all' };
+	exports.author = 'Peter Širka | Total.js';
+	exports.config = { url: '', method: 'GET', dnscache: true, insecure: false, secret: '', nocookies: true, xhr: false, parse: true, timeout: 10000, limit: 1024 * 500, responsebody: true, headers: {}, cookies: {}, serialize: null, send: 'all', path: '', path2: '', patherr: '' };
 	exports.inputs = [{ id: 'payload', name: 'Payload' }];
 	exports.outputs = [{ id: 'response', name: 'Response' }, { id: 'error', name: 'Error' }];
 
@@ -44,25 +44,28 @@
 			var secret = config.secret ? $.variables(config.secret, true) : null;
 
 			if (config.serialize) {
+
+				let payload = config.path ? Utils.get($.data, config.path) : $.data;
+
 				switch (config.serialize) {
 
 					case 'json':
 						opt.type = 'json';
 						if (opt.method !== 'GET')
-							opt.body = JSON.stringify($.data);
+							opt.body = JSON.stringify(payload);
 						break;
 
 					case 'urlencoded':
 						opt.type = 'urlencoded';
 						if (opt.method === 'GET')
-							opt.query = U.toURLEncode($.data);
+							opt.query = U.toURLEncode(payload);
 						else
-							opt.body = U.toURLEncode($.data);
+							opt.body = U.toURLEncode(payload);
 						break;
 
 					case 'buffer':
 						opt.type = 'raw';
-						opt.body = $.data;
+						opt.body = payload;
 						break;
 
 				}
@@ -99,7 +102,12 @@
 			opt.callback = function(err, response) {
 
 				if (err) {
-					$.data = err + '';
+
+					if (config.patherr)
+						Utils.set($.data, config.patherr, err);
+					else
+						$.data = err + '';
+
 					$.send('error');
 					return;
 				}
@@ -110,12 +118,20 @@
 				}
 
 				if (config.send === 'headers') {
-					$.send('response', response.headers);
+					if (config.path2) {
+						Utils.set($.data, config.path2, response.headers);
+						$.send('response');
+					} else
+						$.send('response', response.headers);
 					return;
 				}
 
 				if (config.send === 'status') {
-					$.send('response', response.status);
+					if (config.path2) {
+						Utils.set($.data, config.path2, response.status);
+						$.send('response');
+					} else
+						$.send('response', response.status);
 					return;
 				}
 
@@ -149,16 +165,22 @@
 					}
 				}
 
+				let tmp;
+
 				switch (config.send) {
 					case 'all':
-						$.data = { headers: response.headers, cookies: response.cookies, status: response.status, host: response.host, body: body };
+						tmp = { headers: response.headers, cookies: response.cookies, status: response.status, host: response.host, body: body };
 						break;
 					case 'response':
-						$.data = body;
+						tmp = body;
 						break;
 				}
 
-				$.send('response');
+				if (config.path2) {
+					Utils.set($.data, config.path2, tmp);
+					$.send('response');
+				} else
+					$.send('response', tmp);
 			};
 
 			REQUEST(opt);
@@ -228,6 +250,11 @@ __Response__:
 			<div class="col-md-6 m">
 				<ui-component name="input" path="?.send" config="required:1;dirsource:all|Everything,response|Response body,chunks|Chunks of buffer,headers|Headers only,status|Status code">Send to output</ui-component>
 			</div>
+		</div>
+		<div class="grid-3">
+			<ui-component name="input" path="?.path" config="monospace:1" class="m">Read path</ui-component>
+			<ui-component name="input" path="?.path2" config="monospace:1" class="m">Write path</ui-component>
+			<ui-component name="input" path="?.patherr" config="monospace:1" class="m">Error path</ui-component>
 		</div>
 	</div>
 	<hr class="nmt nmb" />
