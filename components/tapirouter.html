@@ -4,9 +4,9 @@
 	exports.name = 'API Router';
 	exports.group = 'Total.js';
 	exports.icon = 'ti ti-crosshairs';
-	exports.version = '2';
-	exports.author = 'Total.js';
-	exports.config = { path: 'response', schema: [{ id: 'o1984', name: 'users_read/{id}' }] };
+	exports.version = '3';
+	exports.author = 'Peter Širka | Total.js';
+	exports.config = { path: 'response', payload: false, schema: [{ id: 'o1984', name: 'Users|read' }] };
 	exports.outputs = [];
 	exports.kind = 'action';
 	exports.inputs = [{ id: 'input', name: 'Payload' }];
@@ -17,7 +17,7 @@
 
 		instance.message = function($) {
 
-			var data = $.data.payload || $.data.body;
+			var data = $.data.payload || $.data.body || $.data;
 			if (data && typeof(data.schema) === 'string') {
 
 				var index;
@@ -49,9 +49,16 @@
 							params[meta.params[i]] = schema.params[i];
 
 						let payload = $.data;
-						payload.query = schema.query ? DEF.parsers.urlencoded(schema.query) : {};
-						payload.payload = data.data;
-						payload.params = params;
+
+						if (config.payload) {
+							$.data = data.data;
+						} else {
+							payload.query = schema.query ? DEF.parsers.urlencoded(schema.query) : {};
+							payload.payload = data.data;
+							payload.params = params;
+							delete data.data;
+						}
+
 						$.send(meta.id);
 						return;
 					}
@@ -163,6 +170,9 @@ In the case of  `error`, the input data is extended by the `response` property w
 <settings>
 	<div class="CLASS-settings">
 		<div class="padding">
+
+			<ui-component name="input" path="?.payload" config="type:checkbox">Send next only payload without schema</ui-component>
+			<hr />
 			<div class="caption m">
 				<div class="toolbar">
 					<nav>
@@ -171,7 +181,7 @@ In the case of  `error`, the input data is extended by the `response` property w
 				</div>
 				<label>Schema</label>
 			</div>
-			<div class="message message-alert"><i class="ti ti-exclamation-triangle"></i>Every name of identifier must be unique per Flow. You can use dynamic arguments in the form <code>{argument_name}</code></div>
+			<div class="message message-alert"><i class="ti ti-exclamation-triangle"></i>The name of every identifier must be unique within a Flow. You can use dynamic arguments in the form <code>{argument_name}</code>.</div>
 			<ui-bind path="?.schema" config="template:figure --> data-id;show:value && value.length" class="fields m block">
 				<script type="text/html">
 					{{ foreach m in value }}
@@ -188,7 +198,6 @@ In the case of  `error`, the input data is extended by the `response` property w
 					{{ end }}
 				</script>
 			</ui-bind>
-			<div class="help">Use names in lower-case. We recommend to keep e.g. <code>users_read/{id}</code> or <code>products_read/{id}</code></div>
 			<ui-component name="changer" path="?.schema"></ui-component>
 		</div>
 	</div>
@@ -267,7 +276,7 @@ In the case of  `error`, the input data is extended by the `response` property w
 					var scope = M.is20 ? opt.element.plugin() : opt.element.scope();
 					var id = ATTRD(opt.element);
 					var item = scope.get().schema.findItem('id', id);
-					item.name = opt.value.toLowerCase();
+					item.name = opt.value;
 					scope.update('schema @change');
 					next(true);
 				};
