@@ -7,7 +7,7 @@
 	exports.icon = 'ti ti-clock';
 	exports.author = 'Total.js';
 	exports.inputs = [{ id: 'input', name: 'Input' }];
-	exports.outputs = [{ id: 'output', name: 'Output' }];
+	exports.outputs = [{ id: 'output', name: 'Stats' }];
 
 	exports.make = function(instance, config) {
 
@@ -43,7 +43,7 @@
 			stats.count++;
 
 			instance.status(stats, 500);
-			$.send('output', stats);
+			$.send('stat', stats);
 		};
 
 	};
@@ -51,7 +51,7 @@
 </script>
 
 <readme>
-The component counts message duration. All values except `count` are defined in seconds.
+The component counts the duration of the message. All values except count are defined in seconds. Place this component at the end of the flow.
 
 __Output__:
 
