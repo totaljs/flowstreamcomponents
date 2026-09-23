@@ -74,11 +74,11 @@ __Output__:
 
 <body>
 	<header>
-		<i class="ICON"></i>NAME
+		<i class="$ICON"></i>$NAME
 	</header>
 	<footer >
-		<button class="exec button" data-exec="FUNC.trigger">Reset</button>
-		<ui-bind path="STATUS" config="template;.keyvalue" class="mt10 block">
+		<button name="trigger" class="button">Reset</button>
+		<ui-bind path="$STATUS" config="template:.keyvalue" class="mt10 block">
 			<script type="text/html">
 				<div class="keyvalue small">
 					<span>Min</span>
