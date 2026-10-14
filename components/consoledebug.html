@@ -3,11 +3,11 @@
 	exports.id = 'consoledebug';
 	exports.name = 'Console debug';
 	exports.group = 'Flow';
-	exports.version = '2';
+	exports.version = '3';
 	exports.icon = 'ti ti-circle-alt';
 	exports.color = '#E73323';
 	exports.author = 'Peter Širka | Total.js';
-	exports.config = { watch: [] };
+	exports.config = { watch: [], native: true, console: false };
 	exports.meta = { singleton: true };
 
 	exports.make = function(instance, config) {
@@ -41,9 +41,9 @@
 				filter = null;
 
 			if (config.console) {
-				console.log = (...args) => instance.status({ date: NOW = new Date(), data: Total.Util.format(...args.filter(value => value !== undefined)) });
-				console.error = (...args) => instance.status({ type: 'error', date: NOW = new Date(), data: Total.Util.format(...args.filter(value => value !== undefined)) });
-				console.warn = (...args) => instance.status({ type: 'warning', date: NOW = new Date(), data: Total.Util.format(...args.filter(value => value !== undefined)) });
+				console.log = (...args) => instance.status({ native: config.native, date: NOW = new Date(), data: Total.Util.format(...args.filter(value => value !== undefined)) });
+				console.error = (...args) => instance.status({ native: config.native, type: 'error', date: NOW = new Date(), data: Total.Util.format(...args.filter(value => value !== undefined)) });
+				console.warn = (...args) => instance.status({ native: config.native, type: 'warning', date: NOW = new Date(), data: Total.Util.format(...args.filter(value => value !== undefined)) });
 			} else {
 				console.log = cache.log;
 				console.warn = cache.warn;
@@ -70,7 +70,10 @@ The component can print the payload of incoming messages and `instance.debug()` 
 
 <settings>
 	<div class="padding">
-		<ui-component name="input" path="?.console" config="type:checkbox" class="m">Capture all <code>console.log()</code></ui-component>
+		<ui-component name="input" path="?.console" config="type:checkbox">Capture all <code>console.log()</code></ui-component>
+		<ui-bind path="?.console" config="enabled">
+			<ui-component name="input" path="?.native" config="type:checkbox" class="m">Append the log messages to the native web developer console</ui-component>
+		</ui-bind>
 		<hr />
 		<ui-component name="input" path="%debugsearch" config="type:search;placeholder:Search components" class="m">Search</ui-component>
 		<ui-component name="search" path="%debugsearch" config="selector:figure">
@@ -102,8 +105,13 @@ The component can print the payload of incoming messages and `instance.debug()` 
 <script>
 	TOUCH(function(exports, reinit) {
 		exports.status = function(data) {
-			if (data && data.date)
-				EXEC('flow/log', data.type || 'info', data.date.format('[ts]') + ': ' + data.data);
+			if (data && data.date) {
+				if (W.console && data.native) {
+					let fn = console[data.type || 'log'];
+					fn(data.date.format('yyyy-MM-dd HH:mm:ss'), data.data);
+				} else
+					EXEC('flow/log', data.type || 'info', data.date.format('[ts]') + ': ' + data.data);
+			}
 		};
 	});
 </script>
