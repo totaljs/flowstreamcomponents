@@ -1,0 +1,297 @@
+<script total>
+
+	exports.id = 'aiagent';
+	exports.name = 'AI Agent';
+	exports.icon = 'ti ti-brain';
+	exports.author = 'Peter Širka | Total.js';
+	exports.version = '1';
+	exports.group = 'AI';
+	exports.config = { model: 'gpt-4o-mini', thinking: true, url: 'https://api.openai.com/v1/chat/completions', token: '', parser: 'openai', tools: [], timeout: 60 };
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }, { id: 'error', name: 'Error' }];
+
+	exports.call = function(data, next){
+		let response = [];
+		for (let key in Total.actions) {
+			let action = Total.actions[key];
+			if (action.name && action.istool)
+				response.push({ id: key, name: action.name });
+		}
+		next(response);
+	};
+
+	exports.make = function(instance, config) {
+
+		let opt = {};
+		let TOOLS = {};
+		let thinking = [];
+
+		instance.message = function($) {
+
+			// opt.messages {Object Array}
+			// opt.model {String}
+			// opt.tools {String Array}
+			// opt.think {Boolean}
+			// opt.format {String}
+			// opt.options {Object}
+			// opt.url {String}
+
+
+			let status = {};
+
+			status.id = GUID(4);
+			status.thinking = '';
+
+			instance.activity(status.id, status.id + ': ' + $.data.messages[0].content.max(50));
+
+			thinking.push(status);
+
+			let callback = function(err, messages) {
+				thinking.splice(thinking.indexOf(status), 1);
+				instance.status(thinking, 200);
+				instance.activity(status.id, null);
+				if (err) {
+					$.data.messages.push({ role: 'developer', content: err });
+					$.send('error');
+				} else {
+					$.data.messages = messages;
+					$.send('output');
+				}
+			};
+
+			if (typeof(opt.tools) === 'string')
+				opt.tools = opt.tools.split(',').trim();
+
+			let limits = {};
+			let payload = {};
+
+			payload.messages = $.data.messages;
+
+			if (opt.tools) {
+				payload.tools = [];
+				for (let tool of opt.tools.trim()) {
+
+					if (!TOOLS[tool]) {
+						let action = Total.actions[tool];
+						if (!action) {
+							callback('Tool "{0}" not found.'.format(tool));
+							return;
+						}
+						let schema = action.jsinput ? action.jsinput.toAITool(tool) : { type: 'function', function: { name: tool, parameters: { type: 'object', properties: {}, required: [] }}};
+						schema.function.description = action.summary;
+						TOOLS[tool] = schema;
+					}
+
+					let at = Total.actions[tool];
+					limits[tool] = at?.config?.limit || 1000;
+
+					if (at?.config?.end)
+						opt.end = tool;
+
+					payload.tools.push(TOOLS[tool]);
+				}
+			}
+
+			let parser = AIPARSER('openai');
+			let req = {};
+
+			opt.thinking && parser.on('thinking', function(obj) {
+				status.thinking = obj.thinking;
+				instance.status(thinking, 200);
+			});
+
+			payload.model = opt.model;
+			payload.stream = true;
+
+			req.method = 'POST';
+			req.url = opt.url;
+			req.timeout = config.timeout * 1000;
+			req.custom = true;
+			req.type = 'json';
+			req.body = JSON.stringify(payload);
+
+			if (opt.token)
+				req.headers = { authorization: 'Bearer ' + opt.token };
+
+			req.callback = function(err, response) {
+
+				let lines = [];
+
+				if (response.status !== 200) {
+
+					if (response.stream) {
+						let buffer = [];
+						response.stream.on('data', chunk => buffer.push(chunk));
+						response.stream.on('end', function() {
+							let data = Buffer.concat(buffer).toString('utf8').parseJSON();
+							callback(data?.error?.message || data, opt);
+						});
+					} else {
+						callback(response.status + '', opt);
+					}
+					return;
+				}
+
+				response.stream.on('data', chunk => parser.write(chunk));
+				response.stream.on('end', function() {
+
+					let output = parser.end();
+					status.thinking = '';
+					instance.status(thinking, 200);
+
+					if (output.reasoning === 'tool') {
+
+						payload.messages.push({
+							role: 'assistant',
+							content: null,
+							tool_calls: output.tools.map(tool => ({
+								id: tool.id,
+								type: 'function',
+								function: {
+									name: tool.name,
+									arguments: JSON.stringify(tool.arguments)
+								}
+							}))
+						});
+
+						output.tools.wait(function(tool, next) {
+
+							if (limits[tool.name] == null) {
+								payload.messages.push({
+									role: 'tool',
+									tool_call_id: tool.id,
+									content: JSON.stringify(tool_error(tool, 'TOOL_CALL_LIMIT_EXCEEDED', 'The maximum number of executions has been exceeded.'))
+								});
+								next();
+								return;
+							}
+
+							if (limits[tool.name] <= 0) {
+								payload.messages.push({
+									role: 'tool',
+									tool_call_id: tool.id,
+									content: JSON.stringify(tool_error(tool, 'TOOL_NOT_FOUND', 'The requested tool does not exist.'))
+								});
+								next();
+								return;
+							}
+
+							limits[tool.name] -= 1;
+
+							let fn = opt.tools.findItem(n => n.function?.name === tool.name);
+							ACTION(tool.name, tool.arguments).user(opt.user).callback(function(err, response) {
+								if (tool.name === opt.end)
+									output.END = response;
+								let res = JSON.stringify(err ? tool_error(tool, 'TOOL_ERROR', err.toString()) : response);
+								payload.messages.push({ role: 'tool', tool_call_id: tool.id, content: res });
+								next();
+							});
+
+						}, function() {
+							if (output.END) {
+								payload.messages.push({ role: 'assistant', content: output.content });
+								callback(null, output.END);
+							} else {
+								status.thinking = '';
+								instance.status(thinking, 200);
+								parser.reset();
+								req.body = JSON.stringify(payload);
+								REQUEST(req);
+							}
+						});
+					} else {
+						payload.messages.push({ role: 'assistant', content: output.content });
+						callback(null, payload.messages);
+					}
+				});
+			};
+
+			REQUEST(req);
+		};
+
+		instance.configure = function() {
+			opt = instance.replace(config);
+		};
+
+		instance.configure();
+
+	};
+
+</script>
+
+<readme>
+This component performs AI request to OpenAI or OLLAMA.
+
+__Payload__:
+
+```js
+[
+	{
+		role: 'user',
+		content: 'Prompt'
+	}
+]
+```
+
+__Output__:
+
+```js
+[
+	{
+		role: 'user',
+		content: 'Prompt'
+	},
+	{
+		role: 'assistant',
+		content: 'Response'
+	}
+]
+```
+</readme>
+
+<settings>
+	<div class="padding">
+		<ui-component name="input" path="?.url" config="required:1;monospace:1" class="m">URL to provider</ui-component>
+		<ui-component name="input" path="?.token" config="camouflage:1;monospace:1" class="m">Token</ui-component>
+		<ui-component name="input" path="?.model" config="required:1;monospace:1" class="m">Model</ui-component>
+		<ui-component name="input" path="?.tools" config="dirsource:#aitools;multiple:1" class="m">Tools</ui-component>
+		<ui-component name="input" path="?.thinking" config="type:checkbox" class="m">Thinking</ui-component>
+	</div>
+</settings>
+
+<script>
+	ON('configure_aiagent', function(data) {
+		data.call({}, function(response) {
+			SET('#aitools', response);
+		}, true);
+	});
+</script>
+
+<style>
+	.CLASS { width: 100%; }
+	.CLASS footer { font-size: 11px; }
+	.CLASS footer .model { padding: 10px; display: block; }
+	.CLASS footer .thinking figure { border-top: 1px solid rgba(0,0,0,0.1); padding: 10px; font-size: 11px; display: block; }
+</style>
+
+<body>
+	<header>
+		<i class="$ICON"></i>$NAME
+	</header>
+	<footer>
+		<ui-bind path="$CONFIG" config="template" class="model">
+			<script type="text/html">
+				Model: <b>{{ value.model | empty }}</b>
+			</script>
+		</ui-bind>
+		<ui-bind path="$STATUS" config="template:figure" class="thinking">
+			<script type="text/html">
+			{{ foreach m in value }}
+				{{ if m.thinking }}
+				<figure><i class="ti ti-lightbulb-on mr5"></i><span class="mr5 badge badge-gray badge-small">{{ m.id }}</span>{{ m.thinking }}</figure>
+				{{ fi }}
+			{{ end }}
+			</script>
+		</ui-bind>
+	</footer>
+</body>

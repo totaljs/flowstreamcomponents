@@ -1,0 +1,93 @@
+<script total>
+
+	exports.id = 'aitool';
+	exports.name = 'AI Tool';
+	exports.icon = 'ti ti-brain';
+	exports.author = 'Peter Širka | Total.js';
+	exports.version = '1';
+	exports.group = 'AI';
+	exports.config = { code: "$.callback({ message: input.message });", name: 'print', summary: 'This tool prints a input value', input: '*message:String', output: 'message:String', color: '#4285F4' };
+	exports.inputs = [{ id: 'input', name: 'Test' }];
+	exports.outputs = [{ id: 'output', name: 'Test' }];
+
+	exports.make = function(instance, config) {
+
+		let action;
+
+		instance.message = function($) {
+			ACTION(config.name, $.data).callback(function(err, response) {
+				$.send('output', err || response);
+			});
+		};
+
+		instance.configure = function() {
+			let fn = new Function('$', 'let input = model = data = $.model;\n' + config.code);
+			action && action.remove();
+			action = NEWACTION(config.name, {
+				name: config.name,
+				istool: true,
+				summary: config.summary,
+				mpc: true,
+				input: config.input,
+				output: config.output,
+				action: fn
+			});
+		};
+
+		instance.close = function() {
+			action && action.remove();
+		};
+
+		instance.configure();
+
+	};
+
+</script>
+
+<style>
+	.CLASS .content { min-width: 200px; }
+	.CLASS header { color: #FFF; padding: 5px; }
+	.CLASS header div { border-radius: var(--radius); padding: 3px 5px; }
+	.CLASS footer > div { padding: 10px 10px 0; }
+	.ui-dark .CLASS-code .CodeMirror { border-left-color: #404040; }
+	.ui-dark .CLASS-code-button { border-top-color: #404040; }
+</style>
+
+<readme>
+This component registers a new AI Tool. It will register a new Total.js Action in the background. This tool can be used in AI Agent component.
+</readme>
+
+<settings>
+	<div class="CLASS-settings">
+		<div class="padding bg-smoke">
+			<ui-component name="input" path="?.name" config="required:1" class="m">Action name</ui-component>
+			<ui-component name="input" path="?.summary" class="m">Description</ui-component>
+			<hr />
+			<div class="m">
+				<ui-component name="input" path="?.input" config="monospace:1;maxlength:100000;placeholder:name\:Name, *email\:Email">Input schema</ui-component>
+			</div>
+			<div class="m">
+				<ui-component name="input" path="?.output" config="monospace:1;maxlength:100000;placeholder:name\:Name, *email\:Email">Output schema</ui-component>
+			</div>
+		</div>
+	</div>
+	<ui-component name="code" path="?.code" config="type:serverside;height:300"></ui-component>
+</settings>
+
+<body>
+	<header>
+		<ui-bind path="$CONFIG" config="template">
+			<script type="text/html">
+				<div style="background-color:{{ value.color }}" class="b"><i class="ti ti-brain mr5"></i>{{ value.name }}</div>
+			</script>
+		</ui-bind>
+	</header>
+	<footer>
+		<ui-bind path="$CONFIG" config="template" class="block fs11" style="padding:10px">
+			<script type="text/html">
+				{{ if value.input }}<div><i class="ti ti-check-square green mr5"></i>Input</div>{{ fi }}
+				{{ if value.output }}<div><i class="ti ti-check-square green mr5"></i>Output</div>{{ fi }}
+			</script>
+		</ui-bind>
+	</footer>
+</body>
