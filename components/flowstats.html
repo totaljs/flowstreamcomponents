@@ -1,0 +1,90 @@
+<script total>
+
+	exports.id = 'flowstats';
+	exports.name = 'Flow stats';
+	exports.icon = 'ti ti-chart-line';
+	exports.author = 'Peter Širka | Total.js';
+	exports.version = '1';
+	exports.group = 'Flow';
+	exports.config = { path: 'stats' };
+	exports.inputs = [{ id: 'input', name: 'Input' }];
+	exports.outputs = [{ id: 'output', name: 'Output' }];
+
+	exports.make = function(instance, config) {
+
+		instance.message = function($) {
+
+			let data = $.data;
+			let stats = instance.main.stats;
+			let payload = {};
+			let activities = [];
+
+			for (let key in instance.main.activities) {
+				let tmp = instance.main.activities[key];
+				for (let key2 in tmp) {
+					let activity = tmp[key2];
+					if (activity.value)
+						activities.push({ value: activity.value });
+				}
+			}
+
+			payload.memory = stats.memory;
+			payload.online = stats.online;
+			payload.paused = stats.paused;
+			payload.errors = stats.errors;
+			payload.messages = stats.messages;
+			payload.pending = stats.pending;
+			payload.mm = stats.mm;
+			payload.minutes = stats.minutes;
+			payload.activities = activities.length ? Math.ceil(activities.reduce((sum, item) => sum + item.value, 0) / activities.length) : 0;
+
+			if (config.path) {
+				if (config.path.includes('.'))
+					U.set(data, config.path, payload);
+				else
+					data[config.path] = payload;
+			} else
+				data = payload;
+
+			$.send('output', data);
+		};
+
+	};
+
+</script>
+
+<readme>
+This component reads internal stats from the FlowStream.
+
+__Output__:
+
+```js
+{
+	"memory": 21399128,
+	"online": 1,
+	"paused": false,
+	"errors": 0,
+	"messages": 395333,
+	"pending": 1,
+	"mm": 40,
+	"minutes": 67921,
+	"activities": 0
+}
+```
+</readme>
+
+<settings>
+	<div class="padding">
+		<ui-component name="input" path="?.path" config="placeholder:path.to.property">Write path</ui-component>
+	</div>
+</settings>
+
+<style>
+	.CLASS footer { padding: 10px; font-size: 12px; }
+</style>
+
+<body>
+	<header>
+		<i class="$ICON"></i>$NAME
+	</header>
+</body>
