@@ -3,7 +3,7 @@
 	exports.id = 'consoledebug';
 	exports.name = 'Console debug';
 	exports.group = 'Flow';
-	exports.version = '3';
+	exports.version = '4';
 	exports.icon = 'ti ti-circle-alt';
 	exports.color = '#E73323';
 	exports.author = 'Peter Širka | Total.js';
@@ -24,12 +24,18 @@
 				return;
 			NOW = new Date();
 			instance.status({ date: new Date(), data: meta.module.name + ' - ' + Total.Util.format(...args.filter(value => value !== undefined)) });
-		};
+		}
+
+		function onreset() {
+			instance.status(null);
+		}
 
 		instance.main.on('debug', ondebug);
+		instance.main.on('reset', onreset);
 
 		instance.close = function() {
 			instance.main.off('debug', ondebug);
+			instance.main.off('reset', onreset);
 		};
 
 		instance.configure = function() {
